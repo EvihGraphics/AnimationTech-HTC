@@ -1,0 +1,139 @@
+Hi, in the previous video we've seen how we could compute an ARMIT curve and the
+ARMIT curve is using two points and two tangents to draw a curve in between and
+we started to paste a few of those back-to-back so we could have a spline
+automatically drawn between all the points. What we want to do now is
+actually having the fact that we can have a bunch of points and have a
+a function that goes through those points. So really an interpolation spline without the need
+for us to compute that tangent of each point, but to just let the the data itself decide
+what the tangent would be. And that's what the cardinal spline is. The cardinal spline basically
+takes a bunch of points and compute the tangent for us at each point. So we could use mid-curve
+in between. However, it does it. It's basically taking the four specific points. It takes the
+point after the point before, draw that line between the two, and that's the the tangent
+that we'll be using for that point. And then we have a s factor in front of that tangent,
+so we could decide to scale it up and down to give it more importance or less importance
+when we draw the curve itself. So I have a function here that is cardinal to omit
+with the sFactor, basically takes a bunch of points
+and returns a list of points,
+tangents, point, tangents of our derivative every time.
+So we could pass that to the animate functions we had before.
+And if I draw this, basically that's what it gave you.
+You could see that, of course,
+the first point and the last point,
+you don't have any curve coming in or out of it.
+That's just because we don't have enough points before
+after to compute what the tangent will be for this guy.
+But you have that S factor that can decide how big is the tangent.
+So if I bring that S to 0, I basically
+scaling down completely my tangent.
+So I have linear interpolation between all of my points.
+And I can go up and go as crazy and having really weird curves
+by increasing the tangent size for my function.
+Now, it works.
+The only issue we have with this kind of system
+is that the S factor is not really intuitive to use.
+It doesn't represent much except for mathematical purpose.
+Usually when we start to work with planes,
+it comes from the drawing and the physical world.
+So, we tend to want to use something that is more meaningful for the user.
+So what we have is a tension parameter instead.
+The tension parameters make more sense in the physical world, because imagine you are
+trying to draw a spline using, you know, rope and paper.
+What you would have to think about is the tension you put inside of your string will
+actually decide what type of curve you're drawing.
+If you put really hard tensions, you basically have a line and if you let it completely loose,
+you will have a nice curve.
+So we tend to use tension because it's clearer to use as a concept.
+And so what we have is a tension parameters that can go between zero and one.
+Zero means zero tension, I have a nice curve.
+One being I'm pulling on my string maximum and I have a line basically, a straight line.
+So how do you compute that tension?
+give you your s factor from the previous algorithm, but what we have is 1 minus my tension divided by
+2. And so with a t that goes between 0 and 1, attention that goes between 0 and 1, what you
+have is that at 0 you have an s that is equal to 0.5 and at 1 you have an s that is 0. And
+And S that is 0.5 actually is a catmull rom spline.
+So if you are interested in animations,
+you probably have heard of the catmull rom spline.
+And basically it's a specific case
+and it's a cardinal spline with a S value of 0.5.
+That's it.
+So what I have now is my function as a cardinal to omit.
+Again, work the same way.
+So I gave a list of points
+and returns a list of points and derivative.
+I accept that I pass the tension now directly in
+and I compute my S using my tension
+and then everything else stays the same.
+So if I execute this and I execute my functions,
+now I have a function that is drone.
+And you can see that with a tension of zero
+have smooth functions and with a tension of one
+have linear functions.
+You might have noticed that now I actually have drone
+from the zero up to the last point.
+And the way to do this, it's actually
+by repeating the first points and repeating the last points
+inside of my list.
+So you always have something to compute that tangent.
+Now, what we've done so far is still
+using the AmidCurve functions we had before.
+and having a function that goes from cardinal to Hermit
+and then use the Hermit to draw the curve itself.
+What we can do is try to directly find a mathematical function
+that's allowed us to directly render a cardinal spline
+without the need to go through the Hermit function.
+And to do this, what we will do is basically start
+from the Hermit function.
+So I've started with the Amid function as what it was,
+you know, with the matrix form,
+and ask SimPy to compute it,
+and I get that formula, the one we have already seen,
+with the P1 multiplied by 2T cube and so on,
+and then you get the delta, the derivative point one,
+derivative point two, and all that kind of stuff.
+What I've done is instead of using point zero and point one,
+like we had before what I did is that I used 0.1 and 0.2 so I have a curve that is drawn between
+0.1 and 0.2 but it's just the same the same formula I have just changed the letter basically
+now what I can do is I know how the cardinal spline will actually compute my derivative for 0.1
+and my derivative 0.2. So I can use that function here and I can replace the derivative of 0.1
+by the actual formula which is the sp2 minus p0 and the same for the derivative 0.2 it's the s
+0.3 minus 0.1. And if I again ask it to solve for this and write it as a p0, p1, p2, p3 function,
+you could have now a really a p0, p1, p2, and p3 function directly with all the factors here.
+and then we don't have the derivative anymore inside of our matrix but what we have is a bunch of s
+that represents our curve. So I can now write this again as a matrix and see again it's the same
+structures as the matrix for the basic curve, the matrix for the Amid curve, now it's a matrix for
+the cardinal spline using directly the s inside of that matrix here. And I can have my cardinal
+functions now that directly draw a curve and doesn't go through the step of giving me a list of
+mid-spline and that kind of stuff. And if I execute this, now what I can do is of course render
+directly that same cardinal spline as the one I had before, except now that I directly compute
+the cardinal spline just using the points and not doing the intermediate step.
+Now there is one particularity to the cardinal spline and what it is is that it says that at best
+a cardinal spline has a C1 continuity and that might be a confusing term but basically what it means
+a C0 continuity means your function the continuity inside of a function so a continuous function
+is a function where you could always
+keep drawing in with one step.
+You don't have to lift your pen, basically.
+So you don't have discontinuity in your function.
+So at the C0, you have, well, for the function itself,
+it's continuous.
+You could see that with the hard tension, of course,
+even the C1 is my first derivative.
+I can see not my first derivative now
+is completely discontinuous.
+And it said that at best you could have a C1 continuity.
+So if I go with a really smooth function cardinal spline,
+you could see that I have my C1 continuity here.
+Actually, my derivative is continuous function also.
+But then if I try to get a C2 continuity,
+which is the second derivative,
+you could see that I don't have continuity
+inside of my C2, my second derivative.
+What that means is usually it's more important if we if we talk about animation in the sense of I don't know physics and that kind of stuff
+if my spline my cardinal spline here is for instance a
+Curve that represent the position of my object in time and I want my object to follow that curve
+What it means is that a C0 is the position of my object
+My first derivative is the speed of my object at every time.
+And my second derivative is the acceleration of my object.
+And you can see that I have discontinuity inside of my acceleration every time.
+It might be visible, it might not be an issue, depending on what you want to do.
+Every spline does compute different stuff.
+So the Cardinal Spline has at best a C1 continuity, and then we will see in the next video another type of Spline that I can actually give us a C2 continuity, and I'll see you next time.

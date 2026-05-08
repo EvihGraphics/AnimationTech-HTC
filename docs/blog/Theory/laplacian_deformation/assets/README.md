@@ -1,22 +1,32 @@
 # 素材清单
 
-本目录存放 `laplacian_deformation` 的学习型 cell 媒体。每张 PNG 都来自 `docs/blog/media_manifest.json` 指定的 notebook cell，并合成代码摘要、实际输出和结果读法。
+本目录存放 `laplacian_deformation` 的博客媒体。v5 媒体把正文结果图/动画和代码学习卡分开维护。
 
-## Walkthrough
-
-| 文件 | 来源 | 用途 |
-| --- | --- | --- |
-| `00-walkthrough.webm` | `.reports/blog_media_work/laplacian_deformation.ipynb` 的学习卡片序列 | The video walks through the case by sequencing its code-output learning cards. |
-
-## 媒体条目
-
-| 文件 | 锚点 | 输出类型 | 代码目的 | 结果意义 |
+| 文件 | 来源 | 类型 | 角色 | 说明 |
 | --- | --- | --- | --- | --- |
-| `01_strip_mesh_baseline.png` | Cell 5 | `viewer` | Generate and draw the initial 2D strip graph. | This baseline shows the graph vertices and edges before Laplacian reconstruction. |
-| `02_unanchored_reconstruction.png` | Cell 7 | `viewer` | Reconstruct vertices from differential coordinates without enough anchors. | The result shows why Laplacian coordinates alone do not fix global placement. |
-| `03_two_anchor_solve.png` | Cell 9 | `viewer` | Add endpoint anchors to stabilize the linear solve. | Anchors turn relative differential coordinates into a positioned shape. |
-| `04_three_anchor_deformation.png` | Cell 10 | `viewer` | Move an extra control point and solve the constrained system. | The viewer shows local deformation propagating through the graph. |
-| `05_vectorized_3d_solve.png` | Cell 19 | `viewer` | Use a Kronecker-product system for x/y/z coordinates. | The same linear machinery scales from 2D graph points to 3D animation vertices. |
-| `06_rotation_invariance_controls.png` | Cell 29 | `widget_controls` | Compare edge-length, rotation-invariance, and hard-constraint options. | The controls reveal which constraints preserve shape while allowing deformation. |
-| `07_animation_graph_deformation.png` | Cell 40 | `timeline_viewer` | Convert skeleton animation into a graph and reconstruct motion. | The timeline viewer shows Laplacian deformation applied to animated pose data. |
-| `08_curved_locomotion_result.png` | Cell 46 | `timeline_viewer` | Bend the walk trajectory and reconstruct the animated character. | The final viewer checks whether graph deformation can redirect locomotion smoothly. |
+| `00-walkthrough.webm` | case walkthrough | `walkthrough_webm` | `supporting_evidence` | 总览短视频 |
+| `01_strip_mesh_baseline_result.png` | Cell 5 | `result_png` | `key_visual` | Generated strip mesh baseline：This baseline shows the graph vertices and edges before Laplacian reconstruction. |
+| `01_strip_mesh_baseline.png` | Cell 5 | `learning_card` | `key_visual` | Generated strip mesh baseline：This baseline shows the graph vertices and edges before Laplacian reconstruction. |
+| `02_unanchored_reconstruction_result.png` | Cell 7 | `result_png` | `key_visual` | Unanchored Laplacian reconstruction：The result shows why Laplacian coordinates alone do not fix global placement. |
+| `02_unanchored_reconstruction.png` | Cell 7 | `learning_card` | `key_visual` | Unanchored Laplacian reconstruction：The result shows why Laplacian coordinates alone do not fix global placement. |
+| `03_two_anchor_solve_result.png` | Cell 9 | `result_png` | `key_visual` | Two-anchor reconstruction：Anchors turn relative differential coordinates into a positioned shape. |
+| `03_two_anchor_solve.png` | Cell 9 | `learning_card` | `key_visual` | Two-anchor reconstruction：Anchors turn relative differential coordinates into a positioned shape. |
+| `04_three_anchor_deformation_result.png` | Cell 10 | `result_png` | `key_visual` | Three-anchor deformation：The viewer shows local deformation propagating through the graph. |
+| `04_three_anchor_deformation.png` | Cell 10 | `learning_card` | `key_visual` | Three-anchor deformation：The viewer shows local deformation propagating through the graph. |
+| `05_vectorized_3d_solve_result.png` | Cell 19 | `result_png` | `key_visual` | Vectorized 3D Laplacian solve：The same linear machinery scales from 2D graph points to 3D animation vertices. |
+| `05_vectorized_3d_solve.png` | Cell 19 | `learning_card` | `key_visual` | Vectorized 3D Laplacian solve：The same linear machinery scales from 2D graph points to 3D animation vertices. |
+| `06_rotation_invariance_controls_result.png` | Cell 29 | `result_png` | `key_visual` | Rotation-invariant deformation controls：The controls reveal which constraints preserve shape while allowing deformation. |
+| `06_rotation_invariance_controls_preview.gif` | Cell 29 | `preview_gif` | `key_visual` | Rotation-invariant deformation controls：The controls reveal which constraints preserve shape while allowing deformation. |
+| `06_rotation_invariance_controls_preview.mp4` | Cell 29 | `video_mp4` | `key_visual` | Rotation-invariant deformation controls：The controls reveal which constraints preserve shape while allowing deformation. |
+| `06_rotation_invariance_controls_preview.webm` | Cell 29 | `video_webm` | `key_visual` | Rotation-invariant deformation controls：The controls reveal which constraints preserve shape while allowing deformation. |
+| `06_rotation_invariance_controls.png` | Cell 29 | `learning_card` | `key_visual` | Rotation-invariant deformation controls：The controls reveal which constraints preserve shape while allowing deformation. |
+| `07_animation_graph_deformation_result.png` | Cell 40 | `result_png` | `key_animation` | Animation graph reconstruction：The timeline viewer shows Laplacian deformation applied to animated pose data. |
+| `07_animation_graph_deformation_preview.gif` | Cell 40 | `preview_gif` | `key_animation` | Animation graph reconstruction：The timeline viewer shows Laplacian deformation applied to animated pose data. |
+| `07_animation_graph_deformation_preview.mp4` | Cell 40 | `video_mp4` | `key_animation` | Animation graph reconstruction：The timeline viewer shows Laplacian deformation applied to animated pose data. |
+| `07_animation_graph_deformation_preview.webm` | Cell 40 | `video_webm` | `key_animation` | Animation graph reconstruction：The timeline viewer shows Laplacian deformation applied to animated pose data. |
+| `07_animation_graph_deformation.png` | Cell 40 | `learning_card` | `key_animation` | Animation graph reconstruction：The timeline viewer shows Laplacian deformation applied to animated pose data. |
+| `08_curved_locomotion_result_result.png` | Cell 46 | `result_png` | `key_animation` | Curved locomotion result：The final viewer checks whether graph deformation can redirect locomotion smoothly. |
+| `08_curved_locomotion_result_preview.gif` | Cell 46 | `preview_gif` | `key_animation` | Curved locomotion result：The final viewer checks whether graph deformation can redirect locomotion smoothly. |
+| `08_curved_locomotion_result_preview.mp4` | Cell 46 | `video_mp4` | `key_animation` | Curved locomotion result：The final viewer checks whether graph deformation can redirect locomotion smoothly. |
+| `08_curved_locomotion_result_preview.webm` | Cell 46 | `video_webm` | `key_animation` | Curved locomotion result：The final viewer checks whether graph deformation can redirect locomotion smoothly. |
+| `08_curved_locomotion_result.png` | Cell 46 | `learning_card` | `key_animation` | Curved locomotion result：The final viewer checks whether graph deformation can redirect locomotion smoothly. |

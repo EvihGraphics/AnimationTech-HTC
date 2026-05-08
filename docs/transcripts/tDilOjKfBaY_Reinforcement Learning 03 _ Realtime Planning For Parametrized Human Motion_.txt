@@ -1,0 +1,562 @@
+Let's continue our series about reinforcement learning for animation and this time we will
+be looking at a paper that has a continuous state space and a parametrized action space.
+So for each action, instead of just being able to play one clip, we will be able to
+select several of them and blend them together.
+Hi, I'm Jérôme and today's paper is Real Time Planning for Parametrized Human Motion,
+a paper from 2008. As usual, what I would do is that I will
+import a bunch of libraries I need and I will import my characters,
+sets of mesh to represent the direction and the targets.
+And what I would do is that for the animation data,
+this time instead of using LaFan animations, I would use
+Matarica AI website to generate a bunch of locomotion animations.
+So the websites allow you fairly easily
+to just select the trajectory that you want to see
+and then generating animations for it
+and to export that animations.
+The free tier allows you to generate
+up to 10 second of animations.
+So a lot enough for what I need to do here.
+So what I have is that already a bunch of animations
+and that I have retargeted on my character
+And so if we check, those clips I have is those ones.
+So I got a bunch of turning animations like this
+and I will have a few of turn animations
+that then start and stop.
+So I get 46 different clips like this.
+And this paper builds on top of the previous,
+a new optimal character animation
+with continuous control that we did before.
+So it uses exactly the same concept
+for slicing your clips into small steps
+and realigning all those steps every time.
+Those clips every time you want to pick an action
+and play the next clip, you align both.
+So I will not go through that process again.
+It is exactly the same process as the
+near optimal character animation
+with continuous control paper.
+So go watch that video if you want to see
+exactly how those clips works.
+So the only thing I would do is that I would basically
+regenerate all the motion clips and go back to the stage
+we were with the previous paper, which is this.
+Every clip is something like this, a small step,
+and then so you get the first contact next
+and that stops there.
+So every clip is this and then you will be able to play
+with putting them back to back.
+So I got a bunch of clips doing all the different rotation
+and turns and all of this stuff.
+So that's the animation data, is the clips of the animation
+data we'll be using.
+So what I will have is, as usual,
+I will have a player that's allowed me to just say,
+I want to play this clip after that one, after that one,
+and so on, and so on, and keep track of the positions
+and realign all the clips automatically.
+So I'll load that code.
+And just to show you exactly as before,
+what I can do is I can just set the player
+to randomly pick a clip every time.
+And you get this basically.
+It just randomly picks clips
+and you can see that it could generate
+fairly continuous motion with no foot sliding, except that it might have discontinuities
+completely between clips, but the player is still able to do what we were doing in the
+previous paper.
+And following the exact same system as the previous paper, what we need to compute now
+is computing the physical continuity between each clip so basically making sure that
+when we pick a motion and we pick a clip after another one it is physically plausible.
+Also make sure that we never pick the wrong foot by giving a really high cost of playing a clip
+that is on the wrong foot. And I'm also taking that time to compute how much playing a clip after
+another one will actually rotate the character and will actually move the character on X and Z
+positions. So all this code is exactly the same as the previous paper, no difference here. So
+So I've just run it before and I will just reload the stuff that I've created.
+So right now I have a big table that gives me the physics costs from any clip to any
+other clip.
+I get the rotation delta from any clip to any other clip and the same for position X
+and Z.
+video. We have the exact same features that we had previously. Now, what we want to do
+is actually train an optimal policy, trying to match a goal. And the first goal that we're
+trying to match is the easy one is to make sure that the character I control goes in
+the direction I want him to go. And for this, the paper has it's fairly similar to the continuous
+control. It's just take a different approach on the approximations of the value function.
+So if you remember the previous one, we were using basis functions to approximate the value
+functions. And why we had to do this is because the value function is inside of a continuous space.
+So it's hard to train it on every possible values. So what we do is that we train on a subset
+and we try to approximate the value function as best as we could with something that will
+will give us what we expect the value to be outside of the value we've truly seen.
+We did it with basis functions and basically what this is called usually, it's a regression.
+So what you have is a function that you don't know, a bunch of points on that functions
+that you do compute and you try to regress and find an approximations for the function
+itself.
+So, basis functions was one way of doing it.
+This paper decided to go with extra tree regressors.
+And why they've picked it is because it's a known regressor.
+It's good at giving you an approximation of any functions when you throw a lot of data
+at it. And the advantage of an XF3 regressor compared to the basis functions is that it is
+able to approximate anything without a prior knowledge of what the value functions should look
+like. If you remember when we did it with basis functions, what happened is that you do have to
+to kind of guess what the value function would be
+to figure out what is the basis functions you want to use
+to address and to approximate them.
+Here, you could just throw a regressor at it
+and see what it would learn from it.
+It has a little higher cost in memory, of course,
+because it has more parameters to learn
+and memorized and just the few basis functions you could use.
+But it's also better at learning a value functions
+that will not be extremely smooth.
+What happened is basis functions,
+we assume that the value functions will be quite smooth
+and then we could just use a bunch of Gaussian values
+to approximate it.
+The regressor, the extractor regressor,
+just accept any shape without assuming that it will be smooth or anything. So that's the first
+difference between the two papers. They use a different type of regressor. In my case, I will
+use the extra tree regressor from sci-pi directly because it exists. I know that it's stable there
+and I could just use this one. They do implement their own with some specific mathematics behind it.
+I will not go into detail with those, I will just use the regressor.
+Okay, let's go through how to train the optimal policy.
+It is fairly similar to the previous system.
+So what you do is that you start with an empty, but value functions where everything is zero.
+So basically you have no knowledge of what the value function will be, set it all to
+zero. And you start to create a training set out of all the possible states you could have.
+So the way you do it is that you randomly start at any in any states. And from there,
+you use your optimal policy to traverse, to start from that states and you just use the
+policy and see what you get as a result. And for all the steps you take, so you basically move
+forward as if you were playing, and for all of those you store the pair between the states
+and the reward that you would get from taking that action.
+So you store the states and reward that you encounter while traversing
+your states. Once you have all of those,
+when you have a set of those, you train your
+extra tree regressors to approximate all the value functions.
+So you get a new set of value functions and you re-update all your pairs you had.
+So basically, you know, you've computed states and rewards, states, rewards, states, reward.
+You recompute the value functions and then you go back through all the states you've seen.
+You retake the best optimal trajectory you could have taken,
+best optimal action you could have taken from there, you get a new reward probably,
+and you update the values for each of them. And when you've done this, you start the loop again,
+you reset a bunch of random starting positions, walk through and get a few new trajectories
+that should probably be better because your value functions get better and better every time,
+and you keep repeating this until you get conversions.
+What they would do is that they would stop getting new data at some point,
+and then they would just train the value functions on itself with all the data they have.
+Let's not spend too much time on that detail. But yeah, usually that's how you do it.
+It's the loop of getting a bunch of data, training your value functions,
+updating all the data you had, get more data and so on and so on until convergence.
+And to check that you have converge, we compute the Bellman residual and it's just the computation
+of knowing this states expected last time this reward and if I actually take my policy,
+it gets that as a reward and you check the difference between the two.
+and the goal is to have zero difference to get the expected reward being exactly the reward
+you are waiting for.
+So that's it, that's how the algorithm will work and now we will train this and see how
+we could do it. So I will do it for the example of rotating my character and so the only
+Boom, boom, boom, boom, boom, boom, boom, boom, boom.
+Why is the reward fairly simple?
+Yeah, that's it there.
+So the reward is, as before,
+is basically I will encode everything
+as saying that my character should walk forward
+inside of a state space.
+So the state space is always local for my character.
+And the only thing I want to do is to make it sure
+that it walk forward inside of the state space,
+say basically anything that tells me that it is an angle
+would say that's the offsets,
+that's making me not walk in the direction I want it to walk.
+So the only thing I compute is the angle
+of my character local to itself where it end up walking.
+up working. So that's my state say so much rotations offsets I want to have
+compared to in front of me. So I will have a transition function that is just
+able to say I'm in this clip with a plane on X and Z positions and I get an
+angle relative to my plane and I want to play a next clip to that and where
+That that will bring me that's basically what it returns me it returns the next clip
+Then the next X prime the next Z prime and the next
+That are primed the next rotation. So the transitions
+Basically is computed the same way as it was done in the continuous state space. I
+get the transition reward as
+is what is the reward of taking one of the actions?
+So basically, if I'm in specific states
+and I want to go to the next states,
+what is the reward of doing that?
+And basically, in this case, the reward is negative,
+is the inverse of the cost.
+So the bigger the cost,
+the more negative that reward is.
+And the state reward is just the reward
+of being inside of a state itself and a state reward.
+What I would do is that I would say anything
+that is over the original animation number 25
+returns a big negative score.
+And that's just because I know that all of my animations
+I've done here, as you see, I get the walking and curve,
+walking in curve, I get a bunch of turn, I get to walk forward, then everything else
+is start, stop, slowing down and stops. So I'm in a controller that's where I just want to
+walk in a specific direction. So basically, picking any animation that is not a walking
+animation is a big negative reward. And apart from that, where am I here? Otherwise, I just check
+where this state will bring me relative to where I want to walk actually and that's it,
+they will just return the absolute angle. So if my states make me walk in the direction I want it,
+that's basically a reward of zero, otherwise it's a negative reward of how much disalignment you have.
+So, fairly stretchable forward for the rewards and that kind of stuff.
+What I will have is how to pick, to read my value function compared to the top-primes
+and the clip ID.
+And here is the stuff that I've done a little differently than the paper.
+paper is using an extra three regressor and then it's just using it directly to get the value.
+What I wanted to do here, it was to be able to use NumPy and the vectorization of NumPy so I could
+basically request the value functions for every states in one go and having all of that computed
+in parallel, which is something that is fairly hard to do with the implementation of the
+extra tree regressor in scipy. I mean, that's one tree that runs on one core and so on.
+So what I've done is that I would compute the value functions, the extra trees regressor,
+I will compute all of them. And then once they compute it, I will pre compute a search table.
+So basically, I will use the value functions and I will say, that's nice, you have an extra
+tree regressor that gives me an approximation. Now just give me a big table of pre-competed
+values so I could just pick the closest one. And at least I can do that in parallel for all the
+clips in one go. So that's why I have here the value functions actually are not the trees exactly.
+they are one big table with a bunch of pre-competed values for me. And so that
+allows me to find easily old indices that I want to search inside of
+that table and then to return the values of that table. And I use optimal
+policy then basically is just taking the starting clip I have and picking the
+transitions from the starting clip towards all the clips at once so taking
+taking the transition between my clip and everything else that's giving me the
+x prime z prime and theta prime of all the possible transitions then I compute
+transition rewards for all those different transitions. And I can compute the future reward
+for all of them again, multiplying by the discount factor. And once I have that,
+I just pick the one that has the highest score. And then what I return is the picked one, the new
+x prime z prime theta prime and the reward and this time in the reward I picked the
+the transitions plus the future reward so that's basically the future reward
+and I'm adding the state reward to it because that state reward doesn't change anyway it's
+the reward of being in my state now not the reward of being in any future state or anything
+And so that's the value functions and the policy itself.
+I will not care about this one.
+And so what happened is now I could do the algorithm of trying to train that value function.
+And see, it's done the way the paper describes it.
+basically I take height 100 random starting positions so I picked randomly any clip and
+I picked randomly any angle and that becomes my state so one clip one angle that's my state
+and then from that state I use my optimal policy to get the next clip and I store
+I store my state in the X so I store my current clip and data and I store the associated reward
+for it and I keep this for 10 steps. I keep walking using my optimal policy for 10 steps
+and recording every pair of state reward and once I have that pairs of state reward
+I train for each of my clip I will train an extra tree regressor. So it's the
+same concept as the continuous character control. You have one value function per
+clip. So basically it is a continuous state space where the clip itself is
+tabulated. So you learn a bunch of continuous state space next to each
+other and a bunch of value functions next to each other. So each clip has its own value function
+into a continuous value functions and then you train all of them at the same time.
+So because you will start from one clip and read the value functions of the other one and so on.
+So you have to train all of them at once, consider them as one big value functions
+except the clips are tabulated. So compute the extractor regressor with all the pairs of states
+and reward. And as I said, what I do after that is that I predict a bunch of values because that
+is again vectorized and parallelized fairly well. So I can predict, I think I predict 300
+different values for each of my trees. And I put all of that into one big table,
+so I will be able to use NumPy to do computation in parallel on that big table.
+And so once you've done this, what you do is computing the residual. So how much errors
+you have between what reward I was expecting before and what reward I receive now that I've
+updated my value functions and at the same time I update the expected return to be the new
+expected reward basically. So that's the expected reward for the next iteration now
+has been updated with the new rewards I have now. Again, I've run this before and I will just reload
+what I've loaded and what you could see is that I haven't done a lot of epoch because basically
+it's fairly easy to learn in this case. What you see is the mean error, the mean residual,
+Bellman residual, so it drops fairly quickly and I get the maximum residual error, so also
+dropping between the best expected reward and what I actually get. I don't have a lot of difference.
+And so I can now have a gamepad and I can start to play with what we've learned
+here. And so now every time I write it, it will just use the same optimal policy of checking
+every possible clip, checking the future reward to see how good this gets. And so we have something
+that is fairly close to the continuous control except that I would agree that
+using the extractory regressor was a lot simpler to use than trying to find what
+would be the best basis functions for the for the value functions and it's
+it's quite responsive. You could tweak if you wanted to learn something a bit more responsive
+and by giving less score to the physicality continuity, but it does work.
+Now, what this paper shows is that learning with extra tree regressor was needed if they
+wanted to do, in that case they were doing grabbing animations, so giving an object asks
+the character to move toward that object and grabbing it.
+I don't have graphing animations so what I would do instead is stopping at a specific
+target. So I will give him targets somewhere in the world and I want the character to walk
+toward the target and stopping on the target. It basically gives the same concept, maybe
+a little less visual but it's still working. So what I will have is what I call the reach goal
+policy. So I have a bunch of animations that are stopping animations. So I know
+which one they are. So that's all my stopping clips. Those one were just the
+two stops, two-step stops at the end. Now the only thing I need is to know, you know,
+I will ask it to stop at a specific position, which means that by the time
+take the decision I need to make sure that take the decision that if I play that clip it would
+stop where I want it to be so I need to know what is the state in which I need to be to actually
+make sure that if I play that stop I will stop where I want it so that's the stop positions
+it's basically give me where I actually need to be when I take that decision to play this clip
+so it would just finish the animation in the right spot, so I compute basically why the stop
+needs to be starting to stop at zero zero zero. Now the reward function for this system normally
+is this. As they said, you basically give it just a reward. If you are stopping on the right spot,
+you get a reward of one. And every time you do not, your reward is zero.
+basically that's a sparse reward function so it means that there is a really not a lot of time
+something that gives you a reward so they say in the paper that you could just train with this
+reward functions and that would work and that's magic it's something that is known to be extremely
+hard to train actually. And with the data I have was not able to just hope for the best like they
+were saying and then make it work. Because what happened is that you have two cases basically
+and you have to find the right balance between the two. If your reward from reaching a certain
+position is really big. What happens is that it would transfer that value through your value functions
+through every state near it. So everything will say it's really important for me to reach that
+point. I don't care if the transition cost is really high, if all my feet are sliding,
+if I pick the wrong clip, as long as I'm reaching that reward, that's what matters.
+So that's what happens if you give your reward for reaching a value that's too high.
+On the other hand, if your reward value is too small, basically what the system will
+learn is that everything is bad anyway.
+There is no reward of walking more in that direction than anything else.
+So what it will learn at the end is that as long as everything is negative anyway, let's
+pick the one that gives a nice continuous animation and I don't care if I reach the goal or not
+and you really need to fight between those two and it's really hard to find the right values
+that will actually let you but let the value functions learn exactly how to get there especially
+because in my case I have 200 clips I think and I only have a few stops so really not a lot of
+stopping clips. So it's really sparse in my case. So I was not able to train my value functions
+just by doing this. So there is a bunch of tricks you could apply when you try to train
+a sparse value functions like that one. So what I would have to do to train these value functions,
+I would not be able to just let it hope that you will find something
+by just stumbling upon one positive values and then hoping that it will
+start to learn that maybe going that direction is the good way. So what I
+would do is that I will add a bunch of tricks that you could use when you try
+to train values like this one that has a release pass reward. The first thing you
+could do is to have a bootstrap. So basically instead of starting from
+nothing start from something that's not it works. So what I would do is that I will give him a bunch
+of known trajectories that are actually reaching the goal and I'm starting from those trajectories
+instead of starting from nothing. That's the first thing. The second thing I realized that I needed
+was the fact that although it was able to find the target when he was fairly in the certain
+area around it, when he was too far from it, I had nothing that was forcing him to to walk back
+in the right direction. So I would also add a penalty of being too far away from the goal.
+So basically, it would force the system to say, if I'm really far, it's better that I walk in the direction of the goal.
+And as soon as close enough, I will find the best trajectory to reach the goal anyway.
+But I actually had to have those two different costs.
+One that's trying to get to the goal and one that's really far, you try to walk towards mainly the goal.
+And then the last thing I've done is instead of telling the system that I want him to...
+Every time I get the new reward instead of setting that value for the new reward,
+I was using a temporal difference.
+So I'm only computing the error I have between the expected reward I wanted and the true reward I wanted.
+want it. And I'm only slightly updating the expected reward.
+Instead of just replacing it, I just said, I take 10% of the new reward, and I love 10%
+of that new reward. And that's how I managed to make this learn.
+So basically, the transition functions is a bit different, because before everything
+was local to my character and I was telling them the character that it has to
+work forward and that's it and I was computing the angle. This time every
+state's encode in the position X and Z where the target is. So if my character
+is here and the target is here that's what it's encoded. If it works like this
+basically the new values is this offset. So everything is always realigned
+to the character. So my target is always represented as a local offset from my character. So I get my
+transition. What I will have is an inverse transition functions basically computing the
+exact opposite of this one saying that if I'm now in a specific states and I was coming from
+another state. Where was I? That's what the transition inverse does.
+I get the transition reward, same as before. It's the physical costs and inverse the physical costs.
+And I get the state reward. And the only thing that the state rewards does is this. If I'm
+playing a stop animation, I'm just checking am I in a radius of 50
+centimeters around where I wanted him to stop and if it's the case you get a
+reward of one and if you ever pick that state reward with that stopping
+animations while you actually do not stop in the right spot you get the
+massive negative reward, saying that that was not what I wanted you to do. Never stops outside of
+your stopping animation. And that's why I, for all the other cases, if I'm really far from my goal,
+I get a little penalty from being too far. That's it. That's my state reward. I still get my value
+functions instead of now it's an x and z value functions the 2d value function and my optimal
+policy it's basically the same optimal policy as before i take my transitions i get the transition
+reward i read the value functions i get the value functions for it and i picked the best one the
+only thing i did just to avoid having those massive negative values getting injected inside of the
+value functions. What I've done is that if I realized that it picked a stopping animation
+while it shouldn't have anyway, basically restart the search for the optimal policy
+by removing any stopping animations from the the available clip you can look at. So basically,
+I'm checking every clip, if it decided that the best clip it could pick was a stopping
+animation while it wasn't supposed to stop, I just tell him search again, this time doesn't
+count for the stopping animations.
+So that's the value of functions.
+Now I do need to do that bootstrap.
+basically what I have is a system that's allowed me to roll back trajectories. I can say I'm starting
+from one position and I walk backwards from there. That's what the rollback trajectory will do.
+And so for instance, let's pick this one. I get all the my stopping animations and I will roll back
+eight steps and you can see basically there's a kind of stuff I will start the
+learning from you know I have all those different trajectories that will
+eventually anyway stop all in the same position so that's that's what the the
+bootstrapping would do I will have all of those trajectories pre-generated and
+I can start to learn from those. So I will not run this because it would take a bunch of time.
+I will do this 100 times different positions for all the stops. So it would generate
+100,000 different trajectories that actually reach the end.
+Oh, I can do it. So I can show you what happens. I don't think it's that long. So
+So I generate a lot of trajectories, yeah.
+And then I can display now all the, for every clip animation,
+you could see all those areas, all positions
+that I know that if I'm in that state,
+I'm able to reach the stopping animations.
+So it gives me a lot of data to start from.
+I have a bunch of data that I know that are good enough to start learning from.
+And so hopefully it means that every other clips would start to try to reach those points or
+another points further and I can stuff and then I would be able to train.
+The only difference this time is because it's a lot longer, there is a lot more value functions
+and a lot more data in all the value functions. So the only thing I've done to speed up the
+process is that I've started a multiprocessing, so I will actually train the value functions
+in a pool. So I will actually use all my cores and all my CPUs to train it. But
+that's not really important. Everything else is basically the same. You know, I'm
+bootstrapping with a bunch of known trajectories that are valid with an
+expected, the best expected reward I could get from it. Anyway, it's even higher
+because it doesn't take the transition cost into account and then generating a bunch of new paths
+and then you stops every time you actually reach the goal you stop because you don't want to see
+what happened after the fact that you reached the goal. So train the values and it's the same
+loop when I'm training the values, creating the pre-computed tables and
+reusing them and then recomputing the residual and all that kind of stuff.
+Again, all of that has been run before and I can show you here what happened with
+the score and the mean value. So, for every epoch, so I run it 50 epoch this
+time. The only thing I've done also, yeah I've done a lot of stuff to make that able to learn.
+You can see that it started to learn and so basically at every epoch it's generating it's
+around 2600 different trajectories and that's the number of trajectories that actually reached
+the goal in 10 steps while learning. You can see that it was starting to get better but it was fairly
+slow so after 10 generations what I did is basically I kept the same value function
+but I made him forget all the previous trajectory he did and I make him restart again and you can
+can see that it suddenly gets a big jump because it has less
+example of wrong trajectories.
+And so I guess the value functions are softer and better
+at learning the values that don't have too much.
+And I tried to do it several times,
+make him forget again.
+And basically, it capped at the same level every time.
+So it nearly reached 100%, meaning I can start from anywhere
+and in 10 steps, it's always able to reach the stop.
+And I can display one of the value functions,
+for instance.
+So you could see what the value functions look like.
+So the pre-computed one goes from minus 1,000 to 1,000.
+And you get that there, not exactly in the middle,
+a bit offsets.
+That's where it wants that clip to be able to reach the stops.
+And again, I can play this.
+So right now, it's not input anymore.
+It will randomly pick a position and try
+to get that character to walk toward that goal.
+And it has 50 centimeters rear that I
+agreed to not trying to make it get perfectly on the stop.
+Because, again, those clips are not perfect.
+So I want to make sure that it's still
+able to reach the end goal easily by giving him
+a bit of slack, let's say.
+And with all the tricks to train those value functions,
+It is then possible to do it.
+Without all those added stuff on top of the paper,
+I'm not sure I would have been able to learn
+these value functions to do this.
+Now, that's the default system.
+It basically used the exact same thing
+as the continuous functions now.
+I'm just playing one clip and that's it.
+Pick the best clip to reach a goal every time.
+What the paper says is that what you have now
+is a suboptimal search because it is linked
+to all the clip it has and is not able
+to learn something a bit more smooth
+that would be able to reach more easily the goal.
+so comes into play the motion groups so what they have
+what they decided to do is this instead of picking one clip
+what you do is that you regroup those clips together and that's what they've done here
+see they get a bunch of groups and those groups will become your clip.
+And inside of those groups you have a bunch of animations that represent the same kind of stuff
+and that those animations can be blended together so you could choose to blend between
+your first animation and the second one and to have all the in-betweens.
+So that's what the motion groups will be here. That would be exactly the same thing. I would
+take a bunch of indices and I would take a bunch of weights to decide how they
+that represents the blend between the two.
+And then I can show an example by picking,
+so basically I picked a bunch of indices like that
+and a bunch of weights and you can see that what I have
+here is the same as before.
+You know, I have one clip that is able to do this,
+but then I can actually start to blend
+and it will be a bit different and you could choose the different blend weights
+between the different clips and so now what you end up with is what they
+called the parametrized action space because now my action is not just the
+clip I had, it is the fact that each of my clips have different possible values.
+They have one parameter that decides how much you can tweak them.
+So now I actually need to build the same system as what they've done here. So
+regrouping all the animations together, that do make sense. And for this I had to write a bunch
+of helpers functions to compute the different angle of each of them and all that kind of stuff
+to regroup them and by playing all of those I've ended up with this list of motion group indices.
+So now those two indices become one motion group from which I can blend between the two.
+Those three become one motion group and I can blend between the two animations and so on and so on.
+it was basically built by hand in the same way as what they've done.
+They're also saying that every clip was chosen by hand and blended by hand.
+And now that I have those motion clips, what I would do is define a bunch of weights
+for them depending of if I have two indices or three indices I will decide the weights on how I
+want to blend them and again why I would do this is because what the paper does
+normally it picks one of the motion group and it treats the motion group as
+as one action that you can pick.
+And so what you do is that the algorithm works as before.
+You pick the clip, except that what they've done
+as once you've picked the clip,
+you actually evaluate the parameterized version
+X amount of time.
+So you slice it and you take the value of zero one
+and then one zero and all in the between
+you can choose how many between C1 and you pick the best parametrized version you could have.
+You pick the best group and out of that group you re-evaluate your value functions
+X amount of time to pick the best parameter you could have. What I would do would be the same
+thing except that, again, I want to be able to parallelize all of that with numpy.
+So I would go the opposite way. From all my groups, I would, in advance,
+parametrize all of them. So I will have, I don't remember how many groups I have,
+but I have a bunch of groups and for all of those groups, I would take 11 samples in between.
+So I would parametrize all those groups and I would flatten all the list of parametrized
+groups in advance. Which is what I'm doing here with the group count. That returns the number
+of parametrized versions of the groups I have. So I have now basically 847s
+different clip I can pick from because that's basically what it is it's all
+the different group with all the different parameters version of the group
+itself while I had only 150 clips in the beginning so I'm growing the action
+space basically and then I can display all those groups I have so that means
+that I get this animation for group 0 and I can see parametrized between those two.
+I get that and that's all the different parametrized versions I have.
+So I get all my actions now, my animations are slightly parametrized.
+What I would do is again I would need to compute the cost of any parametrized version towards
+any other parameterized version. So basically that's the reason why I flattened everything in
+the beginning because I would need to compute the physics costs between all of the cases.
+What they do is they probably compute it at runtime only for the small groups that they know
+that they want to stay in. Again I will flatten everything in advance and I will compute everything
+in advance. And then the learning is all the same system. What I have is all my stop indices,
+except now it's a bunch of stop indices that were parameterized with different lengths,
+different stops. So I have a lot more different stops. Again, I will have a lot more standing
+position for all those steps. And same way, I would also need to bootstrap my learning
+with a bunch of trajectories that I know works. This time, instead of having a lot of random
+positions around it and growing only a few paths, what I would do, because I have a lot more possible
+trajectories to start from. I will only pick one but I will spread it a lot more. So I would say
+I'm starting from here and instead of picking the best trajectory you give me the 20 best
+trajectories starting from there and then only growing a lot less further than that. So instead
+Instead of having a bunch of long trajectories now, I have a lot of really small ones.
+And hopefully I'm still able to learn my value functions, right?
+That's what I wanted to get.
+I will not run this code because that is a lot longer.
+And all the optimal trajectories and all of that stays exactly the same as before.
+It's only my optimal policy now and it's a bit different.
+And it's only different for one little case, is that before when I was getting my value
+function I had one value function per clip.
+Now I have one value function per motion group, that was the idea.
+You have one, you find the best motion group itself and from that one you picked the best
+parametrized version. So because I've pre-flattened everything, what I have now is that
+it means that I only need to evaluate the value function.
+Well, I need to evaluate the same value functions for all my parametrized versions. So that's what
+I'm doing here. That's why I have that weird clip that says group count and then the clip value
+functions, which is divided by 11, because I know that I've parameterized 11 times each of them.
+So they're grouped like this. And I just need to say, okay, all those values, all those values
+need to check that value functions, all those values need to check that value functions,
+and so on, so on. So that's the only difference between this version and the other versions,
+that a bunch of actions share the same the same value function.
+And so I need to run that.
+And apart from that, learning process is basically the same thing.
+I've trained it several times, I've tweaked a bunch of values by keeping the same value
+functions.
+So the only thing you see here in the epoch and the score of epoch and that stuff is the
+last time I trained the value functions because basically I trained it with the old one and
+I reduced, I think the, now I made it learn really close and then started to make it learn
+further and further and further to make sure that it starts to reach.
+And that's what you see now is the latest run, latest learn. And you could see that
+it basically at every iterations it adds 800 something, so it doesn't seem number as group.
+So again, always able to find the spot in less than 10 steps more or less.
+And I can let it play and we can see what happens now.
+So basically, this time, if I let him run, that would be better.
+It should be better at stopping on the spot because that's what I've learned him.
+I did not give him that big range of possible actions to pick from.
+He tries to stop exactly in the spot.
+Now you could see that sometimes he does big steps to reach it and that's probably because
+I gave him a bunch of trajectories.
+instead of finding the best closest one it finds one of the trajectories that
+will bring him back where it wanted to be but that's in a nutshell how it works
+it has a hard time finding the spot when it's too close if it if it walked just
+next to it you would have to do around and come back because there is not
+enough, a parametrized version to make short steps and that kind of stuff. But it reaches
+more easily the targets we want them to reach. So this is the parametrized version,
+so continuous state space and parametrized action space that this paper gives us. I
+I hope you liked it and see you next time.

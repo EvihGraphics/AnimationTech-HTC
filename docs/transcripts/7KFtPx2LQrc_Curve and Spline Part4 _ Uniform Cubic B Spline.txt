@@ -1,0 +1,151 @@
+Hi, in the previous video, we've seen how to compute the cardinal spline and
+the cardinal spline was an interpolation spline that was going through every data point
+But we've noticed that at best we could have only a C1 continuity and we could not have a C2 continuity
+What we will study today is the uniform cubic B spline
+Which is an approximation curve because we won't go through the data point
+But at this time it will actually give us a C2 continuity
+So, we'll see how to compute a uniform cubic B-spline using the DeBoer algorithm.
+And the DeBoer algorithm is fairly simple to use.
+The stuff that you have to do is if you have a bunch of points and you want to fit a curve
+through it, the first step is to split every edge in three.
+So, you have equidistance points now on those lines.
+Now that we have those, we could actually
+start to connect the last and the first one,
+and then the last and the first, the last and the first,
+and so on and so on.
+And once you've done this, we could
+start to split each of those new edges in half.
+So you have a point in the middle now every time.
+Now that we have those points, what we could do
+is to use those four points we have here
+and give them inside of a basic curve,
+saying that that's a cubic-basic curve we want to build here.
+And then we can give the next four points to the next cubic-basic curve.
+And that's how you actually build a uniform cubic base plane.
+Now it has the advantage that it has computed for us.
+Those dungeons make sure that the points on each side
+were equidistant and on the same line.
+So actually, we've done all the stuff that we said
+that was annoying to do in the basic curve
+when we stick them back to back.
+And by doing so in this way
+and making sure that we have the points in the proper place,
+what happened is that we have a C2 continuity.
+So if I re-draw this exact same curve here,
+you could see now that my first derivative is continuous
+And my second directive is also continuous, so I have continuity in C1, C0, C1 and C2.
+Now at the same way we've computed the cardinous plane using Hermit curves and then we decided
+to try to find the mathematics to be able to compute directly cardinous plane without
+the need of going through Hermit curves.
+We could do the same for Uniform Cubic Spline.
+Instead of having a function that will give us all the points
+that we have to give to basic half to compute those,
+we can actually find a formula that will allow us
+to directly compute a Uniform Cubic B Spline.
+And this algorithm is the Cox-DeBoer basis.
+It's a bit like going from the basic half
+using the Castellge algorithm to the Bernstein basis.
+Now we're going from the Bohr algorithm
+to the Cox-DeBohr basis.
+And how it works is an iterative process
+to build those base.
+And it's a bit tricky to understand,
+maybe if I just show you the mathematics.
+It's an iterative function that starts
+with the simplest step,
+and I will show you here mathematically.
+So the way the Cox-DeBord basis start,
+it says that it has a bunch of knots.
+So that's your points you want to have.
+And in this case, because I'm using the cubic version,
+what I want to have is basically four knots,
+meaning that I have five points, let's say.
+And what happened is I have a point at zero at one,
+two, three, and four, for instance.
+And that gives me four different curves.
+And the curves see, and they're just on and off.
+And that's what the definition is here.
+It says that if I have a basis of degree zero for index i,
+it says the value is one if my t value
+that goes between, in this case, zero to five,
+or zero to four, sorry.
+If my T value is bigger than the knots before and smaller than the knots after, actually
+I'm 1, otherwise I'm 0.
+And that's what you can see here.
+I have my first base, which is the blue line.
+The blue line is 1, and I drop at 0s, and then I get the yellow, and then I get the
+green, and then I get the red.
+So I get four different curves that just on and off.
+And then if you want to start to compute a higher degree,
+it's an iterative recursive function.
+So basically it says that you take the level,
+the base before and with the index i, index i plus one,
+and you do basically a linear interpolation,
+which is a bit more complex now
+because we have range and all that kind of stuff,
+but that's what those two functions here are doing.
+do linear interpolation between the different bases and so meaning that we started from the four
+different base now we have three base that blue triangle is the interpolation between the blue
+square and the yellow square the yellow triangle is the yellow and green and the green triangle
+is the green and red and then you can go one higher step and then you can interpolate
+between the two triangles, which give you that nice curves, and then you can interpret between
+the two curves and that you get one big curve. And that gives me my final answer, that's the curve
+I'm interested in to try to compute my uniform cubic B-spline. Bit abstract at this point still,
+so what I will do is that I will redo exactly the same mathematics as the one I've done here,
+accept that this time I will do them symbolically so I can compute them and see the mathematics
+behind that nice curve I have here. And so this is exactly the same formula I've computed except
+that I've solved it and asked it to collect for my different points, my different bays basically.
+so I get base 1, base 2, base 3. And that's the formula for this curve, right? So again,
+you can see that my first base is multiplied by a bunch of t's and all that kind of stuff,
+as we've had the habit to see most of the time. And if I turn them in four different
+base so I really have my first base here the function is t the t cube divided by
+six so I get t cube divided by six give them four different functions and I
+give them the the proper range you see I have the curve as we have here except
+that now I have colored them in the four different pieces I had so I have a piece
+between 0 and 1 and 1, 2, 2, 3, 3 and 4. But that gives me that nice curve.
+And so now that I have this, basically what I want to do is instead of having
+that nice curve that goes between 0 and 4, I want to bring that back between 0 and 1.
+And I basically don't want to squish the curve itself. What I want to do is I want to slide
+each piece of them to to bring them back to between zero and one so I have my blue between
+zero and one I want to move the yellow between zero and one the green between zero and one
+and the red between zero and one and that's what I do here I take the function I had upstairs
+except that I'm substituting t with t plus one t plus two t plus four to slide them
+and that's the the different functions you will have now so t cube hasn't moved so my
+my first one hasn't moved the other one it's a bit different than before
+and what happened is that if I use this as the four different functions now we could see
+that I have what I wanted I basically have the four bases right on top of each other between zero
+and one and it's basically as the one we had with with the Bernstein bases I mean the sum of
+of all of those curves is always equal to one.
+No matter where we are between zero and one.
+That's the advantage of those bases.
+So it's a basis the same way within the Bernstein basis.
+It's just different shape.
+So that will allow us to do a bit of different things.
+So what we can do is that we could use those four different
+bases and multiply them by the different points
+wanted to use. So you have 0.0, 0.1, 0.2 and 0.3. The four different points will be multiplied by
+the four different bases basically the same way within the basic curve. And so what we do is we
+take the the the the one we shifted the most on the left. So basically 0.3 is my first base
+then point two is my second point one is my third and point zero is my fourth
+and I can turn this into a matrix form as I usually do so what we have is all my
+mathematics into the matrix form I've just put the divided by six here in front because it's
+It's basically everything is divided by six all the time.
+And so that's the B-spline segment now.
+It's just a matrix form again,
+and just a multiplication of one matrix.
+And I can compute a B-spline
+by just moving back to back a bunch of points.
+And then we could see that if I render this again,
+directly I have now the same curve
+I had before, except that I'm not doing the split linear computing or that kind of stuff,
+giving that to the basic curve. I'm just directly using my matrix to generate this.
+And the same way we've done with the card in the spline, you know, if we wanted to actually
+start at the first point and that kind of stuff. If we want to do the same, basically we actually
+have now to repeat it two times. So you have to put the first point three times and the last point
+three times and if you do this you have a curve that starts at point zero and ends at point one.
+And so this is how you compute the uniform cubic B spline and that will be the last type of spline
+we will study in these videos because I have most of what we will probably encounter when we do
+animations. If later we need to go through a different type of curves, because there is
+still other curves, other splines, we will see if we need to make a new video. But for now,
+that will be the last type of curve we want to see. And in the next video, what we will see
+is how we could use those curves to actually encode animation data. See you next time.

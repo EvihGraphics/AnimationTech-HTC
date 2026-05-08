@@ -1,0 +1,11 @@
+Hi, welcome to the AnimationTech channel where we will be looking at the technical side of animation
+in video game mainly by re-implementing old animation paper that we released a long time ago
+up to papers that were actually more recent and we will re-implement them inside of Python
+so we could have an easy visualization of what those papers were about. We will also probably
+talk a bit about physics and also the mathematics behind animations and physics in video games.
+My name is Jérôme Perth and I'm an animation technical director for the past 20 years in
+the game industry. I've been working mainly into designing animation pipeline, writing tools,
+or writing engine code about animations. And I hope this channel will be of an interest for you
+and if you want to make sure that they're here about all the videos I would be releasing
+frequently, I would try to be constant in my release. I would say probably one a month or
+something like that. Make sure that you hit the subscribe button and see you in the next video.

@@ -1,0 +1,224 @@
+Hi, today I wanted to talk about the radial basis functions and the way it was used and
+implemented inside of the verb and adverb paper and I've done it in a separate video
+because the mathematic behind the way they've used it and how they computed it is quite
+complex and I don't want to make the video about the paper itself too long so this one
+we just talk about the radial basis functions in the approximations and blending sense of
+the paper and nothing else.
+The first thing I would do is import all the libraries I would need and then what the paper
+does is that they say that they have a bunch of adverbs and basically an adverb is a style
+or anything in that way inside of an animation, so it could be the mood, the style, or turning left,
+leaning right, all that kind of stuff. So all of that is adverbs for which you can try to blend
+between different values. And then all those adverbs would drive all the degrees of freedom.
+So for them, it would be the rotations and the translations of every bone. So the elbow,
+the one degrees of freedom, the two degrees of freedoms of the wrist and all that kind of stuff.
+I would make this a little more simple in this video so I can actually visualize what I'm doing.
+So what I would do is that I will have the adverbs will just be left, right, top, bottom
+inside of a two-degree and my degrees of freedom would just be a color. So I will have three degrees
+of freedom, red, green, blue. So I have multi-dimensional inputs, multi-dimensional outputs
+as the paper, but something that can visualize. So what we have is a bunch of points on the grid
+and for each of those points I will have the corresponding color. So what I have is this
+bunch of points on the grid and color for each point. And what I want to do is to be able to
+basically interpolate those values and are having the color displayed along the entire square.
+To make things a bit more interesting, instead of just doing basically two adverbs that are
+really what they are, it's left right and top bottom, I'll turn them into four different adverbs,
+all just positive, so I will have the right, the left, the top and the bottom as separate adverbs
+instead of just negative and positive. It will answer, it will give you the exact same interpretations,
+exact same values either way. It's just that in this case I have higher dimensional inputs,
+which will be interesting to see that you're not stuck to 2Ds or anything. So I will turn those
+coordinates into adverbs and those adverbs now are four-dimensional, so each points now,
+so you get left, zero left of course, right 0.7 top and bottom for each point
+and so I get a four-dimensional adverb space
+and what they would try to do is basically allow you to interpolate those values
+I've rewritten the mathematics as the way they use it except that I will use the names of what
+I'm representing and not the degrees of freedom or that kind of stuff so basically what I have is
+an interpolated color which is why I have the little c here because it's one degree
+of freedom inside of the color so c would be red green or blue so the interpreted value of one
+specific point and remember that point is inside of the ad-web space so left right top bottom
+So, it's a 4D point.
+It would be the sum of the radial coefficients multiplied by the radial basis functions.
+The same way we're doing radial basis functions usually.
+So, it's the radial basis functions for a specific point, multiply for the weights,
+And then, see, because I'm multi-dimensional now, I have a weight per example, the little
+I, and per color.
+So I will have, in my case, I have seven points, and I get three colors, so I get 21 different
+weights in this case.
+And on top of that, you add a linear approximations of the, of the interpretations.
+And the way you're doing it this is now it's per adverbs, what you will have is a coefficient,
+a linear coefficient per color, per adverbs, and it goes through the linear functions instead
+of the radial basis one.
+This is fairly similar to the way we were doing in radial basis functions where we had
+a polynomial constraint.
+added a bunch of a bunch of constraints and to do this we we build the matrix when you remember we
+had one and then x squared x cube and so on depending on the degrees of freedom of your
+polynomial here will be the same what you try to do is to find for all the points in our 40 space
+we try to find an hyperplane that will best approximates all those points. So that's what
+this tries to do, tries to find an hyperplane that goes through all the points and approximates
+as best as you can do. It's basically a linear regression. And to do this we would do the same
+kind of system that what we did in the radial basis functions. I will actually put a 1 and then
+instead of doing x x square and so on i will basically do one and then adverb one
+adverb two adverb three adverb four i get four dimensions so it's one left right top bottom
+so and i do this for every points i will have and that gives me a big matrix with a bunch of ones
+all the values for the all those values here for the left all those values here for the right
+and so on and so on. And then I can try to solve for the actual coefficients.
+Except that, of course, you don't have a real answer. I cannot just do inverse matrix and solve
+as we did when we were doing the radial basis functions. Now what I have to do is to go through
+a least square to find the best approximations. So this is exactly what I would do here. What I have
+is the advert matrix. What I do is that I compute the ones and then all my adverbs and then after
+that I do a linear least square so I can find the best solutions and that gives me these coefficients
+and it gives me the coefficients for all my degrees of freedom so all my colors at once. So
+basically what I have is the the red the green and the blue so one for each values
+and I get the five different coefficients and the five coefficients is the coefficients for
+the one and then for left top left right top bottom so I get five and I get three values here
+The idea behind this is I could have solved for one color at a time, I could have solved
+only for the red, then the green, then the blue. It would have given me the same answer,
+it's just that I can compute the multidimensional in one go inside of NumPy.
+So that's how all my linear interpolations is working. Now what I would have is I can
+display the interpolated linear approximations so what I do is I make a big grid of 40 points and
+40 points I get 1600 points for which I have all the coordinates and I would turn that into my
+adverb space because I'm not interested in coordinates again I'm still interested in
+blending different adverbs together so I turned that into my four-dimensional adverbs
+And then I create the interpolations at the data the same way.
+And then I can just multiply my matrix together and that gives me the color.
+So what I would have is this.
+So the linear approximations give me this.
+It's the best color I can find with linear approximations.
+So that's what you have here.
+Now what we want to do is to get something a little better
+that just that linear approximations what we have what we want is to be able to get the exact
+values here and that's why now we need to use the radial basis functions on top of what we've done
+and the way we would do this is we would compute the residual say the amount of error the linear
+approximation is giving for each point and so we take the real values I have and I will
+subtract the linear approximations and that gives me the residual so the amount of error the
+linear approximations gave me and so this is the residual it gives me for every point
+so my seven points and for the red the green and the blue again.
+And now that's the residual values that we will go and plug inside of the radial basis functions.
+If you remember what we did the radial basis functions, what we had is a kernel that turns
+any distance into values that goes between some parameters, some values depending of the type of
+kernel you want to use and we had to use the Gaussian kernel. What they used inside of this
+paper is the delayed cubic B spline. The cubic B spline curve is something we've already seen
+when we were watching the doing the videos for the cubic B spline and it's the same formula.
+So I will use alpha of that b-spline, cubic b-spline as these functions and I can display
+what it looks like if you remember. So it's split into two functions that stick together.
+And the advantage of the cubic b-spline like this is that it has a radius of two
+and anything that is further away than two is just zero.
+So you got a nice curve and then at two,
+every further than two, everything at zero.
+So now that's the kernel they would use.
+So what they could do is that basically say,
+as I said, you get all that,
+if you remember how to solve
+for the radial basis functions,
+We build that big matrix with a distance
+between each point and each points.
+And then we multiply that with the weights
+and equal our values.
+And we solve for that system to find all those weights.
+Except that what we have here is that we don't solve
+for the values itself, we solve for the residual.
+So the amount of error, the approximations,
+the linear approximations are gave us.
+And then the distance is where it's a bit different than the radial basis functions where we were
+just giving the Gaussian kernel and the same distance, the same way of computing a distance
+for each of them. What they said, they said that the D is built this way. And what it means,
+it's actually, it just means that it goes through the Bayesier, the cubic Bayesier,
+but what you feed inside of the cubic Bezier is the distance of the points, so
+that's R, I1 is the distance between your points and the example divided by
+an alpha and what the alpha represents it's basically the distance of all the
+the closest point. So what they really want to do is to make sure that they will only do
+radial basis functions with all the values that fairly close to the points we have and anything
+that is too far away inside of our approximations is not used. And basically to do this, what I said
+is that for every point, you check all the points, all the other points when you build that matrix.
+you compute the distance for all the different points and then you take the closest distance
+and then you divide all the points all the distance you divide by that one which means
+that basically what you have is that the closest point has a distance of one and then everything
+else will be a bit further away and everything that is actually at a distance of two or more
+has no influence so it means that you only have values that are fairly close to you that are used
+inside the radial business functions and everything that is further away is discarded and not used
+so you don't have weird interpretations of posts that really far from each other
+influencing each other so what they have here in this case is really that everything that's close
+has an influence, everything further away has no influence. So again, I will compute the distance
+as we did earlier, except that this time it's a 4D Euler distance. So I compute the distance
+between every point and every point and I give me this matrix again with diagonals all the zeros
+because points with itself is the distance of zeros. And then I can compute those alphas
+for each point basically what I do is that I go through every row and I try
+to find the minimal values I have inside of that row which is not zero and that
+will give me the alpha by which I need to divide all those values for each
+column basically to give me the proper values scaled and now that I have the
+alpha I can take the distance and I can divide those distance by the alpha. And basically what it gives
+you now is a matrix where you know the zeros are still zeros and then the smallest values I had
+is became one and everything is bigger than one so it gets zero one and then something a little
+bigger than one so all of those have influence and I know that everything that is pass two will
+have zero influence in my radial basis functions. So not all those will have
+influence but this one has the most influence and then everything else a
+bit less and everything that reach 2 has no influence. So I get a bunch of
+values that will be discarded when we will be computing the radial
+basis functions. Now that I have those scaled distance I can make them go
+through the kernel itself. That gives me now this distance now for all my different coefficients.
+And again, exactly the same way we did in the radial basis functions. Now I have my matrix of
+distances. I get my matrix of values. I can solve to get the coefficients. And I get the
+the coefficients now here for my seven points and again I'm computing every
+degrees of freedom at once in those matrices so I get the values for all the
+reds the green and the blues at once and I can easily display now the final
+results it's basically as the functions were doing on the top is you add the
+linear interpolations you did and then you add the radial basis functions
+together and when you do this you get this interpolations and now you can see
+that we have something fairly neat when my inputs are not that visible anymore so
+all of that has been properly interpolated. Now it's tricky to understand
+And why it was done this way, basically the advantage of doing it this way is that the
+linear approximations give you an opportunity to do extrapolations.
+If you do, if you remember, radial basis functions are really bad at extrapolating.
+But the linear interpolations is just, it's fairly bad anyway, but it can give you extrapolations.
+So the linear approximation silos you to have extrapolations.
+And then the radial basis functions
+is only looking at poses that are fairly close to the examples.
+So it's avoiding having influences from posts
+that far away when you have really scattered data.
+So that's the reason why they've split it into,
+you have an approximations that is not too bad
+when there is no data and that can give you extrapolations.
+and then the interpolations when you have data,
+which is fairly good.
+What I will do now is just for the paper itself.
+So I would turn all the code I have here into a big class
+so I can reuse and recall.
+And basically it's just all the functions we had.
+I get my base here that is defined here.
+I get the initializations where you will give
+all your points and adverbs as inputs
+when you init the radial basis functions
+and I would pre-compute everything
+that can be pre-computed.
+So the D for the distances, the linear adverbs, the alphas,
+all of that is stored and saved.
+And then you can fit your data
+through that radial basis functions.
+So basically is the step when you actually compute
+the coefficients, the real coefficients you want to use.
+So you can fit and it will return the linear coefficients
+for your data and the radial coefficients for your data.
+And then you can call the radial basic functions
+to do the interpolations.
+And then what you do is that you give him
+the linear coefficients you had received,
+the radial coefficients you had received,
+and the points or the points you want to interpolate
+to get the interpolations.
+While I split it in two different functions like this one,
+it's basically, even if all my adverbs are defined
+advance because I would know what the adverbs I want to use. I can fit different type of curves.
+I can fit all my degrees of freedom or I can fit only one or depending on how I want to use these
+functions I can reuse the same adverbs with different input data and that will be useful for
+the paper so that's why I split it into this way. Now we can see that it actually works.
+So if I do the color again, just doing the RBF, giving the adverbs, then I fit
+my data and then I try to interpolate with all the data points
+interpolations and then that's it. You have it. All that code now has just
+three lines here and it works with any dimensions. So in this case have four
+dimensions adverbs and three degrees of freedom. I can do it in 1D as we were
+doing before, so I get one-dimensional input, one-dimensional output, and that's
+the interpolation they will give me. See, it's not perfect if I was doing a
+pure radial basis function they would give me a better answer than this one,
+but in this you could see that it did the linear interpolations as best as it
+could and then it did the interpretation in between. So that's the
+implementations of the radial basis part of the paper. I'll see you in the actual
+paper analysis to see how this is used and how it can be used to blend
+animations together and how it was done. See you in the next video.

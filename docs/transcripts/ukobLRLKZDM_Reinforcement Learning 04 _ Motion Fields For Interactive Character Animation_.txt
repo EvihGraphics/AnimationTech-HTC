@@ -1,0 +1,342 @@
+Today, we continue the reinforcement learning for animation.
+And we will be looking at one of my favorite paper
+because it influenced the community a lot
+and probably led to the motion matching as we know it today.
+But also because it's still a lot referenced on research
+today because of its way of encoding the animation data
+and using the animation data.
+Hi, I'm Jerome.
+And today's paper is Motion Field for Character Animation,
+paper from 2010. So as usual, I will import all my libraries. I've done it before because I have
+PyTorch this time, so it takes a bit of time. And then I will load my character. I will load
+my little displacement mesh. And I will load a lot of animations, even if I'm not actually using
+all of them, I'm taking a few steps in some of them. But I keep loading all of those. And
+I will compute the contact to know when the foot is on the ground and I'll do it only by checking the speed of the toes
+And that's it. And so that's here all the animation I have
+So basically it's all from the LaFan again, so a lot of really long take of locomotions
+of different style, but
+I'll pick a few of those at the end
+So, what the motion field does, it has four concepts that instead of using animations,
+we will build a database of motion.
+So the way that is composed is basically you have a pose, oops, that's not what I wanted
+to do.
+You have a pose.
+And the pose only represents the position of the character in space and the orientation
+of all his bones.
+In my case, because I have a root and a hip, so I get the two positions and I get the orientation
+of every bones.
+And then we also, for all of those poses, you also compute the velocity by doing the
+finite difference.
+So you take the next frame and you remove your current frame.
+And that's give you basically the delta
+that will allow you to say, if I'm in this pose
+and I add this delta, I will be in the next frame.
+And for the motion field, motion state is basically this.
+It's one pose and one velocity.
+So if one really, if it's one pose
+and how much delta you will lead to the next frame.
+And that's how you will build the motion states.
+will do this for all your frame of animations and you just stores pose and velocities as a big
+database. So I will have functions to compute those. Because I will have all my data inside of a
+big buffer, I will have a pose pack and unpack functions to easily take a buffer returns structures
+as a root, hips and quaternions and then put that back into a buffer because it's a 4D buffers but
+you know positions only three 3Ds the quaternions 4Ds and all kind of stuff so I didn't want to
+deal too much with that so I just have functions that allow me to read and write inside of the
+buffer basically easily. I get the functions that I need to add to a pose together so a pose in a
+velocity but really there is no difference between velocities or pose in this case.
+So it's just that add functions here and get the subtract function here.
+So that's how you to add back the velocity to the positions.
+You get the subtract, that's how you do the opposite of course.
+Then I get the love to be able to love between two poses and I get the blending that's how you
+to take x number of poses with the same number of weights and do the average sum of that pose.
+So all that functions that I would need later in the paper to work properly. And then I will have
+a function that will allow me to go back into a skeleton and display my results from a pose.
+Now, I will build my database with those functions and with a bunch of walking animations
+and a bunch of jogging animations, and I will just run this so I have all my states.
+And you know, I pick all my positions into, pack all my positions in one buffer, pack
+all my velocities in one buffer, then I get the y, it comes also later, is the next frame,
+and I get the contacts, so all my contact informations. And see in total I have now
+6400 pose states inside of my database, and that's basically 6000 frames of animations.
+and I can display those so you can see all of the pose where we set into the
+zero-zero position so they're all now relative to the identity so I will
+start to be able to work with all of those states and then I can also
+display what is the next frame you know so that's my pose plus the next frame
+and so you can start to see that that's how we could still remember there is
+emotions and that the velocities of the root, the velocity of the heaps, and all
+of my orientations. So, but that's all the single states that are inside of my
+motion field. Well, my database right now, not the motion field yet. Then what we
+will need with this is to be able to compute the similarity matrix. So basically trying
+to see how close every pose are from each other and then we will compute the similarity
+weight. So you get the distance and then you get really the weights of how close the two
+are. And I've used a little different functions that the one I've used in the paper. In the paper
+they were only using the orientations of all the bones in the current pose and in the next pose
+when they integrated the velocity with it. What I will do is that I will just take the
+the character positions of all my bones and I will compute the velocity with the next frames.
+So its matrix is a bit different but it works the same way.
+So this functions allow me to receive basically a state and a velocity and to turn that into
+one vector that I will start to be able to compute different waves.
+So I will do this for every states inside of my database.
+And then we compute a big matrix with a distance.
+So it becomes a matrix of number of states,
+number of positions, let's say, because that's
+what this becomes.
+It becomes for every bones.
+I will have its position in character space,
+and then I will have its velocity in character space.
+So it's a bone count multiplied by two,
+and x, y, z vector.
+And I get a big matrix out of those.
+And just to try to explain a little what you have now
+because you have all those distance,
+that you could start to compare all the distance between them while all the you
+could compare the similarities of all the pose to each other and that's you
+could start to think of that as a field that's basically what they would do
+with a motion field so you could try to think of representing those differences
+and that's what I would do here by just reducing the number of dimensions
+because, you know, the dimensions I have now is, I don't remember how many bones I have, but it's
+fairly big. And we're just telling, okay, try to see if there are similarities between all those
+vectors and turn that into a 3D representation. And that's what the Yuma piloted me to do,
+so we could have a kind of visualizations of the field. So what you have here, basically,
+Every dot in this is one pose in the database, and you could see that the position they are
+in space is the relations they have to each other, so probably all those around the move
+in the same directions are in the same pose.
+All the one here might be the jogging animations running forwards and that kind of stuff, so
+one way of representing the motion field. It's just for helping. It has no true values on the
+representation. It's just to be able to get your head around the fact that we build a motion field,
+but it's a motion field in a really high dimension. So this one is just a projection of something
+simpler to be able to visualize it. Now what we need is that for every pose that we will have
+we need to be able to find which poses will be the closest to us. So what's the paper? Basically
+what the paper is doing. So that's the similarity weight. That's how you compute the similarity
+weight, my functions over there. And then when we will try to make an animation for those we need
+to be able to find the nearest neighbor of our pose. So I will be in one pose with certain velocities
+and I want to find the 15 pose that are closest to me. They do an approximative
+nearest neighbor. I'll be lazy in my case because I don't have a lot of animations.
+So what I would do is that I would just drop the entire matrix here in PyTorch and I would
+just do a true search using the GPU. So basically I have a function that's allowed me to get,
+you give him one vector and you ask him to return the k closest one.
+And it runs on the GPU, so it can do it fairly quickly.
+And the advantage of doing it in this way
+is that I can query one vector, but I can also
+query a batch at one point and request
+to compute that for x number of vectors at the same time,
+which would be nd a bit later.
+Now, it's all good.
+we have a database that is composed of all of our frames, we are able to find all the frames
+that are the closest to us. How do we actually make an animation out of it? And that's how
+you have the integration functions. And what the integration function does is this one,
+it takes a state in which you are and it takes x number of action. And the actions is basically
+the, in this case, the 15 different frames I will have found. And what you do is that you average
+all the velocities of all the states you have with all the with the correct
+weights and the weights come from you know the weights similarity weights. So you
+average all the velocities and then you add those velocities to your state, to
+your pose. So you're not adding the pose together you're only integrating the
+velocities and you move your character towards that mixed velocities and then the reason why we
+had that Y and remember the next frame is because now we need to compute the future velocities and
+that we do the same. We take the the average of the future's velocities that becomes our velocity.
+So, I will get the function to find key neighbors and the function to compute the new states
+and I will come back to it because there is a little trick to do it after.
+And what we have is this.
+We have our character, I'll put it on spot so it doesn't go away, come back here.
+it does, it basically wanders around the motion field. So for every pose, it finds the 15 closest
+pose, compute the similarity weights and blend all those weights for the velocities and add that
+velocity back to this one. If you do this, only this, what would happen is basically this. We
+would move through the velocity field to the motion field, and at some point, hopefully we
+we do it at some point. He might start to drift outside of the known data because
+nothing forces him to stay in the motion field. You know, all the velocities have different weights
+and I would love him to start to drift. That would be great. Let me force him back
+from the beginning and hopefully I can get him to drift.
+And so you see it starts to drift outside of the motion field because it probably reaches
+points where they had no data in the field and the velocity pushed him outside of known velocities
+and it starts to blend stuff together that really are not meant to be blend together.
+What we do to fix this is that we will tag him with a small ratio saying okay you could blend
+all the velocities you have. It's all fine but you will always add back 10% of the closest pose
+you were to so basically you let him walk through the motion field but you always tug him towards
+in the rear when you know that there is data and that's what the little 10 percent forces him to
+go back into space of the motion field where there is actual data and then we could just to
+represented. I would slow it down fairly. That does not work anymore. That was Y.
+On the spot plot. And then you could display where all those frames of animations are inside of
+the, oh that's me, that's because of me, where all those frame of dimensions are inside of the
+motion field. So you could see where I am and why all the pose it picked and how much it blends
+them. So that's a representation of what the motion field is, but as I said it's just a representation,
+don't focus on this one too much, it's just to have an idea of what the field does and how it works.
+And so, see that that ratio we have here is basically what was written here on how to compute
+this. You actually have to compute the next frame and then compute how from where you are,
+how you will what you will be needed to do to reach the frame you know and that's
+give you one of the velocities and you integrate all those velocities back in.
+So and that's what I'm doing here while computing the velocities to reach a
+specific state and then computing the new states basically take the frames take take
+the current frame, take all the indices
+for all the next velocities, the weights,
+and then you compute the velocities that
+will allow you to go back in the known frames.
+You blend all of that together, and that
+give you the new pose.
+And so that's how you could walk through the motion field.
+Now, walking through the motion field itself
+has no true interest except to make a character
+walking definitely like that.
+What you will want to do now is to be able to control this.
+So being able to take our pad and make sure that we can move.
+And the way we will do this is basically by saying,
+okay, I've picked 15 different states that I can play.
+that I can play. I have a similarity weight to know how to blend them. But if I want to get
+control, what I could do is that I can give more importance to one of those states. And that's
+what we will do. We compute the similarity weights for all the frames as we did before.
+and then we replace the value of that similarity weights by so that's all
+normalized but then we replace the value by a one for the action we want to pick
+and then we renormalize so basically if I go here right now I'll let him do
+whatever he wants but I could say now actually I want to play that one that
+one is more important for me but then this one is more important and so on and
+and so on. And you can see that the only thing I do is I replace the known value by a one
+and I renormalize the entire weight. So I tell you to tug a bit more the direction
+which of the 15 posts you want to pick, but not by forcing it too much. It's still using
+the similarity weights to blend all of those together and then what we will have is this.
+So the only thing I would do here is that I try to make the character walk
+in the directions I want him to walk. So I will have a function that giving two different vectors,
+it returns me the signed angle distance. I know the angle and I know the direction and the angle
+compared to where I want to go. So that's what this function does. And my reward function
+for my system would just be that it has the desired direction I want to walk towards.
+it gets my current state and my next states. I'm not even using the current
+states to be honest. And I'm just checking if basically the velocities of my
+next states will lead me towards the orientation I want to use. So I would get
+the difference between the orientation and my desired direction and the reward
+is just a negative of the minus abstract. So the reward is more the penalty. If you're walking
+exactly in the direction I want you to walk you get a score of zero and as soon as you deviate
+you get a negative reward and that negativity is bigger if the bigger the error is.
+and so I get my my pad and what you do is so the same thing you take the 15
+possible weights you treat them as different actions compute the different
+weights for them compute the next states it will give you and then compute the
+reward for it and store that reward and then you pick pick the best one that's
+That's it.
+So I'll put him on spot also, otherwise he'll start to run.
+So what you could see now, you get the directions.
+And in green, you get the one he picked
+as being the best action he could choose.
+And I can start to control and see if I can walk
+in a specific direction.
+It might see here, for instance, a stack in the 15 pose
+that forces him to keep running and turning.
+might be able to solve that at some point,
+but it has the greedy algorithm.
+Sometimes it can turn fairly quickly,
+but it gets stuck and doesn't manage to leave that way.
+It states, yeah, I managed to make it turn
+in the opposite way.
+So greedy algorithm kind of work,
+but of course we know it's far from being the optimal way
+of picking your next frame of animation.
+So we need to be able to use value functions
+and Bellman equation to go to the next system.
+So we'll use the Markov decision process control.
+And what we really have in this case,
+here with the reinforcement learning part
+is that we basically have,
+We have a continuous state space,
+because my character here can truly be in any position.
+So that's a continuous state space.
+And what we have is also,
+because we are on that field,
+we have a continuous value function also.
+So, we need to find a way to store that value function and what we will be doing in this
+case is using what we already have.
+We already have the motion field.
+So, basically, what happens is that we have, inside of that field, we have the states that
+all the frames we know. And then we will compute the value functions for each of those states.
+So we get the value functions per one value function per goal, of course. So that one will be
+discretized, but we will blend them together, but it will be discretized in a number of buckets
+for all the directions we want to cover, let's say. And then we will compute those values for
+every state in our motion field and then when we want to request the value for
+that motion field we will for the value functions we will also use the motion
+field to returns a blended values so if you request that's what they've done
+here. You get the next states, the three you have here maybe, and then you will ask the motion
+field itself again to find all the closest value and then to blend them back to give you the value
+functions again. And so it means that what we've done to find the closest pose and blend all the
+values with a similarity weight will be reused to also compute the value functions itself.
+The value functions we will query at a certain state. We'll find the 15 closest values to that one
+and then we will use the similarity weights to blend all the values functions that we had
+into one value functions. And for the training of that value function,
+what we'll do is that we will do fit value iteration. Why? Because we only work on the
+states we know. So what will happen is that we will compute the next states of every
+states we have and that's it we'll stop there we don't do explorations and all
+like I said like like we were doing in other papers before we pre-compute all
+the states and all the next states and all the actions we can take and we
+compute the score and then we iterate through that until we have the
+value functions that converge so what I would do is that I will pre-compute
+first for all of my states the the 15 actions they can pick and and where for
+those 15 actions I will compute also what if what happened if I picked action
+one action two action three action four and so on and I will compute the position
+position positions where those 15 will be and from those I will compute the
+15 closest states that can be used to compute the value functions so that's
+why you pre-compute this is because for every for every action you pick now you
+you take the 15 closest poses you blend towards those 15 poses and for those
+15s you retake 15 times the closest values so we will pre-compute this to
+win sometimes and I will even I will just store it because it takes me 10
+minutes to compute all of those and now that I have all those states you know I
+have to have everything from here to the next frame and all the stuff I can
+blend, I can start to compute the value functions. And I would do it with PyTorch, because, you
+know, everything is pre-computed, it's one big buffer, everything can be done in parallel.
+So let's do that on the GPU, so I can win a lot of time there computing that value functions.
+And how I would do this is basically, I have my value functions that just a bunch of zeros to
+start with. I'll put to the on the GPU my deltas of how much each of my frames will rotate.
+I get the indices of the next frame to look at the the value functions and I get the weights.
+I can compute in one go the offset of orientations that would happen for all of my states at once.
+Yeah, I have a bunch of walking animations and a bunch of jogging animations, so I just have a flag
+to know if I'm walking or jogging. And then you compute what will be the next orientations
+for all the states for each actions and for each offsets in which I wanted to look at.
+E compute the rewards and basically the reward is the same as before as the negativity of the
+absolute next orientation and I'm also adding a score depending if I'm walking or jogging
+because I only want to have one value function that makes me walking and one value function
+that will make me jog. And then basically that's where the blending happens. So
+how to say, you get a 2D blending in this case. What happens is that you first you will blend
+the 15 values, you have to blend them with the weights. And then the orientations in what you
+want to work. I've said that I've split the values in X numbers. And then you will just say, okay,
+if my value is here right in the middle, I just need to do a linear blend between those two values.
+And so that's what this part is doing. It is checking where you're landing in the orientation
+and you just give you the range of the two values you have to blend and which blend factor
+you have to blend them. So that's what this is computing. All of that is pre-computed once
+into one find a bunch of big buffers and then at every iterations now every epoch you basically
+take all the the the next value functions you gather we're using all those indices all the
+values together you blend them you compute the next one and then you get the usual value functions
+you know your Q is the reward plus the expected next reward and your best value is the maximum
+of all the possible functions you have. Then I compute the Bellman residual to see
+how much the current value functions compare to the expected value functions is
+And that's how you to see if you are actually converging.
+And then when you finish, I put that back on the CPU and I compute that twice.
+So I will have two value functions.
+I got a value functions for the walking and one value function for the jogging.
+So basically, that's what this score will be.
+It will be, it will give you an advantage of walking when asked you to walk and an advantage
+of jogging when asked you to jog.
+compute those two so I get 308 epoch to try to get that stabilized and I get the gamma of 0.99
+and we could see now the convergence of the on the jogging one so that's the amount of difference
+I had in the value functions and the expected next values.
+And so what you have now with this value function is basically that.
+We could start to use it as we use it usually.
+So what I have is I only have one button to decide if I want to use the value functions
+for walking or the value functions for jogging.
+I got the direction in which I want to walk I compute my 15 closest neighbors
+again then for all of them I compute the next pose and what I would do is that I
+will store the query inside of what I call a batch query because I will store
+for the 15 of them, I will store the positions where that would lead me and I
+will store the batch data prime also so how much basically score that will give
+me and then I can re-request the next indices and next weights but for the
+batch now. That's why I said it was useful in PyTorch to be able to say I want to query
+the system for one query or I can query it for a batch of queries. This is what's allowed
+me to query the 15 different positions at once. And once you have this, what I could
+do now is compute the future reward for each of those 15 different poses and I get the future reward
+and then I use that future reward to know which one of the value I want to use.
+Then I also use the contact of my foot and I've been lazy in this one, I only checking if the
+toes are in contact or not and if they are in contact I lock them in positions and if they're not
+I'll let them go and blend them back to their default positions for the animation slowly
+that's it and I don't know anything more fancy on the the foot contact and so on
+And that gives you this, the motion field.
+So I will not put them on spot this time.
+Given some room and here we go.
+Now to be honest, I had to cheat and slow down a lot
+the rendering and to speed it up again in a post.
+And that's only because I guess it's my PyTorch
+PyTorch implementations, calling PyTorch twice a frame probably forces the entire system
+to go to synchronize the CPU and GPU and drop my frame rates pretty badly.
+So this is speeded up and that's only speeded up because of my PyTorch implementations.
+was the motion field and as I said is one of my favorite paper always wanted to implement that one
+finally had the chance to look at it which was really great I hope you liked it and see you next time

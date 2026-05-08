@@ -1,0 +1,487 @@
+Earlier we've seen how we could create a motion graph starting from one big animation
+and today as an introduction to reinforcement learning we will see how we could use that motion
+graph to build a runtime animation controller. Hi, I'm Jérôme and today's paper will be
+pre-computing avatar behavior from human motion data, a paper from 2004. So the idea of that paper
+is to start from a motion graph. So what I've done is that I've saved a bunch of information from
+the notebook with the motion graph. So I don't have to recompute the motion graph from scratch.
+I would already have all the transitions and all that kind of stuff saved for me. So what I've done
+is of course loading all the libraries and then I will load my character and I've also added all
+the foot contact so I can do a quick IK pass to stabilize my foot at run time. I have a sphere
+for debug and here's the informations I have from the motion graph data. So I have the animation
+that I've used to do that locomotion. I have the window size that was used. I have the frame
+validity. So I know inside of that big animations which frames are meant to be used and which are
+invalid. I had a bunch of range that I didn't want to use. And I get the local minima. So basically
+all the time, all the places where I could have transitions. So that's all informations coming
+from the motion graph. What I would do is quickly compute the foot contact again. So I know when
+when I have a contact on the ground.
+And as a reminder, here is the animation
+that was used to build a motion graph.
+So this is the entire animation here.
+So a bunch of locomotions walking along
+and then see that's the range
+that I want to use the teleportations.
+And then I get higher turns, smaller turns
+and all that kind of stuff.
+So that's what was used when we were doing the motion graph.
+Now, I will recreate the motion graph here.
+I only have all the transitions possible.
+But what I would do is that I will do it the same way
+as the paper has done it in this case.
+So instead of using the motion graph with every node,
+being a bunch of frames and every edge,
+being the jump where you could go.
+What we will do is that we will turn this graph
+into a state and action graph,
+which is tens of terms that you will hear a lot
+when we start to talk about reinforcement learning
+and all of those.
+So now it's a bunch of states.
+So instead of having all my frames of animation and jump,
+I only have the state and the state represents one frame
+where I can take a decision.
+So it doesn't represent an animation anymore
+and represent a pose.
+And the action itself is the animation you could take,
+you could do to reach the next state.
+So each state is one pose and each actions
+are actually the animations that leads the next state.
+So I will build the graph in this way.
+So I will have a state,
+and each state will have a bunch of actions,
+and the actions will be knowing the starting frame
+of animations and the end frame of animations.
+So that really the action that has the animations.
+And the way you compute this kind of stuff,
+basically you start by creating an action of one frame
+creating an action of one frame between every states as in this case all the
+bees so you create all the actions then you add what I've done is I'm adding all
+the transitions that were coming from the computed motion graph that says you
+could jump from here to here and that kind of stuff so that's all the action
+that represents the jumps.
+And then you will basically pick one of any states.
+And then you check its first action,
+and then you check the state.
+And if that state has only one action,
+you basically collapse the edge.
+So you make the edge longer and longer and longer.
+And then basically all the states
+that don't have any edges anymore discarded.
+So that's how I've done it here.
+I get all my edges and then I start to collapse them
+if they don't have anything that need to lead to.
+And when you've done all of that,
+basically you end up with 540 different states.
+So that's the number of states I have.
+And each of those states have at least two actions
+they can pick from. What I would do then, because I have all those states and the states
+that themselves are the actual animations, I will start to pre-compute a bunch of stuff
+on those states just to make my life easier when I will keep going through the paper and
+I need to play back a bunch of stuff. So what I would do is that now every actions I know
+exactly where they start from and up to where they go. So I will store the trajectory of the root
+motion directly in the state. Remember my animations is all over the place in world space
+and I only want to be able to move everything into local space. So everything I will do
+is that every start of the actions I take the first position as being neutral and bring it back
+back to zero zero. And I take the trajectory as a local trajectory based on the first frame.
+And thanks to that one, I can have a local trajectory that basically is just the amount
+of displacement I have along every frame. So when I would want to play back the animation,
+the only thing I have to care about now is always adding the amount of trajectory, local
+trajectory at every frame. I don't need anymore to compute all the transform, bringing back
+the character, realigning them, all that kind of stuff, because basically all my motion is local
+to the previous frame that was played anyway. So that's what I'm doing here. I go through every
+states, I go through every actions and then I pre-compute the local trajectory. So all of that
+now it's local to the frame of the state itself and then I compute the local trajectory that's
+just the offsets between frame to frame and I store that inside of the action so now my action has
+the trajectory it's expect and what I will do so far every time I was doing a paper
+I was pre-computing an animation and playing back that animation now what I want to be
+to be able to do is to be runtime. So I will actually create an animation player which just
+means that I stored informations of which frame I'm playing and what is the positions I'm in space
+and then I will have the foot lock mechanism. Basically that one is just really a simple
+like it and just check if the foot or it's even only checking if the toe is on the ground
+and if it is, I don't allow it to move from frame to frame and then if it's not, I just release
+that IK with a blend just to get a soft release every time I connect. And then the animation
+player itself basically knows which action is playing. It knows the frame of inside of that
+actions, where am I inside of along this action. I get the position and coordinates of really the
+pose of the character that it computes. I know which frame was played last. If I'm doing a transition,
+so am I blending between two animations and that kind of stuff.
+And so what happens is that you ticket every frame saying I need you to compute the next frame
+and if it has an action it goes and play the next frame of that action
+and when you reach the end of the action it just put the actions to none and says
+I have nothing left to play and what happened is that you could set an action and basically
+you add the new action to the next stuff and so on and so on so that's what the player would do.
+and if we go and see what happens now I get the animation player so I will
+start from my player and the only thing I will do is I start with tell him you
+play you you tick the player the only thing that if you don't have any action
+to do you will play you basically check in which state you should be you pick
+any randomly any action inside of that state you set that action and you play
+and you tick the player. So now you could see it would randomly play any animation from there.
+And what I can do is I can force him to keep playing and the player will basically keep
+playing. So now the timeline doesn't represent anything in my case, it's just runtime playing
+animations. And then that's the character randomly picking an action every time it
+finishes. Every time it reaches a state, it randomly picks an action. It will go not anywhere.
+We did the same with the motion graph. We walked randomly the motion graph. It's exactly the same
+concept here. Nothing really fancy is happening. So what we have is a motion graph that basically
+It's a bunch of states, and in each of those states,
+you could take a number of actions leading to the next state.
+Now, what we want to do is to build a control policy that
+will allow us to pick the best action to do,
+depending on a certain target, a certain goal.
+So if I want to have the character walking along
+and being able to say, I want you to walk and go there.
+Basically, that's the goal is to say,
+I want him to walk and reach that point.
+I will do the same stuff that they've done in this paper,
+which says that they wanted to make the boxer, in this case,
+walk along in the ring to reach the character
+they had to box with.
+So, what we will do is that
+we will discretize the world around the character
+and giving him a bunch of different targets
+that are a bunch of goals you could reach.
+So basically, we say there is a points,
+20 centimeters in front of you,
+find the best actions that will make sure
+that we walk next to that point.
+I will have another point that will be one meters away,
+give me the best actions
+that will actually make me reach that point
+and so on and so on.
+It's set up in a circle around the character that gives you a bunch of points that you
+could start to find the best animations that will allow you to reach any of those points.
+So at runtime, I will be able to say, I need you to go four decent minutes on your left
+and then it will give me the best animation that allows me to do this kind of stuff.
+To do this, basically what you do is that you create a reward function saying for every
+of the possible actions I have, this is the one that gives me the best results compared
+to the target you were asking me to do.
+So what happened is that we have a reward function and that reward function is basically
+depending on the states you are in
+and the action you pick.
+So for every states you are in
+and for every action you can pick,
+this is the score, this is the reward you will get.
+And how they compute this one.
+So basically what you have is the reward functions.
+It depends on the states.
+So the current state of the character.
+It depends on the target state,
+so which points am I trying to reach.
+And then it depends on the action
+that was taken by the avatar.
+And what you try to do is you would basically take
+the position of the character along the trajectory.
+That's why I saved the trajectory
+in local space to that action.
+I will have the point along that trajectory
+and the point from the target,
+say the point 10 centimeters in front,
+the one one meters in front and so on and so on.
+And I compute the distance of those
+and then put them through an exponential.
+And then finally, I have the discount factor.
+So it's a value that I will use to say
+the longer the animation is,
+the worst the reward gets.
+So if you manage to reach the point in 10 frames,
+it will be much better if you reach that target in 100 frames.
+So because you get the exponential here,
+it will go down fairly quickly,
+depending on the length of the animations.
+And then the reward will actually be the maximum value
+you could find along that path.
+I will say for that trajectory at some point,
+it will be really close to my target.
+So that will be the max t.
+But again, it finds the best score
+between long or short term and the closest positions.
+So that will be the reward function that we'll be computing.
+So what I would do is compute a bunch of stuff.
+The first thing that I'm interested in
+is knowing what is the maximum number of action
+any states can take.
+And actually I have one, at least one state
+that has seven actions.
+And the second one is the longest action I have
+and the longest action is 23 frames.
+So nearly one second of animations, the longest actions.
+So as they have in the paper,
+so they said I have a bunch of points around me.
+So this is what I would do.
+I will create the targets, positions.
+So all the points around me,
+So I'm starting from zero zeros,
+and then I go in circle with different ranges,
+and I get more points the further I am.
+And so that gives me 64 different targets.
+So 64 different goals I can reach.
+And then I will compute the immediate reward.
+So I will compute the reward
+with the formula I had here.
+So basically what you have,
+you get the rewards for each state,
+for each target, for all the maximum action count.
+So all of my states have a different number of actions.
+In this case, to make my life easier,
+I just take the maximum.
+So I create a big table,
+even if most of those points will be minus one.
+So a really bad reward,
+basically because you're trying to take an action
+that doesn't exist.
+I get the minus one by default says that that would be the action you would never take.
+And to win sometimes later, at the same time, I compute my next states. So what I do is that
+I know the trajectory of each of my actions. So I know that if I was in the specific states
+trying to reach a specific point and I played these specific actions, the next one anyway,
+will always lead me to the same point and that will be that next state in the state space.
+So what I've called a state space normally when you do reinforcement learning you get
+a table of states and action and basically state count and target position count all becomes one
+big state space. So if you check what I've done here is that I've computed everything using
+the states and the targets separately and then the action. But then when I'm reaching here what I've
+do is that I've reshaped the immediate reward and next states as being just a mix of all the
+different states, states becoming in this case the character position and the target I was trying
+to reach that becomes only one single state so that's why when I compute the next states I do
+it this way so I get only one value the next state is one value is really one states right
+so I have the immediate reward and the next states and so I can actually
+load my gamepad. Okay. So I can use my pad now to control my character. And what I will do is I
+will play the animation using that reward. So what happens is that if I don't have any action,
+I check the states I'm in. And then from there, I compute the
+I find the closest position, the closest target I can have. So
+everything was computed in local space. So every time I'm in a state and I'm asking to reach a
+certain point in world space, I need to convert that position relative to me
+and then find the closest target I could get. So that's what I'm doing here. I convert the position
+to be relative to me and then I take all the target positions and I try to find which one
+I'm the closest one. So I take the distance and I find the minimum argument, the minimum argument
+inside of that list that gives me the target state I'm trying to reach. And then I can just
+pick the reward. So I go with my reward and I say I'm in this state with this target state,
+I get a bunch of actions I can choose from, give me the one that gave me the best reward
+and then that will be my action. And I get my selected positions and all that kind of stuff
+just to let you see what I'm playing with. So what I have is this. I get a bunch of stuff on
+the ground. So I get my ball, which is the target I'm trying to reach. All those little
+transforms are all the different targets that are possible. And the big one is the one that
+right now I'm trying to match because that's the closest one to the to the
+sphere and so if I play my animation you could see what you have there and so
+the the grid only moves every time there is a state and every time there is an
+action that is taken so you could see it always tried to reach the closest one
+and the the the black line is the trajectory projected on the ground that
+represents the length of the action it takes and what it does. Now what you could see is that
+with the immediate reward it kind of stay close to that red ball but really even if I move it
+it tends to do whatever he wants. Every action it picked gives him the best solution to get
+the closest to the target he wanted to be. But he might get stuck into a weird state instead of the
+motion graph that means that even his best action would actually make him walk in the wrong
+direction. So you could see that's what happened. He managed to get close. He reached a bunch of
+states that had big locomotions. So he was able to walk but then he stuck on something that loops
+and is not even able to come here. So right now my policy to only use the reward you get from
+get me the best action is not really accurate, doesn't give me any good results.
+And that's where we will start to talk about reinforcement learning itself. Now what you
+want to realize is that the state and action we have now is actually what we call a mark
+of decision process or MDP in short. And an MDP basically means that any action you can
+take only depends on the state you are in. You don't care about the past and how you
+reach that state, the only thing that matters is what is the goal you want to reach.
+what are the actions that are available to you depending on the states you're in.
+So it only looks forward. And so the Markov decision process basically has a state and has
+a set of actions and you get the reward functions by taking one action depending on one state.
+You get discount factor which basically says how important the future is
+And then you get the transition functions that tell you, well, if I was in one state
+and I took one action, what is the next state I'm in, basically.
+And the goal of the MDP is to find a policy that basically maximizes the cumulative reward
+along the future.
+So the real function is this one.
+You have your gamma again here that reduce.
+at t0 means the first transition you take is the most important one and then every time you advance
+one step further this one will decrease and you will have the reward for the next state that
+picked the next action and then the reward for the next state that picked the next action and so
+on and so on. And what we're trying to find is to maximize this sum of infinite possibilities
+you'll have and find the best trajectory through all the states and actions you could take
+that give you the maximum cumulative reward. That is impossible to compute because it's an
+infinite sum, so we need to find a way to compute that kind of stuff and what we do usually is that
+we use the value function. What is the value functions? It basically stores the best reward
+you could have if you are in one state. So it gives you what you want to do. It basically tells you
+the maximum score you could have to pick any of the actions you have because you are inside of one
+state. So that's your immediate reward plus the discounting factor of the next state that already
+knows what is the best action reward you can have. So it is an iterative process. Basically,
+you have the immediate reward plus the future reward, but the future reward is actually computed
+with the same value functions as the one that you have here at this point. And thanks to this
+formulation, we have the Bellman update rules that basically says that you could just compute this
+As long as your gamma is less than one, you could iteratively compute this stuff
+and update the value every time you take one of the actions, you check the future,
+you update your values to take another action, take the futures and so on.
+And you can update your value functions and it will converge to a solution.
+So it starts from picking randomly any state action pair,
+compute the reward, estimate the value of the future reward,
+and then update your value functions.
+What I've done is that instead of have the value functions
+that's only states and best actions,
+what I would do is that I would have a value functions
+that have the states and each of the action,
+and I will compute all the actions separately.
+It's just to make the code easier to read here.
+So basically what you do is this,
+you randomly pick any states, any action,
+then you compute the length, you take the reward
+and I've pre-computed the reward.
+So at least I don't have to re-compute
+that same reward as every time.
+So I've pre-computed the reward, I get it.
+I also pre-computed what was the next state.
+So I already have the next state.
+And I can find the maximum values.
+So I will go from my value function that I'm computing,
+get the next states, find what is the best value
+I could ever dream of in that case,
+and that's my next max.
+And I can update my value function with a reward
+plus the next max, plus the future reward discount.
+And what they used as a discount was,
+that's why yeah that's what that here so they've used the the gamma again and
+it's multiplied directly by it's a power of the length of the animation again so
+if your action is really long your future reward anyway is less
+So instead of just taking the number of actions you took, it's actually the length of the animation itself that matters to reach.
+Then you can see that I'm slowly converging because the amount of values I have in total in my value functions doesn't change,
+even if I'm actually computing 30,000 different actions there spares, it did
+converge and quite close to a conversion after 370 epochs, so I've
+recomputed that value functions every time. And now that I have the value
+function, well instead of picking the immediate reward as I was doing before, I
+I can just use my value function
+and then we could see if the future reward
+makes the system a bit smarter
+to go and pick the next animations.
+So let's see.
+Walking around, you could see that it goes back
+to the blue sphere a bit faster
+and if I give him a target now,
+I would actually try to reach it a bit further
+or at least null in straight line when I give him a target.
+And I can start to annoy him a lot,
+just changing direction all the time.
+And as a reminder, if I go back to the immediate mode,
+this is what happens, it tends to play
+and live its own life, doesn't care about my targets.
+And if I ask him to go back with the value functions,
+here it is going back to the right direction.
+And so we've trained our first animation controller,
+basically it is now it has the value functions
+that allow him to pick the next best action
+using the future reward.
+But something you might have noticed is that
+in this case, I've actually been able to switch
+from the immediate mode to the value functions.
+And that's basically because when you train a policy
+like this, the policy just tells you which action
+you have to take depending on the states you're in.
+And so you could use different sets of policies
+depending on the stuff you want to do
+inside of your, the same motion graph.
+So you will have always the same states,
+always the same actions.
+The only thing you want to change
+is how you pick the best action.
+So something I don't really like in this case
+is that is not really able to go on the target
+and stays on the target.
+What I want to do is to basically says
+if you're close to the target,
+you go in idle mode and you stop walking.
+Unfortunately for me, I don't have in my motion graph
+any idle animation,
+because when we did the motion graph earlier,
+it was to do locomotion.
+So it basically works all the time.
+But there is something at the end of my animation here
+that basically says from frame 950 to frame 1200,
+it would stay around this spot and just do small steps.
+So what I would do is that instead of saying,
+go in idle because I don't have any,
+I would say, go play those frames of animation
+when you're close to the target,
+just stay close and play that.
+So I could train another policy.
+So what I would do is that instead of having my value
+functions, the one that makes me walk,
+I would do a second value function
+that I would call value function static.
+basically says, stay on the spot as best as you can.
+And this one only depend on the states.
+Now there is no target anymore.
+It's really, it's just you are inside of an animation
+and if I tell you to stop that the action
+I wanted you to do, there is no targets anyway.
+So my value functions is way smaller in this case.
+It's only has state counts and max action count.
+My reward itself is always zero, except if you were playing animations that started inside
+of that range and ended inside of that range.
+So really, I want you to play actions inside of the end of the range.
+And that's it.
+And then I propagate the same way I take the next states, find the next maximum score I
+can have.
+I have the same future reward discount,
+depending on the length of the animations, all the same.
+And then I can compute this reward.
+And you can see that it convert really quickly
+because basically everything is zero
+and the end of the animation is one
+and you just have to propagate those weights.
+And now what I do is that I don't control
+in which state I want to be manually.
+The only thing that happens is that if I'm close to the goal,
+If my position is close to the goal at just less than 50 centimeters,
+I will start to use that policy that says stay next to it. And if I'm further away,
+I use the walking policy to reach the goal. And so if I am here and I ask him to play,
+this is what I would get. So the green one means stay in spot. And you can see it plays
+basically that end of animations, it just stays and plays inside of those animations.
+And the way the value function was computed, it even gives you best scores if it keeps
+playing along in animations, because I would have a score of one for being inside an animation,
+but I will get a big reward because the next one was also in the same range, and I will
+get a big reward because the next one was also in the same range.
+So it will tend to play forward.
+You could see that even here,
+that represent the frame I was playing,
+that represent the transition is taking.
+So you could see it keeps playing all the range
+and then change every time to go back to the beginning.
+So that's that loop to give him the best reward.
+And if I move away, it will go
+and it will start to walk into that direction.
+And as long as if it gets close,
+it goes back to the other one.
+And I can come back here
+And it will walk again, coming back to the targets
+and stop to the targets.
+So that's the advantage of having this kind of stuff.
+You could change policies and depending on how you do,
+see it walk too far, it gets closed again,
+and so on and so on.
+Because there is nothing that forces him to not drift
+when he walks.
+So it will actually, from time to time,
+drift away from the target.
+And that's it.
+train two different policies on one motion graph and you could you could
+think of any type of policies doing different stuff what they've done in the
+paper that it was a boxing one so you have all the different points where you
+can we can punch and you could of course ask him to punch a specific points and
+it will move along punch it. Unfortunately, I didn't had enough punching animations inside of
+my libraries. So I've stayed with the locomotion one. But there's a lot of stuff you could learn.
+And starting from here, basically, what you will have is
+two different directions that the paper will start to go. They will get the branch that will try to
+to get a better motion graph with a lot more connections
+inside of a motion graph,
+because the more connections you have is the more states,
+you have is the more is how quickly you could react
+because it's all the time
+you could actually take a decision.
+You can only take decision at each action.
+So you would try to have a higher number of connections
+inside of your motion graph.
+That's one of the direction.
+Then you will get the other direction
+we say, what we want to do is to find another type of structures that allow us to have more
+and more actions, having actions smaller and smaller and smaller. And so you get the, you
+could take decisions more often. And so the maximum range you could have is at some point
+you will have that every frame would be a state and an action and you will be able to
+take an action at every frame so that will be for in a few paper and basically what will happen
+when you really have all this you will start to reach what the motion matching is which was
+the next step says the first step was to say I remove the motion graph and I have value functions
+that use reinforcement learning on. And then the motion matching would basically say,
+well, I will remove the reinforcement learning, but I will still have basically a value functions.
+We'll just see that it's not learned through the same process. It's extracted from the animations,
+but the concepts are the same. So that's why I love to go through those steps
+before reaching the motion matching. I hope you liked it and see you in our next paper about
+animations and reinforcement learning that will be slightly different.

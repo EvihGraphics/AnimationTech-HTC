@@ -1,0 +1,296 @@
+You have character animation data with issues with your feet that are sliding on the ground and you want to fix those
+Hi, I'm Jerome and today we will be looking at the footscade cleanup for motion capture editing a paper from 2002
+As always the first thing I would do is importing the
+All the libraries I would need inside of my notebook and I will load my characters as I'm doing
+every time. Now one thing I would do on top of this is creating a new mesh and
+that mesh is just a little target that I can place on the ground to display
+where I want to do some contacts. So just creating a new mesh. Now I would need
+to change a little my skeleton because the paper itself assumes that you have
+this skeleton. Basically it needs to have an eel joint and a ball joint and
+and that's because they need to be able to know where the ground is relative to your ankle
+and in my skeleton I don't have those bones yet
+so what I would do is inject the new bones here inside of my skeleton as child of the foot
+and now that I have this I actually have the same skeleton as what they want to have
+And now that I have the skeleton, I can actually load my animation on top.
+And what I would do is that I would load the animation once as the animation I'm retargeting,
+and that's the reason why my feet would be sliding.
+If you check the video about the animation data, I explain why that's happening.
+It's because my character has different proportions, so the feet would be sliding.
+And now what I will do also is I will import the original animation data, as is, with the
+character squashed, but with the actual position from the animation data.
+And the reason why I'm doing this is because the paper itself is there to fix your feet
+on the ground when you know that the feet should be locked.
+it doesn't help you to detect when you want to lock the feet. It's allow you to compute it properly
+but not the when. So luckily enough for me, the data from the Lafan database is actually extremely
+stable. So I will load the animation as the original data and I will use just the position
+of the bones and the speed of the bones to know when I want to get the contacts and when I wanted
+to move. So what I do is that I load twice the animation and then my character is a little bigger
+than the one from the data. So I'm moving the character up a little so there's a little bit
+of the ground, otherwise the feet are really in the ground. Now, as I said, I want to compute
+when I want to get the contacts. And what I will do is that I would build a big buffer
+with all the contacts for every frame. So I have a buffer which has the frame count
+and then four values and those four values are the left heel, left ball, right heel, right ball
+contacts basically when it's static or not and I'm just using the extract feed contacts which is
+just using an heuristic on the speed and I'm checking the the bone itself and if the bones
+from the left is moving faster than 0.04 cm per second or something. I don't remember exactly
+the speed itself but basically if the speed is lower than that I'm assuming that there is a
+contact otherwise it's moving. Now what I do after is actually smoothing the signal a little
+because it happens that you have a contact and then for one frame it turns off the contact
+and the kind of stuff. And I want to make sure that if I have just one or two frames that says
+I'm not in contact, it's probably mean that is just a bug in the detection. So I just want to
+smooth the signal and make sure that I will always have at least three frames of contacts.
+And that's what these little smooth functions are doing here. So now I can have
+my contact timing and then we could display exactly what this means here and
+so what I have is the animation moving and then you could see when I've
+detected that I want to have a contact and that's thanks to the original motion
+and you can see that the feet themselves are sliding compared to where the
+contacts are. At the bottom I have the signal on off for left heel, left ball,
+right heel, right ball basically. Now that we know what the contacts, when the
+contacts should happen, I can actually go through the paper and see what the
+algorithm is. So for the footskate cleanup methods, they basically have five
+different phases. And the first phase is to determine the position of each constraint.
+So to compute the constraint position, what the algorithm will do is compute it one bone at a time
+and what you do is that if you detect that the heel should be static, what you do is you go
+forward in time and then go for L1 frames. So it's a constant. You could change and tweak
+how long that window of frames will be. But then what you do is that you go forward in time and
+you check every frame as long as they also says that they are all in constraint. You take the
+the average of all those positions so you get all the positions take the average
+and you drop it on the ground to get the contact on the ground and for every
+other frames if they say I mean I'm in constraint and the frame before was
+already in constraint basically I already competed the average so I just keep
+the same constraint as the one from the frame before. You do this for each of
+your bones and the only thing that will change is if for instance the ball says
+I'm in constraint for the first time in this frame you will check if the heel
+was already constrained if it's the case basically you re-project the distance
+of the ball so you don't change the relation between heel ball the distance
+between the heel ball so it means that if you complete the heel first you put
+the heel on the ground, and then the ball says,
+now I'm also constrained.
+You put the ball on the ground
+and you move it to keep the same distance.
+If you do the opposite,
+it means that you get the ball first on the ground.
+By the time you hit the heel on the ground,
+you actually move the heel to realign the distance also.
+So that's what I'm doing here.
+I'm computing the contact position.
+And the difference I have is so I've used the L1
+as a 10 frame. And I will build a big buffer with all my constraint position buffer. So
+it takes all the frame counts, the position for the left, left, right, left, right balls,
+and then the XYZ position for the space. And I'm doing the entire buffer at once because
+basically I know the length of my animation, I can compute the entire animation in one
+the algorithm basically says that you could do it this way or you could do
+frame by frame and recompute everything or you could just try to build a bunch
+of buffers that have just the right sizes. It's easier for me to implement this
+paper by just saying well I'm doing the entire animation in one go. So I get a
+constraint buffer, position buffer and see basically that's what I'm
+I'm checking here, I'm checking if the constraint was,
+if the object was already constrained the frame before.
+In that case, I just keep the same position.
+Otherwise, I move forward L1 frame
+and I do the average and I drop it on the ground.
+And I do it for each and also
+reprojecting the distance.
+And I do it for each left heel, left ball and so on.
+So now that I've compute this,
+I can display what I will have here.
+And basically now, it's the same as before,
+except that the position you could see here
+for each target, they actually properly match where
+I will want them as the average of all the positions
+and basically the distance between heel and ball
+are respected every time.
+The second part of the algorithm now is to compute the ankle position and rotation you
+will want to apply because of those constraints.
+Again, to compute that ankle position and rotation, you have several cases that can
+happen and the the first case we will cover basically is the case when we have a double
+constraint so basically the heel and the ball are constrained that means that now we could
+actually compute exactly where the ankle should be because that's the the simplest
+case I have a fully constrained foot I can complete compute the ankle the orientation
+of the ankle and the position of the ankle. Now if you have a single constraint, so meaning that
+maybe you only have the heel that is constrained or maybe you only have the ball that is constrained,
+the only thing you have to do is not compute any reorientation of the ankle, you only want to move
+move the ball, move the ankle to match the right heel, the right ball or the right heel
+position depending on the context.
+So if you have a double constraint, you actually compute the position and orientation, and
+you have a single constraint, you only move the position.
+But that would work if you only have that single case.
+So if you only have always a single constraint
+or always double constraint, now you
+need to be able to transition from a single constraint up
+to a double constraint and all that kind of stuff.
+And that's what this explanation here is.
+It's about the fact that if, for instance, you
+compute a single constraint and you move your heel
+and goes where you want it, and then the frame after is
+double constraint, you will pop in that right position instantly. What you want to do instead
+is when we compute the actual angle for the angle, we don't save that information as an
+absolute value. We don't remember that it's exactly where we want the foot to be. We always
+compute those values as an offset compared to what the animation is. So if my animation
+says that my foot was here and I computed this position, I keep that information of
+offsets. I would want to correct on the ankle. And then if I come from a single
+constraint, I can propagate that offsets back in time and I can linearly blend that offset off.
+So what it means that if my constraint is here and my foot was here, the offset is that angle.
+And so what I will do is that the frame before, I will also reapply that offset a little,
+but a little less and then the frame before I still add that offset but a little less so first
+thing you do is that you rotate the ankle back in time you rotate the ankle and then you move the
+foot and it's the same if you have a double constraint and you reach a single constraint
+the same way you add that offsets and then you move the foot back and then add that offset and
+and then move your foot back.
+And you do it back in time and forward in time.
+And then if you have that weird case
+when you actually go from double constrain,
+back double constrain,
+you need to cross over that information.
+And that's the third case here.
+So again, ankle position and the rotation.
+So I will have my buffer for the ankle rotation
+and the buffer for the ankle position
+for both left and right and the first thing I compute is the compute the double constraints.
+So again, that's easy because then I can just compute the constraint and save that information
+inside of my buffer. And if I have to compute the single constraint, what happens is we check
+if you have a single constraint, we then go back in time to see if we come from a double
+constraint. If it's the case, I do the slabs. I'm lapping the amount of error I was doing
+because of the rotation. In the opposite way, if I will be reaching a double constraint,
+Then I also slurping that stuff and then the third case when I come from and go back to
+I'm slurping the two slurps together and then you get that final result. So that's basically what this
+Is doing and the only thing you have here is that we formula for the alpha and that comes from the paper also
+Dave
+They hear so basically that's how they smooth
+the transition. They don't do purely linear correction. They do easy and easy out
+correction and that's what the formula allows you to have. And so I can compute
+my constraints and now what I will have is my buffer here. I can display it and
+you could see where I would want the ankle to be and that's basically where
+every time you see there is a constraint that's actually where I want the
+ankle to be when we compute it. So we've computed the orientation and the
+position of the ankle. We can go to the next step and the next one is to
+compute the root placement and the root placement basically means that for
+instance imagine that you try to fix the foot and you put it really far away
+away from where the the hips can be, then you will have the issue that the foot cannot reach
+the constraint you wanted to fix. So what we will do is that we will move the the hips so
+we will make sure that the foot can always reach the position we want to do.
+And the root placement, well basically again it depends on the the case and how you want to
+compute it. If you only have one foot that is constrained, you could only, and it's too far,
+you could only move the root in the direction of the foot you're pulling. But if both feet are
+constrained, you actually need to compute the position here of where, by pulling on both feet,
+where the hips should be and that's basically at the intersection of both spheres so if imagine
+you have your foot and then you draw a sphere that is the size of your leg and you do that for
+the second one you have two spheres and that means you have one point in the middle where you could
+put the hips that make sure that both legs can reach the position if the hips is at that spot
+so that's how you do this and basically again to avoid having your root that just pulls
+one frame when suddenly you cannot reach what they do is that they average the position
+they average the the correction they will put on the roots along a bunch of frames
+so this is what we do here in the root position we try to compute the offset compare both legs
+If the distance does not match and then
+Average the position of all those roots and I have a buffer so I will have a buffer of the
+The root position now I would want to have
+In my case I can display where I want the hips to be
+Basically it won't change much because I'm actually never pulling the legs further than what the character is because my character is actually bigger
+that what the original animation was, so I will never have the need to pull that route.
+Now, because of the average, you're not sure that you will always be able to reach that position,
+but that's not an issue, it will be fixed by the next step anyway.
+The next step is to be able to actually compute the IK. The way they have implemented that is
+to go through these steps. You do compute the angle thanks to the fact that the legs in this
+case will be a triangle and then you could compute the angle you need for that triangle.
+So they do it in several paths, so you get the original pose, you don't move anything
+on that pose, then you change the knee angle and that's by computing this formula here.
+It's basically computing the angle thanks to the length of both legs and the length
+of the targets you're trying to reach.
+So you basically compute the triangle and you try to compute the angle you will have
+at the knee.
+And then when you computed that angle, you rotate the knee and now that you have rotated
+the knee, you could see the distance you have between where your foot would be and where
+your target should be.
+And you could rotate the entire leg to make sure that you are aligned with the foot.
+you realign the ankle to match what the ankle target was, and the last step they do and they
+actually stretch the leg. And why do they stretch the leg? Because of two things. The first thing is
+that if you remember when we moved the route, we said that we were doing the average, which means
+that it's possible that your route is still too far for the leg to actually be able to reach it.
+So you do need to be able to stretch the leg
+because of the smoothing we did on the roots.
+And the second thing that's,
+it's when we try to do IK on that kind of stuff
+with the legs that's really close to being stretched.
+What happened in IKs is that
+if your leg is really close to be straight,
+being straight or not will actually change the distance here really a little.
+So you might try to reach a point that is one or two centimeters away and then it will be really
+visible on your knee. Usually we call that a knee pop. It's something that you could see when you
+do IK. You see that knee that moves really fast because it just goes from here to here
+just because it had to close a really small distance so what they do is that they
+detect that the ankle is really close to be straight and they allow the leg to stretch
+in that case so they can avoid that knee pops and give more times for the for the knee to be straight
+And I would do the same except I will do a bit differently that the paper is doing it.
+I will not stretch the actual leg, I will just lock the angle of the knee and I will
+just stretch by moving the foot relative to the leg, meaning that basically that the formation
+is absorbed by my ankle and it's really not visible when you have a small
+distance seeing that the the ankle in changing in size is not more visible
+than trying to stretch the entire leg and moving knees ankle and everything so
+just by doing this I mean it's it's enough and so what I'm doing is this
+the the the part that you have here all the Arcos formula it's the one I'm
+doing here, so you are preparing all the different lengths compared to the distance, computing the
+vector, computing the arcos. And then I'm taking that arcos, and what I'm doing is that I'm
+putting it through a polynomial. I'll show you the polynomial later. Basically, just to make
+make sure that my ankle would avoid having that knee pop,
+and then I can compute the angle,
+I can rotate the knee,
+I can recompute the position of the knee,
+I can rotate the entire leg,
+compute the global position of the foot,
+and then put back my ankle.
+So it's all the step of the paper,
+and I do the same for the right leg and all kind of stuff.
+And just to show you what that weird polynomial is,
+It's just this.
+So basically, we could see it's really close
+of a straight line.
+And that's, an arc cost basically means
+that it's the inverse of the Christmas.
+So at minus one, I have 180 degrees.
+So my leg is really straight.
+And what I do is I have something
+that is nearly mapping, except here at the end.
+So the blue will be the arc cost value.
+and my orange one is the functions that I'm computing.
+You see that basically that means that if my leg
+should have been a straight line with 180 degrees,
+I'm just keeping a little angle in there.
+And that it goes further.
+And so you will always be able to make sure
+that you always keep an angle.
+And it's a smooth angle here.
+So at least I never have a straight leg
+and I'm never stretching.
+So it's not exactly how they were doing it,
+but it's one way of not having the knee pop, let's say.
+I can compute my IK, so at least I have something to show.
+And now I can render what they had here.
+And then you could see that when the constraint are on,
+Basically, my legs are properly placed,
+my foot are properly placed where the ankle wanted to be,
+except that you could see pops every time
+my animation turns on and off.
+You get that pop for every constraint.
+And so that's actually the last step of the algorithm.
+is the final processing.
+And what the final processing does is,
+well, realizing that we've computed every ankle position
+and all of that as an offset
+compared to where the animation was.
+And if you remember what we've moved from single to double,
+or double to single, we smooth out that information.
+And basically what the final processing
+would be doing is the same thing it would say okay now we could detect every
+time a constraint is done on and off and we could also propagate the the the
+offsets and blend them in and blend them out the same way we did for the
+single to double except now we do it for every constraint so check for the for
+the ankle, make sure that we turn on and off, and then we blend that information also forward
+the same way. And then when we've done this, we can finally do the IK on that solution
+instead of doing the IK before doing the final processing. And now what we have is this.
+You could see that moving in and out of a constraint now is perfectly smooth because
+we smooth out that information.
+So we have exactly what we wanted.
+And this is one of the way you could fix sliding issues.
+If you find this video to be too fast or too slow or not enough in detail, feel free to
+comments at the bottom so I know how to adjust for future videos and I will see
+you for the next paper.

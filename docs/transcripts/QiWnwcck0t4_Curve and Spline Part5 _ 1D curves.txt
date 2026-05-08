@@ -1,0 +1,261 @@
+Hi, we've seen all the curves and splines I wanted to cover in this video series.
+Now there is one thing I want to do with all those curves is that every time I showed you
+the curves it was actually in a 2D curve.
+So every point has x and y coordinate, x and y coordinate and then the parameterization
+of the curve itself was a T that was moving inside of that 2D space.
+It could have been a 3D space,
+so it could have been a curve going through a 3D world,
+would have been exactly the same mathematics.
+Now, if we want to use those curves
+to actually encode animation data,
+what we have to do is go down to a one-dimensional curve.
+And what I mean by that is that usually,
+if you encode animation data, you will do keyframes.
+So, you know, you have a timeline
+and each few frames you give a value
+and then you try to interpolate those values.
+So that's how usually you see basic curves use,
+the helmet curve use inside of Maya or that kind of stuff.
+Now, the mathematic for those might be a bit different
+than the 2D case.
+So I will cover each case and show you what we can do
+and how we can compute a 1D example
+to actually have key frames data.
+So if you go one dimensional spline,
+The first thing we can do is go with the Amid Curve.
+And a one-dimensional Amid Curve,
+which actually means the bottom line
+so that my X's will be actually my T,
+so it will be the T that I usually go through the curves,
+and I get the value as Y.
+Now, the Amid Curves goes between zero and one,
+and one thing I can do if it's only two keyframes.
+So what I have here is my keyframes are separate
+in key times and key values.
+So my key times is four and 25,
+my key values is four and two.
+And so I get the tangent that was normally decided
+for the curve.
+And if I render this, basically what happened now
+is that I have really my frames
+and I've plotted the values that I would get
+if I was requesting the value at each frame.
+So I had the keyframe data at my frame four and 26.
+Oh, it was four and 25, sorry, four and 25.
+And then that's my curve
+and you get everything here working properly.
+To get this to work,
+what I did actually is to assume
+that the Armit curve would be a value of size of one.
+And so I compute it as a size of one
+and then I scale up the value.
+so I can reach it.
+The only thing you have to do is that
+if you take your range and you actually scale it,
+what happens, the tangent you had
+would actually stays the same
+and so the curve will start to get flat.
+So the only thing you have to do is that
+knowing that you scaled your range,
+say that's my range here,
+between the two, I use that range
+to multiply my tangent.
+So actually I compensate for the fact
+that I will be stretching the curve I'm computing.
+So that's how you could do it for one single army curve.
+It's fairly easy to do.
+Just remember that you basically stretch your functions.
+So you actually have to stretch your tangent also.
+If we go one step further
+and we go toward the cardinal spline,
+we will have to do that same kind of concept,
+but there is a few tweak in there.
+If I go uniform cardinal spline meaning that every key frame every key time will
+be the same range between them so you know my key time here is 4, 8, 12, 16 so it's
+on a regular grid. I could do the same trick as the one I did for the
+Hermit curve. I can compute my cardinal spline and I can just stretch it. Now
+Now, because the cardinal spline already computes the tensions and the curve, for me in this
+case, I don't even need to bother about tension because when you go one dimension, basically
+that tension factor is useless.
+You cannot ask your cardinal spline to be linear or curved when you do one dimensional.
+You can only tweak the y values and the t is assumed to be regular under the hood.
+So the tension has no meaning.
+And so if I do this, basically I compute the kernel spline as if it was just, you know,
+a kernel spline that was going from one to four, just linear steps inside of my animation.
+I compute the curves, and then I can stretch it
+because the tension has already been computed,
+the curves have already been computed.
+I don't need to do anything else
+than just stretching the end results.
+Basically, actually, I'm not doing a stretch.
+I'm just stepping through it as if it was a stretch.
+So again, cardinal spline,
+if you are regular inside of a cardinal spline,
+then you can actually get the values for each frame
+just by requesting the value properly.
+Now if you go non-uniform cardinal spline,
+then you try to do the same thing,
+showing I take my entire cardinal spline
+and then compute it and try to stretch it.
+What will happen is basically this.
+My curve will not go through the points
+if it was really set up on the keyframes.
+It would assume that actually my T is linear
+And so my T will be, I assume that my frame is here
+and my frame is there.
+So I cannot just do a complete stretch
+of the final result.
+What I need to do instead is actually use the fact
+that I can do the Amid curve and I can stretch Amid curve.
+So I can reuse my functions that I had before,
+which was the one that converts the Carnival splines
+into a bunch of Hermit and so I could do that calling the cardinal spline having
+the Hermit points and then for each range I can properly stretch them the same way
+as I did it for the example of the Hermit just by restretching the the
+tangents for each of the range I'm computing and now I have something that
+looks correct with all my different tangents and I get the values that
+actually on the curve every time when I requested a keyframe. Okay? The next one
+is doing a basic curve. Again a basic curve of one dimensional might be a bit
+weird but then we could do the uniform basic curve meaning that I will have you
+know one basic curve is four points and so I have my four points properly
+spaced on my timeline so I get again my 481216 to represent my points and if I
+do this I can properly compute a Bezier curve that is actually a
+one-dimensional so I get my my T's down here and I get my values that go there
+now you might notice that when we go uniform Bezier curve it also means that
+my keyframes are really you know my first keyframe is at time zero my second one is at time one third
+my third one two third and my final one is at one remember when we did the conversion from
+bezier curve to amit curve we had to divide the tension by three that's one of the hints that's
+why we have to do it is because a uniform bezier curve basically has a split in four parts
+So it's 0, 1, 3, 2, 3, and 1.
+So it works if you really put all your points
+along those values.
+Now, if you were trying to do non-niform basic curves,
+I would have the same issues as the cardinal.
+It would just compute something that makes no sense.
+So there is actually only one way
+to do a basic curve that you could sample to get keyframes.
+And that's how every animation package are doing it,
+is that for this specific case,
+you actually do a 2D base year curve.
+So instead of having my time at the bottom and my value,
+what you will have is a 2D base year curve
+that will be time value together.
+And then we have to find a way to sample that properly
+to get the value we wanted for each frame.
+And that's what we call usually the finding y given x.
+I would first probably execute the example
+and then we can explain what's happening
+because it will be easier in this way.
+So when we do a basic of the t values
+that goes between them does not represent
+a linear time in my timeline.
+So the t value here is not continuous compared to all the keyframe I'm trying to reach.
+So the thing we have to do is actually try to find the opposite, asking if I want to
+be to a specific keyframe value, what would be the t parameters of my curve I need to
+use for that curve to actually be on that spot.
+And how we do this is by doing the mapping between t and the time, the real time.
+So I get my t value that goes between 0 and 1.
+And I get my real time that goes between 4 and 16.
+So that's the time that comes here.
+And I get the t down here.
+And so what you have to do is say, if I wanted to be at frame 10 in my timing here, if I want
+to be at frame 10, I need to be here and I need to be able to find the t value that
+represents my frame 10 and see it's not 0.5 because this is not just a linear mapping.
+And how you do this is basically realizing that this graph here, when we ask for what
+the T there is the same as moving that graph up and down and then trying to find the roots.
+So usually finding the roots mean finding where this curve will hit zero. That's how you find a
+root. And so what you need to do is to say I want to take the entire curve that was drawn as usual.
+I want to shift it down 10 frames because I'm looking for frame 10. And then as soon as I've
+I've shifted down, I can find my root,
+and I can know that it will be hitting here
+nearly something 0.4 or something, right?
+So that's what mathematically we do.
+And that's what this function is doing.
+It takes the time at which you actually want
+to evaluate for t, and it computes the basic curve
+with that little minus time I'm looking for.
+And then it finds the roots.
+I'm using the root function from NumPy.
+It's a cubic function,
+so you can have more than one root.
+I know that I'm constraining the system,
+so I can only have one root or zero
+if I'm outside of my animation.
+But if I'm inside of my animation,
+I constrain the curve itself
+to not give me more than one root,
+so I can just return the first root that will be valid.
+And to understand what's happening here and how we could we compute this it's basically because
+If I do it with same pie again to go through the mathematics
+If I start with the bezier function as usual, so that's the the bezier
+Compute it with the Bernstein basis function
+If I expand it all that's how you compute the entire
+function now based on x0 x1 x2 x3 and so on and I know that the thing I want to
+do is move it's basically taking the points you have here so I get my four
+points here and to move this up and down what I will do is actually I would
+shift the entire all the points here I would shift it on the side to actually
+try to bring that 10 right here, right?
+So what I'm doing now is I will keep the mathematics that
+actually compute the Bayesian curve.
+And I will say that I want to shift the entire Bayesian curve
+using a substitute.
+So I replace the x0 by x0 minus x1 is x1 minus x and so on.
+And that gives you that massive functions
+now, where every x0 is x0 minus x, x1 is x1 minus x and so on and so on and so on.
+And if I try to ask him to factorize that and re rearrange it, you will see that every x
+cancel each other except the last one. So you only have one minus x. So you could keep the
+entire functions as is and just do a minus x at the end and that's the beauty of doing it this way
+and that's what you have here basically when I find the roots I find the root for a cubic function
+that is a b c d and it's just the d that has the minus x here so that's how we actually do it for
+a basic curve it's a bit more involved a bit more complex but I tell you to have a 2d curve
+and to sample it linearly through your time.
+That's how it's completed usually.
+And the final thing I want to show you
+because it might be useful is good to be able
+to represent your animation data
+using one type of curves and that kind of stuff.
+One thing we might need to do at some point
+is actually encode your animation data.
+So it might come from a really massive array
+of data and you just want to fit a curve through it and encode a curve that represents your animation
+data that has heavily as what you have as input. And so what I would do here is actually fit a
+uniform cubic B spline using the minimize system from NumPy or SimPy. I don't remember
+which then where the minimize come from it comes from let me see minimize come from sci-pi sorry
+sci-pi optimize and so what i would have is basically a function and i will draw on the
+the annual results, that would be easier. So I have a function that is my orange dots.
+And that's the function that I would say I want to encode using cubic B spline. And
+I get all the points I want to use, the number of points I want to use for my cubic B spline.
+And that's where they will be placed. And I get the cubic B spline, which is the one
+I've computed that's how my animation would be rendered if I was using it. So I'm fairly close
+to my original data and how you do this kind of stuff is basically by having okay I have my
+function itself which is now a really complex function that I compute and then I would say
+how many points on that curve I would use to try to
+encode my data and I said that I would take 20 points around it. I get my B-spline basis,
+so again I'm using the formula for the matrix for the B-spline. I have my function to compute
+my B-spline and what I would do is I would have a bunch of points. So that's how many
+points I want to use on my B-spline. I would say I want to use seven points. And finally,
+I get the real value of my function. So I sample my function, as I said, 20 times between every
+points so that's my it's all the points on the time and that's the values of my complex function
+for all those x's so I take 100 points on my x and I compute the y values for those so I have
+an x y values for all of those points and I have an error function that would just be a square error
+sum of squares. So I will get my points and inputs. So that's really the control points
+of my b-spline. I compute my b-spline with it and then I do the sum of the squares error between
+the two. So it's the usual functions you use to minimize an error. You have to start with
+an initial guess. So my initial guess is to actually put my points on the curves,
+to put my control points on the curves and then I call the minimize with my
+error functions and my initial guess and the results itself will give me
+where I want that x to be. So my result is here and I get my
+optimal y value and then and now that I have the
+optimal y values for all of my points I can draw my b-spline so I can
+actually display it. That's how you get this kind of stuff. So
+it's an optimal uniform cubic B-spline meaning that if I give 20 control points
+they will all be spaced with the same space between them if you get only four
+that kind of stuff it's a uniform one so you're gonna have more range and
+more points in one range and less in the other range is really uniform
+but that's how in a nutshell how you would do
+fitting a curve and any type of spline. If you have a different type of spline that you
+actually want to fit, it would be the same concept. You would use the minimize and try
+to find the minimal error. That would be the simplest way to do it, thanks to SciPy.
+And I hope this would make sense for later papers when I will start to use these kind
+functions and we'll be able to come back to these videos if you ever need to dig a bit deeper into
+the curves I'm using at some point. I hope you enjoyed it and see you next time!

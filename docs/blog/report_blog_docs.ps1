@@ -25,13 +25,19 @@ repo_root = blog_root.parents[1]
 cases_path = repo_root / "tools" / "cases.yaml"
 media_manifest_path = blog_root / "media_manifest.json"
 
-gold_slugs = {
+deep_slugs = {
     "animation_format",
     "footskate_cleanup_for_motion_capture_editing",
     "motion_matching",
     "motion_graph",
     "real_time_planning_for_parameterized_human_motion",
     "curve_and_spline",
+    "laplacian_deformation",
+    "motion_warping",
+    "verbs_and_adverbs",
+    "precomputing_avatar_behavior",
+    "near_optimal_character_animation_with_continuous_control",
+    "motion_fields_for_interactive_character_animation",
 }
 
 def read_text(path):
@@ -43,6 +49,13 @@ def fmt_bytes(value):
         if value < 1024 or unit == "GB":
             return f"{value:.1f} {unit}" if unit != "B" else f"{int(value)} B"
         value /= 1024
+
+def count_mermaid(text):
+    return text.count("```mermaid")
+
+def count_cell_mermaid(text):
+    pattern = re.compile(r"^### (?:Cell|[A-Za-z0-9_-]+).*?(?=^### |\Z)", re.M | re.S)
+    return sum(1 for block in pattern.findall(text) if "```mermaid" in block)
 
 manifest = json.loads(read_text(cases_path))
 media_manifest = json.loads(read_text(media_manifest_path))
@@ -66,7 +79,7 @@ for case in target_cases:
     group = "AnimationPapers" if case["entry"].startswith("labs/AnimationPapers/") else "Theory"
     group_counts[group] += 1
     kind_counts[case.get("kind", "notebook")] += 1
-    if case["slug"] in gold_slugs:
+    if case["slug"] in deep_slugs:
         status_counts["deep_written_media_complete"] += 1
     else:
         status_counts["media_complete_publish_base"] += 1
@@ -87,9 +100,16 @@ for case in target_cases:
 step_count = 0
 png_count = 0
 webm_count = 0
+gif_count = 0
+mp4_count = 0
 png_bytes = 0
 webm_bytes = 0
+gif_bytes = 0
+mp4_bytes = 0
 output_types = Counter()
+media_roles = Counter()
+mermaid_counts = {}
+cell_mermaid_counts = {}
 unreferenced_assets = []
 extra_assets = []
 
@@ -101,14 +121,21 @@ for case in media_cases:
     assets_dir = repo_root / case.get("assets_dir", "")
     asset_readme = assets_dir / "README.md"
     video_file = media_manifest.get("video", {}).get("file", "00-walkthrough.webm")
-    expected_files = {step.get("file") for step in case.get("steps", []) if step.get("file")}
+    expected_files = set()
+    for step in case.get("steps", []):
+        for key in ("result_file", "card_file", "preview_gif", "video_mp4", "video_webm"):
+            if step.get(key):
+                expected_files.add(step.get(key))
     expected_files.add(video_file)
 
     step_count += len(case.get("steps", []))
     output_types.update(step.get("output_type", "<missing>") for step in case.get("steps", []))
+    media_roles.update(step.get("media_role", "<missing>") for step in case.get("steps", []))
 
     readme_text = read_text(readme) if readme.exists() else ""
     asset_text = read_text(asset_readme) if asset_readme.exists() else ""
+    mermaid_counts[slug] = count_mermaid(readme_text)
+    cell_mermaid_counts[slug] = count_cell_mermaid(readme_text)
     linked_assets = {
         Path(match.group(1)).name
         for match in asset_link_pattern.finditer(readme_text)
@@ -126,13 +153,19 @@ for case in media_cases:
         if file_name.lower().endswith(".png"):
             png_count += 1
             png_bytes += media_path.stat().st_size
+        elif file_name.lower().endswith(".gif"):
+            gif_count += 1
+            gif_bytes += media_path.stat().st_size
+        elif file_name.lower().endswith(".mp4"):
+            mp4_count += 1
+            mp4_bytes += media_path.stat().st_size
         elif file_name.lower().endswith(".webm"):
             webm_count += 1
             webm_bytes += media_path.stat().st_size
 
     if assets_dir.exists():
         for media_path in sorted(assets_dir.iterdir()):
-            if media_path.suffix.lower() not in {".png", ".webm"}:
+            if media_path.suffix.lower() not in {".png", ".gif", ".mp4", ".webm"}:
                 continue
             if media_path.name not in expected_files:
                 extra_assets.append(str(media_path.relative_to(repo_root)))
@@ -148,9 +181,18 @@ report = {
         "learning_steps": step_count,
         "png_count": png_count,
         "png_bytes": png_bytes,
+        "gif_count": gif_count,
+        "gif_bytes": gif_bytes,
+        "mp4_count": mp4_count,
+        "mp4_bytes": mp4_bytes,
         "webm_count": webm_count,
         "webm_bytes": webm_bytes,
         "output_types": dict(output_types),
+        "media_roles": dict(media_roles),
+    },
+    "mermaid": {
+        "case_blocks": mermaid_counts,
+        "cell_blocks": cell_mermaid_counts,
     },
     "issues": issues,
     "extra_assets": extra_assets,
@@ -168,11 +210,19 @@ print("Groups: " + ", ".join(f"{key}={value}" for key, value in sorted(group_cou
 print("Kinds: " + ", ".join(f"{key}={value}" for key, value in sorted(kind_counts.items())))
 print("Publish status: " + ", ".join(f"{key}={value}" for key, value in sorted(status_counts.items())))
 print(f"Learning steps: {step_count}")
-print(f"PNG cards: {png_count} ({fmt_bytes(png_bytes)})")
-print(f"WebM walkthroughs: {webm_count} ({fmt_bytes(webm_bytes)})")
+print(f"PNG media: {png_count} ({fmt_bytes(png_bytes)})")
+print(f"GIF previews: {gif_count} ({fmt_bytes(gif_bytes)})")
+print(f"MP4 videos: {mp4_count} ({fmt_bytes(mp4_bytes)})")
+print(f"WebM videos: {webm_count} ({fmt_bytes(webm_bytes)})")
 print("Output types:")
 for key, value in sorted(output_types.items()):
     print(f" - {key}: {value}")
+print("Media roles:")
+for key, value in sorted(media_roles.items()):
+    print(f" - {key}: {value}")
+print("Mermaid coverage:")
+print(f" - case-level blocks: {sum(mermaid_counts.values())}")
+print(f" - cell-level blocks: {sum(cell_mermaid_counts.values())}")
 
 if extra_assets:
     print("Extra media files not declared in media_manifest.json:")

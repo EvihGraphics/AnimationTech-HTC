@@ -1,0 +1,558 @@
+Hi, I wanted to talk about the Laplacian mesh deformation
+and how you could use that to not only deform a mesh
+but also deform an animation in this case.
+We will go through the basic step
+of the mathematics behind Laplacian deformations
+and we will see how we can grow the system of equations
+with more constraint up to the point
+that it will be useful for animations also.
+Laplacian deformations, first thing I will do
+It's important in my libraries.
+And when we talk about the Laplacian,
+it's a system that works on a graph.
+And so what we will have is that we will define a mesh
+as being a bunch of vertices connected through edges.
+And that could be seen as a graph, basically.
+And my vertices will be in R3, because I'm
+x, y, z coordinate in 3D dimensions.
+And I will build a Laplacian matrix
+using the normal descriptions that says that basically the Laplacian is the degree matrix
+minus the adjacency matrix. And what are those? The adjacency matrix says which vertices is connected
+to which vertices. So if I have five vertices inside of my mesh, I will have a matrix of five
+by five. And for every vertex that I connected, so if my vertex two is connected to vertex three,
+it means that in my matrix at row 2 column 3 I would have a 1 and at row 3 column 2 I would
+have a 1 also. So basically just saying which vertices are connected to which one. And the degree
+matrix is a diagonal matrix that in the diagonal just has the number of connections a vertex has.
+So if my vertex number zero has five connections, it means that in position zero zero I would have five.
+And the Laplacian is computed by just doing the degree minus the adjacency matrix.
+So for instance I will have these functions that compute the degree matrix from the adjacencies,
+because that's fairly easy to just sum the rows to see how many connections you have.
+And I have a little function that generates Laplacian, it's just a strip mesh
+with all the edges making squares and that's it.
+and that's it. So all my vertices are a bunch of squares connected together.
+And so, and it will compute for me, it will return the Laplacian, the adjacencies and the vertices.
+And I have a bit big functions that just draw any mesh you throw at it, just by giving him the
+list of vertices and the adjacency matrix, you can draw it in the entry D. So if I just display this
+functions, you will see that I will have the generic Laplacian and I can draw
+and I'll give me this trip. I've just generated it with my function.
+So why do we talk about the Laplacian coordinates?
+It's basically what we're interested in doing is to be able to deform a mesh but keep all the
+little deformations between the vertices to keep it the same. So try to deform the mesh as
+global but keep the details. And the Laplacian coordinates are the delta of your vertex.
+So if you know the position of all your vertices, what you do is that you take,
+for each vertex, you check all the vertices that are connected to it through an edge,
+you make the average of that, and you do your vertex minus that average. So the delta is just
+knowing how much offset you have between your positions
+and the average positions of all your neighbor.
+That's the Laplacian coordinates.
+And why we computed the Laplacian matrix,
+it's because that formula could be written
+as a matrix multiplication.
+It is just the Laplacian matrix multiplied by your vertex
+and that give you the deltas.
+What we want to do when we deform now,
+As I said, we try to deform the mesh as a global,
+but we also try to keep the little difference
+as close as possible.
+So what we want to do is to say that the delta VI prime,
+so the deform delta mesh,
+is exactly as close as possible
+as the deform delta mesh originally.
+So even if I deform my mesh,
+all the little details I'm trying to make them stay the same.
+So that's what we try to do as an error functions.
+We try to say the difference between the deform mesh
+and the original mesh is as small as possible.
+So what you try to do is to minimize that error.
+And if you write it as a matrix formulations,
+that means that we try to minimize these functions.
+And if I try to minimize these functions,
+mean that because it's a square it's fairly easy it just means that I need to take the
+derivative of that function and set it equal to zero and basically because a bunch of conditions
+on the shape of the Laplacian matrix you could actually simplify this down to say
+what we're trying to solve is just to say that the delta vi equal delta v and that's
+This is a system of linear equation because Lv is known, it's my delta, L is my big matrix
+of coefficients and V' are the position of the vertices I'm looking for.
+So that's a linear system of equations.
+And I can solve it through a least square system just as is.
+So for instance I take my functions I do L dot V to get my delta and I just give that
+to a least square solver saying that I get the Laplacian as A and I get the position
+of my vertex as B, or my delta, sorry.
+But deltas are in three dimensions, so actually I have to solve for x, y and z separately.
+So that's what I'm doing here, x, y and z separately.
+And if I don't give them anything else, it just tries to find the best solution with
+all the deltas and has no other info.
+So what happens is basically, it's useless in this case, but it just re-centered the
+entire machine zero zero.
+So that's just saying, serve the laplacian while there is basically nothing to serve.
+So what we want to do is to grow that system and says but there is a bunch of vertices
+that I want to anchor in some positions.
+So what you do is that you grow the system by having all the Laplacian on top and then
+you grow the matrix with all the constraints you want to add.
+And in this case the constraint is just saying I want this vertex number x to be in that
+position.
+So it's mandatory that one needs to be there.
+So that constraint function is just saying for every vertex that I will want to lock,
+I will make a row of zeros for every vertices that exist, and I just put a one in the vertex
+I'm trying to lock.
+And then the D there will be the true positions of the vertex I want to have, because that's
+what it says, it says vertex number five, for instance, will be in 0, 0, 0, that's it.
+So that's what I will be doing here.
+I will build a matrix that will be the length of all the vertices that exist and I will just
+set that my first constraints will constrain the first vertices and the second constraint
+will constrain the last vertex and then I will have the positions for those two vertices that
+I want to force and that's it. I grow my system by stacking the two matrices on top of each other
+and I concatenate the two um deltas and the positions and then again I solve for x y z
+and now we get what I asked for I basically said I want to pin the first vertex here
+and the last vertex over there and you see you get a nice curved shape so it works for two
+it works of course for three and so many as many anchors you're trying to to solve
+it tries to minimize the amount of errors of everything, so it tries to minimize the error
+of the vertices and the Laplacian deformations at the same time, which is why you get this shape here.
+Now, I've solved everything using the least square solver from SciPy.
+Basically, if you try to solve normally a least square, there is the pseudo inverse that you
+you could use formulations.
+So instead of, if you have an A dot X equal B,
+which is exactly what I have,
+I get the L dot V equal delta.
+So it's the same formula.
+And if I try to minimize the square distance of that,
+the formulations through a bunch of computations,
+you could derive this formula here
+that would say that you get the A transpose A equal X
+equal h transpose b and so that's something
+that you could solve directly now.
+It's not a least square problem anymore.
+The dimensions of those two matrix matches
+so you could do a true solve.
+So if you wanted to do a solve,
+usually what you do is that you inverse your a matrix
+and you multiply your b by it and that give you your x.
+So that's how you solve it numerically.
+So what I will do is that I will build this matrix
+to show you and solve it using a solver
+instead of a least co-solver now.
+So basically, I've done exactly the same.
+I've got my A and right hand side.
+And so I do the A transpose A
+and I do the A transpose B for the X, Y and Z separately.
+Again, I do have to do it separately
+for the three dimensions.
+And what it gives me is exactly the same answer.
+There is no difference.
+I've done a difference that I haven't done a least square.
+Now I've done the solve through matrix multiplications.
+The issues usually with this formulation
+because that kind of work and in this case it works
+is that it's not numerically stable
+in the if the system is big,
+it's not exactly solvable. So that's one way of formulating it and there is another way to do it
+is to do the more pen rows pseudo-inverse. Basically again without going too much in details
+it will allow you to solve these issues by replacing the A transpose A inverse by the
+the pseudo, the main rows, pseudo-inverse,
+that goes through a singular value decomposition,
+and that's way more stable to solve this kind of stuff.
+So now you could solve it just by doing,
+so as before, compute my delta, my A, my right-hand side,
+combine all of them.
+And instead of doing all the different math,
+I would do the pseudo-inverse,
+and the Penrose inverse from the NumPy or SciPy libraries.
+And it works also.
+It will give you, again, exactly the same answer,
+but this one is way more stable numerically.
+Now, be careful that it looks like
+haven't solved x, y, z separately.
+It's just because in NumPy and SciPy,
+all those dot projects are multi-dimensional.
+So it did solve x, y, z,
+But he did it in parallel for me and returned it XYZ parallel, but it was still solved separately
+It still solved XY and Z separately
+Now one thing you've noticed and as I said it quickly
+What it tries to do here it tries to solve
+For all the constraints we gave him so we told him you have to make sure that your lagrange
+range, multipliers, your deltas stays as close as possible and you have to try to make sure that
+you pin your vertices where I ask you to do it. The only stuff is that he's trying to minimize
+the amount of errors that all of that is bringing. So you could see that he hasn't pinned the vertices
+where I asked him to do it. He minimized the amount of error, but it was not perfect.
+But if you have a need, your vertex is to be pinned exactly at some places, you will
+have to go through another system of solving to say that you want to solve for the Lagrange
+subject to a bunch of constraints, which is what we will want to do here with the Lagrange
+multiplier this time.
+And so normally the basic problem of the Lagrange multiplier says that you're still trying to
+minimize a least square problem, but it's subject to a bunch of constraints, which is
+the case of what we have here.
+We have still LVE minus delta that we're trying to minimize, but the anchor positions are
+constrained.
+The Lagrange formulation for this problem, it says that you could add those two together
+and inject in the middle a bunch of Lagrange multipliers there.
+So it's the same formulations,
+you just get the Lagrange multiplier in the middle.
+And now if you try to minimize these issues,
+what you have to do is to take the derivative
+with respect to x, and I'll give you these formulations,
+and you need to take the derivative
+with respect to the Lagrange multipliers,
+that give you those formulations, those functions.
+And so all of that can be turned into one big linear system.
+And the one big linear system is this one now,
+is the ATA C transpose and then the C in the bottom zeros.
+So basically that's the first line here
+that you're trying to solve for A transpose B
+and the C with the D here.
+So it's all mapped into one big system.
+Again, you see the formulation had before,
+A transpose A, A transpose B,
+but you're also growing it with a constrained transpose
+and constrained and all that kind of stuff.
+And if you solve this system now,
+it would be exactly the same problem, right?
+You get the L transpose L.
+You get in response of zero blocks.
+this one you get the constraint so you make a block matrix with the l transpose l the constraint
+transpose the constraint and a bunch of zeros there and then you need to you could solve now
+it's not a least square it's a real solve just to be careful that you've solved for x but also
+for the Lagrange multipliers which I don't need so I'm only reading the vertices that's the only
+part I need and so now if you solve it this way your anchors are constrained
+and so they are really mapping at zero zero is exactly the positions you want
+it so that's going through the KKT system KKT system from the Lagrange
+multiplayer so you we've seen how to solve the Laplacian seen how to
+constraint the Laplacian if you wanted to make it really constrained. Now there is one other thing
+I've done every time that I said I've solved for x, y and z separately. And that's true,
+the l.x is only for one dimensions. What we want to do now is to say could we solve for x, y, z
+z at once. And so that we could do by growing the system of the Laplacian matrix using the
+Kronecker product. And if you do this, basically what happens is that I will try to grow my
+system by multiplying with the identity matrix of the size three because I have three vertices.
+And what will happen when I do this is that if I had five vertices and I got values, you
+you know, A, B, C, D, for instance, and E,
+I go up to there, but let's say I have A, B, C,
+and if I'm multiplied by the chronicle product,
+basically I will have now my matrix
+that will grow three times in the row
+and the column dimension.
+So instead of having A, B, C, I will have A00, B00, C00.
+On the second row, I will have zero, B0,
+zero a zero zero b zero zero c zero and then zero zero a zero zero b zero zero c so it makes the
+abc diagonal every time and by doing so it gives me the same the same values but on a bunch of
+different rows and so what i can do now is that instead of having my xyz as being xyz and versus
+second xyz and so on. I can actually stack them with a transpose so I can have xyz xyz xyz xyz
+inside of one big vector which is what I'm doing here with the v. I get the xyz xyz xyz
+and so I get one line for the x one line for the y one line for the z and so on. So you grow the
+entire system and you do the same for your ankles of course and for your positions so you grow
+everything the same way. The only thing I will do here is that I will actually do something I
+haven't done so far. I will add a weight to the anchor. And by changing the weights, you could
+decide how much of the laplacian need to be solved, how much of the anchor need to be solved.
+You could start to tweak values depending on each of the different stuff. So that's what I'm doing
+doing here, I give an anchor weights of three,
+building my Laplacian matrix as before.
+Now I just have an identity matrix.
+I do the chronicle product from the L,
+I multiply my delta now with a flattened version
+of vertices, so I will have x, y, z, x, y, z, deltas.
+I do my anchor, also grow it.
+And I also flatten my anchors
+and I multiply the weights of the anchor
+and the position by the weights
+and that give me some constraint
+on how close I want the object to be.
+And now, I still have the same results.
+The only difference is that I've solved for x, y, z
+in one pass instead of having solved for x and n, y, n, z.
+Now I have solved for x, y, z at once.
+And I could do it for more vertices, more anchors, and so on.
+And why am I interested in solving XYZ at once is that now I could start to think about
+constraints that would act on XYZ at once and not act separately on a bunch of dimensions.
+And one of the constraints we will be interested into adding into the system is to be able
+to say that we want to lock some edge.
+We want to say that some edges are not allowed to change.
+And so for this, what we will do is that we say that we will have some edges before modifications
+and after modifications they need to stay exactly the same length. So this is the same
+problem that we had when we said the deltas needs to stay the same. Now what we have to say is that
+the distances but the length of edges have to stay the same. And so what we have now is that we'll
+have the hv and the h is an edge incidence matrix. So it's a matrix I would say that's the two edges
+that are connected together and the thing that you do is that you put one vertex equal to one
+and the other vertex equal to minus one because what we want to make sure that if one move in
+one direction the other needs to move near the other directions to keep the length of an edge
+the same length and the functions for knowing the length of the edge is this one here it depends
+on the rest pose of the original length you had and the current length you've computed.
+Now the issue we have is that this formulation says that it depends on the distance of those edges
+and basically what it means is that the distances are computed with the square of the values. So
+So when we try to minimize the deltas,
+it will, at the same time, update the length that actually
+needs to be squared to know.
+And so it's not a linear system of equation anymore.
+You cannot solve this in one go.
+What you have to do is to solve it once,
+and then check the distance you have,
+compute the amount of errors you had between your edge,
+push in the system, solve again, and so on and so on.
+So it's a system that will become now iterative
+to fix the length, because you cannot do it in one pass.
+So that's what we will do here.
+I'll do it by growing all the system as 3D.
+So I get the Laplacian 3D, my Delta 3D,
+is my bunch of anchors, all stays the same.
+And now I have my iterations here.
+Basically, I will compute my h and the length of all my edges and how you do it is that you
+compute the original length. You compute the new vector that gives you the new length.
+You put the incidence matrix with 1 and minus 1, except that as I've done directly for the
+anchors giving a bunch of weights I would do the same for the edge constraint say I get the length
+that are uh instead of being just the one they actually have a weight so I've put the weight
+and minus weight and then the length you want to compute is the original length divided by the new
+length divided multiplied by our weight factor and you get the and the vector itself that's
+that multiply this.
+And now, you don't only solve for the L and N curves,
+you also solve for your H.
+So you grow your system with all the constraints,
+you solve with a least square, and you repeat,
+and you repeat until you converge towards something.
+So what I've done here is I said,
+I have a bunch of edges, that's the edges I want to look,
+that needs to stay the same.
+And those edges are those four that are here.
+So it tries to keep the length of those ones
+as close as possible as what they were before,
+while still doing everything else
+that the system was doing.
+And yeah.
+So that's the length constraint.
+That's one of the constraints
+you could add to the system.
+Another stuff that happens quickly when you try to do the Laplacian is this issue we have here is that
+basically what I've done is that I've completely rotated my vertex there
+but you could see that the Laplacian, the only thing it tries to do is try to deform the mesh
+but keeping all the local translate so it can only skew your mesh basically that's
+That's not anything it did.
+It skewed my mesh to try to match this.
+And it's probably not exactly the result
+I was expecting with the strip.
+When I said, take those two edges there
+and rotate them by 90 degrees,
+I would not expect that S shape.
+What you could do in the Laplacian is grow this
+into a system where what you try to do
+that instead of minimizing the amount of error
+with the deltas, you allow yourself
+to consider every vertex as a system inside of a transform.
+And it can rotate, and it can scale uniformly
+before doing that comparison.
+So you're trying to say, maybe you
+will find a smaller error if actually you
+had considered that everything just rotated 45 degrees.
+And that's what the transform here would be.
+The paper that talks about this one
+is a Laplacian surface editing.
+Let you read it if you want to go through the mathematics
+behind how they derive all those formulas and the matrices
+that we will use soon, where they come from.
+It's all from this paper, so from the Laplacian surface
+editing.
+But basically, what you're trying to do
+is to figure out what the transform you could find
+in a delta at the same time as trying
+to minimize everything else.
+The advantage of this system is that what they found
+is that you could solve for every vertex.
+So for every delta, since there is a TI,
+it's a different transform per delta. What you will want to do is to solve this system that
+basically says a contains all those vertices, your vertices and the vertices of all your neighbor
+and you stack them in the matrix like this one and if you solve that system for a x equal bi yb
+will be the position um of the of the deformed position so bi is all the deformed positions
+of your vertices ai is all the undeformed vertices positions and x what will return in
+this case it will return the s h1 h2 h3 t x t y tz and what there are there are the matrix that
+that's how the component of the matrix
+that's allowed you to rotate and scale a mesh
+as long as the rotations is small.
+So it's an approximation of a rotation matrix.
+So the S, C, S, H1, H1, H2, H3,
+all goes into that big matrix here.
+That is a transformation matrix.
+So solving this system,
+solving this system give you the transformation matrix
+that's how you to be plugged in there as a solve.
+Now, what is interesting to see is that to solve this,
+again, we get our friend formula A transpose A,
+say pseudo inverse, basically, through the pseudo inverse,
+we could compute those x's.
+And what is interesting is to see is that it depends,
+B depends on the deform vertices,
+Which means that what we have now is that before we had,
+in this case we had the undeformed vertices
+minus the deformed vertices.
+Now we have something here that's taken into account
+deformed vertices minus deformed vertices.
+So they all talk about basically the same thing.
+Which means that we could turn this weird formulation
+say the T delta I minus Lv prime.
+We can turn it as L minus transpose delta equal V prime.
+So basically this stuff become my A matrix.
+And we don't have Bs anymore here.
+We just have zeros because we've never moved it
+on the other side.
+We never have the LV equal LV prime.
+We moved everything on the left side
+so we can jump off the zero to solve
+and everything is recouped here
+and I'll give you the V prime.
+So the T can be just solved by solving this
+without taking care of the BI.
+And now you could solve all the systems.
+So what it means, it means that you
+have to pre-compute and solve the T for every vertices once,
+and then you could solve your least square as usual.
+So that's what I'm doing here.
+I take every vertex that I have, compute that big matrix, that big A matrix with all my vertices
+and my neighbors vertices. I do the pseudo inverse that gives me the S, H and T.
+I multiply my transpose by my deltas and that gives me my new deltas and then finally I remove
+it from my Laplacian and my L3 I removed my deltas and now basically now I have built this
+matrix instead of L I have my L minus T deltas. So that's what you pre-compute once
+and then you push that as your anchor, the anchor, you stack them as usual and so the
+difference now is that you don't solve for deltas anymore, you solve for a bunch of zeros.
+that's it you just have zeros to solve and you do your least square and if I do this
+now you could see that I have
+the deformations where he found out that it was better to actually rotate every
+elements up to reach in the direction I want it and it curve my shape here
+and also it scaled it because I give it something bigger you see that the first
+The first square is bigger. It actually scaled the entire square to find out the best solution in this case.
+So that was the interesting stuff of this paper, to be able to turn this into a transform issue.
+Now I could have the transform and on top of it add my edge constraint.
+And so what I would do is that I will say that I want all my strips in the middle to keep the same length.
+And that's what I would try to solve.
+So again, I compute all the adjacencies in the L.
+And now I loop through my edges constraint
+at the same time.
+And what I get is this shape now.
+So not only has it rotated,
+it also has managed to keep the length of all my edges.
+Now what I will do is I will take all the functions
+rewrote and I will make one big function I can reuse and reuse every time I try to do a Laplacian
+deformation. So those functions will be basically the fact that you could compute the rotation
+and variance that transform for all the vertices and then you get the deform that salutes deform
+your mesh choosing different algorithm different constraints and weights and all that kind of
+stuff. So all of the options are inside of these deform functions now and I can reuse this function
+see to play and see what we could use,
+iterate to different number of iterations
+for the edge constraint, remove the edge constraint,
+remove the rotation and variance,
+use art constraint or art constraint,
+and use edge and so on and so on.
+So all the options are tweakable
+and you can play with them independently.
+So now that I have a function that will allow me
+to deform any type of mesh I could throw at it.
+What I would do is that I would decide
+to start to play with animation data instead of just
+my bunch of vertices here.
+So I will load my character, load my animation,
+and I will pre-compute a bunch of foot contacts.
+So I know when my foot are locked on the ground.
+And I would just render this so we
+see what we're talking about. So we just have this character walking along. And that's what I
+will want to use and deform using the Laplacian deformation. So the first thing I have to do
+is to convert my animation into a mesh, a Laplacian mesh. And so for this what I would do is I would
+take the animation and I will take a bunch of bones and all those bones I will get the positions
+in world space and I will take the positions of each of those bones for every frame and that will
+be all my vertices so that will be the position of the bones at every frame and then you have to
+build your adjacency matrix and the first adjacency matrix you will build is the skeleton
+adjacencies just saying that yes okay my foot is connected to my leg my leg is connected to my
+hips and so on and so on so that builds the the connections of the skeleton and I repeat that for
+every frame using the Kronecker product again to put it as a diagonal product. So my adjacencies
+so I'm getting from here is basically every pose at every frame are just connected the bones are
+connected between them and that's it. Then I get another function if I want to connect
+the bones together frame by frame so connecting my hips of frame and to my hips of frame and plus
+one and my foot of frame and to my foot of frame and plus one and so on and so on and a function
+to compute the laplacian out of it. And what I could do is then take my animation and I would take
+just a small piece of the animation that moves forward and I get much greater
+adjacencies, I connect to more of my animations frame and I compute my
+Laplacian and I will anchor the first pose and the last pose and the way I
+will anchor them is that I will take the ten first vertices, belongs to the first
+pose and the ten last vertices, they will be exactly the same pose as the first
+one, except that I will just shift them three meters in front. So that's what I'm building here.
+And if I display this, and I would just remove the stuff there. What you have is this.
+In black is the original animations. So every frame of the animation. And what you have in yellow
+is the deformed animations that I've done. So you could see it was nearly working straight,
+but just not straight and the first and last frame were not the same so you know I've locked the first
+and last frame to be exactly the same so I can have a nicer loop let's say
+now what we could see is by default I'm stretching the entire the entire animation a little
+and say if you could see hey all my feet were probably having were anchored and I have all
+all the positions at the right spot,
+while this one now is sliding a little.
+I have this, this one is more visible.
+My default mesh is sliding.
+So the first thing I would do is that I would add
+a bunch of length constraint.
+That was the reason why we wanted to have,
+the ability to have length constraint is because now
+I can add constraint inside of my animation.
+And all the edge constraints I will do is I will say between the two and the foot.
+If they were locked during the animation, so that's the foot tag is what I've computed
+as when do I have contact.
+If I have contact, I basically said that I want to lock the length between all those
+frames.
+I'm doing here and computing the length between of the all those frames and the
+second constraint of length I will do at the same time is that I would say what
+the length of the legs have to stay the same so I will basically say that for
+every frame every leg has to keep the same length and same for the for the
+foot so leg and foot have to stay the same all the time so if I turn the edge
+constraint. You can see that everything is red, means that it's all the edge
+constraint I have on the system. I have a lot of them and unfortunately it's hard
+to see, but yeah, you get the constraint that is between the frames also.
+So I'm only displaying the skeleton, I'm not displaying all the edges because you
+get more edges, you get all the edges off between the frames also. But as
+constraint you can see that it is it is there it's connected between them and
+those one should be zeros so one of the constraint so I can crank up the
+number of iterations it will do just to try to solve this a bit more and make
+sure that when it slides it basically groups keeps all the foot at the same
+time and move all of them at the same time. Another way you could have done this was to
+not making edge constraint and just saying that all of those were the same vertex and
+that pinning only one vertex but it will be harder at the later stage to recompute the animations
+because you know I would not have just match for every frame but that would be another solution to
+do it. The other things that I've also added is the way that I can say the height of the foot
+has to stay the same exactly between original animations and the new animation. And now I've
+done this just to say that instead of anchoring the the vertex by itself, now that I'm computing
+everything as x, y, z. I'm only anchoring the y-axis and I says all the y-axis of the foot
+has to stay the same. It can only move in x and z, but the y cannot change. So that's what
+the use feet height means is that you pick all the height of the feet and it cannot change.
+And now that I have deformed my animation the way I want it, I can go a little higher,
+see if it's any difference. Now that I have deformed the animation the way I wanted, I can
+regenerate animation out of it. And so how I would do this is I would take the original animations
+and take the new vertices, the new positions and basically I can take the original animations to
+know where what was the orientations and I can use all the position of the point, the vertex now
+to recompute IKs, recompute the orientations of the hips and the kind of stuff. So I recompute
+the hips orientation based on the position of the left and right leg and the height is between
+the spine and the hips that I have. That gives me the new hips and I do the same for both feet
+and I compute an IK between the two and so this allows me to recompute the animation so I can
+compute animations out of the original animation and my new vertices. And that gives me this now.
+I have my animation that match the new deformed Laplacian. So I've deformed my animations by
+turning into a mesh, deforming the mesh and turning the mesh back into an animation.
+And I can do all sorts of transformation this way.
+What I will do is that now that I have something that goes straight,
+what I want to do is to generate curved path animations out of this.
+And so I will have a function.
+So first thing first, I will make out the true animations out of the data.
+So now I have a walk straight animation. It's a real anim for me.
+and I have something that's allow me to say if I know that I have a path along a
+straight line well I can bend that path so that's what this function does if if
+I have a path that is straight and it points along that path I can
+actually bend those points and do whatever I want with it and I can shift
+them which I'll use also being able to bend in or bend out when you're bending.
+And so I would take my animations, my walk straight animation now.
+I will convert it as an aplation the same way.
+And what I will do now is that I will anchor every single vertex of it because I will make sure that
+all the vertices will bend using that curve function so basically I'm
+anchoring every vertices and what I got is let's remove first is this if I
+start to bend I'm bending all my meshes and I'm still solving for the
+Laplacian and solving for mainly solving for the edge length that's what
+would be interesting in this case because you could see now that my feet again are sliding
+because of the transformation I just gave it to you to it so I would recall the exact same function
+that says every bone has to keep the same length and every steps have to stay the same length
+so that's a use edge it has a hard time at the beginning of the few iterations but if you start
+to iterate and see that he can start to solve and figure out a curved path with the feet as
+locked as best as it can and you could bend it as much as you wanted. What I've done also is that I
+have bent the bottom and bent the top but shifted the top a little and depending on the angle so
+as to lean in basically. And now that I have this, I could throw it a bit more, make sure
+I have something fairly stable, and of course I can regenerate an animation out of it.
+And I get my animations of the character bending and walking along the path and curved.
+So that's probably a bit extreme, but that's the example. So this is what you could do with an
+Applation you could deform a mesh and then of course if you can deform a mesh
+you could try to turn your animation as a mesh and use it to deform your
+animations. I hope you liked it and see you next time.

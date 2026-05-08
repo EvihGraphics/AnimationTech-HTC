@@ -1,4 +1,4 @@
-﻿# Motion Graph：从相似姿态中构建动作转移图
+# Motion Graph：从相似姿态中构建动作转移图
 
 ## 元数据
 
@@ -143,9 +143,7 @@ Notebook 的前半段是离线建图：`Keep only a few ranges`、`Build point c
 
 本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和 PNG 学习卡片。PNG 由指定 cell 的代码摘要、输出区、viewer/canvas 或图表/日志合成，不使用整页滚动截图替代。
 
-<video controls muted src="assets/00-walkthrough.webm"></video>
-
-[下载 WebM](assets/00-walkthrough.webm)
+[打开/下载 WebM](assets/00-walkthrough.webm)
 
 | Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
 | --- | --- | --- | --- | --- |
@@ -235,3 +233,39 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpaper
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 motion_graph
 ```
+
+## 重点可视化 / 动画
+
+README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+
+[打开/下载总览 WebM](assets/00-walkthrough.webm)
+
+![Follow-path result viewer](assets/follow_path_visualization_preview.gif)
+
+[打开 MP4](assets/follow_path_visualization_preview.mp4) / [打开 WebM](assets/follow_path_visualization_preview.webm)
+
+| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
+| --- | --- | --- | --- | --- |
+| Cell 2 | `log` | `supporting_evidence` | Initialize Warp, NumPy, ipyanimlab, and graph dependencies. | [结果 PNG](assets/cropped_ranges_padding_result.png) / [代码卡](assets/cropped_ranges_padding.png) |
+| Cell 6 | `viewer` | `key_visual` | Render the source walking animation used to build the graph. | [结果 PNG](assets/motion_graph_overview_result.png) / [代码卡](assets/motion_graph_overview.png) |
+| Cell 12 | `viewer` | `key_visual` | Convert the skeleton pose to world-space point samples. | [结果 PNG](assets/point_cloud_pose_result.png) / [代码卡](assets/point_cloud_pose.png) |
+| Cell 15 | `viewer` | `key_visual` | Show source and target windows after horizontal translation and rotation alignment. | [结果 PNG](assets/alignment_pair_result.png) / [代码卡](assets/alignment_pair.png) |
+| Cell 21 | `plot` | `key_visual` | Plot the distance heatmap and mark local_minima candidates. | [结果 PNG](assets/distance_matrix_minima_result.png) / [代码卡](assets/distance_matrix_minima.png) |
+| Cell 28 | `log` | `supporting_evidence` | Print the strongly connected component pruning process. | [结果 PNG](assets/scc_pruning_result.png) / [代码卡](assets/scc_pruning.png) |
+| Cell 33 | `viewer` | `key_visual` | Play along graph edges while printing the current node and frame. | [结果 PNG](assets/graph_nodes_edges_result.png) / [代码卡](assets/graph_nodes_edges.png) |
+| Cell 45 | `timeline_viewer` | `key_animation` | Display the graph-search result and the Bezier target path together. | [结果 PNG](assets/follow_path_visualization_result.png) / [GIF](assets/follow_path_visualization_preview.gif) / [MP4](assets/follow_path_visualization_preview.mp4) / [WebM](assets/follow_path_visualization_preview.webm) / [代码卡](assets/follow_path_visualization.png) |
+
+## 代码 Cell 与可视化结果
+
+本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+
+| Cell / 片段 | 结果说明 | 证据 |
+| --- | --- | --- |
+| Cell 2 | The log confirms that distance matrices and local minima can be computed in the available environment. | [结果 PNG](assets/cropped_ranges_padding_result.png) / [代码卡](assets/cropped_ranges_padding.png) |
+| Cell 6 | The graph input is a playable sequence of walking frames. | [结果 PNG](assets/motion_graph_overview_result.png) / [代码卡](assets/motion_graph_overview.png) |
+| Cell 12 | Point-cloud distance is closer to visible pose similarity than comparing only root or quaternions. | [结果 PNG](assets/point_cloud_pose_result.png) / [代码卡](assets/point_cloud_pose.png) |
+| Cell 15 | Similar gait windows can transition even when their world positions differ. | [结果 PNG](assets/alignment_pair_result.png) / [代码卡](assets/alignment_pair.png) |
+| Cell 21 | Low-error regions in the matrix become potential transition edges. | [结果 PNG](assets/distance_matrix_minima_result.png) / [代码卡](assets/distance_matrix_minima.png) |
+| Cell 28 | Pruning keeps the runtime graph from entering dead ends that cannot continue generating motion. | [结果 PNG](assets/scc_pruning_result.png) / [代码卡](assets/scc_pruning.png) |
+| Cell 33 | This validates Node and Edge abstractions as a playable animation sequence. | [结果 PNG](assets/graph_nodes_edges_result.png) / [代码卡](assets/graph_nodes_edges.png) |
+| Cell 45 | The final viewer checks whether graph search can serve a path-following goal. | [结果 PNG](assets/follow_path_visualization_result.png) / [GIF](assets/follow_path_visualization_preview.gif) / [MP4](assets/follow_path_visualization_preview.mp4) / [WebM](assets/follow_path_visualization_preview.webm) / [代码卡](assets/follow_path_visualization.png) |

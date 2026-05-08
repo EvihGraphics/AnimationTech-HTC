@@ -1,0 +1,438 @@
+You have a bunch of animation data that are unstructured data and you want to be able to
+use those to generate a new animation specifically along a path or something like that.
+Hi, I'm Jerome and today we'll be looking at one of my favorite papers of all time,
+motion graphs, a paper from 2002. What I would do is that I will import my libraries as usual
+and then I will import my character and I will load one animation and then we could see that
+animation to show you what it is. It's basically a character walking along and doing a bunch of
+stuff inside of that animation but that animation is 7000 frame long which is a bit big for this
+kind of paper that was written a long time ago that was probably not dealing with that much of
+data and to speed up a little the process I would actually reduce that animation and I will do it
+as if it was small clips instead of having one big animation. So what I do is that I only keep
+a few ranges so what I would do is that I will only keep three pieces of the animation and I will
+reuse that as being my animation so I would just convert the animation itself and now
+it's basically the same. I have the beginning of the animation and then it would do a few
+walk and then jump in a different spot there. So that's one clip, the next clip and then does the
+same here, a bunch of walking and then it will walk, walk, then jump. So it's basically three
+different clips but I'm still packing them inside of one animation which will make my life
+easier inside of the notebook, the paper itself would actually work with several clips of one
+big animation. It's up to you on how you want to do it. Then, motion graphs. Basically, the idea
+of motion graphs is to have your animations and then build a graph out of it. And to build that
+graph, there will be a few steps to go through before being able to reach the graph status.
+And basically, if you go through the motion graph constructions,
+the first thing is to find the best candidate to make a graph out of it.
+So imagine you have two animations and you want to figure out from which frame inside of a first
+animation you could reach another frame and that would give you a transition that is smooth and
+doesn't pop. And so basically what you have to do is figure out inside of all your frames of
+animation, find the one that are matching so you could do the transitions. And there are several
+ways to detect those candidates. You could do it by checking the orientations of the bones
+and all that kind of stuff. But then, you know, quaternions can be tricky finding just the thing
+that rotations on the small rotation on the hips can have a lot of big impact while a small
+rotation on the hands has nearly no impact. So what I've decided to do is that instead of
+of looking at orientations itself,
+they said that what we see is actually a mesh.
+So what is the best solution to match
+is to make sure that visually the mesh will be matching.
+So you can test mesh with mesh
+because there will be a lot of vertices and that kind of stuff.
+So what they will do is that they will build a point cloud.
+And a point cloud is a lighter version of the mesh itself.
+itself. So what I would do is that I would generate my point cloud with the
+same kind of idea. So basically I have a bunch of points attached to each bone.
+So you see for the hips I have five points here that are attached for the
+right up leg. I have four bones, right leg, four bones, and four points. Sorry.
+So you get all those points. And to make my life easier at the end, also instead
+of remembering those cloud points and then recomputing their positions every time, I will
+actually generate a point cloud animation. So that's what I did here. I get a cloud animation so
+that I get all my frames, all the points cannot count and XYZ. So I have a bunch of points floating
+in space. And so that's my animation now that we could see what we have here is exactly this.
+we have the character walking and we get all the points that represent the point
+clouds attached to it as separate animations but synchronized. So I have
+the point clouds, I can start to, I know how to build the point clouds, I can
+start to look at the paper on how to compute the stuff. So those point clouds
+will be used to actually compute the distance between two frames. So you want to calculate the
+distance between frame AI and BJ. And instead of considering just the point clouds of frame AI
+and BJ, what they would do is that they know that we want to do a transition between AI and BJ.
+So, we would take a window of frames to do the point clouds.
+So the point clouds itself would not be frame AI, it will be frame AI up to frame AI plus
+10, something like that.
+And frame BJ will be BJ minus 10 up to BJ.
+So, what Salo allows us to do is to make sure that not only the position will be the same,
+But then the velocities of those points will be the same because they will be at the same
+position along several frames.
+So I'm not matching only one position, I'm matching the position, the velocities and
+even the accelerations if the windows is big enough.
+And so that's what we can do here.
+See, instead of having one, I go a bit further here, instead of having one point closed,
+I can actually have all the frame in front.
+that basically be, if I try to match frame A, that's frame A, and I want to match frame B,
+that frame B, it's all the point clouds in the back that represent one point cloud in front and
+one point cloud in front, one point cloud in back. So that's what we'll be comparing together
+to compute the distance. So my transition will be smooth. Now to compute the distance between the
+Those two point clouds we have to remember that they are in world space. So my characters is moving along
+inside of the
+animation and we want to make sure that when we compute the distance we compute the best distance possible
+if we did realign both characters together and
+So instead of just computing the distance itself what you do is actually you compute the minimized
+distance. So instead of computing just the distance, you compute the distance of PI.
+So PI is one point inside of my first point cloud. And P prime I is that corresponding
+point inside of the second point cloud, except that you could transform. So that's what the
+t is it's a transformation of the second point clouds and you could rotate theta and move x and z.
+So basically meaning that if I have one point cloud and I have a second point cloud I can
+with here for instance I can rotate it and I can move it on the same spot and then I'm trying to
+find the best stuff that gives me the minimal error possible and that gives me the best alignment
+and a minimal error. Luckily we don't have to actually run that minimized function
+because there is a closed form solution to that transform issues and that's the formula for the
+closed form solution so that's the angle and x and z offsets and basically what I would do is
+is have that functions as is.
+So it's really see the sum of the weights
+divided by the sum and all that kind of stuff.
+Give me the angle x and z and I can return angle x and z.
+And we could use now that Poincare alignment
+inside of our animations directly to see what they do.
+And so what I have is, for instance,
+I would move this character.
+So I get character in the back is my A frame, let's say character in front is my B frame.
+You could see that I'm computing the cloud alignments every single time.
+So of course, this guy now always stays more or less where the other guy is and you get
+the error, the amount of errors that each point clouds is giving me.
+So even when the error is really big, the alignment is not too bad.
+And then I get the T that set me to display what the transition would be if I was trying
+to do a transition between that frame A and that frame B.
+With a really big error like this, you could see that the transition is quite ugly.
+Basically you could see that the feet are just sliding.
+It makes no sense at all.
+So I'm just basically sliding.
+if I find an animation that has a frame that has a smaller error somewhere, can I find something?
+I'm sorry, 3,000, I'm not too bad. Let's say 3,000 here, and I try to do that with transitions.
+Now I get transitions that actually make a step, and so that transition is more natural
+than the other one. So at least we can compute the alignments, we can compute the distance,
+and then we could see that the transitions, if we were to take a transition at that time,
+it would work. So let's give us the distance functions and now what we need to do is to
+make sure that we can actually select when we want to do that transitions. So and to do this,
+what we will do is that we will compute, basically this, we will compute the distance
+between every frame with every frames and it will give us the error for every possible frames
+and what I would do for this is actually I would instead of running my function that I wrote here
+which is in NumPy I will actually run that functions rewrite that functions using the warp
+library and the warp library is an Nvidia library that's allow you to write
+Python code that is compiled into CUDA and runs on your GPU because my
+animations is 1000 frames so I actually have to do 1000 multiply by 1000 tests
+that's a lot of different tests that's a lot of alignments and all that kind of
+stuff so I will run that on the GPU that will be faster so I will compile this
+So it's the same functions basically exactly the same code written a bit
+differently to run on the GPU. Now compute the alignments and then the
+functions that compute the distance basically aligns the two point clouds
+stores the angle x and z values so I will be able to reuse it and then I
+compute the distance and I store the distance and now I can run this here so
+it takes a bit of time because it compiles the CUDA code and I will launch that on my GPU and
+runs for every points inside of the system and I will come back to you when it's done.
+Now it has computed the all the distance functions and you could see basically that
+mapping between every frames with every frames. Of course the line right in the middle there
+is the absolute best zero error because it's basically said I want to do a
+transition with the animations that it should be playing anyway because it's
+basically frame frame 200 with frame 200 is the same is the same frame you're
+mapping but then all the other one all the different blacks area are potential
+transition you could take between different different animation so I
+So I should be able to take a transition from frame 225 with the frame 50.
+That's the kind of stuff this map shows us.
+And the white rear is actually the three different animations I have.
+It was three clips back to back, so that white rear is actually transitioning from one clip
+to another.
+something it's out of bounds you shouldn't be playing any animations right there in the middle
+but that gives us an idea of all the arrows and then basically it's not enough to know that all
+those are really good candidates we don't want to basically have a graph that says I can take
+a transition from this frame this frame this frame this frame this frame and having a really big
+graph that goes nuts with tons of connections. What we want to do is what they did here,
+what they're mapping is different, white is the best, black is the worst, and for me it's the
+difference. But then what you try to do is to find the local minima. So the green dot represents
+the place where along all the frames around here, I'm the one that is the lowest error. So you
+you should pick me and nothing next to me
+because if I'm the best case,
+I would be the best case around me.
+So it's finding the local minima
+and then I would do the same.
+I will compute the local minima
+and again, I will do it inside of
+a CUDA kernel, just checking if for every frames,
+is all the frames around me worse and better than me
+they're all worth and me I'm a good candidate except if my error is too big anyway or if I'm
+on that diagonal area I don't want to be able to do transitions between myself so I run it on the
+GPU and I have the same thing except that if we go and zoom a little you could see all those
+yellow dots basically means they are local minima that are good enough to take a transition.
+So all of those would be transition points now inside of my graph.
+And to build the graph, what I would do is having a node inside of the graph, which has
+a node ID, it knows the start frame in which the node starts, its end frames when it stops,
+And all the edges you can take at the end, so when you reach the end, that's all the
+possible edge I can take, all the transitions I can take.
+And an edge basically has a start frame, end frame, does it blend or not, we'll come
+into it soon.
+An angle and X and Z, which were all the point clouds were aligned when we did that transition.
+And basically, when I'm starting this, what I do is that I start with a list of nodes,
+list of edges, and the frame mappings allow me to know basically which frame belongs to
+which node.
+So at least I have something that maps the length of the animations.
+I can say, hey, frame 25 in my animations, which node do you belong to?
+And that kind of stuff.
+So that's what the frame mapping allows me to do.
+And I'm building the graph starting with three nodes which are the three different clips
+and without any edge between them, it's just three nodes and that's it.
+And then to build the graph, you take every local minima you found inside of the animation
+and the way I'm doing it is you can represent your graph several ways.
+The choice I made is to say that a node always play its entire animations up to the end and
+only at the end can you take an edge to reach another node.
+I don't have edges that start in the middle of nodes and that kind of stuff, it's just
+at the end of the node you need to take an edge.
+So if a local minima says I'm leaving that node right in the middle of the node, the
+The first thing I do is, here, I'm actually splitting the node in two different nodes,
+and I have the first node that points towards the second one, saying that is a transition
+without any blend, because basically it's just back-to-back animations.
+And there is the second edges from that that goes from the end of the first node up to
+the actual frames I want to go in with the blending informations and angle and transforms
+and all kind of stuff and then you get all the edges and that kind of stuff and then building
+the graph you get this graph here and then you could see nodes so that's the entire graph all the
+nodes I have here with all their edges and all kind of stuff so lots lots of nodes that were
+building the graph. Now the issue we have when you do this when build a graph
+like this one what happened at some point is that you have this kind of
+graph and for instance if you were trying to traverse this graph to build
+animation and all of those if you reach the node number five you will be stuck
+there is no ways to get back inside of the animation and so the node five is
+and logo, it has to be removed basically from the graph, otherwise you might get stuck inside
+of your graph. And the way that they're pruning the graph basically is to compute the strongly
+connected components and you take the biggest one, the largest one, and that becomes the subgraph
+you keep. So in this case, you know, the biggest strongly connected graph is just this one, two,
+three, six, seven, eight. Everything else is discarded because it's not part of the biggest
+strongly graph. This one would be another strongly connected graph, but it's smaller
+than the other one. So keep on that, remove everything else. And that's how they prune the
+graph. It's a bit more complex because they also support the fact that you might have different
+type of animations inside of your graph. You might have, you know, all locomotions and then all
+crouching locomotions and all kind of stuff. So what you would do is that you will compute a
+strongly connected graph per type inside of those and you will keep the strongly connected,
+each of the strongly connected one for each style. In my case I only have one so it would be easier.
+I can only compute the main one and that would be enough. And to prune that graph to compute the
+strongly connected one, they use the Tarjan algorithm, which is what I've done here. It's
+the pure implementation of the Tarjan algorithm. I would not spend time explaining this one in
+And in this video, I might do another video talking about algorithms and covering this
+more in depth.
+But you can find a bunch of videos on internet anyway.
+Basically what it gives me, that's all the strongly connected graph.
+It's well connected in our case here, so basically this one is the big graph I can use.
+And all of those are graphs that are just representing one node that are completely out of access.
+So basically we want to keep all those nodes and then we can discard all those.
+And I will do it as the paper is doing it.
+So you basically traverse every edges and if an edge reach outside of the biggest subgraph,
+delete that edge. Once you've done that for all the edges, you go through all the nodes
+that basically have no edges that leave them. And delete all those nodes. And then what
+I'm doing is I'm remapping all the nodes, basically saying that, you know, the frame
+the node three and zero were gone. I didn't like having IDs and dangling IDs. So basically
+I'm remapping all my IDs now to go back again from zero up to 500 something.
+That's just the remapping. So what you have is that the number of edges I had before,
+so I deleted 50 edges and I've deleted four nodes. That's it.
+And once you have your graph like this, you could actually try to start to extract motion. So
+So you could do a walk through your graph
+and generate, what I have here, the transitions here,
+the transitions itself.
+So you could walk through the animations
+and through the graphs and append animations back to back
+and make the transitions between different animations.
+And that's what this function started me to do.
+Basically, I have the append no blend.
+So, you know, I've split a node in two.
+So I might want to actually be able to play back those nodes
+back to back inside of my animation again.
+So that's what the app on NoBlend does.
+It takes the frame inside of my source animations.
+The frame I'm starting, the frame I'm ending,
+and the generated animations.
+So the generated animation is the buffer
+which I'm building the animation that I'm outputting. And basically the only thing it does is
+imagine my character was walking and doing this and then I said that I want to append an animation
+that is from here. It takes that that animations realign it back at the end of my animation and
+stick it there and then keep going. So that's what it does. It realigns the clip and then
+And then you get the appen blend, which is the one that actually do a real transitions
+between two frames.
+Bit more complex because it has to know the current frame I was playing at the end of
+my nodes and where I'm starting my transitions
+and where I'm ending the clip I'm adding.
+And why do I need to do this?
+It's because, remember, I've said that I split nodes into
+as soon as I had the transition,
+which means now that if my character is here,
+the first thing I need to do is to stick back
+the next few frames after so I can do the transition
+and then I can bring the new animation,
+put it in the same spot,
+and so the transition would happen.
+So it's a bit complex, so that's what I do here.
+The first thing is, if I was at frame 50,
+I take frame 51 to frame 60, for instance,
+and bring it back here, realign it.
+Then I take animation B, so if my animation A is here,
+here, my animation B, it was there. I take my animation B and I make it do the same offset
+that this one did. So my A moved here, so my B moved there at the same time, do that with the B.
+And now that I have actually moved everything together, I can use the phi X and Z that was
+compute it by the cloud alignments to realign this on the same spot. So bring A on the same spot,
+bring B relative and B on the right spot thanks to the cloud alignments and then do the actual
+blend transitions. So blend a few frames and when you did that you get the blend and then
+after happened the end of the animations without the blend.
+And what I do in the blend is that I compute this not as a linear blending, I do it with
+is in is out, which is what they explained here, except that their mathematics are a
+bit weird and I don't know why they go a parameterized between minus one and K instead of zero
+and one but basically what I do is that I will be using this one which is the same formula that
+the one we've seen inside of the footscate cleanup. It's an easy knees out function that's
+allowed me to get a value that goes between zero and one linearly and give me a zero and one with
+a easy knees out which is that minus two x cube plus three x squared and that's the one I'm using
+here so I do an easy and easy blending and then I get the up and edge which makes my life easier
+take an edge find the length of every note it has to do make sure that it's a blend or not a blend
+call the right stuff and up and that toward the animation so as soon as we have this I can do for
+instance a completely random walk inside of the animation which is what I do here I have a max
+frame of 1000 and see as long as I haven't reached at least 900 frames, I'm just adding randomly an
+edge to the to the animation and that's it. And we could see what happens if you do this.
+You basically have this character that walks and do random stuff between different animations.
+What we see all the different colors is when which node is in, what the frame is playing,
+and the red and blue are the skeleton from and to transitions and the transition itself.
+And see, it goes and randomly pick any animation. But it's fairly smooth because we
+would basically force it to to find smooth transitions between the two.
+That's the extract motion I want a bit further.
+So searching for motions, because we haven't searched, we did actually work randomly,
+and they say is useless to work randomly inside your graph.
+I agree is probably a bit useless, might be useful if you try to train neural network, but
+in most of the case is useless to do random work.
+What you want to do is to be able to actually do a proper search
+through that graph.
+You do need to be able to give a purpose, a goal,
+and a cost function, say, how quickly you're
+getting to that goal and how fast you get to that goal.
+And so the way they've decided to do it
+is, there is the naive solutions as I said, I used to go depth first search and search every
+possible graph work you could do and pick the best one. Unfortunately that graph is fairly big
+and so as soon as you try to do this you will probably kill your computer trying to find the
+best solutions or wait for several thousand years. So there is a lot of different algorithms that
+have been studied along the years to solve these kind of issues. And the one they've picked in
+this case is to just do a branch and bound algorithm. Again, I will not go too much in
+detail with the branch and bound because I will probably do another video about it.
+but basically what the branch and bound does is just to make sure that when you
+start a search every single time you you you want to keep going further into your
+search you checking if you haven't found a path that was better than that one
+before so basically you keep track of the best path you found and if you if you
+find something that is better than the one we had you store that one and as
+soon as inside of your search you detect that it will be worth you stop and so
+the way they're doing it here is that every time you happen every time you
+happen an edge through your path you compute the error and that becomes the
+error the the the amount of error or the cost of that path and then you compare that every time with
+the best path you found and you stop as soon as you add an edge that we say but if I'm adding
+this edge now it will be worse than everything you found you stop the entire branch search so
+that's what the algorithm here is doing so I get the path I get the last node the amount of error
+the number of frames that this path is covering and then the list of edges. I don't need anything
+else to be able to rebuild an animation than the list of edges because an edge will give me a node.
+I need to play up to the end of that node and then take that and the next edge and so on. So
+I think the list of edges is enough for me to compute a path. And then the search algorithm is
+is just, as I said, the branch and bound algorithm.
+And one stuff I could compute
+with the branch and bound here is basically saying,
+okay, I have a stop function.
+Say if you reach that, you actually found the solution.
+And the reason why I would stop the search is that
+if you reach the node that has a node ID 200,
+It means that you are in the goal I was looking for.
+And when I open the functions,
+the only thing I do is I'm adding an edge, of course.
+And then when I'm adding the edge,
+I just compute the path and the amount of error
+is just a number of frame.
+So basically, the only thing I'm trying to
+force the search here to do
+is to find the shortest animation
+that will take me from one frame to another frame
+inside of my animations.
+So I will probably start at node zero.
+So if I'm starting at node zeroes
+and I'm trying to reach node 200
+and I'm asking to find the path,
+and he said he found the solutions
+and he did it in 26 frames.
+I can generate the animation out of it
+and I can display this animation.
+And basically, that was the solution
+we found to go from node zero, which is a frame 300.
+And you can say 300, 3, 4, 5, 6, 7, 8, 9, 10, 145.
+So it did jump back in time, and then it reached the solutions.
+So, and you could test other,
+let's try to reach node 500.
+It did find a solution in 60 frames,
+that's a bit bigger.
+And so from node zero up to that pose,
+that was the shortest path you could find.
+So pension bonds allow you to search through your graph
+depending of an input, cost functions,
+a goal and cost functions, let's say.
+Now, again, searching for a mission like this,
+they said deciding what to ask for,
+said asking for the shortest frames like this
+might not be useful, again,
+depending on what you try to do with it.
+What they are interesting in their case
+is trying to make the character walk along a certain path.
+And to do this, I would actually do what they do also.
+The first thing that I will generate a path
+that I want to create.
+So I would do it with Kubic Bezier.
+I will have videos explaining all the mathematics
+between all those functions that will arrive soon.
+But basically that's what I have here.
+Is the path I want my character to follow so I want him to start here walk along this path and
+Reach that point there and I will compute
+All the curve distance and and trajectory so I can I can do this and what I would do is that
+The cost functions and and the the stop would be a bit different
+I will execute this because it's not really optimized
+We take time to compute so
+Let it compute while I'm talking
+So what is the stop function now? It's actually saying that if the path my character has taken is
+As long as the path I wanted him to walk along
+You've reached your goal. So that's the stop functions. That's the reason why I wanted to stop
+And then when I happen an edge, that's where stuff is really not optimized because it was is just for a testing purpose more than actually
+making something running fast
+What I do is that every time an edge I build the entire animation from that
+path and I use that animations to compute the errors between what my
+character is walking along so basically I take every frame of my animation that
+has been generated, take the distance that the character is walking, and walk at the
+same speed along the curve I want him to follow, and I compute the distance between every point
+and assume that error as being the entire amount of error for the entire arc.
+And so basically that's what I'm doing here, computing the entire errors, total distance
+covered and that kind of stuff and I create that new path.
+Now even the branch and bound in this case would actually be extremely slow because
+there is a lot of solutions to walk along that long curve.
+So what they did in the paper and what I've done here is to say, I will not try to generate
+that path in one go as impossible. I will try to find a suboptimal solution. And to do this,
+I'm basically doing this. You would say you could look for the best path, but only for,
+in this case, 34 frames. And you'll find the best solution to make sure that the character
+walk along those along the path for those among the frames and then I will go back a little
+and I will restart from that point and I will redo a search of 34 frames from there and then I
+will go back a little and then redo a search and so on and so on so that's how you get a sub-optimal
+because you might have not found the best ways of walking along the path but at least every small
+steps is computable and you could try to reach it. You could see that's what it's doing here.
+It said that at the first time it did not find the solution. Of course it has only
+two frames of animations. So it didn't find and then eventually it did reach the end goal
+at some point and then we could see how it did it. So I can generate the animations and we could
+display this animation here. And we can see how he managed to walk along. I have absolutely
+zero constraint on the speed. I'm not asking him to do anything except walking. It is not
+even has any real intent to say you cannot stop. The only thing that I'm doing is that
+I'm putting the goal a little in front of him. So the errors keep accumulating if you
+refused to walk, let's say. So there is other cost functions that could be more complex.
+We could try to force him to make sure that it doesn't go through stops and all that kind of stuff.
+It was just here as a test to see if we could generate the path through an animations this way.
+I haven't implemented the entire paper. As you can see, the feet are sliding. I didn't add the
+the foot lock that I would need to actually put
+in the animation data at the first step to say
+that's the transition, you need to make sure
+that your feet are not sliding or that kind of stuff.
+I've skipped that part because really what I was interested
+in was the motion graph.
+I hope you enjoyed this motion graphs video
+as much as I love this paper.
+It's really a paper that starts a lot of different papers
+at the end.
+There is a bunch of papers talking about
+how to improve the graph generations, the amount of transitions it can take.
+There is papers that use this to to say how can we use this as a runtime in video games,
+that kind of stuff. So there is a lot of papers at the end. And it's really the paper I always
+come back to as soon as try to design something. Usually I come back to this one as a ground ID
+before starting to do anything more complex. So I hope you enjoyed it and see you next time.

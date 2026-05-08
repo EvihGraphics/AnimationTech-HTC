@@ -1,0 +1,213 @@
+Previously, we've seen how to fix sliding issues of our foot, but we had to know when
+the contact were happening.
+Now we might want to do this automatically, and this is the purpose of this paper.
+Hi, I'm Jérôme, and today we'll be looking at knowing when to put your foot down, a paper
+from 2006.
+This paper would basically use a model that you train on a few animation examples, and
+we try to extrapolate on all the animation data you have. So for this what I would do is that I
+will first load my character of course. I have a few constants that I will need later and finally
+what I would do is that I will load a bunch of animations and I have different walking style
+with coming from different actors. I have running animation, I get the dance animation, I get aiming
+animations. So quite a lot of different types of animations. So I have different types of
+foot contacts that I will be able to learn in the system. So I get running, I get walking
+backwards, I get a bunch of dance animations right in the middle there. A lot of different types of
+animations that we will be able to learn from. And if I look at how much data I have loaded this
+time, I have 22,600 frames of animations that I would want to use to learn what foot contacts
+look like. So how this paper works, basically the idea is to train what they call an oracle
+that is able to look at your foot animations and tell you if it's a contact with the toe
+heel for the left toe, left heel or right toe, right heel. So what we will build first
+is the feature vector that represents the data that we will feed to the system to
+to learn from.
+And it's not just the entire animations we give him,
+we will just give a feature vector
+that has the position of the toe, heel,
+and knee of both legs,
+but not only for the specific frames,
+but also for the frames,
+for an entire windows of frames before and after.
+So you basically look at a big windows of frames
+with the trajectories of all those positions for the heel, toe, and knee. And that's how
+you predict if at frames, right in the middle, if it's a contact or not. So that's the feature
+vectors that we're trying to build. What they had as a window, what they said they were using
+a 10 frames windows before and after, but the paper is actually running at 60 frames per second.
+Only at 30 frames. So my windows will only be five frames before and five frames after.
+And what we will create is this, I will compute it for the entire animation at once,
+so I don't have to recompute that every time I need to compute the feature vectors.
+So I will compute it once, so I get all my animations, all my frames,
+then I get my six bones I want to use, I get the XYZ positions in space of
+my six bones. And I do it for the entire windows of frames, so for my frames and for the five
+frames before and the five frames after. That gives me my feature vectors here. And I have a
+second one, which is a feature vector indices, basically will allow me to find back from my
+feature vectors, which frame animations it corresponds to, because I will have all my
+animations into one big feature vectors, but it's actually a bunch of different
+animations with different timing in it. So I need to be able to trace that back.
+And basically what they say is that the positions and orientations is irrelevant,
+irrelevant to know if you have a contact or not. So what we want to do is to make sure that
+every feature vectors is basically realigned in zero zero.
+So it all looks the same. We really look at the trajectory of the foot itself and not
+where it was in space. So what I will do for this is that I will project my hips on the ground
+to use it as the root motion, let's say, and I will compute the position of the
+foot for the entire windows of frame at that specific position in space.
+So probably easier to show and to explain what I was doing here.
+So I compute all my feature vectors and now basically the feature vector is this.
+You get all those little arrows, little dots.
+So here we are.
+And so if I take this for instance, it's one feature for one specific frame.
+So and you get so you could actually see the motions itself.
+So it's all stable, but that's the feature vector that the Oracle will see, right?
+And so now that we have the feature vectors, we could start to try to do the training.
+And to do the training, what would happen is that we will use a k-nearest neighbor classifier to
+to classify all those feature vectors and give them a label.
+But we'll have to do the training by hand first.
+And what they do is that they go for a 200 frames sequence
+at once.
+So they slice the entire animations a bunch of clips.
+And you do the training on one clip.
+And we will iterate with that kind of stuff.
+what I would do is the same thing here. I will start to train my oracle. So I have my trained
+feature vectors and I will have my trained label that tells me if I have contacts or not.
+And at this point, they're just empty because I haven't trained anything.
+And I will start to manually train one clip. And the thing I would do, I'll execute this,
+I would pick basically the first clip inside of animation.
+So I take the 200 first frames of animations
+in my entire system because I don't
+have anything better to start from.
+So let's start with the beginning.
+And so now that I would have this big code here, which
+actually is just there to let me see the data I'm looking at
+and the contacts I have.
+So this is the piece of animations
+that will start to train, sorry.
+So that's the piece of animation
+that we start to train manually for him to learn from.
+And basically, because I have nothing at this point,
+you can see I get no contact.
+But if I come here and I start to click,
+I will actually have the representations
+of the contact that's happened here
+and I could do it for both heel.
+So you could see tons of green
+when I say that this is a contact.
+I will not do it entirely manually under first step
+because I would be really annoying
+to go through all of this.
+So what I would do is that I would generate using speed
+as we were doing in the other papers before,
+but I will use bigger range.
+And then I can start to tweak my data as well.
+as long as I decide that this is still a contact.
+So foot contact, that's fairly good.
+And I would probably, sorry, here I'm back.
+And so I will start to tweak this manually
+for each of my animations.
+Make sure that it is correct most of the time.
+And I will probably speed this up
+so you don't see me going in the same doing this by hand.
+by hand. So I see you when this is done. And now basically, I have tweaked by hand all my
+contacts. So I'm making sure that they look like what I want them to be. And so I have
+one piece, I have one clip that I've done manually, and I can start to train my oracle
+with what I've done so far. So what I would do is I would take the trained feature vector
+and I would concatenate what I already trained with the new clips I've just done. So this is just to
+grow slowly what data I've actually trained. So my trained vector is just growing
+as with my label which means now that I actually have my trained feature vectors
+and I will be able to start to use the KNRs neighbor classifier. What they do
+with the KNRs neighbor classifier is basically feed all the features
+they've trained and all the label into it and then we will use it to predict in the futures.
+But to win some time, we will not only give the trained feature vectors, we will also
+give the mirrored version because everything we've done on one side is actually applicable for
+mirrored animations. So what I will do is that I will mirror the trained feature vectors just by
+multiplying the x values because basically I've made sure that everything is aligned
+around the zero zeros and the rotation so I can just mirror the feature vectors and I can
+mirror the label which is what I'm doing here. So the classifier itself will have a much bigger
+train feature vectors which will have everything that I have done plus everything mirrored and I can
+fit this into a nearest neighbor class from scipy because luckily enough it's already
+written for us and it is extremely fast as long as you just use the default Euler distance matrix
+And so we will use that one because it gives us a really big boost in performance and it's really easy to do
+In the paper, they were using also the nearest neighbor, but they were doing it themselves with the brute force manner
+And they use the error distance anyway, so we could just use what exists for us and
+Use the speed as much as we have so we've
+train a classifier with the nearest neighbor with the number of neighbors equal to 10 which is again
+the values they were using so whatever we give you is as soon as you're trying to ask for a position
+inside of a feature vectors it will return the 10 closest one which is what we're interested in
+and then we've trained the the nearest neighbor now the the oracle can start to do predictions
+so we do need to be able to predict. And how do you predict if a specific feature is a
+food contact or not? Basically what we do is that we take the 10 nearest labels to the one we have
+have. And then we sum them and we divide by the total. So it's just a probability that
+the classifier give us compared to everything else it has seen. So if you have a probability
+over 60%, we will say that it is a contact. If we have a probability that is less than
+40%, it is not the contact. And if the probability we find is between 40% and 60%, we basically
+switch only depending on the previous frame. So if we say I'm in 0.5 and the previous frame
+says I was in contact, I'm still in contact. If I'm 0.5 and the previous frame said I was
+not in contact, I'm not in contact either. So it's just to avoid jittering values that
+if you're always between 0.5, 0.5 and that kind of stuff,
+it's too avoid to have on, off, on, off, on, off.
+It's just we smooth the signal by saying only when we were sure it was on,
+if you're unsure we're still on and then as soon as we're sure it's not, we're not.
+So this is what the predict function will do.
+We give him a feature, well it's multi-dimensional inside of sci-pi.
+So the features itself could be only one specific frame, but it's more interestingly,
+it could be an entire animation, so they will tell you the label for the entire animations
+this way. So this is what I do, compute the probabilities. So I'm asking the classifier
+for the 10 nearest indices, then find the values inside of those labels,
+divide it by 10 and then check if it's less or more and if it's in between I
+make sure that it follows the rules. So that returns a label. Now I have the
+neighbors. The oracle is able to predict but how well we did predict it would
+probably be really bad because we really train it on really small data. So the
+The idea now is to iterate through the training process as long as you need.
+And the idea to do this is basically what they've done, I guess they talk it about
+the important sampling.
+So that's that here.
+So what do we do now that we have a training system?
+What I could do is I could ask the classifier to actually look into all my animations and
+tell me which frame has the worst possible distance between all my features.
+So basically, the clean nearest neighbor will have a bunch of features that will be in space
+around here, and all my animations will be around there also.
+But I might have animations that will be really far for which I haven't trained anything.
+And they're asking to find me the frame of animations that is the furthest away from
+anything he has seen already.
+And when I have that frame, I find the clip around that one that I have to train.
+And I will start to do the training on that one.
+So I make sure that I basically, I will start to train the system to see the most different
+animations possible.
+So this is what this will give me.
+So basically, I'm requesting all the distance with my indices and asking to find me the
+the worst one, and that becomes my new animations
+I would start to train, and I get back the animations I want.
+So I run this, it gives me a new feature vectors,
+and I can see what it has done.
+You see that it started already
+to predict a bunch of stuff,
+and it probably gets quite wrong on a lot of stuff, right?
+quite wrong on a lot of stuff right it did it could detect that sometimes there
+was contact but then so it detect that left leg fairly good but then still is
+still in contact so pretty bad and when you only train a retail system so
+basically what we have to do now is manually correct this clip and then
+when this one will be corrected we could again concatenate with what we already
+trained and then we can retrain a new classifier and we keep iterating this
+way. To avoid doing that with you what I've done is that I've already went
+through that process several times and I can just reload this data so basically
+what I've done is that I've trained 10 different clips so out of my 22,000
+frames have trained 2,000 frames.
+And I can actually train my classifier with these values.
+And if I tried to see what was the worst possible animations
+it could find, this is the first thing.
+So this is the one that we say is the worst animations
+predictions possible.
+And we could see that it's not too bad at what it predicted.
+So the idea of this paper is just to stop as soon as when
+it tells you that the worst frame is this one
+and it's actually not wrong.
+You could assume that you've finished training, basically,
+with all the animation of data you have.
+So this is how this paper works.
+It's fairly efficient, I would say.
+It's the first step into that machine learning concept,
+because basically it's a classifier,
+it's a model that you train, you fit data and you predict.
+It's the basics of all machine learning systems.
+So it was an interesting introduction
+on all of the systems.
+I haven't talked about key libraries and how they work and all that kind of stuff.
+You could find a lot of videos about the system themselves and those libraries themselves
+if you want to.
+I hope you liked it and see you next time.

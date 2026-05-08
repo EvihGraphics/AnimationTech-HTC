@@ -5,8 +5,8 @@
 当前发布状态：
 
 - 案例覆盖：19 个受管案例全部有独立子工程、`assets/` 目录、模块图、模块拆解和运行方式。
-- 媒体覆盖：19 个案例全部有学习型媒体，包含 142 张 PNG cell/source 学习卡和 19 段短 WebM walkthrough。
-- 深写状态：6 个代表案例已经深写完成，剩余 13 个案例保持媒体完整的发布基底，后续可继续扩写正文密度。
+- 媒体覆盖：19 个案例全部迁移到 v5 媒体结构，包含 142 张结果 PNG、142 张学习卡 PNG、30 个 GIF 预览、30 个 MP4/H.264、30 个 WebM/VP9 和 19 段 walkthrough WebM。
+- 深写状态：12 个代表案例已经深写完成，剩余 7 个案例保持媒体完整的发布基底，后续可继续扩写正文密度。
 
 ## 学习入口
 
@@ -121,16 +121,22 @@ flowchart LR
 
 ## 深写完成案例
 
-这些案例已经具备更完整的前置知识、代码执行路径、关键 cell / 函数深讲、至少 2 个 Mermaid 图、执行结果读法和素材清单。
+这些案例已经具备更完整的前置知识、代码执行路径、关键 cell / 函数深讲、Mermaid 图、执行结果读法和素材清单；新增重点案例还补齐了 cell-level Mermaid 与结果媒体读法。
 
 | 分组 | slug | 主题 |
 | --- | --- | --- |
 | AnimationPapers | [`animation_format`](AnimationPapers/animation_format/README.md) | 动画数据格式和通道组织 |
 | AnimationPapers | [`footskate_cleanup_for_motion_capture_editing`](AnimationPapers/footskate_cleanup_for_motion_capture_editing/README.md) | 脚滑检测、约束和修复 |
+| AnimationPapers | [`motion_fields_for_interactive_character_animation`](AnimationPapers/motion_fields_for_interactive_character_animation/README.md) | motion field 查询、候选动作和交互控制 |
 | AnimationPapers | [`motion_matching`](AnimationPapers/motion_matching/README.md) | 特征库检索式角色控制 |
 | AnimationPapers | [`motion_graph`](AnimationPapers/motion_graph/README.md) | 动作片段图与转移边 |
+| AnimationPapers | [`motion_warping`](AnimationPapers/motion_warping/README.md) | 接触约束下的时间/空间重定向 |
+| AnimationPapers | [`near_optimal_character_animation_with_continuous_control`](AnimationPapers/near_optimal_character_animation_with_continuous_control/README.md) | 连续控制中的候选扩展与代价裁剪 |
+| AnimationPapers | [`precomputing_avatar_behavior`](AnimationPapers/precomputing_avatar_behavior/README.md) | 离线行为图预计算与运行时查询 |
 | AnimationPapers | [`real_time_planning_for_parameterized_human_motion`](AnimationPapers/real_time_planning_for_parameterized_human_motion/README.md) | 参数化动作实时规划 |
+| AnimationPapers | [`verbs_and_adverbs`](AnimationPapers/verbs_and_adverbs/README.md) | RBF 语义空间中的动词/副词调制 |
 | Theory | [`curve_and_spline`](Theory/curve_and_spline/README.md) | 曲线、样条、参数和连续性 |
+| Theory | [`laplacian_deformation`](Theory/laplacian_deformation/README.md) | Laplacian 坐标、锚点约束和形变传播 |
 
 ## 全量案例索引
 
@@ -140,18 +146,18 @@ flowchart LR
 | AnimationPapers | [`footskate_cleanup_for_motion_capture_editing`](AnimationPapers/footskate_cleanup_for_motion_capture_editing/README.md) | `notebook` | 深写完成 + 媒体完整 |
 | AnimationPapers | [`halo_4_facial_animation`](AnimationPapers/halo_4_facial_animation/README.md) | `notebook` | 媒体完整 + 发布基底 |
 | AnimationPapers | [`knowing_when_to_put_your_foot_down`](AnimationPapers/knowing_when_to_put_your_foot_down/README.md) | `notebook` | 媒体完整 + 发布基底 |
-| AnimationPapers | [`motion_fields_for_interactive_character_animation`](AnimationPapers/motion_fields_for_interactive_character_animation/README.md) | `notebook` | 媒体完整 + 发布基底 |
+| AnimationPapers | [`motion_fields_for_interactive_character_animation`](AnimationPapers/motion_fields_for_interactive_character_animation/README.md) | `notebook` | 深写完成 + 媒体完整 |
 | AnimationPapers | [`motion_graph`](AnimationPapers/motion_graph/README.md) | `notebook` | 深写完成 + 媒体完整 |
 | AnimationPapers | [`motion_matching`](AnimationPapers/motion_matching/README.md) | `notebook` | 深写完成 + 媒体完整 |
-| AnimationPapers | [`motion_warping`](AnimationPapers/motion_warping/README.md) | `notebook` | 媒体完整 + 发布基底 |
-| AnimationPapers | [`near_optimal_character_animation_with_continuous_control`](AnimationPapers/near_optimal_character_animation_with_continuous_control/README.md) | `notebook` | 媒体完整 + 交互说明增强 |
-| AnimationPapers | [`precomputing_avatar_behavior`](AnimationPapers/precomputing_avatar_behavior/README.md) | `notebook` | 媒体完整 + 发布基底 |
+| AnimationPapers | [`motion_warping`](AnimationPapers/motion_warping/README.md) | `notebook` | 深写完成 + 媒体完整 |
+| AnimationPapers | [`near_optimal_character_animation_with_continuous_control`](AnimationPapers/near_optimal_character_animation_with_continuous_control/README.md) | `notebook` | 深写完成 + 媒体完整 |
+| AnimationPapers | [`precomputing_avatar_behavior`](AnimationPapers/precomputing_avatar_behavior/README.md) | `notebook` | 深写完成 + 媒体完整 |
 | AnimationPapers | [`real_time_planning_for_parameterized_human_motion`](AnimationPapers/real_time_planning_for_parameterized_human_motion/README.md) | `notebook` | 深写完成 + 媒体完整 |
-| AnimationPapers | [`verbs_and_adverbs`](AnimationPapers/verbs_and_adverbs/README.md) | `notebook` | 媒体完整 + 发布基底 |
+| AnimationPapers | [`verbs_and_adverbs`](AnimationPapers/verbs_and_adverbs/README.md) | `notebook` | 深写完成 + 媒体完整 |
 | AnimationPapers | [`real_time_planning_multiprocess_func`](AnimationPapers/real_time_planning_multiprocess_func/README.md) | `python_module` | 媒体完整 + 源码证据 |
 | AnimationPapers | [`halo_4_exporter_from_maya`](AnimationPapers/halo_4_exporter_from_maya/README.md) | `python_module` | 媒体完整 + 源码证据 |
 | Theory | [`curve_and_spline`](Theory/curve_and_spline/README.md) | `notebook` | 深写完成 + 媒体完整 |
-| Theory | [`laplacian_deformation`](Theory/laplacian_deformation/README.md) | `notebook` | 媒体完整 + 发布基底 |
+| Theory | [`laplacian_deformation`](Theory/laplacian_deformation/README.md) | `notebook` | 深写完成 + 媒体完整 |
 | Theory | [`motiongraph_pointcloud_derivation`](Theory/motiongraph_pointcloud_derivation/README.md) | `notebook` | 媒体完整 + 发布基底 |
 | Theory | [`radial_basis_function`](Theory/radial_basis_function/README.md) | `notebook` | 媒体完整 + 术语说明增强 |
 | Theory | [`radial_basis_function_verbs_and_adverbs`](Theory/radial_basis_function_verbs_and_adverbs/README.md) | `notebook` | 媒体完整 + 发布基底 |
@@ -177,8 +183,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\docs\blog\report_blog_docs
 每个案例目录包含：
 
 - `README.md`：canonical 博客正文。
-- `assets/`：PNG 学习卡、WebM walkthrough、图示和后续素材。
-- `assets/README.md`：素材清单，说明每个 PNG/WebM 的来源、用途和对应正文位置。
+- `assets/`：结果 PNG、GIF 预览、MP4/WebM 视频、学习卡 PNG、walkthrough WebM 和后续素材。
+- `assets/README.md`：素材清单，说明每个 PNG/GIF/MP4/WebM 的来源、用途和对应正文位置。
 
 `docs/examples/Footskate Cleanup for Motion Capture Editing.md` 和 PDF 保留为素材源；canonical 工程化版本放在 `docs/blog/AnimationPapers/footskate_cleanup_for_motion_capture_editing/README.md`。
 

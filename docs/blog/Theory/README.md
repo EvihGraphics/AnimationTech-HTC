@@ -8,7 +8,7 @@ Theory 分组对应后续动画案例所依赖的数学和几何基础。建议�
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 <slug>
 ```
 
-发布状态：5 个受管 notebook 全部有 README、assets 清单、学习型媒体和运行入口；其中 `curve_and_spline` 已深写完成，其余 4 个案例是媒体完整的发布基底。
+发布状态：5 个受管 notebook 全部有 README、assets 清单、v5 媒体和运行入口；其中 `curve_and_spline` 与 `laplacian_deformation` 已深写完成，其余 3 个案例是媒体完整的发布基底。
 
 ## 分组模块图
 
@@ -43,20 +43,21 @@ flowchart TD
 | slug | 读它时重点看什么 |
 | --- | --- |
 | [`curve_and_spline`](curve_and_spline/README.md) | 参数、控制点、插值和连续性如何决定曲线形状与运动速度。 |
+| [`laplacian_deformation`](laplacian_deformation/README.md) | Laplacian 坐标、锚点约束和旋转不变性如何把局部形变传播到整体网格。 |
 
 ## 全量案例列表
 
 | slug | 类型 | 发布状态 |
 | --- | --- | --- |
 | [`curve_and_spline`](curve_and_spline/README.md) | `notebook` | 深写完成 + 媒体完整 |
-| [`laplacian_deformation`](laplacian_deformation/README.md) | `notebook` | 媒体完整 + 发布基底 |
+| [`laplacian_deformation`](laplacian_deformation/README.md) | `notebook` | 深写完成 + 媒体完整 |
 | [`motiongraph_pointcloud_derivation`](motiongraph_pointcloud_derivation/README.md) | `notebook` | 媒体完整 + 发布基底 |
 | [`radial_basis_function`](radial_basis_function/README.md) | `notebook` | 媒体完整 + 术语说明增强 |
 | [`radial_basis_function_verbs_and_adverbs`](radial_basis_function_verbs_and_adverbs/README.md) | `notebook` | 媒体完整 + 发布基底 |
 
 ## 媒体与阅读建议
 
-本分组当前有 42 张 PNG 学习卡和 5 段 WebM walkthrough。素材覆盖图表、公式、矩阵、viewer 和交互控件状态，适合把数学推导和 notebook 输出并排阅读。
+本分组当前有 42 张结果 PNG、42 张学习卡 PNG、3 个 GIF 预览、3 个 MP4/H.264、3 个 WebM/VP9 和 5 段 walkthrough WebM。素材覆盖图表、公式、矩阵、viewer 和交互控件状态，适合把数学推导和 notebook 输出并排阅读。
 
 先看“总模块图”，建立输入、核心算法和输出之间的关系。再看“代码执行路径”，把 notebook 的 cell 顺序翻译成工程流水线。最后看“执行结果的意义”，明确图像、曲线或数值日志到底在验证什么。
 

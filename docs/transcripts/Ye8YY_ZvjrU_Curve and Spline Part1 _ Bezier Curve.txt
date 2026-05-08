@@ -1,0 +1,216 @@
+Hi, we will be talking about curves and splines.
+Basically, because when we are working with animations,
+they will have often the time when you will want to encode your animation.
+And somehow, if you have keyframes, you want to be able to have
+an interpretation between those keyframes. Or you might
+have an object that has to follow a certain path.
+So, mathematically, we will be using curves.
+types of curves and so I wanted to have those videos to show you the mathematical background
+behind a few of them so when we'll be doing white papers I will be able to just copy the
+code from this notebook and reuse them inside of our studies. When we talk about curve and spline
+basically we have two types of curves we have the approximation curves and we have the interpolation
+curves. Interpolation curves is the one you will want to use when you encode your animation data
+as keyframes. You will want to make sure that actually your interpolation goes through all
+the keyframes you set, and then you have in-betweens computed for you. That's the interpolation
+curves. In that case, we will study the helmet curves, and we will have the cardinal spline as
+And you have the approximation curves, which is the fact that you don't need your curve
+to go through every points, but you need to follow the data points as close as possible.
+And on the approximation curve, we will be using the Bezier curve, which is the most
+known one. And as it extends, we will be studying the cubic
+B's plane. So as a first one, we will be studying the basic
+curve. And what the basic curve is, is the most known one. In
+the industry, when we talk about animations, usually is the
+basic curve you encounter the first time. And we will be
+studying the basic curve through the Castell-Geo algorithm and first before going in through the
+mathematics and all that kind of stuff, what I would do is I will actually show you what it is
+and how it works and then we could see what is the mathematical formula for it. So a basic curve
+can be computed with any number of points. The only important part is that to know that the
+the basic curve is parametrized by a t-value usually that goes between 0 and 1 and the
+idea is that at time 0 you are at your the position of your first point and at t1 you
+will be at the position of your last point. So if I draw the basic curve for the simple
+case of a quadratic one. What you have is the we start at the first point, we end at the last
+point and we have the curve that goes towards the the point in between. And how the Castel
+Joaquin compute this it's basically by a bunch of linear interpolation. So what you do is that
+you take the linear interpolation of the point one and two that give you that yellow one and you
+you do the same with point 2 and 3 and I'll give you that red one and now that you have those two
+points you again do the linear interpolation between those two points and that give you
+the point on the Bezier curve and between zero and one it draws the entire Bezier curve this way
+and it works with any degrees so in this case I've showed you with the quadratic one if I go
+cubic so with the four points it is the same concept except that you have more steps of course
+you do interpolation between the first and second the second and third the third and fourth
+and so on and so on and you repeat every time and it works for any number of points as I said
+and the mathematical formula for it is a recursive function basically says that
+that a Bezier curve that has only one point
+is equal to that point, that's it.
+And any other Bezier curve that is defined with,
+in this case, N point is just equal
+to the linear interpolation with the Bezier curve
+that goes from point zero to point N minus one
+and the Bezier curve that goes from point one to point N.
+So it's really a simple algorithm.
+It's really stable mathematically.
+So it's the one that's usually used
+and presented the first time.
+And you can see that's the actual entire algorithm.
+Everything else is just to draw the graph here.
+So take a list of points.
+If there is only one point, you return it.
+And if there is more than one,
+you'd call back that function with the two different ranges and you do the linear interpolation
+between them. That's it, that's the Castelgio algorithm. Now, the Castelgio algorithm is
+well known and easy to use, but there is another way to compute a Bezier curve that you will
+probably uncontrollable at some point and it's to go through the Bernstein polynomials.
+So what are the Bernstein polynomials? It's a way of computing a bunch of functions depending
+of the degrees you want to use. So a Bernstein polynomial of degree n is defined at this function
+and basically is depending of the number on the the degree and the index and it's
+also a function of t that goes between zero and one and as you can see k goes
+from zero to n so if you do a bunch and polynomial of degree three you will have
+four different base basically so let me show you what they are exactly so that's
+the Bernstein basis just using that formula the binomial coefficients you
+have here in front that brackets I'm using the comb functions from sci-pi and
+And then if I just draw all of those,
+so for instance, for a degree three,
+I will go with degree one first.
+You can see what happened.
+A degree one, Bernstein will actually give you
+two polynomial, you know,
+and then you will have the first one
+that starts at zero and value of one
+and end at value zero at one,
+and the second one is just the opposite.
+And you could do as many of those and you could see that the first one already start at one and the last one always
+End at one and in between you have those curves
+the particularity of the Bernstein basis is that
+At any point between zero and one if you sum all of your basis
+You actually have one so you see the last one is the sum of my four
+for my five different curves and
+and it's equal to one. What the button bases are used usually for is for
+approximation, basically without going too much in detail, because between zero
+and one you can see you get a bunch of curves, so you could decide that you
+could try to give a multiplier for all of those different curves to try to
+to mimic any functions you receive as an input.
+So what I have here is my green one
+is the functions I tried to approximate
+using the Bernstein basis.
+And what I would do is that if I have degree one,
+the best fit I can have is something is just a line.
+But as soon as I start to get a bit more degrees,
+I can actually get closer and closer
+to the actual function I'm trying to approximate.
+And now with a degree 13,
+meaning with 14 coefficients,
+I can approximate my curves the best as I can.
+Now, that's usually where you will uncount the bone stain,
+but in our case, it can also be used
+to compute the Bezier curve.
+and how you compute a Bayesian curve
+thanks to the Bernstein polynomials.
+You basically take all the Bernstein functions
+for the degrees of the Bayesian curve you want to use.
+So if I want to do a cubic Bayesian curve,
+I will have four points,
+meaning that I will have four different bases
+for the Bernstein.
+And I would just multiply my first point
+with my first base, my second point,
+second base, third point, my third base, 4.4 base and sum all of them and it will give me the
+Bezier curve. So let me write my Bezier function this way. So I take the degrees and then I take
+my burst and Bezes, multiply it by the points, do it for each points and sum the results. So that's
+That's my function and you can see that if I just execute this function I will have the
+same curves as the one I had before.
+So it's my three points that my curves, four points curves and so on.
+And it's equal to the shape I have here.
+So that's the other way of computing the Bezier curve.
+And to show you that we are actually computing exactly the same things, what I would do is
+that I will use SimPy, which is the symbolic Mathematics library inside of Python.
+And SimPy allow you to do math as in calculus, so you don't actually compute values.
+You could use letters and keep those letters.
+So what I would do is write the formula for a cubic Bezier using the Casteljeu algorithm.
+So I do the linear interpolation for the first point, and so on, so on, and so forth, and
+then I interpolate those two, those three, and then interpolate the final two.
+I expand all the mathematics, and I try to rearrange them in a certain order to have
+of P1, P2 and P3 explicitly defined in my function.
+Now, I would do the same using the Bernstein formula,
+so using the binomial and then the exponent
+and the factors and multiply by the points.
+So that's the entire Bernstein base,
+multiply by the points and sum all those four.
+And again, I expand and I try to refactorize
+and collect the different values.
+And if I do this, what I can see is that, of course,
+it makes sense, you actually end up
+with the exact same formula, which
+is really proving that we were computing the same thing,
+just using different means to reach them.
+What I would do here quickly, but it
+will be useful for later.
+Don't worry, it doesn't make any sense at this point.
+is to say that if what we want to do most of the time
+is a cubic Bayesian, it also means
+that I don't need to use the Bernstein formula
+or I don't need to use the Castelgeo algorithm
+because it's a cubic one and I've just computed exactly
+what are the terms of that cubic.
+It's always, it will always be those same values.
+I don't need to go through the entire algorithm
+to do linear interpolation and all that kind of stuff.
+I could just use that formula and plug my P1, P2, P3, P4, meaning that I can actually turn this
+into a matrix form and I will be useful because often at later stage we will be using matrix form
+for a lot of different splines and different computations so at least let's get used to this
+writing with the Bezier at this point. So what I do is I define a matrix and I
+just reused the terms that I have for all of my points here. So the point
+1 is minus t cubed 3t squared minus 3t plus 1. So I do my minus 1, 3, minus 3, 1
+in the first column, 0.2 is 3 3 3 t cube minus 6 t square and so on and so on.
+So I'll write them in column and now that I have that matrix I can have the
+matrix for all the t's t cube t square t and 1 and I can also have the one for p1
+p2 p3 p4 and basically what you do is that you write this as a matrix form
+And just to prove to you that this is exactly the same computation at this one, but written
+as a matrix, I could just execute the computation and you could see that you end up with the
+exact same formula, right? One side note we could do about basic curve is what we call
+the rational basic curve. I don't have any example here because it's more just to know
+that it exists. Say if I need the mathematical formula at some point, I can grab and pick
+it from here. But basically what rational basic curve is, is the fact that you could
+say that you want to give more importance to a certain point that to another one. Say
+you could say in the cubic one, the second point has two times more importance than the
+third one and so you can give weights to each point to make the curves get closer to that point
+relative to another one. So the formula is basically the same as the normal one.
+You take your points and multiply with the Bernstein basis except that you also multiply it
+by the weights. So each point has a weight and a Bernstein base and then you divide everything by
+the sum of all the weights multiplied by the bandstand. So it's just to renormalize all
+the weights to make sure that everything keeps a curve that goes between 0 and 1.
+So you need to divide by the sum of all the weights you injected here.
+And that's it, that's the formula. So basically it's the same as before except that you multiply
+by the weights and then you re-divide by all the weights and you have the original Bezier curve.
+And now that we have one Bayesian curve, usually what we want to do is to actually make a spline
+with it, having several curves back-to-back so you could define a real shape and keep going and
+keep working exactly as you do with keyframes. So what we will do is just having the system
+to compute the Bezier you could see that at this time I know that I will be
+using cubic Bezier so I've used the matrix notation to compute the Bezier
+curve so I just do the matrix the multiply the point by the matrix and
+then the times and that's it so and then when I want to compute the Bezier's
+plan I would just take the first four points and do one base here with them
+and then take the the next four points and do the base here with them and just
+reusing the first and last base here the points so we can align them so
+basically what you end up with is this so you'll have two base here of back to
+back so that was my first second third and four and then my first second third and four points
+and I'm sharing the points here in the three zeros for both Bezier. Now you've seen that what I've
+done is I make the function for cubic Bezier and I said this will probably be the one we'll be using
+most of the time is cubic and to be honest everything else in this mathematical introduction
+will be about cubic spline, cubic anything, but it will be cubic every time. And so why
+do we focus so much on the cubic? It's because if we were doing only linear interpolation between
+all the points we have in our data, of course, the first thing we could do is line to a graph,
+and that's not exactly how you would want to interpolate your animation, right?
+If I go one degree higher and I go quadratic, what it means is the quadratic curve can actually
+bend in one direction all the time and has to only bend in that one. So five of those four points
+now I can have a nice curve that start at my first point reach the second and then keep going from
+there with the same curvatures and go down but then here I'm blocked because either I would have to
+go back up this direction and break my curve here or having a curvature in the opposite
+direction and anyway I have a discontinuity here. So quadratic is not enough in our case here
+and what we need to do is to go at least cubic because cubic allows you to have two curves
+into your interpolations. So you can start with the one curvature and end with the opposite one
+and you can see that as soon as you go cubic now I can have full continuity between all my lines
+because I can curve up and then curve down curve down and curve up curve up and curve down so now
+I'm able to interpolate my points and I don't need to go in a higher degrees because the cubic
+is enough to actually curve both directions and that's it. I won't go further in the number of
+degrees and that covers the cubic and the next time we will be going through a mid-curve and see
+see why we do them.

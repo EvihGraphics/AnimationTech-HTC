@@ -1,4 +1,4 @@
-﻿# Footskate Cleanup for Motion Capture Editing：动捕滑脚修复
+# Footskate Cleanup for Motion Capture Editing：动捕滑脚修复
 
 ## 元信息
 
@@ -216,9 +216,7 @@ notebook 先用普通版本生成 `solved_animation`，后面又用 `L4 = 1000` 
 
 本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和 PNG 学习卡片。PNG 由指定 cell 的代码摘要、输出区、viewer/canvas 或图表/日志合成，不使用整页滚动截图替代。
 
-<video controls muted src="assets/00-walkthrough.webm"></video>
-
-[下载 WebM](assets/00-walkthrough.webm)
+[打开/下载 WebM](assets/00-walkthrough.webm)
 
 | Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
 | --- | --- | --- | --- | --- |
@@ -296,3 +294,37 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 footska
 ```
 
 建议先观察 `solved=False` 的原始抬高版本，再切到 `solved=True`；最后使用 Final Processing 对比 cell 查看 `solved_animation_no_fp` 和 `solved_animation_fp` 的边界平滑差异。
+
+## 重点可视化 / 动画
+
+README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+
+[打开/下载总览 WebM](assets/00-walkthrough.webm)
+
+![Final Processing boundary smoothing](assets/06_final_processing_compare_preview.gif)
+
+[打开 MP4](assets/06_final_processing_compare_preview.mp4) / [打开 WebM](assets/06_final_processing_compare_preview.webm)
+
+| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
+| --- | --- | --- | --- | --- |
+| Cell 12 | `viewer` | `key_visual` | Display two sphere-joint characters for keep_translation=False and keep_translation=True. | [结果 PNG](assets/07_keep_translation_compare_result.png) / [代码卡](assets/07_keep_translation_compare.png) |
+| Cell 16 | `plot` | `key_visual` | Plot LeftHeel, LeftBall, RightHeel, and RightBall contact booleans. | [结果 PNG](assets/03_contact_signal_timeline_result.png) / [代码卡](assets/03_contact_signal_timeline.png) |
+| Cell 19 | `viewer` | `key_visual` | Draw the heel and ball targets back into the viewer for contact spans. | [结果 PNG](assets/02_contact_targets_result.png) / [代码卡](assets/02_contact_targets.png) |
+| Cell 22 | `viewer` | `key_visual` | Render ankle and root helper axes while the contact constraints are active. | [结果 PNG](assets/05_ankle_root_axes_result.png) / [代码卡](assets/05_ankle_root_axes.png) |
+| Cell 28 | `plot` | `key_visual` | Plot the damping polynomial used by the IK correction. | [结果 PNG](assets/04_constraint_buffer_debug_result.png) / [代码卡](assets/04_constraint_buffer_debug.png) |
+| Cell 29 | `viewer` | `key_visual` | Toggle between the original animation and the solved animation. | [结果 PNG](assets/01_raw_vs_solved_overview_result.png) / [代码卡](assets/01_raw_vs_solved_overview.png) |
+| Cell 34 | `timeline_viewer` | `key_animation` | Compare the solved animation before and after final processing. | [结果 PNG](assets/06_final_processing_compare_result.png) / [GIF](assets/06_final_processing_compare_preview.gif) / [MP4](assets/06_final_processing_compare_preview.mp4) / [WebM](assets/06_final_processing_compare_preview.webm) / [代码卡](assets/06_final_processing_compare.png) |
+
+## 代码 Cell 与可视化结果
+
+本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+
+| Cell / 片段 | 结果说明 | 证据 |
+| --- | --- | --- |
+| Cell 12 | The comparison clarifies the responsibility split between root translation and local joint offsets. | [结果 PNG](assets/07_keep_translation_compare_result.png) / [代码卡](assets/07_keep_translation_compare.png) |
+| Cell 16 | These signals decide which foot points should stay fixed in world space. | [结果 PNG](assets/03_contact_signal_timeline_result.png) / [代码卡](assets/03_contact_signal_timeline.png) |
+| Cell 19 | Stable targets are the anchors that let IK remove foot sliding. | [结果 PNG](assets/02_contact_targets_result.png) / [代码卡](assets/02_contact_targets.png) |
+| Cell 22 | The axes help check whether cleanup preserves foot orientation and body orientation. | [结果 PNG](assets/05_ankle_root_axes_result.png) / [代码卡](assets/05_ankle_root_axes.png) |
+| Cell 28 | The curve explains how correction error is smoothly distributed through the leg chain. | [结果 PNG](assets/04_constraint_buffer_debug_result.png) / [代码卡](assets/04_constraint_buffer_debug.png) |
+| Cell 29 | The reader can inspect whether the foot is more stable without damaging the body motion. | [结果 PNG](assets/01_raw_vs_solved_overview_result.png) / [代码卡](assets/01_raw_vs_solved_overview.png) |
+| Cell 34 | Final processing smooths entering and leaving contact spans instead of recomputing the whole IK solve. | [结果 PNG](assets/06_final_processing_compare_result.png) / [GIF](assets/06_final_processing_compare_preview.gif) / [MP4](assets/06_final_processing_compare_preview.mp4) / [WebM](assets/06_final_processing_compare_preview.webm) / [代码卡](assets/06_final_processing_compare.png) |

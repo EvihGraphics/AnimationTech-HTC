@@ -1,190 +1,177 @@
-﻿# Motion Warping：时间与姿态约束下的动作变形
+# Motion Warping：用时间曲线和姿态偏移重定向动作
 
 ## 元数据
 
-| 字段 | 值 |
+| 字段 | 内容 |
 | --- | --- |
 | slug | `motion_warping` |
-| source path | `labs/AnimationPapers/Motion Warping.ipynb` |
+| source path | [`labs/AnimationPapers/Motion Warping.ipynb`](../../../../labs/AnimationPapers/Motion Warping.ipynb) |
+| transcript sources | [`docs/transcripts/COzRpFPZ4rk_Motion Warping.txt`](../../../../docs/transcripts/COzRpFPZ4rk_Motion Warping.txt) |
 | env prefix | `.envs/motion_warping` |
 | kernel | `animationtech-motion_warping` |
-| validation status | `passed`（`manual_smoke`；自动执行通过，仍需 JupyterLab 手动冒烟） |
+| validation status | `passed` (`manual_smoke`) |
 
 ## 问题背景
 
-Motion Warping 来自 Witkin 和 Popovic 1995 年的工作，目标是在保留原动作细节的前提下，满足新的时间或姿态约束。工程上它常用于“已有动作大体正确，但某些关键时刻或关键姿态需要改到指定目标”的场景。Notebook 把问题拆成两层：先做 time warp 改变动作播放进度，再做 pose warp 在关键帧附近插入局部姿态偏移。
+Motion warping 处理的是已有动作大体正确但关键事件时间或空间位置不符合新目标的问题。语音稿把动画拆成曲线：time warp 决定新帧应该读取旧动画的哪一帧，pose warp 决定在特定时间附近叠加多少姿态偏移。notebook 先观察原始动画和 quaternion channel，再用 Cardinal/Hermite 生成 timewarp lookup，随后构造局部 offset layer，最后合成 time + pose warped animation。
 
-该例使用 `fightAndSports1_subject1.bvh`，通过 `AnimMapper(root_motion=True, match_effectors=True, local_offsets={'Hips':[0, 2, 0]})` 映射到角色骨架，并截取原动画的 `97:530` 片段作为演示范围。
+## 阅读前置知识
+
+- 动画通道曲线、逐帧 resampling 和 lookup table。
+- Cardinal/Hermite spline：用稀疏 timing key 生成连续映射。
+- quaternion normalization 与局部 offset：姿态 warp 是叠加差异，不是覆盖原 pose。
+- 动画 layer 思想：time layer 和 pose layer 要在同一时间轴上对齐。
 
 ## 总模块图
 
 ```mermaid
 flowchart TD
-    A[读取并截取 fightAndSports 动作] --> B[设置 time_wrap_points]
-    B --> C[Cardinal 点转 Hermite 曲线]
-    C --> D[重采样成逐帧 timewarp_curve]
-    D --> E[warp_curve 重映射 pos/quats]
-    E --> F[设置 pose keyframes 与目标姿态]
-    F --> G[计算局部 offset poses]
-    G --> H[为每根骨骼插值 warp_quats/warp_pos]
-    H --> I[与原动作或 time-warped 动作合成]
-    I --> J[三角色并排渲染比较]
+    A[Source BVH clip] --> B[观察 quaternion / root channel]
+    B --> C[Time warp key points]
+    C --> D[Hermite/Cardinal lookup]
+    D --> E[Resample quats/pos]
+    E --> F[Pose key offsets]
+    F --> G[Offset curve retimed]
+    G --> H[Final time + pose warped animation]
+```
+
+## 代码执行路径
+
+```mermaid
+flowchart LR
+    C5[Cell 5: source playback] --> C6[Cell 6: raw channel plot]
+    C6 --> C12[Cell 12: timewarp keys]
+    C12 --> C15[Cell 15: dense lookup]
+    C15 --> C20[Cell 20: retimed animation]
+    C20 --> C27[Cell 27: pose offset curve]
+    C27 --> C31[Cell 31: combined warp]
 ```
 
 ## 模块拆解
 
-### 1. 动作准备
+### 1. 输入动画与曲线视角
 
-Notebook 导入一个主角色和两个副本，并给副本设置不同颜色与水平偏移，方便比较原始、time-warped、fully-warped 三种结果。`pose_A` 和 `pose_B` 分别从原始长动画的第 695 帧和第 1940 帧取出，作为后续 pose warp 的目标姿态。
+原始 viewer 建立动作语境，raw quaternion channel 把动画还原成一组随帧变化的数值通道。
 
-### 2. Time warp inputs
+### 2. Time Warp
 
-时间重映射控制点是 `(原始帧时间, 新帧时间)`：
+`time_wrap_points` 给出旧时间和新时间的对应关系。代码把 sparse keys 转成 Hermite/Cardinal 表达，再采样出每个新帧读取旧动画的位置。
 
-```text
-(0, 0), (40, 40), (100, 190), (200, 250), (430, 400)
+### 3. Pose Warp
+
+pose warp 先取关键姿态差异，转换成局部 offset，再用曲线控制 offset 随时间进入和退出。
+
+## 关键 cell / 函数深讲
+
+### Cell 5-8 - 动画作为曲线
+
+```mermaid
+flowchart LR
+    C5[Source playback] --> C6[Quaternion channel plot]
+    C6 --> C8[time_wrap_points]
+    C8 --> I[确定事件时间映射]
 ```
 
-这些点表达了“某些区段加速或减速”的需求。例如原始第 100 帧被映射到新时间 190，说明前段动作被拉长。
+这一步把动画问题转成曲线问题。读图时先看原始通道是否连续，再看关键事件应该如何重定时。
 
-### 3. Spline/Hermite mapping
+![Cell 5-8 - 动画作为曲线](assets/02_raw_quaternion_channel_result.png)
 
-`cardinal_to_hermite` 将 cardinal 控制点转换为 Hermite 形式，`resample_curve` 再把分段曲线重采样成逐帧查表。这样后续可以用简单数组 `timewarp_curve` 查询每个新帧应该采样原动作的哪个浮点帧。
+### Cell 10-20 - Time warp lookup
 
-### 4. Time Warp
-
-`build_curve(time_wrap_points)` 生成最终映射表，`warp_curve(timewarp_curve, animation.quats)` 与 `warp_curve(timewarp_curve, animation.pos)` 对四元数和位置做逐帧重采样。四元数重采样后会再做 `lab.utils.quat_normalize`，避免插值造成长度漂移。
-
-### 5. Pose Warp
-
-姿态约束关键帧为：
-
-```text
-0, 190, 220, 320, 349, 405, 432
+```mermaid
+flowchart LR
+    K[Timing keys] --> H[Cardinal to Hermite]
+    H --> R[resample_curve]
+    R --> Q[old-frame lookup]
+    Q --> W[warp quats/pos]
+    W --> V[time-warped viewer]
 ```
 
-其中部分关键帧使用原动作，部分关键帧替换为 `pose_A` 或 `pose_B`。为了不破坏根运动，代码将这些目标姿态的 root 通道重新对齐到当前动画的 root。
+结果重点看同一个动作事件是否被挪到目标帧，同时姿态连续性是否保留。
 
-### 6. 输入姿态转 offset
+![Cell 10-20 - Time warp lookup](assets/05_timewarped_animation_compare_result.png)
 
-`local_offset_poses = lab.utils.qp_mul(qp_inv(animation_at_keyframes), target_keyframes)` 计算“从原关键帧到目标关键帧”的局部偏移。这样 pose warp 不直接覆盖整段动作，而是在原动作上叠加一条平滑的 offset 曲线。
+![Cell 10-20 - Time warp lookup preview](assets/05_timewarped_animation_compare_preview.gif)
 
-### 7. Offset 曲线插值与合成
+[打开 MP4](assets/05_timewarped_animation_compare_preview.mp4) / [打开 WebM](assets/05_timewarped_animation_compare_preview.webm)
 
-`warp_quats` 和 `warp_pos` 分别保存每帧、每骨骼的旋转和平移 offset。代码对每根骨骼、每个通道都调用 `build_curve(warp_pt)`，把 sparse keyframe offset 展开成 dense offset。最终通过 `lab.utils.qp_mul((animation.quats, animation.pos), (warp_quats, warp_pos))` 合成空间变形结果。
+### Cell 22-31 - Pose offset layer
 
-### 8. Timewarp the warped offsets
+```mermaid
+flowchart LR
+    P[Pose keyframes] --> O[local offset poses]
+    O --> C[offset curve]
+    C --> T[retime offsets]
+    T --> F[combine with time-warped clip]
+```
 
-最后一段把 offset 曲线也通过 `timewarp_curve` 重映射，再与 `new_q/new_p` 合成。这样时间变形和姿态变形处在同一个新时间轴上，避免只 retime 原动作而没有同步 retime pose offset。
+pose warp 的输出应该像在目标窗口附近轻推姿态，而不是整段动画突然换姿势。
+
+![Cell 22-31 - Pose offset layer](assets/08_combined_warped_animation_result.png)
+
+![Cell 22-31 - Pose offset layer preview](assets/08_combined_warped_animation_preview.gif)
+
+[打开 MP4](assets/08_combined_warped_animation_preview.mp4) / [打开 WebM](assets/08_combined_warped_animation_preview.webm)
 
 ## 关键数据结构
 
-| 名称 | 形状或类型 | 作用 |
-| --- | --- | --- |
-| `animation.pos` / `animation.quats` | `[frame_count, bone_count, 3/4]` | 截取后的原动作 |
-| `time_wrap_points` | `[5, 2] int` | 稀疏时间重映射控制点 |
-| `timewarp_curve` | `[new_frame_count, 2]` | 逐帧时间查表 |
-| `pose_A` / `pose_B` | `(quats, pos)` | 从长动画中取出的目标姿态 |
-| `keyframes` | `[7] int` | pose warp 的关键帧位置 |
-| `local_offset_poses` | `(quats, pos)` | 从原姿态到目标姿态的局部偏移 |
-| `warp_quats` / `warp_pos` | `[frame_count, bone_count, 4/3]` | 每帧姿态 offset 曲线 |
-| `new_q` / `new_p` | time-warped 动作 | 只做时间变形后的动画 |
-| `full_warp_q` / `full_warp_p` | fully-warped 动作 | 同时应用时间与姿态变形后的动画 |
+- `animation.quats/pos`：输入 BVH 的旋转和位移通道。
+- `pose_A/pose_B`：用于构造 warp 的关键姿态。
+- `time_wrap_points`、`timewarp_curve`：时间映射控制点和逐帧 lookup。
+- `keyframes_q/keyframes_p`、`local_offset_poses`：姿态偏移层。
+- `new_q/new_p`、`full_warp_q/full_warp_p`：time warp 和最终组合结果。
 
 ## 执行结果的意义
 
-结果比较展示了 motion warping 的两条轴线：time warp 改变动作事件发生的速度和位置，pose warp 改变关键时刻的姿态目标。两者合成后，可以让动作在指定时间到达指定姿态，同时尽量保留原始动作中的连续性、惯性和骨架细节。
+Time warp 图验证事件是否发生在新时间；pose warp viewer 验证关键姿态是否被推向目标；最终动画验证两者是否同步。若动作时间正确但姿态突跳，通常是 offset curve 太窄或 quaternion 处理不连续。
+
+## 重点可视化 / 动画
+
+README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+
+[打开/下载总览 WebM](assets/00-walkthrough.webm)
+
+![Final time and pose warped animation](assets/08_combined_warped_animation_preview.gif)
+
+[打开 MP4](assets/08_combined_warped_animation_preview.mp4) / [打开 WebM](assets/08_combined_warped_animation_preview.webm)
+
+| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
+| --- | --- | --- | --- | --- |
+| Cell 5 | `timeline_viewer` | `key_animation` | Render the source animation before time or pose warping. | [结果 PNG](assets/01_source_animation_playback_result.png) / [GIF](assets/01_source_animation_playback_preview.gif) / [MP4](assets/01_source_animation_playback_preview.mp4) / [WebM](assets/01_source_animation_playback_preview.webm) / [代码卡](assets/01_source_animation_playback.png) |
+| Cell 6 | `plot` | `key_visual` | Plot a selected quaternion channel over time. | [结果 PNG](assets/02_raw_quaternion_channel_result.png) / [代码卡](assets/02_raw_quaternion_channel.png) |
+| Cell 12 | `plot` | `key_visual` | Build a cardinal/Hermite curve from time remapping keypoints. | [结果 PNG](assets/03_timewarp_keypoints_result.png) / [代码卡](assets/03_timewarp_keypoints.png) |
+| Cell 15 | `plot` | `key_visual` | Resample the time-warp curve at animation-frame resolution. | [结果 PNG](assets/04_resampled_timewarp_curve_result.png) / [代码卡](assets/04_resampled_timewarp_curve.png) |
+| Cell 20 | `timeline_viewer` | `key_animation` | Render the original and time-warped animation together. | [结果 PNG](assets/05_timewarped_animation_compare_result.png) / [GIF](assets/05_timewarped_animation_compare_preview.gif) / [MP4](assets/05_timewarped_animation_compare_preview.mp4) / [WebM](assets/05_timewarped_animation_compare_preview.webm) / [代码卡](assets/05_timewarped_animation_compare.png) |
+| Cell 23 | `viewer` | `key_visual` | Render key poses used to define a pose-space offset. | [结果 PNG](assets/06_pose_warp_key_poses_result.png) / [代码卡](assets/06_pose_warp_key_poses.png) |
+| Cell 27 | `plot` | `key_visual` | Plot the computed warp offsets over time. | [结果 PNG](assets/07_offset_warp_curve_result.png) / [代码卡](assets/07_offset_warp_curve.png) |
+| Cell 31 | `timeline_viewer` | `key_animation` | Render the final animation after time and pose warping. | [结果 PNG](assets/08_combined_warped_animation_result.png) / [GIF](assets/08_combined_warped_animation_preview.gif) / [MP4](assets/08_combined_warped_animation_preview.mp4) / [WebM](assets/08_combined_warped_animation_preview.webm) / [代码卡](assets/08_combined_warped_animation.png) |
 
 ## 代码 Cell 与可视化结果
 
-本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和 PNG 学习卡片。PNG 由指定 cell 的代码摘要、输出区、viewer/canvas 或图表/日志合成，不使用整页滚动截图替代。
+本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
 
-<video controls muted src="assets/00-walkthrough.webm"></video>
+| Cell / 片段 | 结果说明 | 证据 |
+| --- | --- | --- |
+| Cell 5 | This baseline lets later warped outputs be compared against the original motion. | [结果 PNG](assets/01_source_animation_playback_result.png) / [GIF](assets/01_source_animation_playback_preview.gif) / [MP4](assets/01_source_animation_playback_preview.mp4) / [WebM](assets/01_source_animation_playback_preview.webm) / [代码卡](assets/01_source_animation_playback.png) |
+| Cell 6 | The graph shows that animation warping often starts as curve manipulation. | [结果 PNG](assets/02_raw_quaternion_channel_result.png) / [代码卡](assets/02_raw_quaternion_channel.png) |
+| Cell 12 | The plot shows how sparse timing edits become a continuous time-warp curve. | [结果 PNG](assets/03_timewarp_keypoints_result.png) / [代码卡](assets/03_timewarp_keypoints.png) |
+| Cell 15 | The output shows the actual per-frame time lookup used for animation sampling. | [结果 PNG](assets/04_resampled_timewarp_curve_result.png) / [代码卡](assets/04_resampled_timewarp_curve.png) |
+| Cell 20 | The viewer reveals the timing change without changing the underlying pose content. | [结果 PNG](assets/05_timewarped_animation_compare_result.png) / [GIF](assets/05_timewarped_animation_compare_preview.gif) / [MP4](assets/05_timewarped_animation_compare_preview.mp4) / [WebM](assets/05_timewarped_animation_compare_preview.webm) / [代码卡](assets/05_timewarped_animation_compare.png) |
+| Cell 23 | The key-pose viewer shows what spatial correction will be blended into the clip. | [结果 PNG](assets/06_pose_warp_key_poses_result.png) / [代码卡](assets/06_pose_warp_key_poses.png) |
+| Cell 27 | The curve explains how local pose edits are distributed smoothly. | [结果 PNG](assets/07_offset_warp_curve_result.png) / [代码卡](assets/07_offset_warp_curve.png) |
+| Cell 31 | This final viewer checks whether timing and pose edits combine into a coherent motion. | [结果 PNG](assets/08_combined_warped_animation_result.png) / [GIF](assets/08_combined_warped_animation_preview.gif) / [MP4](assets/08_combined_warped_animation_preview.mp4) / [WebM](assets/08_combined_warped_animation_preview.webm) / [代码卡](assets/08_combined_warped_animation.png) |
 
-[下载 WebM](assets/00-walkthrough.webm)
-
-| Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
-| --- | --- | --- | --- | --- |
-| 5 | `timeline_viewer` | Render the source animation before time or pose warping. | This baseline lets later warped outputs be compared against the original motion. | [PNG](assets/01_source_animation_playback.png) |
-| 6 | `plot` | Plot a selected quaternion channel over time. | The graph shows that animation warping often starts as curve manipulation. | [PNG](assets/02_raw_quaternion_channel.png) |
-| 12 | `plot` | Build a cardinal/Hermite curve from time remapping keypoints. | The plot shows how sparse timing edits become a continuous time-warp curve. | [PNG](assets/03_timewarp_keypoints.png) |
-| 15 | `plot` | Resample the time-warp curve at animation-frame resolution. | The output shows the actual per-frame time lookup used for animation sampling. | [PNG](assets/04_resampled_timewarp_curve.png) |
-| 20 | `timeline_viewer` | Render the original and time-warped animation together. | The viewer reveals the timing change without changing the underlying pose content. | [PNG](assets/05_timewarped_animation_compare.png) |
-| 23 | `viewer` | Render key poses used to define a pose-space offset. | The key-pose viewer shows what spatial correction will be blended into the clip. | [PNG](assets/06_pose_warp_key_poses.png) |
-| 27 | `plot` | Plot the computed warp offsets over time. | The curve explains how local pose edits are distributed smoothly. | [PNG](assets/07_offset_warp_curve.png) |
-| 31 | `timeline_viewer` | Render the final animation after time and pose warping. | This final viewer checks whether timing and pose edits combine into a coherent motion. | [PNG](assets/08_combined_warped_animation.png) |
-
-### Cell 5 - Source animation playback
-
-- 代码做什么：Render the source animation before time or pose warping.
-- 运行后看到什么：带 timeline 的可播放 viewer。
-- 结果说明什么：This baseline lets later warped outputs be compared against the original motion.
-
-![Source animation playback](assets/01_source_animation_playback.png)
-
-### Cell 6 - Raw quaternion channel plot
-
-- 代码做什么：Plot a selected quaternion channel over time.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The graph shows that animation warping often starts as curve manipulation.
-
-![Raw quaternion channel plot](assets/02_raw_quaternion_channel.png)
-
-### Cell 12 - Time-warp keypoints and tangents
-
-- 代码做什么：Build a cardinal/Hermite curve from time remapping keypoints.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The plot shows how sparse timing edits become a continuous time-warp curve.
-
-![Time-warp keypoints and tangents](assets/03_timewarp_keypoints.png)
-
-### Cell 15 - Resampled time-warp curve
-
-- 代码做什么：Resample the time-warp curve at animation-frame resolution.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The output shows the actual per-frame time lookup used for animation sampling.
-
-![Resampled time-warp curve](assets/04_resampled_timewarp_curve.png)
-
-### Cell 20 - Time-warped animation comparison
-
-- 代码做什么：Render the original and time-warped animation together.
-- 运行后看到什么：带 timeline 的可播放 viewer。
-- 结果说明什么：The viewer reveals the timing change without changing the underlying pose content.
-
-![Time-warped animation comparison](assets/05_timewarped_animation_compare.png)
-
-### Cell 23 - Pose-warp key poses
-
-- 代码做什么：Render key poses used to define a pose-space offset.
-- 运行后看到什么：可视化 viewer 视口。
-- 结果说明什么：The key-pose viewer shows what spatial correction will be blended into the clip.
-
-![Pose-warp key poses](assets/06_pose_warp_key_poses.png)
-
-### Cell 27 - Offset warp curve
-
-- 代码做什么：Plot the computed warp offsets over time.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The curve explains how local pose edits are distributed smoothly.
-
-![Offset warp curve](assets/07_offset_warp_curve.png)
-
-### Cell 31 - Final time and pose warped animation
-
-- 代码做什么：Render the final animation after time and pose warping.
-- 运行后看到什么：带 timeline 的可播放 viewer。
-- 结果说明什么：This final viewer checks whether timing and pose edits combine into a coherent motion.
-
-![Final time and pose warped animation](assets/08_combined_warped_animation.png)
 
 ## 运行方式
 
-启动 AnimationPapers 的 JupyterLab 环境后，打开 `labs/AnimationPapers/Motion Warping.ipynb`，选择 kernel `animationtech-motion_warping` 按 cell 顺序运行。
+AnimationPapers 案例优先使用：
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpapers_lab.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 motion_warping
 ```
 
-本文档只整理 notebook 结构与工程含义，未重新执行 notebook。
+单案例验证使用：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 motion_warping
+```

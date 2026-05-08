@@ -1,4 +1,4 @@
-﻿# Halo 4 Exporter from Maya
+# Halo 4 Exporter from Maya
 
 ## 元数据
 
@@ -66,9 +66,7 @@ flowchart TD
 
 本节把 Python module 当作支撑子工程来阅读：每个条目绑定源码片段、命令日志、产物摘要或流程图，说明它如何服务对应 notebook 案例。
 
-<video controls muted src="assets/00-walkthrough.webm"></video>
-
-[下载 WebM](assets/00-walkthrough.webm)
+[打开/下载 WebM](assets/00-walkthrough.webm)
 
 | 片段 | 输出类型 | 代码/证据做什么 | 结果说明什么 | 素材 |
 | --- | --- | --- | --- | --- |
@@ -142,3 +140,31 @@ python "labs/AnimationPapers/Halo 4 exporter from maya.py" --force-synthetic --o
 ```
 
 在 Maya 的 Python 环境中，选中目标 mesh 后可省略 `--force-synthetic`，脚本会尝试走真实导出路径。
+
+## 重点可视化 / 动画
+
+README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+
+[打开/下载总览 WebM](assets/00-walkthrough.webm)
+
+| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
+| --- | --- | --- | --- | --- |
+| maya-fallback | `source_excerpt` | `code_evidence` | Show argparse/pickle imports, Maya detection, and synthetic asset writer import. | [结果 PNG](assets/01_maya_fallback_imports_result.png) / [代码卡](assets/01_maya_fallback_imports.png) |
+| maya-export | `source_excerpt` | `code_evidence` | Show the selected mesh, topology extraction, normals, frame sampling, and pickle write. | [结果 PNG](assets/02_maya_export_function_result.png) / [代码卡](assets/02_maya_export_function.png) |
+| cli-path | `source_excerpt` | `code_evidence` | Show CLI arguments and the --force-synthetic path. | [结果 PNG](assets/03_cli_entrypoint_result.png) / [代码卡](assets/03_cli_entrypoint.png) |
+| export-log | `command_log` | `code_evidence` | Show the managed run log for the exporter. | [结果 PNG](assets/04_export_command_log_result.png) / [代码卡](assets/04_export_command_log.png) |
+| artifact-summary | `artifact_summary` | `code_evidence` | Inspect the generated pickle artifact. | [结果 PNG](assets/05_animated_face_artifact_summary_result.png) / [代码卡](assets/05_animated_face_artifact_summary.png) |
+| dataflow | `diagram` | `code_evidence` | Summarize the exporter path from Maya or synthetic fallback into a notebook-readable .dat file. | [结果 PNG](assets/06_exporter_dataflow_result.png) / [代码卡](assets/06_exporter_dataflow.png) |
+
+## 代码 Cell 与可视化结果
+
+本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+
+| Cell / 片段 | 结果说明 | 证据 |
+| --- | --- | --- |
+| maya-fallback | The script can run inside Maya or fall back to generating a compatible synthetic face asset. | [结果 PNG](assets/01_maya_fallback_imports_result.png) / [代码卡](assets/01_maya_fallback_imports.png) |
+| maya-export | The exporter records topology once and vertex positions over time for facial animation playback. | [结果 PNG](assets/02_maya_export_function_result.png) / [代码卡](assets/02_maya_export_function.png) |
+| cli-path | The command-line path makes the case reproducible without an interactive Maya session. | [结果 PNG](assets/03_cli_entrypoint_result.png) / [代码卡](assets/03_cli_entrypoint.png) |
+| export-log | The log records the generated artifact path used by the notebook case. | [结果 PNG](assets/04_export_command_log_result.png) / [代码卡](assets/04_export_command_log.png) |
+| artifact-summary | The summary verifies that the artifact contains topology, normals, and per-frame vertices. | [结果 PNG](assets/05_animated_face_artifact_summary_result.png) / [代码卡](assets/05_animated_face_artifact_summary.png) |
+| dataflow | The diagram links the supporting script to the Halo 4 Facial Animation notebook. | [结果 PNG](assets/06_exporter_dataflow_result.png) / [代码卡](assets/06_exporter_dataflow.png) |

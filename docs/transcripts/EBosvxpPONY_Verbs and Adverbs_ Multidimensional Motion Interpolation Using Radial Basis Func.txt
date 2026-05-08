@@ -1,0 +1,493 @@
+You have a bunch of animation clips representing one specific action, but with different styles
+or different moods, and you want to be able to blend those styles and moods doing those
+actions.
+Hi, I'm Jerome, and today we'll be looking at the verb and adverb multidimensional motion
+blending using radial basis functions, a paper from 1999.
+So what the paper says is that you will have your animations that will have actions and
+they will call them verbs.
+So you have the idle, walking, crouching and all that kind of stuff.
+And then you will have adverbs on top of them representing the style or the mood so you
+could be happy, sad, or even leaning left, leaning right, turning left, turning right.
+All of those will be adverbs and you can have as many adverbs as you want and you will
+to be able to blend all those animations together by just saying I want to have my walking verb
+with a leaning right happy animations for instance. So how they would do this first thing I would do
+is that I will import all the libraries I need and I will import my character I will extract the
+skeleton you will see later why so basically I turn my skeleton into quaternions and positions
+because that's what I will be working with, creating a little mesh that allow me to display
+stuff on the ground. And then this is finally all the animations I want to use in my case.
+So I will not have moods as happy, sad and aghast stuff. What I will have is walking
+animations and I will have the walking with turning left, walking turning right, and two
+different styles, one with small steps and one doing bigger steps. So that's the animations I
+I would have in my case, and this is all the animations
+I will be using as one verb.
+So the verb is walking, and all of those are adverbs.
+So it's all the turning lefts, all the examples for turnings,
+all the examples for the type of steps.
+So this is all the animations I want to use.
+Now that I have all the animations I want to use,
+and I know what the adverbs I will be using,
+We can start to look at the paper to see exactly how it works.
+And so for them, they said that you
+will have a lot of different motions.
+And then they represent the motions basically
+as this one saying that you have a motion itself,
+a set of degrees of freedom.
+So for us, it will be the rotations
+in translation of every bones.
+For them, I think that because they talk about degrees of freedom as a really low level,
+it's probably just the rotations as Euler angle, you know, one angle for the elbow,
+three angles for the wrists and shoulders and that kind of stuff.
+So they have the exact degrees of freedom.
+I would be working in quaternions and I would stay inside of quaternions,
+which means now that my degrees of freedom is basically the number of bones
+I would have multiplied by seven because I have w x y z for each quaternions and x y z for each
+translate. So a bit heavier, not what they had in their mind, but it would work just the same way
+for us. So the way they encode the data when they do animations, they talk about the degrees of
+freedom. For them, any animations is actually encoded inside of a uniform cubic B spline. So
+So I recommend watching the uniform cubic B-spline videos
+I did earlier.
+So you have a number of control points for the entire animation,
+and that's allowed you to get the animation back.
+Now, what is really interesting in this case,
+what I said is basically every animation's
+inside of your ad-vab.
+So you can see that my animations have different lengths
+and different timing, but they will all be encoded
+with the same number of control points.
+So for the number of control points,
+you decide empirically how many you want of them
+for all of your animations,
+and then you will use the same number.
+So I will not encode my animation
+as uniform cubic B-spline just yet,
+because I have a lot of other stuff to do
+before I will be able to do this.
+First thing first, they do a time warping of the animations to get into what they call
+the canonical form.
+And basically the idea behind this is to realize that all of animations have different timings
+and different lengths, and we want to re-encode them to be all of the same length.
+So the generic timing for them will be instead of saying I have 30 frames or 60 frames of
+animations, it just timing goes between 0 and 1 as a parametric functions. My animations goes
+between 0 and 1 and that's it. So we will stretch and squash the timing, so we will basically do
+time warps as in the paper, the time warping paper. And on top of this, we want to make sure that
+everything inside of each animations
+have the same timing reference.
+So basically the beginning of the animations at time one,
+the end of the animation is at time zero, sorry,
+the end of the animations at time one.
+And then in my case, because it's a working animation,
+I can decide that I want to detect
+when the foot hits the ground
+and when it's lift the ground.
+So all my animations start with the left foot going down.
+left foot going down.
+So I will have a time zero at the beginning of animations
+and then when the left foot hits the ground
+is time zero point two, for instance,
+then the right legs go up, that's time zero point four
+and then it goes down time point six
+and then this one goes up time point eight
+and then end of the animation is time one.
+So we will compute the different timing
+for all of our animations this way.
+So what I do is this for the canonical form,
+I've already pre-computed all the values.
+So you can see my first animations,
+the different timing I have inside of my real animation
+is that at frame zero, it starts.
+Then at frame seven, I get my first contact,
+11, 23, 27, 32.
+So I get all of those.
+And basically to do this,
+how they do it in the paper is all done by hands manually.
+So it's a manual processor.
+I had this little window that's allowed me
+to create those information.
+So you could see my animation zero,
+the value is from zero seven.
+So I know that frame at frame seven,
+what I have is the contact of my right foot.
+At frame 11 is when I decided that
+when the contact from the left foot doesn't exist anymore,
+then I will be frame 23.
+That's when the contact will reopen.
+there. 23, I get the contact, 27, I don't have the contact anymore and so on and so on.
+And you do this for all of your animations. So it's a manual process. It is tricky to get
+right and that's usually why the blending might be a bit off when you try to blend all the info
+because contact will not be exactly the same on every animations. But it's a manual process,
+you have to do it for every animations, but I have done it.
+What I would do on top of this, because all those animations
+come from motion captures, and I just
+picked a clip into motion capture.
+It's not an animation that done by hand,
+which has nice cycles.
+I need to make those animation loop properly
+so I could be able to use those animations
+because walking animations, I want
+to be able to make the character walk after it.
+So I will make the animation loop.
+And to do this, basically, the only thing I do
+is that I take the first frame and the last frame.
+I take the difference between the two frames
+when I'm here with the offsets.
+And now that you know how much arrows basically you
+have with the last frame to be exactly the same as the first
+frame, you just propagate that error slowly
+through time during your animation.
+So if I have an animation that says I have 100 frames,
+I would say that frame 0 is just my frame 0.
+at frame one is frame one plus 1% of the error.
+Frame two is frame two plus 2% of the error.
+So on and then at the end is frame 100
+with 100% of the error on top.
+And so I get the exact same pose.
+So you do this in the local space of all your bones.
+And at the same time, if you just do this,
+basically your feet will start to slide, unfortunately.
+So what I do is that I also compute
+where the foot would be at the end of the animations
+after I corrected it.
+So I get the first frame, I know where the positions are
+and at the end, I modify that pose
+and I compute where the foot would be.
+And now that I know this, I basically make sure
+that I will only change, apply that fixing,
+that correction that I did on the entire animations.
+I will only do it when the feet are going up and going down.
+So it starts from where it was before doing any fixes.
+And during the fly, it will reach directly
+where it's supposed to be at the end of the corrections.
+So that's the local offsets.
+And then I get the stuff when I compute the global version
+of the left foot and the right foot.
+And I'm just using the timing because I know exactly
+by the timings, I know when the feet are hitting the ground
+so I can just use that information from the timing
+I computed before.
+This is why I'm doing the looping now basically.
+And now I can just compute the looping animations
+for all my animations.
+And what I have is these animations.
+So basically you won't see a lot of difference,
+but if I go on spot, you see now that I have a looping
+animations for all of those, and I do loop properly,
+and everything is fine now.
+Now I have my looping animations that works properly,
+but what I need is to have them encoded as generic time,
+say going between zero and one,
+instead of having the number of frames as you wanted,
+that's I had before.
+And so what I will do is that I will warp my animations
+using the timing I did
+to make it, to warp it using the time warps basically.
+And because I'm using data at this point,
+I cannot just say between zero and one
+and not having any informations.
+The timing will be between zero and one,
+but then I need to have the intermediate values
+and decide how many intermediate values I want to have
+in to encode my data to be able to work with.
+And what I would do is I would say that I'd go
+for 400 frames, which is a lot bigger
+than my original animations.
+My original animations were only 30 frames
+or a maximum 60 frames.
+So now I have an animation that will be
+with a lot more data when I'm doing this,
+but it's because the time what sometimes will slow down
+a piece of the animations,
+and sometimes it will accelerate a piece of the animations.
+And I want to make sure that when it accelerates,
+I actually have enough data in between,
+I don't want to have only suddenly zero or two frames in between because it
+means nothing in data when I would try to compute the cubic bezier so I grow my
+animation so I know that I have something that will have enough data so
+the warping is just this it takes every range that I have inside of my time
+warping functions and it will just scale all those range properly and it does it
+linearly. So the paper was actually doing the time warp linearly between all the values.
+So I do the same, I will just stretch each piece of the animations linearly the same way.
+And what I would do on top, so what I've done this for, see now my new animations will be
+400 frames long. I have six values, so it means that I actually have 80 frames between each of
+my ranges. So I compute the the quaternions, all the quaternions, all the positions.
+I normalize my quaternions now because I did just linear interpolations without any stuff.
+And what is important for me now here is because I'm not working in Euler angle
+or any other representations, I'm actually working in quaternion space.
+which means that when I would try to blend quaternions together, I need to make sure that
+they are exactly in the same quadrant. You know that quaternions have a double cover,
+meaning that the quaternion and the inverse of the quaternion represent the same 3D rotation.
+So if, for instance, finally you try to blend together one quaternion and it's inverse,
+the rotation between will probably do a 360 and that kind of stuff and I don't want this I want
+to be able to just blend as if it was the closest values and the simplest way to do it is actually
+to make sure that every quaternions you have inside your animation would be in the same quadrant
+as the bind pose of your skeleton. So it has the advantage of saying that everything stays
+around the bind pose of the animations, meaning that any values that you try to blend together will
+always stay naturally inside of what the bone is supposed to do. So even if I have a value that
+it might be negative or positive, something really close, it would always do the right
+rotations. It would never try to do the opposite and go in the opposite directions,
+because I've made every quaternion be
+closest as possible as the bind pose, let's say.
+So that's what I'm doing here. I'm checking that the angle between
+my animations and the bind pose is in the same quadrant and if they're not
+I'm just inverting those so all the quaternions are in the bind pose
+quadrant. So now that I have done this, what I have
+is all my animations now have exactly all the same length.
+They are all 400 frames long.
+That's supposed to be just the timing between zero and one.
+And I can display those animations.
+And then you could see that what happens is that now everything
+is a lot slower.
+But it slows down some steps and accelerates
+just to make sure that if I post these animations,
+I can pick any specific frame.
+For instance, I'm passing.
+So my left foot is passing the right foot.
+And if I check any other animations,
+I would be in the same at the same time
+with exactly at the passing stage of any style.
+So, and you could see for this one,
+this one actually slows down
+and then will really slow down at this time.
+And then we'll have to reaccelerate quickly
+because the timing of those animations is really different.
+So that's what the time warp was used for,
+so make sure that all the informations
+hit at the same time.
+And now that I have all my animations
+into the canonical form,
+so they all have the same length,
+they all have the same frame,
+all the frames presenting the same data,
+I can actually turn them into a uniform cubic Bezier.
+And to do this, I would just do the minimize functions
+to find the best uniform cubic Bezier I can find
+to cover the animation curves.
+So I'm using the minimize functions
+and I try to find out the minimum error.
+And the number of control points you choose,
+So the one that you decide how many control points
+that controls one animations, it's something you choose.
+And in this case, I will just pick 23 control points.
+So I will actually now have 23 control points
+for each of my curves when I do this.
+So this is the functions to convert.
+And this one actually is converting all the animations.
+So what I will have is the quaternion and positions
+for all my animations,
+for the 23 control points for each bones
+and then for each curves inside of those.
+So the WXYZ and the XYZ of the positions.
+So that's a lot of different curves
+that I would be converting.
+It would take a bit of time.
+I'm coming back when it's done.
+So now what we have is not an animations in terms of frames,
+frames but just animation in terms of those control points. So the only thing I have in
+the animations are those control points here and that's actually enough to rebuild the curve.
+And you can see that the blue one is the reconstructed curves and the little dashed one
+are the original data. So that's for one of the animations for the heaps and the quaternions
+X values in this case, so that's the one I've picked to display this stuff, but it works
+for all of the curves I have inside of the systems.
+And I can show that we could actually render the animation using this.
+So now I'm not replaying the animation itself, I'm playing the animations that was encoded
+in uniform cubic B-spline.
+And it plays at the right speed,
+because on top of this I'm not only just computing,
+recomputing the animation,
+so you could see I get the B-spline functions
+that allow me to take a specific set of control points
+and rebuild the curves.
+So that's the functions you have from the other video.
+So I'm rebuilding all the quaternions
+and all the positions.
+And I'm going to renormalize my cotonians, of course,
+because they are completely unnormalized.
+Now, I did reconstruct curves separately,
+so I need to renormalize my cotonians.
+And on top of this, I'm converting back the generic time.
+The delta time I want to play, because I
+want to move to the next real frame in real time.
+But then I need to find what it means inside of the generic time
+to move those values.
+So you need to say, OK, I'm moving one frame forward.
+How many frames does that represent?
+How many times does it represent in the generic time?
+Is it 0.1, 0.2, and so on, and so on?
+So you have to go through the timings,
+find what were the different timings for the different time
+and play at the right frames so this is what I'm doing here I'm finding back
+inside the generic time what is my values and now that I have my generic
+time I can just request that correct frames inside of my animations and that
+gives me basically this and the quantity to play back any of the
+animations using the cubic B-spline and we will finally be able to actually build our verb with
+all of this. Now I have all my animations in the canonical form and encoded as a bunch of control
+points for uniform cubic B-spline not animation data itself anymore and I can go through the verb
+construction one and to build those you actually use that was the purpose of
+this paper is to use the radial basis functions and for each degrees of freedom
+so that's the value that you will have to to compute except they use b because
+that's one of the control points of the uniform B spline. So for each of those control points now
+what you will have to do is to compute radial basis functions and a linear approximation. I will
+not go through the mathematics on how they compute all those informations because I've done the other
+videos that represent the mathematics for it. Just watch that one and you will have heavy
+introductions to how they computed that specific coefficients, but basically we
+need to find the coefficients for the radial basis functions and the
+coefficients for the linear approximations for every, basically for
+every control point. So that will be for every degrees of freedom, for every
+animations and for every control points of every curves.
+That's a lot of different coefficients we have to compute.
+And on top of it, they do it for every control points to be able to blend those control points
+together.
+But they do it also for the timing.
+of our animations have time warps and we decided that the time warps was in this case always defined
+by six different values because the you know the beginning the first the first foot on the ground
+the second left ground left and so on so that's my six time values inside of a time warp and basically
+we will do the same thing we will use that same radial basis functions but with the timing this
+time we will have for every animations for every of those six values we will have a radial basis
+function and that's what this class is doing it basically allows us to give a bunch of adverbs
+with examples, build all the information we want and then fit a specific curve through it so we
+will be able to fit any of our control points animations or we'll be able to fit the timings
+and that kind of stuff and that returns the coefficients we want to use and then we could
+actually interpolate using those coefficients so that's what this class is doing and what I would
+do is just this I will now actually make real adverbs because so far I'm talking about the
+motions that have different directions and examples but I haven't encoded what for me
+that represents inside of the adverb space and that's what I would do here. I would create
+the adverb space and basically for me it's to the adverb space. The first one is how much left or
+right I have inside of that animations. And the second part is the style. For the angle,
+I'm doing something fairly simple. I take the first frame and then I take the last frame and I
+check what angle I have between those. And that gives me the advanced values at the angle,
+the amount of rotations I had at the end of the animation. And the second one is the style.
+and now I will encode it manually because I know which animations have which style.
+So basically all the the seven first animations have the small steps one
+and then the other animations have the biggest steps one the five one
+I have the the second style so two style and the angle of rotations.
+And so now that I have the adverbs I can actually create my radial basis functions
+and then I will start to be able to fit to get all the coefficients I need. So
+what I would do is that I will fit one by one because it would be easier to
+just see exactly what I'm fitting than trying to fit a multi-dimensional
+timings and all kind of stuff that I don't want to to fight against swizzling
+the animations, the data and that kind of stuff. So I have the timing, the linear
+Timing coefficients and the radial timing coefficients. It's basically the six values
+I had inside of a timing and then I get the three values for the linear coefficients because that's
+The adverbs size plus one
+And then the 12 different values because I have 12 different
+examples animations and I compute so the timing I fit the timing all of them
+I do the same for every point cloud every
+uniform-basic control points of any bones of all the degrees of freedom of each
+bone. So basically, you know, my 23 points, every bones in the characters, the WXYZ
+of the quaternions, XYZ of the positions, and then again the three, the three and
+12 for the linear and radial. And now that I have all those coefficients, I
+I will be able to use those coefficients
+to actually play my animation
+and blend the different values.
+So one thing I haven't done inside of these implementations
+is actually what they call the verb graph.
+So basically what we have is the fact that
+we have one action, which is the walking actions
+and I have a bunch of adverbs.
+say the verb is working, my adverbs is all my style and rotations, and then normally you will
+build a graph of verbs, you will be able to do from idle, go to walk and then maybe crouch or
+sit and that kind of stuff, and all of those verbs will have adverbs and all of those, and
+basically you build a graph of verbs and you make transitions between the the different verbs.
+I haven't done this part because we've done this when we we've done the motion
+graph it's basically the same thing except that instead of a verb you have
+a complete verb and adverbs but then you have transitions between those verbs
+and you blend the results between the verbs so nothing really fancy in the
+verb graph itself. What I'm more interesting in is how they evaluate
+the adverbs and so this is how you what you have to compute. Now to compute
+your animations when you have the different adverbs and you want to
+blend them together the first thing is to interpolate all the timings you know
+we've decided that each animations had a time warps and they all have different
+time warps. And then we build the coefficients for the different time warps. So we would
+blend together all those different time warps to find how we should normally time warp the
+blended results. So now we have to compute the blended time warped, let's say.
+And once you've done this, you could convert it into the generic time to know where you want to
+pick inside of all our canonical form animations. And give us the T. Then for every degree of freedom,
+for every control points,
+we need to blend those control points together.
+So all the first control points
+of every degrees of freedom together,
+all the second control points
+of all the degrees of freedom together,
+and so on, and so on.
+So it's per frame, per control points,
+per degrees of freedom.
+And then once you've done this, we could actually evaluate the uniform cubic Bezier because
+we've blended the control points of the cubic Bezier and then we could evaluate that cubic
+Bezier and we have our animation.
+If we had to compute all of that at every frame, that would be a lot of things to compute.
+Instead, what we could see is that at any time when we try to evaluate the uniform cubic
+B-spline, we don't need to evaluate every control point.
+We're just interested in the four control points that are useful to be able to compute
+our values.
+That's what I'm showing here, it's how we could, you know, if my values can go between
+0 and 1, which is my generic time. At any point, if I need to compute the values itself, I only
+need to evaluate those four control points. I don't need to evaluate the 23 of them, just the four
+relevant control points. And that's what I would do. I will only evaluate those fours.
+And so finally, this is the full functions. Let's see what it does. And then we can go back to
+to what was computing.
+So I have my character, it can now blend
+with different angles and you could see
+how it does blend between them
+and it can blend between different mood.
+And of course I could probably do this when it plays
+and that will be better.
+So I can walk, I can make it rotate,
+you can make it rotate in the opposite directions.
+It blends with all the values I want.
+And I can change, for instance, my mood also.
+So the mood is just changing the type of steps
+and you can change the type of steps
+and also the directions.
+So everything has been merged together
+inside of a big systems.
+Now, if you watched the video about the radial basis functions
+and why it was doing linear and radial basis one,
+and the radial basis one it was so it could do extrapolations on top of interpolation so for
+instance I don't have any example that goes further than minus something in this angle
+and I can try to force it to go further it does some kind of extrapolations and then we said it
+can do some kind of extrapolation but it's not that fancy you could see that extrapolation
+animation kind of does something when it's not perfect.
+It has a lot of issues with the looping part of the animations, but then it's even sliding.
+But if I'm staying into values I have, you can just interpolate those.
+Same for the mood.
+If I can blend between the two, but my mood has nothing that's allowing him to turn that
+big.
+So I will have big issues there during the looping.
+But if I stay inside of values for which I had animations, it would work a bit better.
+So I can go completely changing the mood completely and it all works smoothly
+So as long I have data and I'm not trying to extrapolate too much it kind of work
+I can force the the foot to be on the ground
+Nothing fancy here. That's why it pops like crazy. I'm just watching the timing from
+the generic time to know if it I'm between a flying or
+stick to the ground stuff and I
+I don't even smooth in and out those constraints, I just enforce them and stop them at once
+and that's why it pops like crazy.
+But basically, because my animation knows when I'm supposed to lock my feet, I'll be
+able to do it.
+And so how this works, basically again, it's all the same stuff, I'm saving a bunch of
+information because I need the characters to be able to move along, but you compute the
+times.
+So as I said, you interpolate the six values of the timing, you interpolate them.
+So I get the computed times, the computed time warps that is the blended versions of
+all the time warps.
+And then when I have this, I can go and compute the generic time, thanks to those blended
+time warped. And now that I have the timing I want to have, I can pick the correct four control
+points I need to compute. I can compute those four different control points using the radial
+basis functions. I can actually blend together all the control points that need to be blended
+together. And now that I have those blended control points, I can actually evaluate
+my beast plane at the specific time I need to with those four control points
+I'm the only computing one time now with the four control points and then I
+normalize my cotonion and that's it and everything else is just to make sure
+that I can keep playing animations and it's keep moving forward that's how this
+is working. So that was the, look, foot. That was the verb and adverb paper. You
+could see that it's a paper from 1999 and it basically has most of the
+all the features we already have specifically implemented in this case
+but if we take a game engine what you will have you will have your animation
+graph, which says, well, working, joking, running, and how you transition between them.
+And that's the verb in this case. And then you will have inside of all those actions,
+you will probably have a blend tree. That's how you decide how you blend
+leaning directions or blending animation, depending on the style. So it basically is the
+same as the adverb, except that all of this was computed at once trying to blend a higher
+dimension systems instead of just doing a simple blend between those.
+So paper from 1999 which has most of the concepts we have in game engine today
+although a bit more complex in the mathematics
+behind it. I hope you enjoyed it and I'll see you next time.

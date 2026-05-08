@@ -1,6 +1,6 @@
 {
-  "version": 4,
-  "capture_mode": "learning_cell_cards",
+  "version": 5,
+  "capture_mode": "key_result_media",
   "viewport": {
     "width": 1440,
     "height": 1000
@@ -12,7 +12,7 @@
   "video": {
     "file": "00-walkthrough.webm",
     "max_seconds": 15,
-    "max_bytes": 20971520,
+    "max_bytes": 10485760,
     "fps": 4
   },
   "cases": [
@@ -26,120 +26,146 @@
       "steps": [
         {
           "id": "bezier-control",
-          "file": "01-bezier-de-casteljau.png",
           "cell_index": 13,
           "output_type": "plot",
           "title": "Bezier control polygons and curves",
           "code_purpose": "Plot Bezier curves of different orders with their control points.",
-          "result_meaning": "The curve is constrained by the control polygon rather than being an isolated function plot."
+          "result_meaning": "The curve is constrained by the control polygon rather than being an isolated function plot.",
+          "card_file": "01-bezier-de-casteljau.png",
+          "result_file": "01-bezier-de-casteljau_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "bspline-basis",
-          "file": "02-bernstein-basis.png",
           "cell_index": 64,
           "output_type": "plot",
           "title": "Cox-De Boor basis functions",
           "code_purpose": "Plot recursively constructed B-Spline basis functions.",
-          "result_meaning": "Local support explains why one B-Spline control point affects only a local curve span."
+          "result_meaning": "Local support explains why one B-Spline control point affects only a local curve span.",
+          "card_file": "02-bernstein-basis.png",
+          "result_file": "02-bernstein-basis_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "bezier-spline",
-          "file": "03-bezier-control-polygon.png",
           "cell_index": 22,
           "output_type": "plot",
           "title": "Multi-segment Bezier spline",
           "code_purpose": "Connect multiple cubic Bezier spans and draw their control points.",
-          "result_meaning": "Long paths are built from local spans, and shared endpoints control continuity."
+          "result_meaning": "Long paths are built from local spans, and shared endpoints control continuity.",
+          "card_file": "03-bezier-control-polygon.png",
+          "result_file": "03-bezier-control-polygon_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "symbolic-derivation",
-          "file": "04-rational-bezier-weight.png",
           "cell_index": 15,
           "output_type": "log",
           "title": "De Casteljau versus Bernstein derivation",
           "code_purpose": "Expand the De Casteljau form using SymPy.",
-          "result_meaning": "The symbolic output proves that recursive interpolation and Bernstein polynomials describe the same cubic Bezier."
+          "result_meaning": "The symbolic output proves that recursive interpolation and Bernstein polynomials describe the same cubic Bezier.",
+          "card_file": "04-rational-bezier-weight.png",
+          "result_file": "04-rational-bezier-weight_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "cubic-motivation",
-          "file": "05-cubic-bezier-spline.png",
           "cell_index": 24,
           "output_type": "plot",
           "title": "Cubic curve shape control",
           "code_purpose": "Compare low-order and cubic polynomial interpolation behavior.",
-          "result_meaning": "Cubic curves can control both position and derivative, which is why they are common in animation curves."
+          "result_meaning": "Cubic curves can control both position and derivative, which is why they are common in animation curves.",
+          "card_file": "05-cubic-bezier-spline.png",
+          "result_file": "05-cubic-bezier-spline_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "hermite",
-          "file": "06-hermite-tangents.png",
           "cell_index": 40,
           "output_type": "plot",
           "title": "Hermite endpoints and tangents",
           "code_purpose": "Plot a 2D Hermite curve with endpoint tangent controls.",
-          "result_meaning": "Velocity and tangent information are as important as position values in animation curves."
+          "result_meaning": "Velocity and tangent information are as important as position values in animation curves.",
+          "card_file": "06-hermite-tangents.png",
+          "result_file": "06-hermite-tangents_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "cardinal",
-          "file": "07-cardinal-tension.png",
           "cell_index": 56,
           "output_type": "plot",
           "title": "Cardinal spline tension",
           "code_purpose": "Plot a Cardinal spline with control points.",
-          "result_meaning": "Cardinal splines estimate tangents from neighboring points and pass through key points."
+          "result_meaning": "Cardinal splines estimate tangents from neighboring points and pass through key points.",
+          "card_file": "07-cardinal-tension.png",
+          "result_file": "07-cardinal-tension_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "continuity",
-          "file": "08-cardinal-continuity.png",
           "cell_index": 62,
           "output_type": "plot",
           "title": "Continuity construction",
           "code_purpose": "Plot interpolation points, midpoints, and helper structures for continuity.",
-          "result_meaning": "The output separates positional continuity, velocity continuity, and higher-order smoothness."
+          "result_meaning": "The output separates positional continuity, velocity continuity, and higher-order smoothness.",
+          "card_file": "08-cardinal-continuity.png",
+          "result_file": "08-cardinal-continuity_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "bspline-local",
-          "file": "09-bspline-local-support.png",
           "cell_index": 72,
           "output_type": "plot",
           "title": "Uniform cubic B-Spline",
           "code_purpose": "Plot a uniform cubic B-Spline and its control points.",
-          "result_meaning": "B-Splines are smooth approximations and usually do not pass through every control point."
+          "result_meaning": "B-Splines are smooth approximations and usually do not pass through every control point.",
+          "card_file": "09-bspline-local-support.png",
+          "result_file": "09-bspline-local-support_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "keyframe-hermite",
-          "file": "10-keyframe-hermite.png",
           "cell_index": 77,
           "output_type": "plot",
           "title": "1D Hermite keyframe curve",
           "code_purpose": "Generate a 1D Hermite curve from key time, key value, and tangent.",
-          "result_meaning": "This transfers geometric curve ideas to animation-editor keyframe curves."
+          "result_meaning": "This transfers geometric curve ideas to animation-editor keyframe curves.",
+          "card_file": "10-keyframe-hermite.png",
+          "result_file": "10-keyframe-hermite_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "nonuniform-cardinal",
-          "file": "11-nonuniform-cardinal-time.png",
           "cell_index": 83,
           "output_type": "plot",
           "title": "Non-uniform Cardinal time",
           "code_purpose": "Compare Cardinal sampling under non-uniform key times.",
-          "result_meaning": "Treating parameter t as real time can place samples incorrectly."
+          "result_meaning": "Treating parameter t as real time can place samples incorrectly.",
+          "card_file": "11-nonuniform-cardinal-time.png",
+          "result_file": "11-nonuniform-cardinal-time_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "bezier-root",
-          "file": "12-bezier-time-root.png",
           "cell_index": 88,
           "output_type": "plot",
           "title": "Bezier time root solving",
           "code_purpose": "Show a non-uniform Bezier time curve and recovered internal parameter.",
-          "result_meaning": "Animation systems often need to solve internal curve parameters from frame time."
+          "result_meaning": "Animation systems often need to solve internal curve parameters from frame time.",
+          "card_file": "12-bezier-time-root.png",
+          "result_file": "12-bezier-time-root_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "bspline-fitting",
-          "file": "13-bspline-fitting.png",
           "cell_index": 92,
           "output_type": "plot",
           "title": "B-Spline least-squares fitting",
           "code_purpose": "Fit a complex sampled function with a uniform cubic B-Spline.",
-          "result_meaning": "The fitted curve does not need to pass through every sample, but it preserves a stable trend."
+          "result_meaning": "The fitted curve does not need to pass through every sample, but it preserves a stable trend.",
+          "card_file": "13-bspline-fitting.png",
+          "result_file": "13-bspline-fitting_result.png",
+          "media_role": "key_visual"
         }
       ],
       "video_step": {
@@ -147,7 +173,20 @@
         "title": "Curve and Spline learning walkthrough",
         "result_meaning": "The video links Bezier, Hermite, Cardinal, B-Spline, and keyframe curves."
       },
-      "kind": "notebook"
+      "kind": "notebook",
+      "transcript_sources": [
+        "docs/transcripts/Ye8YY_ZvjrU_Curve and Spline Part1 _ Bezier Curve.txt",
+        "docs/transcripts/bjnJV4elorg_Curve and Spline Part2 _ Hermite Curve.txt",
+        "docs/transcripts/N9ojjE7RMpo_Curve and Spline Part3 _ Cardinal Spline.txt",
+        "docs/transcripts/7KFtPx2LQrc_Curve and Spline Part4 _ Uniform Cubic B Spline.txt",
+        "docs/transcripts/QiWnwcck0t4_Curve and Spline Part5 _ 1D curves.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Curve and Spline learning walkthrough"
+      }
     },
     {
       "slug": "laplacian_deformation",
@@ -160,53 +199,70 @@
       "steps": [
         {
           "id": "strip-baseline",
-          "file": "01_strip_mesh_baseline.png",
           "cell_index": 5,
           "output_type": "viewer",
           "title": "Generated strip mesh baseline",
           "code_purpose": "Generate and draw the initial 2D strip graph.",
           "result_meaning": "This baseline shows the graph vertices and edges before Laplacian reconstruction.",
-          "slider_fraction": 0.5
+          "slider_fraction": 0.5,
+          "card_file": "01_strip_mesh_baseline.png",
+          "result_file": "01_strip_mesh_baseline_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.5
+            }
+          ]
         },
         {
           "id": "unanchored-reconstruction",
-          "file": "02_unanchored_reconstruction.png",
           "cell_index": 7,
           "output_type": "viewer",
           "title": "Unanchored Laplacian reconstruction",
           "code_purpose": "Reconstruct vertices from differential coordinates without enough anchors.",
-          "result_meaning": "The result shows why Laplacian coordinates alone do not fix global placement."
+          "result_meaning": "The result shows why Laplacian coordinates alone do not fix global placement.",
+          "card_file": "02_unanchored_reconstruction.png",
+          "result_file": "02_unanchored_reconstruction_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "two-anchor-solve",
-          "file": "03_two_anchor_solve.png",
           "cell_index": 9,
           "output_type": "viewer",
           "title": "Two-anchor reconstruction",
           "code_purpose": "Add endpoint anchors to stabilize the linear solve.",
-          "result_meaning": "Anchors turn relative differential coordinates into a positioned shape."
+          "result_meaning": "Anchors turn relative differential coordinates into a positioned shape.",
+          "card_file": "03_two_anchor_solve.png",
+          "result_file": "03_two_anchor_solve_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "three-anchor-deform",
-          "file": "04_three_anchor_deformation.png",
           "cell_index": 10,
           "output_type": "viewer",
           "title": "Three-anchor deformation",
           "code_purpose": "Move an extra control point and solve the constrained system.",
-          "result_meaning": "The viewer shows local deformation propagating through the graph."
+          "result_meaning": "The viewer shows local deformation propagating through the graph.",
+          "card_file": "04_three_anchor_deformation.png",
+          "result_file": "04_three_anchor_deformation_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "vectorized-3d",
-          "file": "05_vectorized_3d_solve.png",
           "cell_index": 19,
           "output_type": "viewer",
           "title": "Vectorized 3D Laplacian solve",
           "code_purpose": "Use a Kronecker-product system for x/y/z coordinates.",
-          "result_meaning": "The same linear machinery scales from 2D graph points to 3D animation vertices."
+          "result_meaning": "The same linear machinery scales from 2D graph points to 3D animation vertices.",
+          "card_file": "05_vectorized_3d_solve.png",
+          "result_file": "05_vectorized_3d_solve_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "rotation-invariance",
-          "file": "06_rotation_invariance_controls.png",
           "cell_index": 29,
           "output_type": "widget_controls",
           "title": "Rotation-invariant deformation controls",
@@ -219,33 +275,98 @@
           "checkbox_indices": [
             0,
             1
-          ]
+          ],
+          "card_file": "06_rotation_invariance_controls.png",
+          "result_file": "06_rotation_invariance_controls_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.4
+            },
+            {
+              "kind": "slider",
+              "index": 1,
+              "role": "parameter",
+              "fraction": 0.5
+            },
+            {
+              "kind": "checkbox",
+              "index": 0,
+              "checked": true
+            },
+            {
+              "kind": "checkbox",
+              "index": 1,
+              "checked": true
+            }
+          ],
+          "preview_gif": "06_rotation_invariance_controls_preview.gif",
+          "video_mp4": "06_rotation_invariance_controls_preview.mp4",
+          "video_webm": "06_rotation_invariance_controls_preview.webm"
         },
         {
           "id": "animation-graph",
-          "file": "07_animation_graph_deformation.png",
           "cell_index": 40,
           "output_type": "timeline_viewer",
           "title": "Animation graph reconstruction",
           "code_purpose": "Convert skeleton animation into a graph and reconstruct motion.",
           "result_meaning": "The timeline viewer shows Laplacian deformation applied to animated pose data.",
-          "slider_fraction": 0.55
+          "slider_fraction": 0.55,
+          "card_file": "07_animation_graph_deformation.png",
+          "result_file": "07_animation_graph_deformation_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.55
+            }
+          ],
+          "preview_gif": "07_animation_graph_deformation_preview.gif",
+          "video_mp4": "07_animation_graph_deformation_preview.mp4",
+          "video_webm": "07_animation_graph_deformation_preview.webm"
         },
         {
           "id": "curved-locomotion",
-          "file": "08_curved_locomotion_result.png",
           "cell_index": 46,
           "output_type": "timeline_viewer",
           "title": "Curved locomotion result",
           "code_purpose": "Bend the walk trajectory and reconstruct the animated character.",
           "result_meaning": "The final viewer checks whether graph deformation can redirect locomotion smoothly.",
-          "slider_fraction": 0.65
+          "slider_fraction": 0.65,
+          "card_file": "08_curved_locomotion_result.png",
+          "result_file": "08_curved_locomotion_result_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.65
+            }
+          ],
+          "preview_gif": "08_curved_locomotion_result_preview.gif",
+          "video_mp4": "08_curved_locomotion_result_preview.mp4",
+          "video_webm": "08_curved_locomotion_result_preview.webm"
         }
       ],
       "video_step": {
         "mode": "step_sequence",
         "title": "Laplacian Deformation learning walkthrough",
         "result_meaning": "The video walks through the case by sequencing its code-output learning cards."
+      },
+      "transcript_sources": [
+        "docs/transcripts/0hyEbxAQVNY_Laplacian Mesh and Animation Deformation (re-upload).txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Laplacian Deformation learning walkthrough"
       }
     },
     {
@@ -259,63 +380,84 @@
       "steps": [
         {
           "id": "objective",
-          "file": "01_alignment_objective_formula.png",
           "cell_index": 4,
           "output_type": "formula",
           "title": "Weighted point-cloud objective",
           "code_purpose": "Display the weighted squared-distance objective for point-cloud alignment.",
-          "result_meaning": "The formula states exactly what motion-graph transition alignment minimizes."
+          "result_meaning": "The formula states exactly what motion-graph transition alignment minimizes.",
+          "card_file": "01_alignment_objective_formula.png",
+          "result_file": "01_alignment_objective_formula_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "derivatives",
-          "file": "02_partial_derivatives.png",
           "cell_index": 6,
           "output_type": "latex",
           "title": "Partial derivatives",
           "code_purpose": "Differentiate the objective with respect to rotation and translation.",
-          "result_meaning": "The derivatives define the first-order conditions for the optimal alignment."
+          "result_meaning": "The derivatives define the first-order conditions for the optimal alignment.",
+          "card_file": "02_partial_derivatives.png",
+          "result_file": "02_partial_derivatives_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "expanded-equations",
-          "file": "03_expanded_stationarity.png",
           "cell_index": 8,
           "output_type": "latex",
           "title": "Expanded stationarity equations",
           "code_purpose": "Expand the derivative equations before substitution.",
-          "result_meaning": "The raw equations show where the sine, cosine, and translation terms come from."
+          "result_meaning": "The raw equations show where the sine, cosine, and translation terms come from.",
+          "card_file": "03_expanded_stationarity.png",
+          "result_file": "03_expanded_stationarity_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "weighted-shorthand",
-          "file": "04_weighted_sum_shorthand.png",
           "cell_index": 13,
           "output_type": "latex",
           "title": "Weighted-sum shorthand",
           "code_purpose": "Introduce compact weighted-sum symbols for the derivation.",
-          "result_meaning": "The shorthand turns large sums into readable centroid-like expressions."
+          "result_meaning": "The shorthand turns large sums into readable centroid-like expressions.",
+          "card_file": "04_weighted_sum_shorthand.png",
+          "result_file": "04_weighted_sum_shorthand_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "translation-solution",
-          "file": "05_translation_solution.png",
           "cell_index": 16,
           "output_type": "formula",
           "title": "Closed-form translation solution",
           "code_purpose": "Solve the translation equations for x0 and z0.",
-          "result_meaning": "The result separates translation from the remaining rotation solve."
+          "result_meaning": "The result separates translation from the remaining rotation solve.",
+          "card_file": "05_translation_solution.png",
+          "result_file": "05_translation_solution_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "theta-solution",
-          "file": "06_theta_solution.png",
           "cell_index": 20,
           "output_type": "formula",
           "title": "Final theta solution",
           "code_purpose": "Collect sine/cosine terms and derive the atan form.",
-          "result_meaning": "The final expression is the closed-form rotation used for point-cloud alignment."
+          "result_meaning": "The final expression is the closed-form rotation used for point-cloud alignment.",
+          "card_file": "06_theta_solution.png",
+          "result_file": "06_theta_solution_result.png",
+          "media_role": "supporting_evidence"
         }
       ],
       "video_step": {
         "mode": "step_sequence",
         "title": "Motiongraph Pointcloud Derivation learning walkthrough",
         "result_meaning": "The video walks through the case by sequencing its code-output learning cards."
+      },
+      "transcript_sources": [
+        "docs/transcripts/h1ZpqBlHkk0_MotionGraphs _ Derivation of the closed form solution.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Motiongraph Pointcloud Derivation learning walkthrough"
       }
     },
     {
@@ -329,72 +471,95 @@
       "steps": [
         {
           "id": "sample-function",
-          "file": "01_sample_function_points.png",
           "cell_index": 6,
           "output_type": "plot",
           "title": "Sample function and sparse points",
           "code_purpose": "Plot the target function and sparse interpolation samples.",
-          "result_meaning": "The plot establishes what the RBF interpolator must reconstruct."
+          "result_meaning": "The plot establishes what the RBF interpolator must reconstruct.",
+          "card_file": "01_sample_function_points.png",
+          "result_file": "01_sample_function_points_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "gaussian-kernels",
-          "file": "02_gaussian_kernel_influence.png",
           "cell_index": 7,
           "output_type": "plot",
           "title": "Gaussian kernel influence",
           "code_purpose": "Plot per-sample Gaussian radial basis functions.",
-          "result_meaning": "The graph shows each sample as a local influence field."
+          "result_meaning": "The graph shows each sample as a local influence field.",
+          "card_file": "02_gaussian_kernel_influence.png",
+          "result_file": "02_gaussian_kernel_influence_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "kernel-matrix",
-          "file": "03_distance_kernel_matrix.png",
           "cell_index": 9,
           "output_type": "matrix",
           "title": "Distance and kernel matrices",
           "code_purpose": "Print the pairwise distances and Phi kernel matrix.",
-          "result_meaning": "The matrix is the linear system that determines interpolation weights."
+          "result_meaning": "The matrix is the linear system that determines interpolation weights.",
+          "card_file": "03_distance_kernel_matrix.png",
+          "result_file": "03_distance_kernel_matrix_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "rbf-weights",
-          "file": "04_rbf_weights.png",
           "cell_index": 10,
           "output_type": "table",
           "title": "Solved RBF weights",
           "code_purpose": "Solve Phi w = y and print the weights.",
-          "result_meaning": "The weights tell how much each radial basis contributes to the reconstruction."
+          "result_meaning": "The weights tell how much each radial basis contributes to the reconstruction.",
+          "card_file": "04_rbf_weights.png",
+          "result_file": "04_rbf_weights_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "interpolation-result",
-          "file": "05_interpolated_query_result.png",
           "cell_index": 16,
           "output_type": "plot",
           "title": "Interpolated curve and query sample",
           "code_purpose": "Evaluate the RBF curve and mark a query point.",
-          "result_meaning": "The plot checks that local kernels reconstruct the target curve between samples."
+          "result_meaning": "The plot checks that local kernels reconstruct the target curve between samples.",
+          "card_file": "05_interpolated_query_result.png",
+          "result_file": "05_interpolated_query_result_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "polynomial-basis",
-          "file": "06_polynomial_basis_matrix.png",
           "cell_index": 21,
           "output_type": "matrix",
           "title": "Polynomial augmentation matrix",
           "code_purpose": "Build and print the polynomial basis matrix P.",
-          "result_meaning": "The augmentation adds a global trend term alongside local kernels."
+          "result_meaning": "The augmentation adds a global trend term alongside local kernels.",
+          "card_file": "06_polynomial_basis_matrix.png",
+          "result_file": "06_polynomial_basis_matrix_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "augmented-fit",
-          "file": "07_augmented_rbf_fit.png",
           "cell_index": 27,
           "output_type": "plot",
           "title": "Augmented RBF fit",
           "code_purpose": "Plot the final polynomial-augmented RBF interpolation.",
-          "result_meaning": "The final curve preserves both sparse samples and stable large-scale behavior."
+          "result_meaning": "The final curve preserves both sparse samples and stable large-scale behavior.",
+          "card_file": "07_augmented_rbf_fit.png",
+          "result_file": "07_augmented_rbf_fit_result.png",
+          "media_role": "key_visual"
         }
       ],
       "video_step": {
         "mode": "step_sequence",
         "title": "Radial Basis Function learning walkthrough",
         "result_meaning": "The video walks through the case by sequencing its code-output learning cards."
+      },
+      "transcript_sources": [
+        "docs/transcripts/luX11STn1Uk_Radial Basis Function.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Radial Basis Function learning walkthrough"
       }
     },
     {
@@ -408,81 +573,106 @@
       "steps": [
         {
           "id": "sample-space",
-          "file": "01_sample_adverb_space.png",
           "cell_index": 3,
           "output_type": "plot",
           "title": "Sample adverb color space",
           "code_purpose": "Plot sample points in a two-dimensional adverb space.",
-          "result_meaning": "The plot connects semantic directions to observed color/motion samples."
+          "result_meaning": "The plot connects semantic directions to observed color/motion samples.",
+          "card_file": "01_sample_adverb_space.png",
+          "result_file": "01_sample_adverb_space_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "adverb-encoding",
-          "file": "02_4d_adverb_encoding.png",
           "cell_index": 4,
           "output_type": "matrix",
           "title": "Four-dimensional adverb encoding",
           "code_purpose": "Encode right, left, up, and down adverb components.",
-          "result_meaning": "The matrix is the feature space used for linear and radial interpolation."
+          "result_meaning": "The matrix is the feature space used for linear and radial interpolation.",
+          "card_file": "02_4d_adverb_encoding.png",
+          "result_file": "02_4d_adverb_encoding_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "linear-coefficients",
-          "file": "03_linear_coefficients.png",
           "cell_index": 7,
           "output_type": "table",
           "title": "Linear model coefficients",
           "code_purpose": "Fit and print least-squares linear coefficients.",
-          "result_meaning": "The coefficients capture the broad global trend in adverb space."
+          "result_meaning": "The coefficients capture the broad global trend in adverb space.",
+          "card_file": "03_linear_coefficients.png",
+          "result_file": "03_linear_coefficients_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "linear-field",
-          "file": "04_linear_color_field.png",
           "cell_index": 9,
           "output_type": "plot",
           "title": "Linear color field",
           "code_purpose": "Plot the color field produced by the linear model.",
-          "result_meaning": "The broad field shows what linear interpolation can and cannot explain."
+          "result_meaning": "The broad field shows what linear interpolation can and cannot explain.",
+          "card_file": "04_linear_color_field.png",
+          "result_file": "04_linear_color_field_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "residuals",
-          "file": "05_linear_residuals.png",
           "cell_index": 11,
           "output_type": "table",
           "title": "Linear residuals",
           "code_purpose": "Print the residuals left after the linear model.",
-          "result_meaning": "Residuals are the local details that the radial basis layer must recover."
+          "result_meaning": "Residuals are the local details that the radial basis layer must recover.",
+          "card_file": "05_linear_residuals.png",
+          "result_file": "05_linear_residuals_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "b3-basis",
-          "file": "06_cubic_bspline_basis.png",
           "cell_index": 14,
           "output_type": "plot",
           "title": "Cubic B-spline radial basis",
           "code_purpose": "Plot the B3 radial basis shape.",
-          "result_meaning": "The compact-support basis defines how far each example influences the field."
+          "result_meaning": "The compact-support basis defines how far each example influences the field.",
+          "card_file": "06_cubic_bspline_basis.png",
+          "result_file": "06_cubic_bspline_basis_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "radial-system",
-          "file": "07_radial_system_solve.png",
           "cell_index": 20,
           "output_type": "matrix",
           "title": "Radial coefficient solve",
           "code_purpose": "Compute distances, scales, D matrix, and residual coefficients.",
-          "result_meaning": "The system transforms residual examples into a smooth correction field."
+          "result_meaning": "The system transforms residual examples into a smooth correction field.",
+          "card_file": "07_radial_system_solve.png",
+          "result_file": "07_radial_system_solve_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "final-rbf-field",
-          "file": "08_final_rbf_field.png",
           "cell_index": 21,
           "output_type": "plot",
           "title": "Residual-corrected RBF field",
           "code_purpose": "Plot the final field after adding the RBF residual correction.",
-          "result_meaning": "The field shows local semantic control beyond the linear trend."
+          "result_meaning": "The field shows local semantic control beyond the linear trend.",
+          "card_file": "08_final_rbf_field.png",
+          "result_file": "08_final_rbf_field_result.png",
+          "media_role": "key_visual"
         }
       ],
       "video_step": {
         "mode": "step_sequence",
         "title": "Radial Basis Function Verbs And Adverbs learning walkthrough",
         "result_meaning": "The video walks through the case by sequencing its code-output learning cards."
+      },
+      "transcript_sources": [
+        "docs/transcripts/rL0pEfXbQ6g_Radial Basis Function _ Multidimensional Motion Interpolation.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Radial Basis Function Verbs And Adverbs learning walkthrough"
       }
     },
     {
@@ -495,65 +685,111 @@
       "steps": [
         {
           "id": "character-bind-pose",
-          "file": "01_character_bind_pose.png",
           "cell_index": 11,
           "output_type": "viewer",
           "title": "Character bind pose and skeleton viewer",
           "code_purpose": "Run render(frame), convert BVH channels to character bone matrices, then draw the character, ground, skeleton lines, and local axes.",
           "result_meaning": "This confirms that the animation data can drive the live viewer; later format, mapping, and root-motion discussions use this visual baseline.",
-          "slider_fraction": 0.2
+          "slider_fraction": 0.2,
+          "card_file": "01_character_bind_pose.png",
+          "result_file": "01_character_bind_pose_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.2
+            }
+          ]
         },
         {
           "id": "raw-bvh-skeleton",
-          "file": "02_raw_bvh_skeleton.png",
           "cell_index": 12,
           "output_type": "viewer",
           "title": "Raw BVH skeleton-only view",
           "code_purpose": "Run render_skeleton(frame) and draw only BVH skeleton lines and joint axes.",
           "result_meaning": "Separating the mesh from the skeleton lets the reader inspect the joint hierarchy directly.",
-          "slider_fraction": 0.35
+          "slider_fraction": 0.35,
+          "card_file": "02_raw_bvh_skeleton.png",
+          "result_file": "02_raw_bvh_skeleton_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.35
+            }
+          ]
         },
         {
           "id": "tensor-shapes",
-          "file": "03_tensor_shape_output.png",
           "cell_index": 9,
           "output_type": "log",
           "title": "pos/quats tensor shape output",
           "code_purpose": "Print the position and quaternion tensor shapes after importing BVH data.",
-          "result_meaning": "The log shows that an animation is represented as frame x bone x channel arrays."
+          "result_meaning": "The log shows that an animation is represented as frame x bone x channel arrays.",
+          "card_file": "03_tensor_shape_output.png",
+          "result_file": "03_tensor_shape_output_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "raw-vs-mapped",
-          "file": "04_raw_vs_mapped_compare.png",
           "cell_index": 19,
           "output_type": "viewer",
           "title": "Raw skeleton versus mapped skeleton",
           "code_purpose": "Render the raw BVH skeleton beside the AnimMapper result on the target character.",
           "result_meaning": "This shows that mapping adapts hierarchy and pose to the character while preserving the time structure.",
-          "slider_fraction": 0.45
+          "slider_fraction": 0.45,
+          "card_file": "04_raw_vs_mapped_compare.png",
+          "result_file": "04_raw_vs_mapped_compare_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.45
+            }
+          ]
         },
         {
           "id": "skeleton-tree",
-          "file": "05_skeleton_tree_output.png",
           "cell_index": 21,
           "output_type": "log",
           "title": "Skeleton parent tree output",
           "code_purpose": "Print the raw and mapped skeleton parent trees.",
-          "result_meaning": "The textual tree turns the viewer difference into an inspectable parent-child hierarchy."
+          "result_meaning": "The textual tree turns the viewer difference into an inspectable parent-child hierarchy.",
+          "card_file": "05_skeleton_tree_output.png",
+          "result_file": "05_skeleton_tree_output_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "root-projection",
-          "file": "06_root_projection_motion.png",
           "cell_index": 24,
           "output_type": "timeline_viewer",
           "title": "Root projection and Root/Hips split",
           "code_purpose": "Use static_position/static_rotation controls to inspect root motion and local pelvis motion.",
           "result_meaning": "The result explains how global displacement and local body pose are stored separately.",
-          "slider_fraction": 0.5
+          "slider_fraction": 0.5,
+          "card_file": "06_root_projection_motion.png",
+          "result_file": "06_root_projection_motion_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.5
+            }
+          ],
+          "preview_gif": "06_root_projection_motion_preview.gif",
+          "video_mp4": "06_root_projection_motion_preview.mp4",
+          "video_webm": "06_root_projection_motion_preview.webm"
         },
         {
           "id": "static-root-toggles",
-          "file": "07_static_root_toggles.png",
           "cell_index": 24,
           "output_type": "timeline_viewer",
           "title": "Static Root toggle comparison",
@@ -562,7 +798,26 @@
           "slider_fraction": 0.5,
           "checkbox_indices": [
             0
-          ]
+          ],
+          "card_file": "07_static_root_toggles.png",
+          "result_file": "07_static_root_toggles_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.5
+            },
+            {
+              "kind": "checkbox",
+              "index": 0,
+              "checked": true
+            }
+          ],
+          "preview_gif": "07_static_root_toggles_preview.gif",
+          "video_mp4": "07_static_root_toggles_preview.mp4",
+          "video_webm": "07_static_root_toggles_preview.webm"
         }
       ],
       "video_step": {
@@ -570,7 +825,16 @@
         "title": "Animation Format learning walkthrough",
         "result_meaning": "The video links character viewing, tensor output, skeleton mapping, and root projection."
       },
-      "kind": "notebook"
+      "kind": "notebook",
+      "transcript_sources": [
+        "docs/transcripts/cwmrRvw2mPM_Animation Data.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Animation Format learning walkthrough"
+      }
     },
     {
       "slug": "footskate_cleanup_for_motion_capture_editing",
@@ -582,71 +846,128 @@
       "steps": [
         {
           "id": "keep-translation",
-          "file": "07_keep_translation_compare.png",
           "cell_index": 12,
           "output_type": "viewer",
           "title": "keep_translation comparison",
           "code_purpose": "Display two sphere-joint characters for keep_translation=False and keep_translation=True.",
           "result_meaning": "The comparison clarifies the responsibility split between root translation and local joint offsets.",
-          "slider_fraction": 0.25
+          "slider_fraction": 0.25,
+          "card_file": "07_keep_translation_compare.png",
+          "result_file": "07_keep_translation_compare_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.25
+            }
+          ]
         },
         {
           "id": "contact-signal",
-          "file": "03_contact_signal_timeline.png",
           "cell_index": 16,
           "output_type": "plot",
           "title": "Four foot-contact signals",
           "code_purpose": "Plot LeftHeel, LeftBall, RightHeel, and RightBall contact booleans.",
-          "result_meaning": "These signals decide which foot points should stay fixed in world space."
+          "result_meaning": "These signals decide which foot points should stay fixed in world space.",
+          "card_file": "03_contact_signal_timeline.png",
+          "result_file": "03_contact_signal_timeline_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "contact-targets",
-          "file": "02_contact_targets.png",
           "cell_index": 19,
           "output_type": "viewer",
           "title": "Contact target points",
           "code_purpose": "Draw the heel and ball targets back into the viewer for contact spans.",
           "result_meaning": "Stable targets are the anchors that let IK remove foot sliding.",
-          "slider_fraction": 0.4
+          "slider_fraction": 0.4,
+          "card_file": "02_contact_targets.png",
+          "result_file": "02_contact_targets_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.4
+            }
+          ]
         },
         {
           "id": "ankle-root-axes",
-          "file": "05_ankle_root_axes.png",
           "cell_index": 22,
           "output_type": "viewer",
           "title": "Ankle and root debug axes",
           "code_purpose": "Render ankle and root helper axes while the contact constraints are active.",
           "result_meaning": "The axes help check whether cleanup preserves foot orientation and body orientation.",
-          "slider_fraction": 0.5
+          "slider_fraction": 0.5,
+          "card_file": "05_ankle_root_axes.png",
+          "result_file": "05_ankle_root_axes_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.5
+            }
+          ]
         },
         {
           "id": "knee-damping",
-          "file": "04_constraint_buffer_debug.png",
           "cell_index": 28,
           "output_type": "plot",
           "title": "IK knee damping curve",
           "code_purpose": "Plot the damping polynomial used by the IK correction.",
-          "result_meaning": "The curve explains how correction error is smoothly distributed through the leg chain."
+          "result_meaning": "The curve explains how correction error is smoothly distributed through the leg chain.",
+          "card_file": "04_constraint_buffer_debug.png",
+          "result_file": "04_constraint_buffer_debug_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "solved-comparison",
-          "file": "01_raw_vs_solved_overview.png",
           "cell_index": 29,
           "output_type": "viewer",
           "title": "Original versus IK-solved animation",
           "code_purpose": "Toggle between the original animation and the solved animation.",
           "result_meaning": "The reader can inspect whether the foot is more stable without damaging the body motion.",
-          "slider_fraction": 0.55
+          "slider_fraction": 0.55,
+          "card_file": "01_raw_vs_solved_overview.png",
+          "result_file": "01_raw_vs_solved_overview_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.55
+            }
+          ]
         },
         {
           "id": "final-processing",
-          "file": "06_final_processing_compare.png",
           "cell_index": 34,
           "output_type": "timeline_viewer",
           "title": "Final Processing boundary smoothing",
           "code_purpose": "Compare the solved animation before and after final processing.",
           "result_meaning": "Final processing smooths entering and leaving contact spans instead of recomputing the whole IK solve.",
-          "slider_fraction": 0.6
+          "slider_fraction": 0.6,
+          "card_file": "06_final_processing_compare.png",
+          "result_file": "06_final_processing_compare_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.6
+            }
+          ],
+          "preview_gif": "06_final_processing_compare_preview.gif",
+          "video_mp4": "06_final_processing_compare_preview.mp4",
+          "video_webm": "06_final_processing_compare_preview.webm"
         }
       ],
       "video_step": {
@@ -654,7 +975,16 @@
         "title": "Footskate cleanup learning walkthrough",
         "result_meaning": "The video links contact detection, target construction, IK debugging, and final smoothing."
       },
-      "kind": "notebook"
+      "kind": "notebook",
+      "transcript_sources": [
+        "docs/transcripts/exASa8NAhc8_Footskate cleanup for motion capture editing.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Footskate cleanup learning walkthrough"
+      }
     },
     {
       "slug": "halo_4_facial_animation",
@@ -667,44 +997,62 @@
       "steps": [
         {
           "id": "data-load",
-          "file": "01_data_load_shapes.png",
           "cell_index": 5,
           "output_type": "table",
           "title": "Face mesh data loading",
           "code_purpose": "Load pickled triangle indices, normals, and per-frame vertex positions.",
-          "result_meaning": "The output confirms the face animation is stored as mesh topology plus a frame-indexed vertex stream."
+          "result_meaning": "The output confirms the face animation is stored as mesh topology plus a frame-indexed vertex stream.",
+          "card_file": "01_data_load_shapes.png",
+          "result_file": "01_data_load_shapes_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "raw-face",
-          "file": "02_raw_vertex_stream_viewer.png",
           "cell_index": 11,
           "output_type": "timeline_viewer",
           "title": "Raw vertex-stream face playback",
           "code_purpose": "Upload frame vertices to WebGL buffers and draw the animated face mesh.",
           "result_meaning": "This shows the raw per-frame geometry playback before any compression.",
-          "slider_fraction": 0.35
+          "slider_fraction": 0.35,
+          "card_file": "02_raw_vertex_stream_viewer.png",
+          "result_file": "02_raw_vertex_stream_viewer_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.35
+            }
+          ],
+          "preview_gif": "02_raw_vertex_stream_viewer_preview.gif",
+          "video_mp4": "02_raw_vertex_stream_viewer_preview.mp4",
+          "video_webm": "02_raw_vertex_stream_viewer_preview.webm"
         },
         {
           "id": "memory-size",
-          "file": "03_memory_size_log.png",
           "cell_index": 13,
           "output_type": "log",
           "title": "Raw animation memory size",
           "code_purpose": "Print the raw vertex animation memory footprint.",
-          "result_meaning": "The memory log motivates PCA compression by showing why full vertex streams are expensive."
+          "result_meaning": "The memory log motivates PCA compression by showing why full vertex streams are expensive.",
+          "card_file": "03_memory_size_log.png",
+          "result_file": "03_memory_size_log_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "pca-components",
-          "file": "04_pca_components_shape.png",
           "cell_index": 17,
           "output_type": "table",
           "title": "Seven PCA component layout",
           "code_purpose": "Fit PCA to flattened frame data and print the component shape.",
-          "result_meaning": "The component count shows how a large vertex stream becomes a compact coefficient space."
+          "result_meaning": "The component count shows how a large vertex stream becomes a compact coefficient space.",
+          "card_file": "04_pca_components_shape.png",
+          "result_file": "04_pca_components_shape_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "pca-component-viewer",
-          "file": "05_pca_component_viewer.png",
           "cell_index": 19,
           "output_type": "widget_controls",
           "title": "PCA component deformation viewer",
@@ -713,33 +1061,88 @@
           "slider_fractions": [
             0.45,
             0.65
-          ]
+          ],
+          "card_file": "05_pca_component_viewer.png",
+          "result_file": "05_pca_component_viewer_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.45
+            },
+            {
+              "kind": "slider",
+              "index": 1,
+              "role": "parameter",
+              "fraction": 0.65
+            }
+          ],
+          "preview_gif": "05_pca_component_viewer_preview.gif",
+          "video_mp4": "05_pca_component_viewer_preview.mp4",
+          "video_webm": "05_pca_component_viewer_preview.webm"
         },
         {
           "id": "cpu-reconstruction",
-          "file": "06_cpu_reconstruction_compare.png",
           "cell_index": 23,
           "output_type": "timeline_viewer",
           "title": "CPU PCA reconstruction playback",
           "code_purpose": "Inverse-transform PCA coefficients and draw original/reconstructed animation.",
           "result_meaning": "The viewer checks whether the compressed representation preserves the visible expression motion.",
-          "slider_fraction": 0.55
+          "slider_fraction": 0.55,
+          "card_file": "06_cpu_reconstruction_compare.png",
+          "result_file": "06_cpu_reconstruction_compare_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.55
+            }
+          ],
+          "preview_gif": "06_cpu_reconstruction_compare_preview.gif",
+          "video_mp4": "06_cpu_reconstruction_compare_preview.mp4",
+          "video_webm": "06_cpu_reconstruction_compare_preview.webm"
         },
         {
           "id": "gpu-reconstruction",
-          "file": "07_gpu_shader_reconstruction.png",
           "cell_index": 26,
           "output_type": "timeline_viewer",
           "title": "GPU shader PCA reconstruction",
           "code_purpose": "Run the shader path that reconstructs vertex positions on the GPU.",
           "result_meaning": "The final viewer shows the runtime-friendly form of the PCA facial animation pipeline.",
-          "slider_fraction": 0.65
+          "slider_fraction": 0.65,
+          "card_file": "07_gpu_shader_reconstruction.png",
+          "result_file": "07_gpu_shader_reconstruction_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.65
+            }
+          ],
+          "preview_gif": "07_gpu_shader_reconstruction_preview.gif",
+          "video_mp4": "07_gpu_shader_reconstruction_preview.mp4",
+          "video_webm": "07_gpu_shader_reconstruction_preview.webm"
         }
       ],
       "video_step": {
         "mode": "step_sequence",
         "title": "Halo 4 Facial Animation learning walkthrough",
         "result_meaning": "The video walks through the case by sequencing its code-output learning cards."
+      },
+      "transcript_sources": [
+        "docs/transcripts/JNR7iFONGmg_Halo4 Facial Animations.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Halo 4 Facial Animation learning walkthrough"
       }
     },
     {
@@ -753,57 +1156,69 @@
       "steps": [
         {
           "id": "clip-window-count",
-          "file": "01_clip_window_count.png",
           "cell_index": 8,
           "output_type": "table",
           "title": "Animation windows and frame count",
           "code_purpose": "Accumulate source clip ranges and print the available training-frame count.",
-          "result_meaning": "The count defines how many temporal windows can contribute foot-contact examples."
+          "result_meaning": "The count defines how many temporal windows can contribute foot-contact examples.",
+          "card_file": "01_clip_window_count.png",
+          "result_file": "01_clip_window_count_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "feature-vector-code",
-          "file": "02_feature_vector_construction.png",
           "cell_index": 10,
           "output_type": "code_only",
           "title": "Foot-contact feature vector construction",
           "code_purpose": "Build a local pose and velocity feature vector around leg and foot bones.",
-          "result_meaning": "The source card identifies what the classifier sees when deciding whether a foot should be planted."
+          "result_meaning": "The source card identifies what the classifier sees when deciding whether a foot should be planted.",
+          "card_file": "02_feature_vector_construction.png",
+          "result_file": "02_feature_vector_construction_result.png",
+          "media_role": "code_evidence"
         },
         {
           "id": "annotation-skip",
-          "file": "03_annotation_ui_stability_note.png",
           "cell_index": 11,
           "output_type": "log",
           "title": "Manual annotation UI stability note",
           "code_purpose": "Record the prepared-notebook skip for the original manual contact-labeling UI.",
-          "result_meaning": "This documents that the browser-safe study copy validates the pipeline without replaying the fragile annotation widget."
+          "result_meaning": "This documents that the browser-safe study copy validates the pipeline without replaying the fragile annotation widget.",
+          "card_file": "03_annotation_ui_stability_note.png",
+          "result_file": "03_annotation_ui_stability_note_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "training-accumulation",
-          "file": "04_training_set_accumulation.png",
           "cell_index": 15,
           "output_type": "log",
           "title": "Training-set accumulation stability note",
           "code_purpose": "Record the prepared skip for the manual oracle accumulation cell.",
-          "result_meaning": "The blog can still explain the intended data flow while avoiding a non-repeatable browser labeling step."
+          "result_meaning": "The blog can still explain the intended data flow while avoiding a non-repeatable browser labeling step.",
+          "card_file": "04_training_set_accumulation.png",
+          "result_file": "04_training_set_accumulation_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "classifier-code",
-          "file": "05_classifier_training_code.png",
           "cell_index": 18,
           "output_type": "table",
           "title": "Classifier construction",
           "code_purpose": "Create and fit the contact classifier from accumulated mirrored labels.",
-          "result_meaning": "The card marks the transition from hand labels to a reusable prediction model."
+          "result_meaning": "The card marks the transition from hand labels to a reusable prediction model.",
+          "card_file": "05_classifier_training_code.png",
+          "result_file": "05_classifier_training_code_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "saved-features",
-          "file": "06_saved_feature_vectors.png",
           "cell_index": 25,
           "output_type": "table",
           "title": "Saved feature-vector artifact load",
           "code_purpose": "Load saved feature vectors and labels from disk.",
-          "result_meaning": "The artifact load is the stable validation path for the case after manual labeling has been done once."
+          "result_meaning": "The artifact load is the stable validation path for the case after manual labeling has been done once.",
+          "card_file": "06_saved_feature_vectors.png",
+          "result_file": "06_saved_feature_vectors_result.png",
+          "media_role": "supporting_evidence"
         }
       ],
       "video_step": {
@@ -811,7 +1226,16 @@
         "title": "Knowing When To Put Your Foot Down learning walkthrough",
         "result_meaning": "The video walks through the case by sequencing its code-output learning cards."
       },
-      "capture_note": "Prepared notebook skips the original manual annotation UI; media uses code/log/artifact evidence for those cells."
+      "capture_note": "Prepared notebook skips the original manual annotation UI; media uses code/log/artifact evidence for those cells.",
+      "transcript_sources": [
+        "docs/transcripts/2k3xZQgXc9s_Knowing When To Put Your Foot Down.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Knowing When To Put Your Foot Down learning walkthrough"
+      }
     },
     {
       "slug": "motion_fields_for_interactive_character_animation",
@@ -824,66 +1248,80 @@
       "steps": [
         {
           "id": "interactive-skip",
-          "file": "01_interactive_ui_skip_note.png",
           "cell_index": 7,
           "output_type": "log",
           "title": "Interactive UI stability note",
           "code_purpose": "Record the prepared skip for the first interactive viewer cell.",
-          "result_meaning": "The note separates browser-safe validation from the original exploratory UI."
+          "result_meaning": "The note separates browser-safe validation from the original exploratory UI.",
+          "card_file": "01_interactive_ui_skip_note.png",
+          "result_file": "01_interactive_ui_skip_note_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "state-table",
-          "file": "02_state_table_build.png",
           "cell_index": 11,
           "output_type": "table",
           "title": "Motion-field state table allocation",
           "code_purpose": "Allocate pose, velocity, and trajectory state arrays for the motion field.",
-          "result_meaning": "The table-like log shows the scale and layout of the state database."
+          "result_meaning": "The table-like log shows the scale and layout of the state database.",
+          "card_file": "02_state_table_build.png",
+          "result_file": "02_state_table_build_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "umap-field",
-          "file": "03_umap_motion_field.png",
           "cell_index": 17,
           "output_type": "plot",
           "title": "UMAP motion-field embedding",
           "code_purpose": "Project high-dimensional motion states to a two-dimensional field.",
-          "result_meaning": "The plot makes the motion-field neighborhood structure visible."
+          "result_meaning": "The plot makes the motion-field neighborhood structure visible.",
+          "card_file": "03_umap_motion_field.png",
+          "result_file": "03_umap_motion_field_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "knn-functions",
-          "file": "04_torch_knn_functions.png",
           "cell_index": 20,
           "output_type": "code_only",
           "title": "Torch nearest-neighbor helper",
           "code_purpose": "Define vector-based nearest-neighbor queries for runtime motion lookup.",
-          "result_meaning": "The source card explains how a controller state becomes candidate future motions."
+          "result_meaning": "The source card explains how a controller state becomes candidate future motions.",
+          "card_file": "04_torch_knn_functions.png",
+          "result_file": "04_torch_knn_functions_result.png",
+          "media_role": "code_evidence"
         },
         {
           "id": "controller-widget",
-          "file": "05_controller_widget_note.png",
           "cell_index": 25,
           "output_type": "log",
           "title": "Controller widget setup",
           "code_purpose": "Create the browser gamepad/controller widget with safe defaults.",
-          "result_meaning": "The log documents why browser capture uses default input rather than requiring physical hardware."
+          "result_meaning": "The log documents why browser capture uses default input rather than requiring physical hardware.",
+          "card_file": "05_controller_widget_note.png",
+          "result_file": "05_controller_widget_note_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "transition-precompute",
-          "file": "06_transition_table_precompute.png",
           "cell_index": 32,
           "output_type": "log",
           "title": "Transition table precompute",
           "code_purpose": "Run the precompute cell that fills transition/value tables.",
-          "result_meaning": "Moving the expensive search offline is what makes runtime interaction feasible."
+          "result_meaning": "Moving the expensive search offline is what makes runtime interaction feasible.",
+          "card_file": "06_transition_table_precompute.png",
+          "result_file": "06_transition_table_precompute_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "value-learning",
-          "file": "07_value_learning_curve.png",
           "cell_index": 35,
           "output_type": "plot",
           "title": "Value-learning score curve",
           "code_purpose": "Plot the learning score over epochs.",
-          "result_meaning": "The curve gives a quick read on whether the learned policy is stabilizing."
+          "result_meaning": "The curve gives a quick read on whether the learned policy is stabilizing.",
+          "card_file": "07_value_learning_curve.png",
+          "result_file": "07_value_learning_curve_result.png",
+          "media_role": "key_visual"
         }
       ],
       "video_step": {
@@ -891,7 +1329,16 @@
         "title": "Motion Fields For Interactive Character Animation learning walkthrough",
         "result_meaning": "The video walks through the case by sequencing its code-output learning cards."
       },
-      "capture_note": "Prepared notebook skips several original interactive cells; media prioritizes stable plots, logs, and source evidence."
+      "capture_note": "Prepared notebook skips several original interactive cells; media prioritizes stable plots, logs, and source evidence.",
+      "transcript_sources": [
+        "docs/transcripts/ukobLRLKZDM_Reinforcement Learning 04 _ Motion Fields For Interactive Character Animation_.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Motion Fields For Interactive Character Animation learning walkthrough"
+      }
     },
     {
       "slug": "motion_graph",
@@ -903,80 +1350,139 @@
       "steps": [
         {
           "id": "runtime-log",
-          "file": "cropped_ranges_padding.png",
           "cell_index": 2,
           "output_type": "log",
           "title": "Runtime environment log",
           "code_purpose": "Initialize Warp, NumPy, ipyanimlab, and graph dependencies.",
-          "result_meaning": "The log confirms that distance matrices and local minima can be computed in the available environment."
+          "result_meaning": "The log confirms that distance matrices and local minima can be computed in the available environment.",
+          "card_file": "cropped_ranges_padding.png",
+          "result_file": "cropped_ranges_padding_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "raw-walk",
-          "file": "motion_graph_overview.png",
           "cell_index": 6,
           "output_type": "viewer",
           "title": "Raw walk clip playback",
           "code_purpose": "Render the source walking animation used to build the graph.",
           "result_meaning": "The graph input is a playable sequence of walking frames.",
-          "slider_fraction": 0.35
+          "slider_fraction": 0.35,
+          "card_file": "motion_graph_overview.png",
+          "result_file": "motion_graph_overview_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.35
+            }
+          ]
         },
         {
           "id": "point-cloud",
-          "file": "point_cloud_pose.png",
           "cell_index": 12,
           "output_type": "viewer",
           "title": "Point-cloud pose representation",
           "code_purpose": "Convert the skeleton pose to world-space point samples.",
           "result_meaning": "Point-cloud distance is closer to visible pose similarity than comparing only root or quaternions.",
-          "slider_fraction": 0.45
+          "slider_fraction": 0.45,
+          "card_file": "point_cloud_pose.png",
+          "result_file": "point_cloud_pose_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.45
+            }
+          ]
         },
         {
           "id": "alignment",
-          "file": "alignment_pair.png",
           "cell_index": 15,
           "output_type": "viewer",
           "title": "Window alignment between two clips",
           "code_purpose": "Show source and target windows after horizontal translation and rotation alignment.",
           "result_meaning": "Similar gait windows can transition even when their world positions differ.",
-          "slider_fraction": 0.55
+          "slider_fraction": 0.55,
+          "card_file": "alignment_pair.png",
+          "result_file": "alignment_pair_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.55
+            }
+          ]
         },
         {
           "id": "distance-matrix",
-          "file": "distance_matrix_minima.png",
           "cell_index": 21,
           "output_type": "plot",
           "title": "Distance matrix and local minima",
           "code_purpose": "Plot the distance heatmap and mark local_minima candidates.",
-          "result_meaning": "Low-error regions in the matrix become potential transition edges."
+          "result_meaning": "Low-error regions in the matrix become potential transition edges.",
+          "card_file": "distance_matrix_minima.png",
+          "result_file": "distance_matrix_minima_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "scc-pruning",
-          "file": "scc_pruning.png",
           "cell_index": 28,
           "output_type": "log",
           "title": "Tarjan SCC pruning log",
           "code_purpose": "Print the strongly connected component pruning process.",
-          "result_meaning": "Pruning keeps the runtime graph from entering dead ends that cannot continue generating motion."
+          "result_meaning": "Pruning keeps the runtime graph from entering dead ends that cannot continue generating motion.",
+          "card_file": "scc_pruning.png",
+          "result_file": "scc_pruning_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "graph-traversal",
-          "file": "graph_nodes_edges.png",
           "cell_index": 33,
           "output_type": "viewer",
           "title": "Graph traversal playback debug",
           "code_purpose": "Play along graph edges while printing the current node and frame.",
           "result_meaning": "This validates Node and Edge abstractions as a playable animation sequence.",
-          "slider_fraction": 0.45
+          "slider_fraction": 0.45,
+          "card_file": "graph_nodes_edges.png",
+          "result_file": "graph_nodes_edges_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.45
+            }
+          ]
         },
         {
           "id": "follow-path",
-          "file": "follow_path_visualization.png",
           "cell_index": 45,
           "output_type": "timeline_viewer",
           "title": "Follow-path result viewer",
           "code_purpose": "Display the graph-search result and the Bezier target path together.",
           "result_meaning": "The final viewer checks whether graph search can serve a path-following goal.",
-          "slider_fraction": 0.65
+          "slider_fraction": 0.65,
+          "card_file": "follow_path_visualization.png",
+          "result_file": "follow_path_visualization_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.65
+            }
+          ],
+          "preview_gif": "follow_path_visualization_preview.gif",
+          "video_mp4": "follow_path_visualization_preview.mp4",
+          "video_webm": "follow_path_visualization_preview.webm"
         }
       ],
       "video_step": {
@@ -984,7 +1490,16 @@
         "title": "Motion Graph learning walkthrough",
         "result_meaning": "The video links point clouds, distance matrices, SCC pruning, and path following."
       },
-      "kind": "notebook"
+      "kind": "notebook",
+      "transcript_sources": [
+        "docs/transcripts/3YbY0gG7AEQ_Motion Graphs.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Motion Graph learning walkthrough"
+      }
     },
     {
       "slug": "motion_matching",
@@ -996,72 +1511,140 @@
       "steps": [
         {
           "id": "spring-damper",
-          "file": "spring_damper_prediction.png",
           "cell_index": 9,
           "output_type": "viewer",
           "title": "Spring-damper future trajectory",
           "code_purpose": "Update root position, velocity, and orientation with a spring-damper model.",
           "result_meaning": "This is the source of the future trajectory target used in the motion-matching query.",
-          "slider_fraction": 0.45
+          "slider_fraction": 0.45,
+          "card_file": "spring_damper_prediction.png",
+          "result_file": "spring_damper_prediction_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.45
+            }
+          ]
         },
         {
           "id": "source-animation",
-          "file": "motion_matching_overview.png",
           "cell_index": 14,
           "output_type": "viewer",
           "title": "Source locomotion clip playback",
           "code_purpose": "Render the imported locomotion clips.",
           "result_meaning": "The database is built from real motion frames, not from generated poses.",
-          "slider_fraction": 0.35
+          "slider_fraction": 0.35,
+          "card_file": "motion_matching_overview.png",
+          "result_file": "motion_matching_overview_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.35
+            }
+          ]
         },
         {
           "id": "filtered-motion",
-          "file": "trajectory_query_runtime.png",
           "cell_index": 18,
           "output_type": "viewer",
           "title": "Filtered root displacement and orientation",
           "code_purpose": "Visualize filtered bone positions, root velocity, and facing direction.",
           "result_meaning": "Stable velocity and orientation estimates reduce noise in nearest-neighbor search.",
-          "slider_fraction": 0.55
+          "slider_fraction": 0.55,
+          "card_file": "trajectory_query_runtime.png",
+          "result_file": "trajectory_query_runtime_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.55
+            }
+          ]
         },
         {
           "id": "feature-vector",
-          "file": "feature_vector_layout.png",
           "cell_index": 21,
           "output_type": "viewer",
           "title": "33-dimensional feature layout",
           "code_purpose": "Show hips, foot, and future-trajectory debug lines in the viewer.",
           "result_meaning": "The abstract feature vector becomes visible as body parts and trajectory targets.",
-          "slider_fraction": 0.5
+          "slider_fraction": 0.5,
+          "card_file": "feature_vector_layout.png",
+          "result_file": "feature_vector_layout_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.5
+            }
+          ]
         },
         {
           "id": "normalization-code",
-          "file": "feature_database_debug.png",
           "cell_index": 23,
           "output_type": "code_only",
           "title": "Feature normalization code",
           "code_purpose": "Compute features_mean, features_std, and the normalized database.",
-          "result_meaning": "Different physical quantities must be normalized before Euclidean nearest-neighbor search."
+          "result_meaning": "Different physical quantities must be normalized before Euclidean nearest-neighbor search.",
+          "card_file": "feature_database_debug.png",
+          "result_file": "feature_database_debug_result.png",
+          "media_role": "code_evidence"
         },
         {
           "id": "runtime-player",
-          "file": "inertialization_transition.png",
           "cell_index": 26,
           "output_type": "timeline_viewer",
           "title": "Runtime Player search loop",
           "code_purpose": "Build a query, find the best frame, jump playback, and smooth the transition with inertialization.",
           "result_meaning": "This is the closed loop that connects input prediction, feature search, and visual playback.",
-          "slider_fraction": 0.5
+          "slider_fraction": 0.5,
+          "card_file": "inertialization_transition.png",
+          "result_file": "inertialization_transition_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.5
+            }
+          ],
+          "preview_gif": "inertialization_transition_preview.gif",
+          "video_mp4": "inertialization_transition_preview.mp4",
+          "video_webm": "inertialization_transition_preview.webm"
         },
         {
           "id": "fast-stop-turn",
-          "file": "fast_stop_turn_cases.png",
           "cell_index": 26,
           "output_type": "timeline_viewer",
           "title": "Stop and turn debug frame",
           "code_purpose": "Inspect another runtime frame in the Player cell.",
           "result_meaning": "Stop and sharp-turn cases are useful stress tests for matching quality.",
-          "slider_fraction": 0.8
+          "slider_fraction": 0.8,
+          "card_file": "fast_stop_turn_cases.png",
+          "result_file": "fast_stop_turn_cases_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.8
+            }
+          ],
+          "preview_gif": "fast_stop_turn_cases_preview.gif",
+          "video_mp4": "fast_stop_turn_cases_preview.mp4",
+          "video_webm": "fast_stop_turn_cases_preview.webm"
         }
       ],
       "video_step": {
@@ -1069,7 +1652,16 @@
         "title": "Motion Matching learning walkthrough",
         "result_meaning": "The video links prediction, database construction, feature layout, and the Player loop."
       },
-      "kind": "notebook"
+      "kind": "notebook",
+      "transcript_sources": [
+        "docs/transcripts/3U_SyxqpGKA_Motion Matching.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Motion Matching learning walkthrough"
+      }
     },
     {
       "slug": "motion_warping",
@@ -1082,85 +1674,151 @@
       "steps": [
         {
           "id": "source-playback",
-          "file": "01_source_animation_playback.png",
           "cell_index": 5,
           "output_type": "timeline_viewer",
           "title": "Source animation playback",
           "code_purpose": "Render the source animation before time or pose warping.",
           "result_meaning": "This baseline lets later warped outputs be compared against the original motion.",
-          "slider_fraction": 0.35
+          "slider_fraction": 0.35,
+          "card_file": "01_source_animation_playback.png",
+          "result_file": "01_source_animation_playback_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.35
+            }
+          ],
+          "preview_gif": "01_source_animation_playback_preview.gif",
+          "video_mp4": "01_source_animation_playback_preview.mp4",
+          "video_webm": "01_source_animation_playback_preview.webm"
         },
         {
           "id": "raw-channel-plot",
-          "file": "02_raw_quaternion_channel.png",
           "cell_index": 6,
           "output_type": "plot",
           "title": "Raw quaternion channel plot",
           "code_purpose": "Plot a selected quaternion channel over time.",
-          "result_meaning": "The graph shows that animation warping often starts as curve manipulation."
+          "result_meaning": "The graph shows that animation warping often starts as curve manipulation.",
+          "card_file": "02_raw_quaternion_channel.png",
+          "result_file": "02_raw_quaternion_channel_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "timewarp-keypoints",
-          "file": "03_timewarp_keypoints.png",
           "cell_index": 12,
           "output_type": "plot",
           "title": "Time-warp keypoints and tangents",
           "code_purpose": "Build a cardinal/Hermite curve from time remapping keypoints.",
-          "result_meaning": "The plot shows how sparse timing edits become a continuous time-warp curve."
+          "result_meaning": "The plot shows how sparse timing edits become a continuous time-warp curve.",
+          "card_file": "03_timewarp_keypoints.png",
+          "result_file": "03_timewarp_keypoints_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "resampled-timewarp",
-          "file": "04_resampled_timewarp_curve.png",
           "cell_index": 15,
           "output_type": "plot",
           "title": "Resampled time-warp curve",
           "code_purpose": "Resample the time-warp curve at animation-frame resolution.",
-          "result_meaning": "The output shows the actual per-frame time lookup used for animation sampling."
+          "result_meaning": "The output shows the actual per-frame time lookup used for animation sampling.",
+          "card_file": "04_resampled_timewarp_curve.png",
+          "result_file": "04_resampled_timewarp_curve_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "timewarped-animation",
-          "file": "05_timewarped_animation_compare.png",
           "cell_index": 20,
           "output_type": "timeline_viewer",
           "title": "Time-warped animation comparison",
           "code_purpose": "Render the original and time-warped animation together.",
           "result_meaning": "The viewer reveals the timing change without changing the underlying pose content.",
-          "slider_fraction": 0.5
+          "slider_fraction": 0.5,
+          "card_file": "05_timewarped_animation_compare.png",
+          "result_file": "05_timewarped_animation_compare_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.5
+            }
+          ],
+          "preview_gif": "05_timewarped_animation_compare_preview.gif",
+          "video_mp4": "05_timewarped_animation_compare_preview.mp4",
+          "video_webm": "05_timewarped_animation_compare_preview.webm"
         },
         {
           "id": "pose-warp-keys",
-          "file": "06_pose_warp_key_poses.png",
           "cell_index": 23,
           "output_type": "viewer",
           "title": "Pose-warp key poses",
           "code_purpose": "Render key poses used to define a pose-space offset.",
           "result_meaning": "The key-pose viewer shows what spatial correction will be blended into the clip.",
-          "slider_fraction": 0.45
+          "slider_fraction": 0.45,
+          "card_file": "06_pose_warp_key_poses.png",
+          "result_file": "06_pose_warp_key_poses_result.png",
+          "media_role": "key_visual",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.45
+            }
+          ]
         },
         {
           "id": "offset-curve",
-          "file": "07_offset_warp_curve.png",
           "cell_index": 27,
           "output_type": "plot",
           "title": "Offset warp curve",
           "code_purpose": "Plot the computed warp offsets over time.",
-          "result_meaning": "The curve explains how local pose edits are distributed smoothly."
+          "result_meaning": "The curve explains how local pose edits are distributed smoothly.",
+          "card_file": "07_offset_warp_curve.png",
+          "result_file": "07_offset_warp_curve_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "combined-warp",
-          "file": "08_combined_warped_animation.png",
           "cell_index": 31,
           "output_type": "timeline_viewer",
           "title": "Final time and pose warped animation",
           "code_purpose": "Render the final animation after time and pose warping.",
           "result_meaning": "This final viewer checks whether timing and pose edits combine into a coherent motion.",
-          "slider_fraction": 0.65
+          "slider_fraction": 0.65,
+          "card_file": "08_combined_warped_animation.png",
+          "result_file": "08_combined_warped_animation_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.65
+            }
+          ],
+          "preview_gif": "08_combined_warped_animation_preview.gif",
+          "video_mp4": "08_combined_warped_animation_preview.mp4",
+          "video_webm": "08_combined_warped_animation_preview.webm"
         }
       ],
       "video_step": {
         "mode": "step_sequence",
         "title": "Motion Warping learning walkthrough",
         "result_meaning": "The video walks through the case by sequencing its code-output learning cards."
+      },
+      "transcript_sources": [
+        "docs/transcripts/COzRpFPZ4rk_Motion Warping.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Motion Warping learning walkthrough"
       }
     },
     {
@@ -1174,35 +1832,51 @@
       "steps": [
         {
           "id": "load-helpers",
-          "file": "01_load_character_helpers.png",
           "cell_index": 5,
           "output_type": "log",
           "title": "Character and foot-helper loading",
           "code_purpose": "Load the character and add helper bones for foot constraints.",
-          "result_meaning": "The helper indices are later used for contacts, costs, and debug drawing."
+          "result_meaning": "The helper indices are later used for contacts, costs, and debug drawing.",
+          "card_file": "01_load_character_helpers.png",
+          "result_file": "01_load_character_helpers_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "source-clip",
-          "file": "02_source_clip_playback.png",
           "cell_index": 9,
           "output_type": "timeline_viewer",
           "title": "Source clip playback",
           "code_purpose": "Render source locomotion clips before planning.",
           "result_meaning": "The viewer establishes the motion vocabulary available to the planner.",
-          "slider_fraction": 0.35
+          "slider_fraction": 0.35,
+          "card_file": "02_source_clip_playback.png",
+          "result_file": "02_source_clip_playback_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.35
+            }
+          ],
+          "preview_gif": "02_source_clip_playback_preview.gif",
+          "video_mp4": "02_source_clip_playback_preview.mp4",
+          "video_webm": "02_source_clip_playback_preview.webm"
         },
         {
           "id": "clip-count",
-          "file": "03_clip_count_table.png",
           "cell_index": 11,
           "output_type": "table",
           "title": "Clip slicing count",
           "code_purpose": "Slice source motion into fixed-length clips and print the count.",
-          "result_meaning": "The count determines the discrete action set used by the controller."
+          "result_meaning": "The count determines the discrete action set used by the controller.",
+          "card_file": "03_clip_count_table.png",
+          "result_file": "03_clip_count_table_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "contact-viewer",
-          "file": "04_contact_constraint_viewer.png",
           "cell_index": 16,
           "output_type": "timeline_viewer",
           "title": "Clip contact constraints",
@@ -1211,51 +1885,110 @@
           "slider_fractions": [
             0.45,
             0.0
-          ]
+          ],
+          "card_file": "04_contact_constraint_viewer.png",
+          "result_file": "04_contact_constraint_viewer_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.45
+            },
+            {
+              "kind": "slider",
+              "index": 1,
+              "role": "parameter",
+              "fraction": 0.0
+            }
+          ],
+          "preview_gif": "04_contact_constraint_viewer_preview.gif",
+          "video_mp4": "04_contact_constraint_viewer_preview.mp4",
+          "video_webm": "04_contact_constraint_viewer_preview.webm"
         },
         {
           "id": "random-player",
-          "file": "05_random_transition_player.png",
           "cell_index": 19,
           "output_type": "timeline_viewer",
           "title": "Random transition player",
           "code_purpose": "Play through clip transitions with the Player abstraction.",
           "result_meaning": "This validates that clips can be stitched into continuous playback.",
-          "slider_fraction": 0.45
+          "slider_fraction": 0.45,
+          "card_file": "05_random_transition_player.png",
+          "result_file": "05_random_transition_player_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.45
+            }
+          ],
+          "preview_gif": "05_random_transition_player_preview.gif",
+          "video_mp4": "05_random_transition_player_preview.mp4",
+          "video_webm": "05_random_transition_player_preview.webm"
         },
         {
           "id": "transition-cost",
-          "file": "06_transition_cost_precompute.png",
           "cell_index": 21,
           "output_type": "log",
           "title": "Transition-cost precompute",
           "code_purpose": "Compute transition costs between candidate clips.",
-          "result_meaning": "The log shows the expensive planning data being prepared offline."
+          "result_meaning": "The log shows the expensive planning data being prepared offline.",
+          "card_file": "06_transition_cost_precompute.png",
+          "result_file": "06_transition_cost_precompute_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "value-surface",
-          "file": "07_learned_value_surface.png",
           "cell_index": 36,
           "output_type": "plot",
           "title": "Learned value surface",
           "code_purpose": "Plot a learned value function over position and orientation state.",
-          "result_meaning": "The surface makes the optimal-control objective visible as future cost."
+          "result_meaning": "The surface makes the optimal-control objective visible as future cost.",
+          "card_file": "07_learned_value_surface.png",
+          "result_file": "07_learned_value_surface_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "optimal-policy",
-          "file": "08_optimal_policy_player.png",
           "cell_index": 38,
           "output_type": "timeline_viewer",
           "title": "Optimal-policy controller",
           "code_purpose": "Run the final optimal-policy player with browser-safe default controller input.",
           "result_meaning": "The viewer checks that the policy callback advances without requiring a physical gamepad.",
-          "slider_fraction": 0.75
+          "slider_fraction": 0.75,
+          "card_file": "08_optimal_policy_player.png",
+          "result_file": "08_optimal_policy_player_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.75
+            }
+          ],
+          "preview_gif": "08_optimal_policy_player_preview.gif",
+          "video_mp4": "08_optimal_policy_player_preview.mp4",
+          "video_webm": "08_optimal_policy_player_preview.webm"
         }
       ],
       "video_step": {
         "mode": "step_sequence",
         "title": "Near Optimal Character Animation With Continuous Control learning walkthrough",
         "result_meaning": "The video walks through the case by sequencing its code-output learning cards."
+      },
+      "transcript_sources": [
+        "docs/transcripts/_S4vpMV0-UY_Reinforcement Learning 02 _ Near Optimal Character Animation with Continuous Con.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Near Optimal Character Animation With Continuous Control learning walkthrough"
       }
     },
     {
@@ -1269,85 +2002,154 @@
       "steps": [
         {
           "id": "load-helpers",
-          "file": "01_character_helper_indices.png",
           "cell_index": 5,
           "output_type": "log",
           "title": "Character helper bone indices",
           "code_purpose": "Load character and helper bones used by the behavior system.",
-          "result_meaning": "The log identifies the bones later used for foot locking and rewards."
+          "result_meaning": "The log identifies the bones later used for foot locking and rewards.",
+          "card_file": "01_character_helper_indices.png",
+          "result_file": "01_character_helper_indices_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "source-graph",
-          "file": "02_source_motion_graph_playback.png",
           "cell_index": 9,
           "output_type": "timeline_viewer",
           "title": "Source motion graph playback",
           "code_purpose": "Render the source motion graph clips.",
           "result_meaning": "The viewer shows the action fragments from which avatar behavior is assembled.",
-          "slider_fraction": 0.35
+          "slider_fraction": 0.35,
+          "card_file": "02_source_motion_graph_playback.png",
+          "result_file": "02_source_motion_graph_playback_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.35
+            }
+          ],
+          "preview_gif": "02_source_motion_graph_playback_preview.gif",
+          "video_mp4": "02_source_motion_graph_playback_preview.mp4",
+          "video_webm": "02_source_motion_graph_playback_preview.webm"
         },
         {
           "id": "state-action-code",
-          "file": "03_state_action_graph.png",
           "cell_index": 11,
           "output_type": "code_only",
           "title": "State and Action graph definitions",
           "code_purpose": "Define dataclasses that hold graph states, actions, rewards, and transitions.",
-          "result_meaning": "The source card explains the discrete MDP structure behind the behavior system."
+          "result_meaning": "The source card explains the discrete MDP structure behind the behavior system.",
+          "card_file": "03_state_action_graph.png",
+          "result_file": "03_state_action_graph_result.png",
+          "media_role": "code_evidence"
         },
         {
           "id": "random-action",
-          "file": "04_random_action_playback.png",
           "cell_index": 16,
           "output_type": "timeline_viewer",
           "title": "Random graph action playback",
           "code_purpose": "Play random actions through the graph with FootLock correction.",
           "result_meaning": "The viewer validates that graph actions can produce continuous animated output.",
-          "slider_fraction": 0.45
+          "slider_fraction": 0.45,
+          "card_file": "04_random_action_playback.png",
+          "result_file": "04_random_action_playback_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.45
+            }
+          ],
+          "preview_gif": "04_random_action_playback_preview.gif",
+          "video_mp4": "04_random_action_playback_preview.mp4",
+          "video_webm": "04_random_action_playback_preview.webm"
         },
         {
           "id": "action-count",
-          "file": "05_action_count_table.png",
           "cell_index": 18,
           "output_type": "table",
           "title": "Action count and maximum length",
           "code_purpose": "Compute action counts and maximum clip lengths.",
-          "result_meaning": "These numbers define the dimensionality of policy and value tables."
+          "result_meaning": "These numbers define the dimensionality of policy and value tables.",
+          "card_file": "05_action_count_table.png",
+          "result_file": "05_action_count_table_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "target-rings",
-          "file": "06_target_position_rings.png",
           "cell_index": 19,
           "output_type": "table",
           "title": "Target-position ring construction",
           "code_purpose": "Build target position samples around the avatar.",
-          "result_meaning": "The target set converts continuous goals into discrete reward queries."
+          "result_meaning": "The target set converts continuous goals into discrete reward queries.",
+          "card_file": "06_target_position_rings.png",
+          "result_file": "06_target_position_rings_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "reward-policy",
-          "file": "07_reward_policy_viewer.png",
           "cell_index": 22,
           "output_type": "timeline_viewer",
           "title": "Immediate reward policy viewer",
           "code_purpose": "Run the policy viewer with default controller input.",
           "result_meaning": "The viewer shows how local target rewards can choose graph actions.",
-          "slider_fraction": 0.5
+          "slider_fraction": 0.5,
+          "card_file": "07_reward_policy_viewer.png",
+          "result_file": "07_reward_policy_viewer_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.5
+            }
+          ],
+          "preview_gif": "07_reward_policy_viewer_preview.gif",
+          "video_mp4": "07_reward_policy_viewer_preview.mp4",
+          "video_webm": "07_reward_policy_viewer_preview.webm"
         },
         {
           "id": "mdp-policy",
-          "file": "08_mdp_value_policy_viewer.png",
           "cell_index": 27,
           "output_type": "timeline_viewer",
           "title": "MDP value-policy viewer",
           "code_purpose": "Run the value-based behavior policy after offline learning.",
           "result_meaning": "The final viewer checks that the learned value function can drive action selection.",
-          "slider_fraction": 0.65
+          "slider_fraction": 0.65,
+          "card_file": "08_mdp_value_policy_viewer.png",
+          "result_file": "08_mdp_value_policy_viewer_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.65
+            }
+          ],
+          "preview_gif": "08_mdp_value_policy_viewer_preview.gif",
+          "video_mp4": "08_mdp_value_policy_viewer_preview.mp4",
+          "video_webm": "08_mdp_value_policy_viewer_preview.webm"
         }
       ],
       "video_step": {
         "mode": "step_sequence",
         "title": "Precomputing Avatar Behavior learning walkthrough",
         "result_meaning": "The video walks through the case by sequencing its code-output learning cards."
+      },
+      "transcript_sources": [
+        "docs/transcripts/tv3ZwY1mvIw_Reinforcement Learning 01 _ Precomputing Avatar Behavior From Human Motion Data.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Precomputing Avatar Behavior learning walkthrough"
       }
     },
     {
@@ -1360,75 +2162,91 @@
       "steps": [
         {
           "id": "load-log",
-          "file": "01_source_animation_viewer.png",
           "cell_index": 4,
           "output_type": "log",
           "title": "Character and foot-helper bone loading",
           "code_purpose": "Load the character and print added heel/ball bone indices.",
-          "result_meaning": "The planning system can reference the foot-contact helper bones later."
+          "result_meaning": "The planning system can reference the foot-contact helper bones later.",
+          "card_file": "01_source_animation_viewer.png",
+          "result_file": "01_source_animation_viewer_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "clip-count",
-          "file": "02_motion_clip_contact_axes.png",
           "cell_index": 13,
           "output_type": "table",
           "title": "MotionClip count output",
           "code_purpose": "Build short motion clips and output the number of clips.",
-          "result_meaning": "The clip count determines the size of transition-cost and value-function tables."
+          "result_meaning": "The clip count determines the size of transition-cost and value-function tables.",
+          "card_file": "02_motion_clip_contact_axes.png",
+          "result_file": "02_motion_clip_contact_axes_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "transition-progress",
-          "file": "03_player_transition_blend.png",
           "cell_index": 25,
           "output_type": "log",
           "title": "Transition-cost precompute output",
           "code_purpose": "Iterate over clip pairs and compute physical continuity costs and delta states.",
-          "result_meaning": "The progress output shows that expensive transition work is moved offline."
+          "result_meaning": "The progress output shows that expensive transition work is moved offline.",
+          "card_file": "03_player_transition_blend.png",
+          "result_file": "03_player_transition_blend_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "orientation-policy-loss",
-          "file": "04_orientation_policy_controller.png",
           "cell_index": 30,
           "output_type": "plot",
           "title": "Orientation policy value-learning curve",
           "code_purpose": "Plot the mean/min/max value-learning curve.",
-          "result_meaning": "A decreasing curve indicates that the policy is stabilizing in the current state space."
+          "result_meaning": "A decreasing curve indicates that the policy is stabilizing in the current state space.",
+          "card_file": "04_orientation_policy_controller.png",
+          "result_file": "04_orientation_policy_controller_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "reach-goal-stops",
-          "file": "05_reach_goal_target_tracking.png",
           "cell_index": 35,
           "output_type": "table",
           "title": "Reach-goal stopping positions",
           "code_purpose": "Print local end positions for stopping clips.",
-          "result_meaning": "These endpoints define target states for the reach-goal policy."
+          "result_meaning": "These endpoints define target states for the reach-goal policy.",
+          "card_file": "05_reach_goal_target_tracking.png",
+          "result_file": "05_reach_goal_target_tracking_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "value-surface",
-          "file": "06_value_surface_clip16.png",
           "cell_index": 45,
           "output_type": "plot",
           "title": "clip 16 value surface",
           "code_purpose": "Plot the value function over a two-dimensional target space.",
-          "result_meaning": "The surface shows the future cost of reaching different target positions from one clip."
+          "result_meaning": "The surface shows the future cost of reaching different target positions from one clip.",
+          "card_file": "06_value_surface_clip16.png",
+          "result_file": "06_value_surface_clip16_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "motion-group-count",
-          "file": "07_motion_group_weight_blend.png",
           "cell_index": 61,
           "output_type": "table",
           "title": "MotionGroup count output",
           "code_purpose": "Build motion groups and output the group count.",
-          "result_meaning": "Motion groups turn multiple clips into a parameterized action space."
+          "result_meaning": "Motion groups turn multiple clips into a parameterized action space.",
+          "card_file": "07_motion_group_weight_blend.png",
+          "result_file": "07_motion_group_weight_blend_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "group-policy-loss",
-          "file": "08_group_reach_goal_result.png",
           "cell_index": 72,
           "output_type": "plot",
           "title": "MotionGroup policy-learning curve",
           "code_purpose": "Plot the parameterized MotionGroup policy-learning curve.",
-          "result_meaning": "The plot verifies that a useful policy can still be learned after moving from clips to motion groups."
+          "result_meaning": "The plot verifies that a useful policy can still be learned after moving from clips to motion groups.",
+          "card_file": "08_group_reach_goal_result.png",
+          "result_file": "08_group_reach_goal_result_result.png",
+          "media_role": "key_visual"
         }
       ],
       "video_step": {
@@ -1436,7 +2254,16 @@
         "title": "Real-Time Planning learning walkthrough",
         "result_meaning": "The video links loading logs, clip states, value curves, and parameterized policy output."
       },
-      "kind": "notebook"
+      "kind": "notebook",
+      "transcript_sources": [
+        "docs/transcripts/tDilOjKfBaY_Reinforcement Learning 03 _ Realtime Planning For Parametrized Human Motion_.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Real-Time Planning learning walkthrough"
+      }
     },
     {
       "slug": "verbs_and_adverbs",
@@ -1449,17 +2276,29 @@
       "steps": [
         {
           "id": "sample-clips",
-          "file": "01_raw_sample_clips.png",
           "cell_index": 7,
           "output_type": "timeline_viewer",
           "title": "Raw sample clip overview",
           "code_purpose": "Render the original sample actions for different verbs/adverbs.",
           "result_meaning": "The viewer establishes the motion examples that will be normalized and blended.",
-          "slider_fraction": 0.25
+          "slider_fraction": 0.25,
+          "card_file": "01_raw_sample_clips.png",
+          "result_file": "01_raw_sample_clips_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.25
+            }
+          ],
+          "preview_gif": "01_raw_sample_clips_preview.gif",
+          "video_mp4": "01_raw_sample_clips_preview.mp4",
+          "video_webm": "01_raw_sample_clips_preview.webm"
         },
         {
           "id": "canonical-timing",
-          "file": "02_canonical_timing_contacts.png",
           "cell_index": 10,
           "output_type": "timeline_viewer",
           "title": "Canonical timing and contact inspection",
@@ -1468,11 +2307,30 @@
           "slider_fractions": [
             0.35,
             0.0
-          ]
+          ],
+          "card_file": "02_canonical_timing_contacts.png",
+          "result_file": "02_canonical_timing_contacts_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.35
+            },
+            {
+              "kind": "slider",
+              "index": 1,
+              "role": "parameter",
+              "fraction": 0.0
+            }
+          ],
+          "preview_gif": "02_canonical_timing_contacts_preview.gif",
+          "video_mp4": "02_canonical_timing_contacts_preview.mp4",
+          "video_webm": "02_canonical_timing_contacts_preview.webm"
         },
         {
           "id": "looping-clips",
-          "file": "03_looping_animation_compare.png",
           "cell_index": 14,
           "output_type": "timeline_viewer",
           "title": "Looping animation comparison",
@@ -1481,11 +2339,30 @@
           "slider_fractions": [
             0.45,
             0.0
-          ]
+          ],
+          "card_file": "03_looping_animation_compare.png",
+          "result_file": "03_looping_animation_compare_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.45
+            },
+            {
+              "kind": "slider",
+              "index": 1,
+              "role": "parameter",
+              "fraction": 0.0
+            }
+          ],
+          "preview_gif": "03_looping_animation_compare_preview.gif",
+          "video_mp4": "03_looping_animation_compare_preview.mp4",
+          "video_webm": "03_looping_animation_compare_preview.webm"
         },
         {
           "id": "resampled-clips",
-          "file": "04_resampled_canonical_clips.png",
           "cell_index": 18,
           "output_type": "timeline_viewer",
           "title": "Resampled canonical clips",
@@ -1494,20 +2371,41 @@
           "slider_fractions": [
             0.55,
             0.0
-          ]
+          ],
+          "card_file": "04_resampled_canonical_clips.png",
+          "result_file": "04_resampled_canonical_clips_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.55
+            },
+            {
+              "kind": "slider",
+              "index": 1,
+              "role": "parameter",
+              "fraction": 0.0
+            }
+          ],
+          "preview_gif": "04_resampled_canonical_clips_preview.gif",
+          "video_mp4": "04_resampled_canonical_clips_preview.mp4",
+          "video_webm": "04_resampled_canonical_clips_preview.webm"
         },
         {
           "id": "bspline-fit",
-          "file": "05_bspline_fit_plot.png",
           "cell_index": 22,
           "output_type": "plot",
           "title": "B-spline curve fit",
           "code_purpose": "Plot fitted B-spline curves over normalized samples.",
-          "result_meaning": "The plot shows how sparse motion samples become smooth parameterized curves."
+          "result_meaning": "The plot shows how sparse motion samples become smooth parameterized curves.",
+          "card_file": "05_bspline_fit_plot.png",
+          "result_file": "05_bspline_fit_plot_result.png",
+          "media_role": "key_visual"
         },
         {
           "id": "bspline-viewer",
-          "file": "06_bspline_reconstruction_viewer.png",
           "cell_index": 23,
           "output_type": "timeline_viewer",
           "title": "B-spline reconstruction viewer",
@@ -1516,20 +2414,41 @@
           "slider_fractions": [
             0.55,
             0.0
-          ]
+          ],
+          "card_file": "06_bspline_reconstruction_viewer.png",
+          "result_file": "06_bspline_reconstruction_viewer_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.55
+            },
+            {
+              "kind": "slider",
+              "index": 1,
+              "role": "parameter",
+              "fraction": 0.0
+            }
+          ],
+          "preview_gif": "06_bspline_reconstruction_viewer_preview.gif",
+          "video_mp4": "06_bspline_reconstruction_viewer_preview.mp4",
+          "video_webm": "06_bspline_reconstruction_viewer_preview.webm"
         },
         {
           "id": "adverb-table",
-          "file": "07_adverb_coordinate_table.png",
           "cell_index": 28,
           "output_type": "table",
           "title": "Adverb coordinate table",
           "code_purpose": "Print the adverb-space coordinates used by the RBF interpolator.",
-          "result_meaning": "The table connects semantic labels to numeric interpolation coordinates."
+          "result_meaning": "The table connects semantic labels to numeric interpolation coordinates.",
+          "card_file": "07_adverb_coordinate_table.png",
+          "result_file": "07_adverb_coordinate_table_result.png",
+          "media_role": "supporting_evidence"
         },
         {
           "id": "final-controls",
-          "file": "08_final_interpolated_adverb_controls.png",
           "cell_index": 33,
           "output_type": "timeline_viewer",
           "title": "Final interpolated adverb controls",
@@ -1539,13 +2458,48 @@
             0.55,
             0.25,
             0.75
-          ]
+          ],
+          "card_file": "08_final_interpolated_adverb_controls.png",
+          "result_file": "08_final_interpolated_adverb_controls_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.55
+            },
+            {
+              "kind": "slider",
+              "index": 1,
+              "role": "parameter",
+              "fraction": 0.25
+            },
+            {
+              "kind": "slider",
+              "index": 2,
+              "role": "parameter",
+              "fraction": 0.75
+            }
+          ],
+          "preview_gif": "08_final_interpolated_adverb_controls_preview.gif",
+          "video_mp4": "08_final_interpolated_adverb_controls_preview.mp4",
+          "video_webm": "08_final_interpolated_adverb_controls_preview.webm"
         }
       ],
       "video_step": {
         "mode": "step_sequence",
         "title": "Verbs And Adverbs learning walkthrough",
         "result_meaning": "The video walks through the case by sequencing its code-output learning cards."
+      },
+      "transcript_sources": [
+        "docs/transcripts/EBosvxpPONY_Verbs and Adverbs_ Multidimensional Motion Interpolation Using Radial Basis Func.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Verbs And Adverbs learning walkthrough"
       }
     },
     {
@@ -1558,7 +2512,6 @@
       "steps": [
         {
           "id": "imports",
-          "file": "01_module_imports.png",
           "output_type": "source_excerpt",
           "title": "Module dependencies",
           "code_purpose": "Show the imports for NumPy and ExtraTreesRegressor.",
@@ -1567,22 +2520,26 @@
           "source_range": [
             1,
             5
-          ]
+          ],
+          "card_file": "01_module_imports.png",
+          "result_file": "01_module_imports_result.png",
+          "media_role": "code_evidence"
         },
         {
           "id": "function-contract",
-          "file": "02_function_contract.png",
           "output_type": "source_excerpt",
           "title": "reach_train_value_function contract",
           "code_purpose": "Show the function signature and primary inputs.",
           "result_meaning": "The function maps training samples and precompute query indices to a reshaped value table.",
           "source_path": "labs/AnimationPapers/RealTimePlanning_MultiProcess_Func.py",
           "symbol": "reach_train_value_function",
-          "source_context_lines": 12
+          "source_context_lines": 12,
+          "card_file": "02_function_contract.png",
+          "result_file": "02_function_contract_result.png",
+          "media_role": "code_evidence"
         },
         {
           "id": "empty-guard",
-          "file": "03_empty_training_guard.png",
           "output_type": "source_excerpt",
           "title": "Empty training-set guard",
           "code_purpose": "Show the zero-table fallback for empty training data.",
@@ -1591,11 +2548,13 @@
           "source_range": [
             7,
             9
-          ]
+          ],
+          "card_file": "03_empty_training_guard.png",
+          "result_file": "03_empty_training_guard_result.png",
+          "media_role": "code_evidence"
         },
         {
           "id": "extra-trees",
-          "file": "04_extra_trees_regressor.png",
           "output_type": "source_excerpt",
           "title": "ExtraTrees value fitting",
           "code_purpose": "Show the n_jobs setting, ExtraTreesRegressor fit, prediction, and reshape.",
@@ -1604,11 +2563,13 @@
           "source_range": [
             10,
             14
-          ]
+          ],
+          "card_file": "04_extra_trees_regressor.png",
+          "result_file": "04_extra_trees_regressor_result.png",
+          "media_role": "code_evidence"
         },
         {
           "id": "import-check",
-          "file": "05_import_validation_log.png",
           "output_type": "command_log",
           "title": "Import validation log",
           "code_purpose": "Show the managed validation import check output.",
@@ -1618,13 +2579,25 @@
             1,
             4
           ],
-          "log_path": ".reports/logs/real_time_planning_multiprocess_func.log"
+          "log_path": ".reports/logs/real_time_planning_multiprocess_func.log",
+          "card_file": "05_import_validation_log.png",
+          "result_file": "05_import_validation_log_result.png",
+          "media_role": "code_evidence"
         }
       ],
       "video_step": {
         "mode": "step_sequence",
         "title": "Real Time Planning Multiprocess Func module walkthrough",
         "result_meaning": "The video walks through source excerpts, validation logs, and generated artifacts."
+      },
+      "transcript_sources": [
+        "docs/transcripts/tDilOjKfBaY_Reinforcement Learning 03 _ Realtime Planning For Parametrized Human Motion_.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Real Time Planning Multiprocess Func module walkthrough"
       }
     },
     {
@@ -1637,7 +2610,6 @@
       "steps": [
         {
           "id": "maya-fallback",
-          "file": "01_maya_fallback_imports.png",
           "output_type": "source_excerpt",
           "title": "Maya API fallback and synthetic writer",
           "code_purpose": "Show argparse/pickle imports, Maya detection, and synthetic asset writer import.",
@@ -1646,22 +2618,26 @@
           "source_range": [
             1,
             16
-          ]
+          ],
+          "card_file": "01_maya_fallback_imports.png",
+          "result_file": "01_maya_fallback_imports_result.png",
+          "media_role": "code_evidence"
         },
         {
           "id": "maya-export",
-          "file": "02_maya_export_function.png",
           "output_type": "source_excerpt",
           "title": "Maya mesh export function",
           "code_purpose": "Show the selected mesh, topology extraction, normals, frame sampling, and pickle write.",
           "result_meaning": "The exporter records topology once and vertex positions over time for facial animation playback.",
           "source_path": "labs/AnimationPapers/Halo 4 exporter from maya.py",
           "symbol": "export_from_maya",
-          "source_context_lines": 28
+          "source_context_lines": 28,
+          "card_file": "02_maya_export_function.png",
+          "result_file": "02_maya_export_function_result.png",
+          "media_role": "code_evidence"
         },
         {
           "id": "cli-path",
-          "file": "03_cli_entrypoint.png",
           "output_type": "source_excerpt",
           "title": "CLI output path and fallback switch",
           "code_purpose": "Show CLI arguments and the --force-synthetic path.",
@@ -1670,11 +2646,13 @@
           "source_range": [
             43,
             60
-          ]
+          ],
+          "card_file": "03_cli_entrypoint.png",
+          "result_file": "03_cli_entrypoint_result.png",
+          "media_role": "code_evidence"
         },
         {
           "id": "export-log",
-          "file": "04_export_command_log.png",
           "output_type": "command_log",
           "title": "Exporter validation log",
           "code_purpose": "Show the managed run log for the exporter.",
@@ -1684,11 +2662,13 @@
             43,
             60
           ],
-          "log_path": ".reports/logs/halo_4_exporter_from_maya.log"
+          "log_path": ".reports/logs/halo_4_exporter_from_maya.log",
+          "card_file": "04_export_command_log.png",
+          "result_file": "04_export_command_log_result.png",
+          "media_role": "code_evidence"
         },
         {
           "id": "artifact-summary",
-          "file": "05_animated_face_artifact_summary.png",
           "output_type": "artifact_summary",
           "title": "animated_face.dat artifact summary",
           "code_purpose": "Inspect the generated pickle artifact.",
@@ -1698,11 +2678,13 @@
             34,
             41
           ],
-          "artifact_path": "labs/AnimationPapers/animated_face.dat"
+          "artifact_path": "labs/AnimationPapers/animated_face.dat",
+          "card_file": "05_animated_face_artifact_summary.png",
+          "result_file": "05_animated_face_artifact_summary_result.png",
+          "media_role": "code_evidence"
         },
         {
           "id": "dataflow",
-          "file": "06_exporter_dataflow.png",
           "output_type": "diagram",
           "title": "Exporter data flow",
           "code_purpose": "Summarize the exporter path from Maya or synthetic fallback into a notebook-readable .dat file.",
@@ -1718,14 +2700,37 @@
             "-> 220 sampled vertex-position frames",
             "-> pickle tuple (indices, normals, frames)",
             "-> Halo 4 Facial Animation notebook viewer and PCA pipeline"
-          ]
+          ],
+          "card_file": "06_exporter_dataflow.png",
+          "result_file": "06_exporter_dataflow_result.png",
+          "media_role": "code_evidence"
         }
       ],
       "video_step": {
         "mode": "step_sequence",
         "title": "Halo 4 Exporter From Maya module walkthrough",
         "result_meaning": "The video walks through source excerpts, validation logs, and generated artifacts."
+      },
+      "transcript_sources": [
+        "docs/transcripts/JNR7iFONGmg_Halo4 Facial Animations.txt"
+      ],
+      "cell_mermaid_policy": "per_step_optional",
+      "walkthrough": {
+        "webm": "00-walkthrough.webm",
+        "role": "supporting_evidence",
+        "title": "Halo 4 Exporter From Maya module walkthrough"
       }
     }
-  ]
+  ],
+  "media_policy": {
+    "readme_preview": "gif",
+    "primary_video": "mp4_h264",
+    "fallback_video": "webm_vp9",
+    "legacy_cards": "retained_as_evidence"
+  },
+  "animation": {
+    "fps": 6,
+    "max_seconds": 6,
+    "max_bytes": 10485760
+  }
 }

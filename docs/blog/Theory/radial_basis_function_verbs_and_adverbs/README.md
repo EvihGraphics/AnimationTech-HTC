@@ -1,4 +1,4 @@
-﻿# RBF Verbs and Adverbs：线性项与残差径向项
+# RBF Verbs and Adverbs：线性项与残差径向项
 
 ## 元数据
 
@@ -79,9 +79,7 @@ flowchart TD
 
 本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和 PNG 学习卡片。PNG 由指定 cell 的代码摘要、输出区、viewer/canvas 或图表/日志合成，不使用整页滚动截图替代。
 
-<video controls muted src="assets/00-walkthrough.webm"></video>
-
-[下载 WebM](assets/00-walkthrough.webm)
+[打开/下载 WebM](assets/00-walkthrough.webm)
 
 | Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
 | --- | --- | --- | --- | --- |
@@ -168,3 +166,35 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 radial_
 ```
 
 打开 `labs/Theory/radial_basis_function_verbs_and_adverbs.ipynb`，选择 kernel `animationtech-radial_basis_function_verbs_and_adverbs`。本说明只根据 notebook 源内容整理，没有重新执行 notebook。
+
+## 重点可视化 / 动画
+
+README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+
+[打开/下载总览 WebM](assets/00-walkthrough.webm)
+
+| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
+| --- | --- | --- | --- | --- |
+| Cell 3 | `plot` | `key_visual` | Plot sample points in a two-dimensional adverb space. | [结果 PNG](assets/01_sample_adverb_space_result.png) / [代码卡](assets/01_sample_adverb_space.png) |
+| Cell 4 | `matrix` | `supporting_evidence` | Encode right, left, up, and down adverb components. | [结果 PNG](assets/02_4d_adverb_encoding_result.png) / [代码卡](assets/02_4d_adverb_encoding.png) |
+| Cell 7 | `table` | `supporting_evidence` | Fit and print least-squares linear coefficients. | [结果 PNG](assets/03_linear_coefficients_result.png) / [代码卡](assets/03_linear_coefficients.png) |
+| Cell 9 | `plot` | `key_visual` | Plot the color field produced by the linear model. | [结果 PNG](assets/04_linear_color_field_result.png) / [代码卡](assets/04_linear_color_field.png) |
+| Cell 11 | `table` | `supporting_evidence` | Print the residuals left after the linear model. | [结果 PNG](assets/05_linear_residuals_result.png) / [代码卡](assets/05_linear_residuals.png) |
+| Cell 14 | `plot` | `key_visual` | Plot the B3 radial basis shape. | [结果 PNG](assets/06_cubic_bspline_basis_result.png) / [代码卡](assets/06_cubic_bspline_basis.png) |
+| Cell 20 | `matrix` | `supporting_evidence` | Compute distances, scales, D matrix, and residual coefficients. | [结果 PNG](assets/07_radial_system_solve_result.png) / [代码卡](assets/07_radial_system_solve.png) |
+| Cell 21 | `plot` | `key_visual` | Plot the final field after adding the RBF residual correction. | [结果 PNG](assets/08_final_rbf_field_result.png) / [代码卡](assets/08_final_rbf_field.png) |
+
+## 代码 Cell 与可视化结果
+
+本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+
+| Cell / 片段 | 结果说明 | 证据 |
+| --- | --- | --- |
+| Cell 3 | The plot connects semantic directions to observed color/motion samples. | [结果 PNG](assets/01_sample_adverb_space_result.png) / [代码卡](assets/01_sample_adverb_space.png) |
+| Cell 4 | The matrix is the feature space used for linear and radial interpolation. | [结果 PNG](assets/02_4d_adverb_encoding_result.png) / [代码卡](assets/02_4d_adverb_encoding.png) |
+| Cell 7 | The coefficients capture the broad global trend in adverb space. | [结果 PNG](assets/03_linear_coefficients_result.png) / [代码卡](assets/03_linear_coefficients.png) |
+| Cell 9 | The broad field shows what linear interpolation can and cannot explain. | [结果 PNG](assets/04_linear_color_field_result.png) / [代码卡](assets/04_linear_color_field.png) |
+| Cell 11 | Residuals are the local details that the radial basis layer must recover. | [结果 PNG](assets/05_linear_residuals_result.png) / [代码卡](assets/05_linear_residuals.png) |
+| Cell 14 | The compact-support basis defines how far each example influences the field. | [结果 PNG](assets/06_cubic_bspline_basis_result.png) / [代码卡](assets/06_cubic_bspline_basis.png) |
+| Cell 20 | The system transforms residual examples into a smooth correction field. | [结果 PNG](assets/07_radial_system_solve_result.png) / [代码卡](assets/07_radial_system_solve.png) |
+| Cell 21 | The field shows local semantic control beyond the linear trend. | [结果 PNG](assets/08_final_rbf_field_result.png) / [代码卡](assets/08_final_rbf_field.png) |

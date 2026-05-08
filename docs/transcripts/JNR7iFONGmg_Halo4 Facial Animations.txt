@@ -1,0 +1,208 @@
+Imagine you are 15 years ago and you start the production on Halo 4.
+You want to push the quality of the facial animations in your cutscenes, but you are
+on an Xbox 360 with limited resources.
+Hi, I'm Jerome and today I want not to talk about a specific paper per se, but I want
+to talk about how Halo 4 managed to stream the facial animations inside of an Xbox 360
+principal component analysis. So for those of you that might not remember what the cutscenes
+were looking like, so this is Halo 4 on an Xbox 360 probably 11 years ago. And you can see that
+the facial still holds up on these cutscenes, and it was all runtime cutscenes, so it was all
+running on the consoles directly. But back then you couldn't execute a really expensive rig like
+metahuman or having blend shapes and all of those kind of stuff. So you were limited on the kind
+of rigs you could use. So the choice that Halo made was to use the same production pipeline
+that they were using when they were doing, let's say, pre-rendered cutscenes. So doing mock apps,
+doing facial mocap, doing all the stuff that we could do in pre-rendering, which was not the kind
+of stuff that we could run at runtime back then because of the the the weights of all of those
+rigs. And we could already record and we could already work with expensive rigs back then,
+but it's really the runtime that wasn't the issues. So what Halo decided to do was to
+to use the same pipeline as the pre-rendered one.
+And then they would pre-render the facial animations
+as vertex animation.
+And that's the vertex animation
+that they would try to stream on the console.
+So you get rid of the entire rig.
+You only have basically a big alumbic file
+with all the vertices moving through times.
+And that's what you try to stream on the console.
+So I would do the same here.
+What I would do first is that I would import
+all the libraries I need and then I would create a material
+because I will work with some things
+outside of the usual framework.
+Now, I've created official animations
+using Omniverse Audio2Face.
+So it's really a big alumbic file
+with all my vertices moving.
+And that's why it takes a bit of time to actually import
+because it's quite massive.
+And what I have is a head that is based on 123,000 triangles.
+And that has a bit more than 60,000 vertices.
+And it's only 220 frames of animations.
+But really, because, as I said, we
+moving every vertices through time basically means that if you have 200 frames of animations you have
+200 different heads. So that's what I have in my frames here. It's 220 frames of 60,000 vertices
+XYZ positions. So I get all my animations here and what I would do is that I would want to be able
+to stream that to the graphic card. So I will create a vertex buffer for the vertices,
+the positions, and I will make it as dynamic because I will update the values all the time
+and I will do a second one with the normals. So I get both informations. I don't want to stream
+normals. I would just keep them static. It's not perfect, but it makes it easier. And then I get
+my vertex array, that's how we need to render everything. And then what I will do is that
+I will create a shader because the framework is not expecting this kind of data. It's just
+a simple shader. We just take the normal and the positions. I get the positions and I get the normal
+and I multiply that by the view matrix and the position matrix. So it's correctly placed on screen
+and then the fragment shader itself is the default one from the framework just to make sure
+that I push everything I need inside of all my gbuffers and then I can create my program and I
+can finally render that animation so what you could see is this character playing the animations
+I've created, so as I said, 60,000 vertices, so there's no normal map, it's all inside
+of the mesh directly, all the little bumps, it's fairly heavy mesh, and the way you render
+this is really what I said, it's 220 different heads and I'm just uploading those heads on
+the GPU every frame, so basically I take my buffer and I update what is inside of the
+buffer with the correct frame at every frame. And it works, I mean I'm streaming the entire data.
+Now you would have one big issue with this and the biggest issue is of course the size of what
+you're trying to stream. In this case just with my 200 frames what I already have is 154 megabytes
+of data, which is a lot. It's only one character, one head for 200 frames. It's not even an
+entire cutscene. It's not multiple characters. So you don't have that kind of room on the disk.
+So you will have to compress that data quite a lot. So basically, if you try to run it this way,
+your CPU will be busy uncompressing the data,
+your bus between the CPU and GPU
+will be busy sending the data every time,
+and your GPU will be just waiting
+for the data to arrive most of the time.
+So you will have to really focus
+on how to be able to stream this kind of data.
+And the solution that was used by Halo
+was to go with the principal component analysis
+to compress the data and send them with a lighter solution.
+So that's what it will go through at this point.
+So what is the principle component analysis?
+Analysis is the fact that if you have a data
+with a lot of dimensions,
+you might want to reduce the number of dimensions.
+So usually when you see the PCA explain what you will have
+explain what you will have is, for instance, a bunch of 3D points scattered in a plot and you ask
+the system, give me the line through all those points that represent the biggest variations.
+So that's really what the principle component means is find the component that has the biggest
+variations that represent the best the values. So you get one line through all your points.
+And then you can ask for a second component that will be orthogonal to the first one and
+that represent the second most important directions for all your data.
+And you can remap your data inside of those two vectors inside of being in 3D.
+So in statistics, for instance, you might have a population where you would ask for
+the weights, the size, the age, the sleeping habits, what they eat, all that kind of stuff.
+And you might do a PCA to reduce the number of features to a lower number so you could see if
+there is a correlation between a bunch of values and if you start to get clusters of populations
+in some places it will mean that a bunch of your values are actually related and that kind of stuff.
+In our case we will actually do the same thing. What we have is 220 different heads
+and so it will be considered as 220 features and what we want to say is that I want to reduce
+those 220 frames to just, in my case, seven. So I will turn the 220 frames in seven different
+components. In this case, it will be frames, but it's really seven different components.
+And what the PC would allow us to do is to use those seven components
+and reproject the data into the seven components and rebuild the animations. So really, what I'm
+I'm using is the PCA implementation from scikit-learn.
+So I will not rewrite PCA from scratch,
+but I might do it in a different video
+because there is paper talking about how to write
+PCA for vertex animation.
+So it might be interesting to see,
+but at this point,
+I just use the default scikit-learn implementations.
+And it returns, you see, I'm fitting all my animations
+And it returns me seven components,
+and those seven components are basically seven heads.
+So it is 184 floats,
+so it's basically 60,000 vertices x, y, z, back to back.
+And what I can do is that I can actually display
+the different poses that he picked.
+So that's one of the pose that he can use
+to recompute my animations, that's a second one,
+third, fourth, five, six, and seven.
+So that's all the poses that he wants to use,
+that he says that he can use to rebuild my animation.
+And I can multiply those values so I can see
+more or less what they will do.
+All right, so you could see all the different poses.
+What, oh, I'm doing this, I'm just picking the component,
+I'm multiplying with a value because they will be really close.
+And I'm adding the mean because a PCA works best
+if you always remove the mean of all your values
+before starting to compute the components.
+So all the components are computed around zeros.
+So you have to remember that you have a mean
+that represents the average heads,
+and then you get the components that represents
+the offsets of that average head for all values.
+That's what we have here.
+And now that I have this, I can actually
+say, well, you could transform my data into an animation that
+would be basically is just an array now for the 220 frames
+instead of having all the vertices that were used
+is just the weights represent that you want to use to multiply each of the seven components you
+have. So it's really a 220 frames, seven floats values. And I can render using that PCA. So what
+I would do is again, I would use the scikit-learn inverse transform now. So I take the animations
+I receive I do the reverse transform so it will give me back a head and I'm just moving it 30
+centimeters on the side so I can render the ground truth so that's the first thing I'm
+rendering here using the buffer I'm sending my true head and then I'm sending the one that has
+been recomputed thanks to the PCA and what I have is the comparison between the two heads so
+that the ground screws and that's the PCA animations. So remember this one is 220 different heads
+and this one is just eight different heads so the mean plus seven components and seven floats for
+every frame. So you're quite a lot smaller and you get the weights that are used for all the
+different heads so for all the different components. So you see they study one times the
+the first component plus minus five times
+the second components and so on and so on.
+And I give you that head.
+So at this point, of course,
+I have compressed the data quite a lot,
+but I'm still decompressing the data on the CPU
+and sending the full heads to the GPU.
+So I haven't won anything.
+So what you could do now is define a render
+to try to make sure that we can render that
+on the GPU directly.
+And so the shader basically now just have,
+instead of having one set of vertices,
+it will have eight of them.
+So it will get the mean, the first one is my mean,
+and then all the different ones are the seven different
+components.
+And when you try to render this,
+Basically, you have to send the seven floats you want to use
+and how much you want to blend the difference head together.
+And then you just accumulate the values.
+It's just you take the mean, and then you
+add the first component multiplied by the first values,
+then the second component multiplied by the second values,
+and so on, and so on.
+And that's it.
+And now you can build your buffers.
+They don't need to be dynamic anymore,
+because you will build them once,
+and then you send them to the graphic card
+and they will stay in VRAM.
+You don't have to stream them anymore at every frames
+and you build the programs, of course,
+so you can render that.
+And if I want to play my animations
+and render this animation,
+I better remove this.
+What you have now is the only thing you have to send
+at every frame is just a seven floats
+and you could render your facial animations
+just by sending seven floats,
+because all the components now sits
+in memory on your graphic card.
+And that's how Halo 4 was able to achieve
+this quality of facial animations in the cut scenes.
+And interestingly, you could see
+that one of the popular video you had back then
+was done by Lord Z that actually make a mod and tweak the values of the animations.
+And he said that he multiplied the facial animation by five and it got that with results that make a lot of people laugh.
+And it's interesting to see that it really represents what was happening with the PCA
+because it just multiplied all the values of animation by five and if I really do the same,
+same, it would give me something quite similar. If I multiply it by 5, I get that same weight
+result just basically because you are reconstructing your PCA with the wrong weights, you're pushing
+them too far, all those weights, different weights basically. And I wanted to talk about
+how Halo 4 did it because to my knowledge, it was one of the first time it was used.
+I'm still not sure how Hélène Noir, if you remember that game, was doing the rendering.
+But I was sure that Halo 4 was using PCA and I haven't seen any other game after using that
+same technique and even Lord Z basically said that it only works on Halo 4 and it never
+worked in any different LO. It was the only game as far as I know that ever used PCA to render
+the facial animations instead of the cutscenes. And I find it interesting and I wanted to make
+sure that it wasn't basically forgotten at some point. So I hope you liked it and see you next time.

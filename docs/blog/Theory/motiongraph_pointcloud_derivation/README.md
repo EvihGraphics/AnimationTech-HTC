@@ -1,4 +1,4 @@
-﻿# Motion Graph 点云配准公式推导
+# Motion Graph 点云配准公式推导
 
 ## 元数据
 
@@ -70,9 +70,7 @@ flowchart TD
 
 本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和 PNG 学习卡片。PNG 由指定 cell 的代码摘要、输出区、viewer/canvas 或图表/日志合成，不使用整页滚动截图替代。
 
-<video controls muted src="assets/00-walkthrough.webm"></video>
-
-[下载 WebM](assets/00-walkthrough.webm)
+[打开/下载 WebM](assets/00-walkthrough.webm)
 
 | Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
 | --- | --- | --- | --- | --- |
@@ -141,3 +139,31 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 motiong
 ```
 
 打开 `labs/Theory/motiongraph_pointcloud_derivation.ipynb`，选择 kernel `animationtech-motiongraph_pointcloud_derivation`。本说明只根据 notebook 源内容整理，没有重新执行 notebook。
+
+## 重点可视化 / 动画
+
+README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+
+[打开/下载总览 WebM](assets/00-walkthrough.webm)
+
+| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
+| --- | --- | --- | --- | --- |
+| Cell 4 | `formula` | `supporting_evidence` | Display the weighted squared-distance objective for point-cloud alignment. | [结果 PNG](assets/01_alignment_objective_formula_result.png) / [代码卡](assets/01_alignment_objective_formula.png) |
+| Cell 6 | `latex` | `supporting_evidence` | Differentiate the objective with respect to rotation and translation. | [结果 PNG](assets/02_partial_derivatives_result.png) / [代码卡](assets/02_partial_derivatives.png) |
+| Cell 8 | `latex` | `supporting_evidence` | Expand the derivative equations before substitution. | [结果 PNG](assets/03_expanded_stationarity_result.png) / [代码卡](assets/03_expanded_stationarity.png) |
+| Cell 13 | `latex` | `supporting_evidence` | Introduce compact weighted-sum symbols for the derivation. | [结果 PNG](assets/04_weighted_sum_shorthand_result.png) / [代码卡](assets/04_weighted_sum_shorthand.png) |
+| Cell 16 | `formula` | `supporting_evidence` | Solve the translation equations for x0 and z0. | [结果 PNG](assets/05_translation_solution_result.png) / [代码卡](assets/05_translation_solution.png) |
+| Cell 20 | `formula` | `supporting_evidence` | Collect sine/cosine terms and derive the atan form. | [结果 PNG](assets/06_theta_solution_result.png) / [代码卡](assets/06_theta_solution.png) |
+
+## 代码 Cell 与可视化结果
+
+本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+
+| Cell / 片段 | 结果说明 | 证据 |
+| --- | --- | --- |
+| Cell 4 | The formula states exactly what motion-graph transition alignment minimizes. | [结果 PNG](assets/01_alignment_objective_formula_result.png) / [代码卡](assets/01_alignment_objective_formula.png) |
+| Cell 6 | The derivatives define the first-order conditions for the optimal alignment. | [结果 PNG](assets/02_partial_derivatives_result.png) / [代码卡](assets/02_partial_derivatives.png) |
+| Cell 8 | The raw equations show where the sine, cosine, and translation terms come from. | [结果 PNG](assets/03_expanded_stationarity_result.png) / [代码卡](assets/03_expanded_stationarity.png) |
+| Cell 13 | The shorthand turns large sums into readable centroid-like expressions. | [结果 PNG](assets/04_weighted_sum_shorthand_result.png) / [代码卡](assets/04_weighted_sum_shorthand.png) |
+| Cell 16 | The result separates translation from the remaining rotation solve. | [结果 PNG](assets/05_translation_solution_result.png) / [代码卡](assets/05_translation_solution.png) |
+| Cell 20 | The final expression is the closed-form rotation used for point-cloud alignment. | [结果 PNG](assets/06_theta_solution_result.png) / [代码卡](assets/06_theta_solution.png) |

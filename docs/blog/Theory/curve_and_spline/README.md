@@ -1,4 +1,4 @@
-﻿# 曲线与样条：从 Bezier 到 B-Spline
+# 曲线与样条：从 Bezier 到 B-Spline
 
 ## 元数据
 
@@ -195,9 +195,7 @@ B-Spline 图要看平滑性和局部支撑。曲线通常不穿过所有控制�
 
 本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和 PNG 学习卡片。PNG 由指定 cell 的代码摘要、输出区、viewer/canvas 或图表/日志合成，不使用整页滚动截图替代。
 
-<video controls muted src="assets/00-walkthrough.webm"></video>
-
-[下载 WebM](assets/00-walkthrough.webm)
+[打开/下载 WebM](assets/00-walkthrough.webm)
 
 | Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
 | --- | --- | --- | --- | --- |
@@ -331,3 +329,45 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 curve_a
 打开 `labs/Theory/curve_and_spline.ipynb`，选择 kernel `animationtech-curve_and_spline`。如果只想复现验证环境，先运行 `tools/run_case.ps1`；如果想查看交互滑块和图像输出，再启动 Jupyter Lab 并从头执行 notebook。
 
 本文根据 notebook 源内容整理，重点解释执行路径、核心函数和图像阅读方式。
+
+## 重点可视化 / 动画
+
+README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+
+[打开/下载总览 WebM](assets/00-walkthrough.webm)
+
+| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
+| --- | --- | --- | --- | --- |
+| Cell 13 | `plot` | `key_visual` | Plot Bezier curves of different orders with their control points. | [结果 PNG](assets/01-bezier-de-casteljau_result.png) / [代码卡](assets/01-bezier-de-casteljau.png) |
+| Cell 64 | `plot` | `key_visual` | Plot recursively constructed B-Spline basis functions. | [结果 PNG](assets/02-bernstein-basis_result.png) / [代码卡](assets/02-bernstein-basis.png) |
+| Cell 22 | `plot` | `key_visual` | Connect multiple cubic Bezier spans and draw their control points. | [结果 PNG](assets/03-bezier-control-polygon_result.png) / [代码卡](assets/03-bezier-control-polygon.png) |
+| Cell 15 | `log` | `supporting_evidence` | Expand the De Casteljau form using SymPy. | [结果 PNG](assets/04-rational-bezier-weight_result.png) / [代码卡](assets/04-rational-bezier-weight.png) |
+| Cell 24 | `plot` | `key_visual` | Compare low-order and cubic polynomial interpolation behavior. | [结果 PNG](assets/05-cubic-bezier-spline_result.png) / [代码卡](assets/05-cubic-bezier-spline.png) |
+| Cell 40 | `plot` | `key_visual` | Plot a 2D Hermite curve with endpoint tangent controls. | [结果 PNG](assets/06-hermite-tangents_result.png) / [代码卡](assets/06-hermite-tangents.png) |
+| Cell 56 | `plot` | `key_visual` | Plot a Cardinal spline with control points. | [结果 PNG](assets/07-cardinal-tension_result.png) / [代码卡](assets/07-cardinal-tension.png) |
+| Cell 62 | `plot` | `key_visual` | Plot interpolation points, midpoints, and helper structures for continuity. | [结果 PNG](assets/08-cardinal-continuity_result.png) / [代码卡](assets/08-cardinal-continuity.png) |
+| Cell 72 | `plot` | `key_visual` | Plot a uniform cubic B-Spline and its control points. | [结果 PNG](assets/09-bspline-local-support_result.png) / [代码卡](assets/09-bspline-local-support.png) |
+| Cell 77 | `plot` | `key_visual` | Generate a 1D Hermite curve from key time, key value, and tangent. | [结果 PNG](assets/10-keyframe-hermite_result.png) / [代码卡](assets/10-keyframe-hermite.png) |
+| Cell 83 | `plot` | `key_visual` | Compare Cardinal sampling under non-uniform key times. | [结果 PNG](assets/11-nonuniform-cardinal-time_result.png) / [代码卡](assets/11-nonuniform-cardinal-time.png) |
+| Cell 88 | `plot` | `key_visual` | Show a non-uniform Bezier time curve and recovered internal parameter. | [结果 PNG](assets/12-bezier-time-root_result.png) / [代码卡](assets/12-bezier-time-root.png) |
+| Cell 92 | `plot` | `key_visual` | Fit a complex sampled function with a uniform cubic B-Spline. | [结果 PNG](assets/13-bspline-fitting_result.png) / [代码卡](assets/13-bspline-fitting.png) |
+
+## 代码 Cell 与可视化结果
+
+本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+
+| Cell / 片段 | 结果说明 | 证据 |
+| --- | --- | --- |
+| Cell 13 | The curve is constrained by the control polygon rather than being an isolated function plot. | [结果 PNG](assets/01-bezier-de-casteljau_result.png) / [代码卡](assets/01-bezier-de-casteljau.png) |
+| Cell 64 | Local support explains why one B-Spline control point affects only a local curve span. | [结果 PNG](assets/02-bernstein-basis_result.png) / [代码卡](assets/02-bernstein-basis.png) |
+| Cell 22 | Long paths are built from local spans, and shared endpoints control continuity. | [结果 PNG](assets/03-bezier-control-polygon_result.png) / [代码卡](assets/03-bezier-control-polygon.png) |
+| Cell 15 | The symbolic output proves that recursive interpolation and Bernstein polynomials describe the same cubic Bezier. | [结果 PNG](assets/04-rational-bezier-weight_result.png) / [代码卡](assets/04-rational-bezier-weight.png) |
+| Cell 24 | Cubic curves can control both position and derivative, which is why they are common in animation curves. | [结果 PNG](assets/05-cubic-bezier-spline_result.png) / [代码卡](assets/05-cubic-bezier-spline.png) |
+| Cell 40 | Velocity and tangent information are as important as position values in animation curves. | [结果 PNG](assets/06-hermite-tangents_result.png) / [代码卡](assets/06-hermite-tangents.png) |
+| Cell 56 | Cardinal splines estimate tangents from neighboring points and pass through key points. | [结果 PNG](assets/07-cardinal-tension_result.png) / [代码卡](assets/07-cardinal-tension.png) |
+| Cell 62 | The output separates positional continuity, velocity continuity, and higher-order smoothness. | [结果 PNG](assets/08-cardinal-continuity_result.png) / [代码卡](assets/08-cardinal-continuity.png) |
+| Cell 72 | B-Splines are smooth approximations and usually do not pass through every control point. | [结果 PNG](assets/09-bspline-local-support_result.png) / [代码卡](assets/09-bspline-local-support.png) |
+| Cell 77 | This transfers geometric curve ideas to animation-editor keyframe curves. | [结果 PNG](assets/10-keyframe-hermite_result.png) / [代码卡](assets/10-keyframe-hermite.png) |
+| Cell 83 | Treating parameter t as real time can place samples incorrectly. | [结果 PNG](assets/11-nonuniform-cardinal-time_result.png) / [代码卡](assets/11-nonuniform-cardinal-time.png) |
+| Cell 88 | Animation systems often need to solve internal curve parameters from frame time. | [结果 PNG](assets/12-bezier-time-root_result.png) / [代码卡](assets/12-bezier-time-root.png) |
+| Cell 92 | The fitted curve does not need to pass through every sample, but it preserves a stable trend. | [结果 PNG](assets/13-bspline-fitting_result.png) / [代码卡](assets/13-bspline-fitting.png) |

@@ -1,0 +1,284 @@
+Hi today we'll be looking at the radial basis function. Basically what the radial basis function
+is is a way to interpolate your data when you have sparse data and you want to have a smooth
+interpretation between those. Let's see how it is done mathematically because it will be used
+in several papers when we try to analyze them. So the first thing I will do is again import all
+all the libraries I would need,
+so I will be able to display what I'm doing.
+And why do we call that radial basis functions?
+It's basically because we have a function
+that only depends on the distance between
+the point I'm trying to interpolate
+and all the points I have inside of my data.
+So I will have examples, a bunch of examples,
+and I try to interpolate in betweens.
+And the only thing that I'm interested in
+is the distance between the point I have
+and all my examples to try to find the interpolated values.
+So that's why we said that it's a radial functions.
+And it's only depending on the distance.
+So the points I'm looking at
+compared to all the points I have.
+And then we will go through a kernel.
+So instead of just having the linear distance,
+you could pass that through any type of function.
+There is a lot of different kernels.
+And one of the most used is the Gaussian kernel
+that I would call phi in this case.
+And the Gaussian is basically the exponential of minus epsilon
+r squared r being the distance itself.
+And epsilon is how much I want to make that bell curve short
+or big.
+Before going through all the maths,
+I will just show you basically what I'm talking about.
+So I get the Gaussian, so that's the ghost,
+see the exponential functions as we have here.
+And I will basically call one example function,
+so I would know what are the functions
+and I will just pick a few points around that function
+and I will display the function.
+So basically, what I have is this.
+And I have a ground truth, and the ground truth
+is my red dots.
+And then I get a bunch of points that I have,
+for which I have the values.
+So that would be the points I would have truly measured
+something in the real world.
+And I need to be able to interpolate, basically,
+to re-draw that red curve without knowing what was the function before, just by knowing
+the points I have here.
+So that's the point of the radial basis functions interpolations.
+And how we will do this, as I said, it's going through the Gaussians.
+Basically the function is here, so the function to find any x value will be the sum of all
+the distances I will have between my points and all the examples I have multiplied by
+weights. And then we'll have to do some stuff. So let's see what happens if I just try to
+do that sum. So to represent what I have here, I've kept all the points that I had in my
+function. So that's all the points I had here. I have all those points. And then I will draw
+one Gaussian through each of the points so you can see that I get the blue one
+right there it's at the bottom then the second one is that yellow and you get the
+bell curve you know that goes here with the the correct points and then the
+green one the red one and the purple one and what we do is that we sum all of
+them to try to find the approximation the interpretation we want and if I
+sum all of those of course what I have is this big function that's completely
+over shooting what I'm trying to interpolate. And what I could do is I can change the Gaussian
+curve itself to make it really a small bell curve. And so the approximation, the interpolation
+here is closer, it doesn't add to be that big, but then you know that now we dip around
+here we go down which is not what we want. So depending on the value of the Gaussian you have
+you get an interpolation that is really smooth or really precise but tends to go down and not
+working properly. So the purpose of the radial basis functions now is to actually
+solve this, so the interpolation will go through all the points. And to do this, what
+we have, that I haven't used yet, is to say that we had a weight that we could use for
+each point. So basically, for the first point I have one weight, for the second point I
+have a second weight, third weight, fourth weight and fifth weight. So I get a weight
+for each of those so I can add them together but multiply them by the weights and now we
+have to find the weights that make sure that we will go through all the points.
+And how to do this, basically what we do is that we will turn this into a system of equation
+because what we could say is that I know that for my first point, for instance, so if I
+I go 0.1 minus 0.1, I know the value where it would be.
+So I know that that would be the value 1.
+And for my 0.2 minus 0.2, it has to be at the value of 0.2,
+and so on and so on.
+So I know what the weight should be for each of the points
+that I know.
+So basically what I would do is just this.
+I will compute the distance between every point,
+so between all the points i minus all the points j.
+So basically, I do for every point,
+I do the weights for every point.
+And that gives me a system of equations.
+So I get the first point minus the first point,
+the first point minus the second point, and so on, and so on.
+Multiply by the first weight, and so on, and so on.
+That gives me my first value.
+And that's the known values I have.
+So because it's a system of equation,
+now that it's actually a squared matrices here,
+I can just solve this.
+I can solve for w and I would know the w I want to use.
+So let's see how we do this.
+I will force my epsilon to be two.
+So basically like this fairly smooth.
+So I really force it to be two and then I compute my distance and as I said is
+between each point and each point and the way I'm doing it is just subtracting
+all the points but then I'm taking the advantage of the broadcast of NumPy to
+make sure that it will build a big matrices with all the distance between
+between all the points.
+So compute all the distance,
+and then I will just make those distances
+go through my Gaussian functions
+because that's the kernel I want to use,
+and that will give me my phi.
+So first is all the distance.
+So of course you could see in the diagonal,
+the distance is zero because that's the point one
+with the point one, the point two with point two
+and so on and so on.
+And then it's a big symmetric matrix.
+But basically, you get the distance between 0.1 and 2,
+0.1 and 3, and so on and so on.
+And then when I go through the Gaussian,
+now what I have is the value when
+I go through the Gaussians.
+And now, of course, in diagonal, I
+get 1's because at 0.1, I want to be at 0.1.
+At 0.2, I want to be at 0.2.
+At 0.3, I want to be at 0.3.
+and so on and I get the different sums of all the weights I want to use and now as I
+said I get so that's really here that's this matrix and now I can solve for my weights
+if I solve my weights, that's the values of all my weights now. So that's the weights for each of my
+points. So I can use the function we had. Remember just the sum of all the distances
+multiplied by the weights. What I will do is that instead of writing this as a sum,
+I will write this as a matrix multiplication. It's exactly the same stuff. I'm multiplying
+my points minus 0.1 with the weight 1, my points minus 0.2 with the weight 2 and so on and so on.
+And if I do this basically what I have is that I compute the distance now I will pick randomly
+the value 0.5 so that's the on the x-axis I want to know the value of 0.5 so I can 0.5
+minus all my all my points. I can make that go through the Gaussian and then I
+can do the multiplication, the matrix multiplication to get the values I will
+have. I haven't displayed it yet but so that's the value for the point zero five
+and the reason why I wrote this as a matrix form and not as a sum, it's
+It's because, as usual, inside of NumPy,
+I can compute more than one thing at once.
+So what I would do is that,
+instead of computing only one values
+and having only one row here,
+I can have as many rows as I want
+and that gives me as many answer as I want.
+So what I could do is I could actually
+compute the distance between all the points I want to do
+to draw my curves at once and get all the values
+and that's what I do here.
+And now it's time for me to display this.
+And what I will have is again the red is the ground truth
+and the green is the interpolated value.
+So you could see the interpolation is fairly close.
+And one thing that we have with radial basis functions
+by default is that it's really good at interpolation.
+it's really bad at extrapolation
+because it has no clue that it should be going up here.
+There's no data for him to know
+that it should be going up and so on.
+So really good interpolation, really bad at extrapolation.
+They could see, so then my green curve
+and then the values I've computed for the 0.5 is just here.
+It's right on the green curve, of course.
+And that's basically what you do
+When you hear about radial basis function interpolation,
+that's it.
+That's how you compute it.
+Of course, your weights can be in multidimensional.
+It doesn't need to be just, like in this case, one dimension.
+But it's the same principle.
+Another thing that I wanted to talk about
+is the polynomial augmentation.
+because sometime here I get something fairly smooth
+and we could guess already just by seeing
+where the curve would be.
+So it's really good interpolating this kind of stuff.
+But then I can easily find a function
+that will not have a proper Gaussian
+and radial basis function interpolation.
+What I had is, I wrote a different example.
+And I've picked a bunch of points on that functions.
+And then what I've done is all the step we had before,
+I computed the distance solve for my w's
+and then try to interpolate using my weights.
+And you could see that what I have is that red interpolation
+and it just dips to zero.
+There is no way for him to do the interpolation
+because the data is way too sparse
+and it's missing information, let's say,
+to be able to do a proper interpolation.
+What I can see visually here and I could guess,
+and I actually mainly know because of the function I wrote,
+is this is probably a quadratic.
+And I can actually try to tell the interpolation
+that on top of all my Gaussians, I
+want him to make sure that he tries
+to find a quadratic function to do that interpolation.
+So that's what we could do, and we
+could grow the system that we had before with just
+the matrix of phi and weights.
+Grow it with a bunch of constraints,
+and those constraints will be tried to find a polynomial.
+And to do this, what we do is that we
+add a second term to the functions,
+and the second term is to say that we
+have a polynomial basis and a bunch of coefficients
+for those polynomials.
+Then I could choose the type of polynomial I'm trying to solve,
+because what I can see here that it's probably
+quadratic and I know it's a quadratic I will tell him as a constraint I want you
+to find a quadratic polynomial so I will build a bunch of polynomial basis of
+degree 2 which gives me this matrix so basically what it says it says that I
+have a matrix with first row is always 1 and then I get the values for x and
+and then I get the value for x squared so I will have minus 2 and then 4
+then I do a second row it will be for x2
+which is a bit bigger, I don't remember what the values are but
+you see it will be also minus 150 and then
+squared and so on and so on so you do it for as many degrees you have and for
+all the x's you have
+so basically what I have in my case is this P
+I get, from all the points I had here, minus 2, minus 1.8, minus 1.7, 1.802, then it turns
+into this matrix and then it's 1, minus 2, 4, 1, minus 1.8, 3, 24, and so on and so on.
+So that's the P I would have.
+Now how do you combine the phi and the polynomial?
+You turn it into a matrix form that
+contains all those constraints.
+And how you do it is basically you
+will make a matrix that is a bit bigger.
+And at the top corner, you get the same matrix
+as the one we had before.
+Then next to it, we put all the matrix for the P's.
+Under the other one, we put the transpose
+of all the matrix for the P's,
+and then everything else stays just a bunch of zeros.
+So that matrix, it's written as a matrix,
+but really this one is a matrix,
+that one is a matrix and so on.
+So you have to make in your head
+that it's just a matrix that is bigger.
+And then where we had just the weights, now we have the weights and then we have the coefficients we want to find for the polynomials.
+So basically what it means, it means that for all of the values I have here, all the different values,
+I will try to find for all the x and x, for all the ones, the x and the x squares,
+I will try to find the same coefficients because they're the only ones, so I will need to find
+the coefficients for all the different polynomials that make sure that this looks like a polynomial.
+And on the solutions there, we have the f, so the values we know, and then under it a
+bunch of zeros because basically we want to solve for a plus bx plus cx squared equals
+zeroes. That's what you try to do. So we solve for the vector w and c. Let's do it this.
+So I get my extended phi now. So basically see it the same. I started with the distance
+and the Gaussian, and then I created a new matrix that is bigger with a much of zeroes
+and I've just injected in the right corners the data for phi, p and p transpose.
+And now I can do, I can solve the w's. So I get a bunch of w's here. And what you do is that if
+I reuse that same concept now to interpolate, so for each values I want to look and also build
+the extended phi and interpolates using the extended phi then I only take the values that
+I'm interested no so not all the zeros I will have at the end only the the extended values
+what I have is this interpolations and then if I render I get this so that's interpolations if it
+find. So it did find a perfect polynomial to interpolate the points I have here.
+That's in the theory, that's what I wanted to show you, how you do it before starting to
+make things a bit more messy. Because what you've done here is basically
+actually did a little. What happened is that I've created a perfect function, I've sampled
+that function, and I gave that function to the system. What happened really if you check
+the values that this one prints, it's a bit maybe abstract to read, but basically it was
+the weights for all the different Gaussian and then actually you could see that they're
+all zeros because they're all exponent minus 16 so basically they're all zeros and what
+found for the coefficient of my polynomial is 0.7 minus 0.15 and 0.35, which are exactly
+the values I have. Of course it had no choice to actually find the perfect value for it
+because I gave him the perfect point so he had to find the polynomial because I gave him all the
+information to find the polynomial and everything else all the Gaussian and all the radial basis
+functions are useless for in this case so what I would do is that I would make sure that I actually
+have a bit of noise in the data I will give him so it's not a perfect polynomial that I give him
+and I don't ask him to solve for perfect polynomial so what I would do is that I would keep the same
+axis sample all those axes and then I will make I will offset them to say
+well I'm actually I'm not exactly looking at those values it's something a bit
+random it's not exactly I've been a bit random here and probably look a bit
+weird especially this one we'll see so now I have something a bit
+different what I should have is of course my piece that is values I get my standard
+and then I will get my weights now I could see that I do have actual weights for my radial basis
+functions and I have weights for the polynomial that are not exactly or not at all the polynomial
+had at the beginning. And if I do the interpolation, I will get something. That is still a radial
+basis function with the added constraint that we kind of know that extrapolation is a polynomial,
+a quadratic polynomial. I have a kind of a quadratic polynomial in the middle, so it doesn't
+just drop with no reason. It has the polynomial as here and it did its best guess as what the
+polynomial and the radial basis functions together should give me as a result for interpolations.
+So that's what radial basis functions with extended polynomial is giving you. So I hope
+you enjoyed this one and I'll see you next time when we will start to use
+radial basis functions in animation papers. See ya!

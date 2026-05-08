@@ -1,4 +1,4 @@
-﻿# RealTimePlanning_MultiProcess_Func
+# RealTimePlanning_MultiProcess_Func
 
 ## 元数据
 
@@ -63,9 +63,7 @@ flowchart TD
 
 本节把 Python module 当作支撑子工程来阅读：每个条目绑定源码片段、命令日志、产物摘要或流程图，说明它如何服务对应 notebook 案例。
 
-<video controls muted src="assets/00-walkthrough.webm"></video>
-
-[下载 WebM](assets/00-walkthrough.webm)
+[打开/下载 WebM](assets/00-walkthrough.webm)
 
 | 片段 | 输出类型 | 代码/证据做什么 | 结果说明什么 | 素材 |
 | --- | --- | --- | --- | --- |
@@ -134,3 +132,29 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 real_ti
 ```powershell
 $env:ANIMATIONTECH_TREE_N_JOBS = "1"
 ```
+
+## 重点可视化 / 动画
+
+README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+
+[打开/下载总览 WebM](assets/00-walkthrough.webm)
+
+| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
+| --- | --- | --- | --- | --- |
+| imports | `source_excerpt` | `code_evidence` | Show the imports for NumPy and ExtraTreesRegressor. | [结果 PNG](assets/01_module_imports_result.png) / [代码卡](assets/01_module_imports.png) |
+| function-contract | `source_excerpt` | `code_evidence` | Show the function signature and primary inputs. | [结果 PNG](assets/02_function_contract_result.png) / [代码卡](assets/02_function_contract.png) |
+| empty-guard | `source_excerpt` | `code_evidence` | Show the zero-table fallback for empty training data. | [结果 PNG](assets/03_empty_training_guard_result.png) / [代码卡](assets/03_empty_training_guard.png) |
+| extra-trees | `source_excerpt` | `code_evidence` | Show the n_jobs setting, ExtraTreesRegressor fit, prediction, and reshape. | [结果 PNG](assets/04_extra_trees_regressor_result.png) / [代码卡](assets/04_extra_trees_regressor.png) |
+| import-check | `command_log` | `code_evidence` | Show the managed validation import check output. | [结果 PNG](assets/05_import_validation_log_result.png) / [代码卡](assets/05_import_validation_log.png) |
+
+## 代码 Cell 与可视化结果
+
+本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+
+| Cell / 片段 | 结果说明 | 证据 |
+| --- | --- | --- |
+| imports | The module is a small worker dependency for value-function fitting, not a standalone viewer case. | [结果 PNG](assets/01_module_imports_result.png) / [代码卡](assets/01_module_imports.png) |
+| function-contract | The function maps training samples and precompute query indices to a reshaped value table. | [结果 PNG](assets/02_function_contract_result.png) / [代码卡](assets/02_function_contract.png) |
+| empty-guard | The guard keeps multiprocessing workers deterministic when a motion group has no samples. | [结果 PNG](assets/03_empty_training_guard_result.png) / [代码卡](assets/03_empty_training_guard.png) |
+| extra-trees | This is the offline regression step used to fill a value-function table. | [结果 PNG](assets/04_extra_trees_regressor_result.png) / [代码卡](assets/04_extra_trees_regressor.png) |
+| import-check | A quiet log means the module imports successfully in the managed environment. | [结果 PNG](assets/05_import_validation_log_result.png) / [代码卡](assets/05_import_validation_log.png) |

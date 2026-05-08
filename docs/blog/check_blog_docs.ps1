@@ -26,13 +26,19 @@ strict = len(sys.argv) > 2 and sys.argv[2].lower() == "true"
 
 cases_path = repo_root / "tools" / "cases.yaml"
 media_manifest_path = blog_root / "media_manifest.json"
-gold_slugs = {
+deep_slugs = {
     "animation_format",
     "footskate_cleanup_for_motion_capture_editing",
     "motion_matching",
     "motion_graph",
     "real_time_planning_for_parameterized_human_motion",
     "curve_and_spline",
+    "laplacian_deformation",
+    "motion_warping",
+    "verbs_and_adverbs",
+    "precomputing_avatar_behavior",
+    "near_optimal_character_animation_with_continuous_control",
+    "motion_fields_for_interactive_character_animation",
 }
 
 required_sections = [
@@ -75,6 +81,10 @@ def read_text(path):
 
 def count_mermaid(text):
     return text.count("```mermaid")
+
+def count_cell_mermaid(text):
+    pattern = re.compile(r"^### (?:Cell|[A-Za-z0-9_-]+).*?(?=^### |\Z)", re.M | re.S)
+    return sum(1 for block in pattern.findall(text) if "```mermaid" in block)
 
 def resolve_blog_relative(base_file, relative_path):
     clean = relative_path.split("#", 1)[0].split("?", 1)[0].strip()
@@ -226,26 +236,35 @@ for case in target_cases:
     if f"{group}/{slug}/README.md" not in top_text:
         add_error(f"Top README does not link {group}/{slug}.")
 
-    if slug in gold_slugs:
+    if slug in deep_slugs:
         for token in forbidden_tokens:
             if token in text:
-                add_error(f"Gold README for {slug} contains forbidden token.")
+                add_error(f"Deep README for {slug} contains forbidden token.")
 
         if count_mermaid(text) < 2:
-            add_error(f"Gold README for {slug} needs at least two Mermaid blocks.")
+            add_error(f"Deep README for {slug} needs at least two Mermaid blocks.")
+        if slug not in {
+            "animation_format",
+            "footskate_cleanup_for_motion_capture_editing",
+            "motion_matching",
+            "motion_graph",
+            "real_time_planning_for_parameterized_human_motion",
+            "curve_and_spline",
+        } and count_cell_mermaid(text) < 3:
+            add_error(f"Deep README for {slug} needs at least three cell-level Mermaid blocks.")
 
         for section in gold_sections:
             if section not in text:
-                add_error(f"Gold README for {slug} is missing {section}.")
+                add_error(f"Deep README for {slug} is missing {section}.")
 
         asset_readme = assets_dir / "README.md"
         if not asset_readme.exists():
-            add_error(f"Gold case {slug} is missing assets/README.md.")
+            add_error(f"Deep case {slug} is missing assets/README.md.")
         else:
             asset_text = read_text(asset_readme)
             for token in forbidden_tokens:
                 if token in asset_text:
-                    add_error(f"Gold assets README for {slug} contains forbidden token.")
+                    add_error(f"Deep assets README for {slug} contains forbidden token.")
             check_asset_links(asset_readme, asset_text)
 
 unmanaged_dir = blog_root / "AnimationPapers" / "animation_format_inv"
@@ -253,19 +272,22 @@ if unmanaged_dir.exists():
     add_error(f"Unmanaged Animation Format_inv case directory should not exist: {unmanaged_dir}")
 
 if media_manifest is not None:
-    if int(media_manifest.get("version", 0)) != 4:
-        add_error("Media manifest must use version 4 full-coverage learning-card schema.")
-    if media_manifest.get("capture_mode") != "learning_cell_cards":
-        add_error("Media manifest capture_mode must be learning_cell_cards.")
+    if int(media_manifest.get("version", 0)) != 5:
+        add_error("Media manifest must use version 5 key-result media schema.")
+    if media_manifest.get("capture_mode") != "key_result_media":
+        add_error("Media manifest capture_mode must be key_result_media.")
     media_cases = media_manifest.get("cases", [])
     media_slugs = {case.get("slug") for case in media_cases}
     if media_slugs != target_slugs:
         add_error(f"Media manifest slugs do not match managed blog slugs: {sorted(media_slugs)}")
 
     video_conf = media_manifest.get("video", {})
+    animation_conf = media_manifest.get("animation", video_conf)
     video_file = video_conf.get("file", "00-walkthrough.webm")
     max_video_bytes = int(video_conf.get("max_bytes", 20 * 1024 * 1024))
     max_video_seconds = float(video_conf.get("max_seconds", 15))
+    max_animation_bytes = int(animation_conf.get("max_bytes", 10 * 1024 * 1024))
+    max_animation_seconds = float(animation_conf.get("max_seconds", 6))
 
     for case in media_cases:
         slug = case.get("slug")
@@ -291,7 +313,12 @@ if media_manifest is not None:
         steps = case.get("steps", [])
         if len(steps) < 5:
             add_error(f"Media case {slug} needs at least 5 learning steps.")
-        media_entries = list(steps) + [{"file": video_file, "output_type": "video"}]
+        media_entries = []
+        for step in steps:
+            for key in ("result_file", "card_file", "preview_gif", "video_mp4", "video_webm"):
+                if step.get(key):
+                    media_entries.append({"file": step.get(key), "output_type": step.get("output_type"), "key": key, "step": step})
+        media_entries.append({"file": video_file, "output_type": "video", "key": "walkthrough"})
         declared_media_files = {entry.get("file") for entry in media_entries if entry.get("file")}
         for media_entry in media_entries:
             media_file = media_entry.get("file")
@@ -313,20 +340,29 @@ if media_manifest is not None:
                     add_error(f"PNG media is not readable for {slug}: {media_path}")
                 else:
                     width, height = size
-                    if width < 800 or height < 450:
-                        add_error(f"PNG media is too small for a learning card for {slug}: {media_path} ({width}x{height})")
-                if media_path.stat().st_size < 10000:
+                    if media_entry.get("key") == "result_file":
+                        if width < 320 or height < 160:
+                            add_error(f"Result PNG media is too small for {slug}: {media_path} ({width}x{height})")
+                    elif width < 800 or height < 450:
+                        add_error(f"Card PNG media is too small for {slug}: {media_path} ({width}x{height})")
+                min_png_bytes = 4000 if media_entry.get("key") == "result_file" else 10000
+                if media_path.stat().st_size < min_png_bytes:
                     add_error(f"PNG media is suspiciously tiny for {slug}: {media_path}")
-            elif media_file.lower().endswith(".webm"):
-                if media_path.stat().st_size > max_video_bytes:
-                    add_error(f"WebM media is too large for {slug}: {media_path}")
+            elif media_file.lower().endswith(".gif"):
+                if media_path.stat().st_size > max_animation_bytes:
+                    add_error(f"GIF media is too large for {slug}: {media_path}")
+            elif media_file.lower().endswith((".webm", ".mp4")):
+                limit_bytes = max_animation_bytes if media_entry.get("key") in {"video_mp4", "video_webm"} else max_video_bytes
+                limit_seconds = max_animation_seconds if media_entry.get("key") in {"video_mp4", "video_webm"} else max_video_seconds
+                if media_path.stat().st_size > limit_bytes:
+                    add_error(f"Video media is too large for {slug}: {media_path}")
                 duration = ffprobe_duration(media_path)
-                if duration is not None and duration > max_video_seconds + 0.75:
-                    add_error(f"WebM media is too long for {slug}: {media_path} ({duration:.2f}s)")
+                if duration is not None and duration > limit_seconds + 0.75:
+                    add_error(f"Video media is too long for {slug}: {media_path} ({duration:.2f}s)")
 
         if assets_dir.exists():
             for local_media in assets_dir.iterdir():
-                if local_media.suffix.lower() not in {".png", ".webm"}:
+                if local_media.suffix.lower() not in {".png", ".gif", ".mp4", ".webm"}:
                     continue
                 media_ref = f"assets/{local_media.name}"
                 if local_media.name not in declared_media_files:
@@ -345,6 +381,20 @@ if media_manifest is not None:
             for field in required_step_fields:
                 if field not in step:
                     add_error(f"Media step for {slug} is missing {field}.")
+            for field in ("media_role", "result_file", "card_file"):
+                if field not in step:
+                    add_error(f"Media step for {slug} is missing {field}.")
+            if step.get("media_role") in {"key_visual", "key_animation"}:
+                result_ref = f"assets/{step.get('result_file', '')}"
+                if result_ref not in readme_text:
+                    add_error(f"README for {slug} does not reference key result media {result_ref}.")
+            if step.get("output_type") == "timeline_viewer" or any(control.get("role") == "parameter" for control in step.get("controls", [])):
+                if not step.get("preview_gif"):
+                    add_error(f"Timeline/parameter step for {slug} missing preview_gif: {step.get('id')}")
+                if not (step.get("video_mp4") or step.get("video_webm")):
+                    add_error(f"Timeline/parameter step for {slug} missing video_mp4/video_webm: {step.get('id')}")
+            if step.get("media_role") not in {"key_visual", "key_animation", "supporting_evidence", "code_evidence"}:
+                add_error(f"Media step for {slug} has unsupported media_role: {step.get('media_role')}")
             if step.get("output_type") not in {
                 "log",
                 "table",

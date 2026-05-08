@@ -1,4 +1,4 @@
-﻿# 径向基函数插值
+# 径向基函数插值
 
 ## 元数据
 
@@ -92,9 +92,7 @@ Polynomial augmentation 的结果说明，RBF 不一定只负责完整函数本�
 
 本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和 PNG 学习卡片。PNG 由指定 cell 的代码摘要、输出区、viewer/canvas 或图表/日志合成，不使用整页滚动截图替代。
 
-<video controls muted src="assets/00-walkthrough.webm"></video>
-
-[下载 WebM](assets/00-walkthrough.webm)
+[打开/下载 WebM](assets/00-walkthrough.webm)
 
 | Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
 | --- | --- | --- | --- | --- |
@@ -172,3 +170,33 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 radial_
 ```
 
 打开 `labs/Theory/radial_basis_function.ipynb`，选择 kernel `animationtech-radial_basis_function`。本说明只根据 notebook 源内容整理，没有重新执行 notebook。
+
+## 重点可视化 / 动画
+
+README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+
+[打开/下载总览 WebM](assets/00-walkthrough.webm)
+
+| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
+| --- | --- | --- | --- | --- |
+| Cell 6 | `plot` | `key_visual` | Plot the target function and sparse interpolation samples. | [结果 PNG](assets/01_sample_function_points_result.png) / [代码卡](assets/01_sample_function_points.png) |
+| Cell 7 | `plot` | `key_visual` | Plot per-sample Gaussian radial basis functions. | [结果 PNG](assets/02_gaussian_kernel_influence_result.png) / [代码卡](assets/02_gaussian_kernel_influence.png) |
+| Cell 9 | `matrix` | `supporting_evidence` | Print the pairwise distances and Phi kernel matrix. | [结果 PNG](assets/03_distance_kernel_matrix_result.png) / [代码卡](assets/03_distance_kernel_matrix.png) |
+| Cell 10 | `table` | `supporting_evidence` | Solve Phi w = y and print the weights. | [结果 PNG](assets/04_rbf_weights_result.png) / [代码卡](assets/04_rbf_weights.png) |
+| Cell 16 | `plot` | `key_visual` | Evaluate the RBF curve and mark a query point. | [结果 PNG](assets/05_interpolated_query_result_result.png) / [代码卡](assets/05_interpolated_query_result.png) |
+| Cell 21 | `matrix` | `supporting_evidence` | Build and print the polynomial basis matrix P. | [结果 PNG](assets/06_polynomial_basis_matrix_result.png) / [代码卡](assets/06_polynomial_basis_matrix.png) |
+| Cell 27 | `plot` | `key_visual` | Plot the final polynomial-augmented RBF interpolation. | [结果 PNG](assets/07_augmented_rbf_fit_result.png) / [代码卡](assets/07_augmented_rbf_fit.png) |
+
+## 代码 Cell 与可视化结果
+
+本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+
+| Cell / 片段 | 结果说明 | 证据 |
+| --- | --- | --- |
+| Cell 6 | The plot establishes what the RBF interpolator must reconstruct. | [结果 PNG](assets/01_sample_function_points_result.png) / [代码卡](assets/01_sample_function_points.png) |
+| Cell 7 | The graph shows each sample as a local influence field. | [结果 PNG](assets/02_gaussian_kernel_influence_result.png) / [代码卡](assets/02_gaussian_kernel_influence.png) |
+| Cell 9 | The matrix is the linear system that determines interpolation weights. | [结果 PNG](assets/03_distance_kernel_matrix_result.png) / [代码卡](assets/03_distance_kernel_matrix.png) |
+| Cell 10 | The weights tell how much each radial basis contributes to the reconstruction. | [结果 PNG](assets/04_rbf_weights_result.png) / [代码卡](assets/04_rbf_weights.png) |
+| Cell 16 | The plot checks that local kernels reconstruct the target curve between samples. | [结果 PNG](assets/05_interpolated_query_result_result.png) / [代码卡](assets/05_interpolated_query_result.png) |
+| Cell 21 | The augmentation adds a global trend term alongside local kernels. | [结果 PNG](assets/06_polynomial_basis_matrix_result.png) / [代码卡](assets/06_polynomial_basis_matrix.png) |
+| Cell 27 | The final curve preserves both sparse samples and stable large-scale behavior. | [结果 PNG](assets/07_augmented_rbf_fit_result.png) / [代码卡](assets/07_augmented_rbf_fit.png) |

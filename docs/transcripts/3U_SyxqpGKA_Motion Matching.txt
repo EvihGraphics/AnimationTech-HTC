@@ -1,0 +1,493 @@
+Today we'll be playing with one of the most popular algorithms for character animation in video game.
+Hi, I'm Jérôme and today we'll be looking at motion matching for character animation.
+It's not a paper per se because it was never published as a paper,
+but it has been shown in a lot of different talks and GDC talks and stuff.
+And so the first thing that is important in motion matching is that you will have
+the future trajectory. You need to predict what your trajectory is. And only when you have your
+prediction, what you could do is try to find animations to address that prediction. So you
+need to have a stable prediction. You need to know in advance what your character would need
+to be able to do. So for this, what I will do, in my case, I will work with the locomotion only
+as a first example, and I will use a spring damper model to compute how I want the character to move
+and also compute at the same time the futures of where the character would be depending on those.
+I really recommend you to read the article from Daniel Alden that explained all the
+the mathematics for the spring dampers, the critical spring
+damper, and how you could use that for a lot of different
+stuff. But in this case, to compute the position of a
+character, the velocity and acceleration, and predict where
+you want to use it. So really, what I have is these functions,
+and that this one is the most important one. You give him a
+position at times zero velocity at times zero acceleration at
+time zero velocity goal your alpha life so it's how much time it takes for the
+spring to do half of the distance and a delta time and it will return the next
+position next velocity and next acceleration at that time and that's
+a second order differential equation that has been solved so the answer is
+correct no matter what is the delta time you give him any time in the future it
+would actually have the exact position, velocity, and acceleration you will have in that time.
+So that's really powerful for that. So I get my gamepad and I can, well, I have a little function
+to create a sphere I can draw. Then I get this function. Basically, I'm computing the
+directions I want to move, the velocity I want to have, and the orientations I want to get
+to get and you have this so if I play this
+now I can take my pad and then I can
+so the the black is the current positions where I want to add to my character to be
+and the yellows are the predicted position orientations I will have
+10 frames in the future, 20 frames in the future, 30 frames in the future, say, one second in the
+future there. So basically, and that's perfect. I mean, if I release, you could see that everyone
+stops on the same spot. So the prediction is perfect. And you can play with it half time to
+get something smoother if you need to, or if you want something faster in interaction. And I've
+separate this in position and the same for orientation, I can choose how quickly the
+orientation change and that kind of stuff. So that is one of the key
+need for the motion matching. You need to make sure that you have something that moves in a
+physically plausible way and that's how you predict where you will be. In this case, it's
+using spring damper to simulate the accelerations
+and velocities and all kinds of stuff you could have.
+It could be any other system
+if you have something that works for you,
+but accurately predict your trajectory.
+That's really what is important here.
+Now that I have this, I can actually load my character.
+I can load a little displacement.
+I can load a bunch of animations.
+So I will have all the running animation
+from the LaFUN database.
+And we could see the animations we have here.
+So basically, it's the character running in all directions,
+stopping, accelerating, going strafing animations,
+several animations that get a bunch of motion.
+Now, the second thing that is important
+when you do motion matching, of course,
+if we had the, we have our prediction of trajectory,
+we see that we've used velocity and acceleration
+and that kind of stuff.
+So we have something that is extremely smooth
+in the trajectory we generate.
+And we will want to match animation
+those smooth trajectory. But my animation in this case, you could see that the root of my character
+is the projected hips on the ground and orientation. So that is a signal
+that oscillates a lot. And basically it's a signal that has a lot of small noises.
+And if I tried to match the two, my data will not be perfect.
+I mean, I would have something that have a lot of noise and I would try to match that noise.
+So what do we need to do is to make sure that we remove the noise we have in the signal coming from the animation itself.
+And for this, I would use a filter that I will not try to pronounce because I will probably butcher the name badly,
+but I will use an SG filter let's say and what the filter does it if you have a
+signal that has a lot of noise into it you will make a window and you will try
+to you will slide that window slowly to compute the values and every time inside
+of that window you will match a polynomial of degree you choose, but you will basically
+fit the polynomial, take the middle value, move forward, fit the polynomial, take the
+middle value, move forward, fit the polynomial and so on and so on. What I will do in my
+case for this motion I will basically fit a window of 2 seconds and I will fit a polynomial
+of degree 4 in the middle of the time for the positions and I will go a little further
+and go 65 frames for the rotations but filling a polynomial of degree 5.
+So that's how I will smooth the signal.
+Now I will do this inside of a function
+that I call prepareData, because what you do usually
+when you have motion matching that kind of stuff,
+is that you would take all your animations
+and you would put that inside of what we call a database.
+That would be a flat structures
+of all your frame of animations.
+And so that's what this function does.
+It takes an animation.
+So the quaternions and position of all the bones
+and transition and roots and that stuff.
+And I will smooth the signal.
+I will realign my animation to the smooth one.
+So the smoothed root becomes the root of my animation.
+And then I will compute the velocities,
+the local velocities of all of my bones
+and the local angular velocities of all of my bones.
+That would be useful for later at the end,
+but at least I have everything in my database.
+And so it returns, you know, the animation,
+the quaternion, the animation of the quaternions,
+the position, the velocities and good velocities.
+And then I get the frame range and the frame count.
+That will actually allows me to know in my database
+what are the range of each of an animations
+because I will have all my animations back to back
+inside of my database and my frame range
+will tell me, well, that was an animation,
+that was one animation, that was one animation.
+And I will build that database for several animations
+and several ranges of animations and I will have one big.
+So basically this becomes that database.
+database. I get all my animations for everything. So if I display now this, so really displaying
+my database, I get this. You can see now that the displacement linked to the character is
+now smooth in orientations and positions. I don't have the little association anymore.
+Now that we have our database of animation itself,
+we could start to think about how we will use
+that database to play animations.
+So how we will match the frame of animations
+to our future trajectory the way we want it.
+And for this, what we will do is that we will build
+a feature vector.
+So we will extract a bunch of features
+that we are interested in.
+And in the case of the locomotions,
+What will be the most interesting stuff for us
+will be the hips velocity.
+So how is the hips moving?
+I'll get the feet position and velocities.
+So I will know where my feet are
+and how they were moving.
+And then I will get the future states
+which is sample at 10, 20, or 30 frames in the future
+inside of my animation.
+and I will sample the position of the character
+and the orientation of the character.
+So it's really the hips, the feet,
+a velocity of the feet,
+and then the character positions
+and the character orientations.
+So that's how I will build my feature vector.
+And that's what I would do here.
+So basically what I'm doing is that
+converting all my animations in global space,
+so I will be able to compute the position,
+the velocity of my foot and my hips also.
+And then I will take my current frame,
+so I do it for every frame.
+So I take my first frame and I compute,
+I take the positions of frame plus one,
+plus 10, plus 20, plus 30,
+just making sure that I'm actually never going over boundaries.
+So, you know, I had several animations back to back.
+I don't want to take future positions
+that comes from different animations.
+I want to have future positions
+that only belongs to my current animation.
+And once you have all of those,
+what you do is that you bring back all the data
+as local to the current frame.
+So I computed the, I have my frame,
+this is frame zero is somewhere here in the world.
+I get the features, positions there,
+and I take all those positions
+and I bring them back into zero, zero, zero
+relative to the current frame I'm computing.
+And when you have that, you could
+start to build your feature vector.
+And that will be a big, flat features.
+When I will have the velocity of my hips,
+the position of my left foot, position of my right foot,
+velocity of the feet, and then the future positions,
+and the future orientations.
+And I do that for every frame.
+So it's a, the features becomes a tensor of size,
+number of frames, and number of columns,
+study three in my case here.
+It's all the three points and velocities I have.
+And then when I've computed all of these,
+we could start to display what it looks like.
+So this is what is extracted from
+our animation. So what we have is the local informations compared to all the current frames
+of where the foot positions are, the foot velocities, the hips velocity, and the future
+positions and orientations of the character. And we have that for every frame inside of our database.
+And that's basically it. I mean, I've extracted all of data, you know, I've already computed
+the future trajectory so we will start to be able to match the future trajectory with the data we
+have here. The only issue we have right now is that all of this data has a lot of different
+values and sizes you know all the values that are from these points are fairly closed around here
+but the one is really far in the features have big values. And what I have is one feature
+vector that is basically a vector in 33 dimensions. And I just want to be able to
+compute the Euclidean distance when I will be searching for the most similar pose.
+I would just do a flat Euclidean distance, but something that will have a lot more importance than
+other. And I don't want to have to deal with this because it will be tricky to remember, yeah, maybe
+this one has a bigger value, this one has less value, I need to give more importance to this or
+to that. So what I would do is that I will normalize my vector. It's something that you always do when
+you do machine learnings and all of those stuff, that is you normalize all your value, all of your
+values inside of your features. And to normalize them, basically, you take the average, the
+mean of all your values, you subtract the mean, so all your values, if they were all
+from zero to 20, then you will switch, you will slide your window to be around zero.
+And then you divide all the values by the standard deviations. So the goal is to have
+for all of your feature to have a mean of zero and a standard deviation of one.
+So basically everything now is in the same space, everything has the same
+importance and when you try to do an Euclidean distance on the flat vector
+like this, it would work. So this is what you do. You take the feature mean, the
+feature standard deviations. I need to add a really small error here because I
+I have a bunch of values that are zeros everywhere
+because I've kept the y position of my trajectories,
+they're all zeros.
+So I keep the feature mean feature standard deviation.
+So you take the features, remove the mean,
+divide by the standard deviations
+and that give you the normalized feature.
+Now that I have this, I basically have something
+in which I could do Euclidean distance
+to compute the closest vector.
+And we can start to have something
+that Talou has to play back those animations.
+So what I would do is that I would have a player.
+And basically what the player does,
+it stores the current frame I'm playing
+and stores the current position and orientations
+of every bones and also of the root of my character.
+I don't bother with the rest.
+And so when you say go to the next frame, what it does,
+it basically here, you know, all my data in my database
+is moving in space.
+So what you have to do is compute the displacements.
+So say that if I want to play frame 10,
+I need to know how much it moved from frame 9 to frame 10.
+And that's the offsets I want to add to my character.
+So I want to compute how much displacement was
+inside of animations and to add that to my character.
+So I can put my character anywhere I want
+and I can let him follow the animation.
+So that's what this function does.
+Takes the actual animations,
+orientations of every bones.
+but compute the offsets of the displacements only.
+And we come back to this later also, so import this.
+And now, if you want to play animations and map,
+the only thing you have to do is,
+what I was doing before, taking my pad inputs
+and knowing what I want to do with my character.
+And then I compute the future trajectory.
+I compute the future position,
+velocity and acceleration of my character.
+I do the same for my orientation,
+and then I compute the one in 10 frame in the future,
+20 frame and 30 frame is the future positions
+and orientation.
+And I get all basically the same trajectory
+I've computed before.
+What I'm doing is that bringing back all that info
+into local space of my character,
+because you know right now my future positions
+and my future trajectories are in a world space somewhere
+where I want my character to be.
+But I want to compute everything relative to my character.
+All my data is relative to my character.
+So convert that relative to my character.
+And then I can build my query vector.
+So it's the same.
+It has the same size as the feature vector.
+So it's 33 dimension.
+And the easiest way and the most stable way to do it
+in this case is to start from the frame I played.
+So I take my feature normalized and I do a copy
+of the frame that was played.
+Why I'm doing this is because I'm using motion matching
+to playback animation.
+So I know that last frame I wanted to play that frame.
+So that means that I know the feed position, the feed velocity and that kind of stuff of what I wanted to do.
+That's the really important thing here. I know that I wanted to play this frame, no matter what happened.
+That's the frame I wanted to play. So I expect the character to be in that state.
+So I take the feature normalized as a starting point for my query vector.
+And then I just change the future trajectory positions
+and future trajectory direction.
+And I do normalize those values the same way.
+So I really use the same feature mean
+and feature standard deviation that
+was used to normalize the vector in the first place.
+And that gives me the query vector.
+Now that I have the query vector,
+I could just ask which is the frame of animation
+that minimize the error between my query vector
+and the vectors I have in my feature vector.
+And I will not use any acceleration libraries
+or algorithm, I just brute force the search
+because I have around 20,000 frames in this case.
+I can brute force that fairly quickly
+Because the only thing you really need to do is compute, as I said, an Euclidean distance.
+So I take my feature vectors minus my query vector square root and sum the square.
+I don't even need to do the square roots if I only keep the square distance.
+It's all fine also.
+an arc sort in that big array. So it will tell me which row has the lowest value and that will
+give me the best frame. So I pick the best frame. That's the one I want to play. That's the one that
+has the smallest error. That's the best score, let's say. Now, the only thing I would do is,
+and I would just always pick the best one. The first thing I'm doing is something that happens
+a lot when you're doing motion matching that it might find that the best frame is the frame that
+was just right before you and then you restart to loop and only play a really small piece of
+animation. So just to avoid that going backward one frame I just make sure that it doesn't pick any
+I will go in the order of the one it shows and make sure that you don't pick any of the frames that
+were in my case less than five frames in the past and that would be way enough for him to never
+go back in that weird loop and the other part I'm doing is the opposite I'm making sure that the
+frame it picks it's not at the end of one of my animations so I'll just ban him to pick anything
+from the frame range minus 30 so it doesn't it cannot play any cannot pick something that is 30
+frames before the end of the animation. So basically the last second of the animation is gone.
+That's what I'm doing here all the time because my takes are really big. So if I discard one second
+of each of those, it's not a big deal. And that gives you the best frame of animations. And so I
+can set to the system. Now it's time to play that frames. And what I do is I tell him to play the
+next frame why is because I don't have any delta time I'm playing at 30 frame per second in my system
+here so this feature query vector pick the best matching animation now I need to play the animation
+so I tell him go play the next frame of the one you matched and that's why if you have the query
+vector now if I re-picked the same feature normalized and nothing changed in my input.
+I have really high, nearly 100% chance that it would pick
+the correct frame. It will go back to the next frame and so it would play the next frame. This
+one will re-pick the same frame, that one will go back and play the next frame and so on and so on.
+So, that's one of the ways to stabilize that kind of stuff also.
+Just making sure that every frame it picks the next frame.
+There is also the way of saying that you don't want to play, that you don't want to compute
+the search database every frame.
+If your input hasn't changed, your trajectory was correctly computed.
+I mean, for a bunch of frames, you know that it will just say play the next frame.
+You don't need to do that search every time.
+You could say, if the input doesn't change,
+recompute the search to the database every X-frames.
+I haven't gone that far.
+I'm just recomputing every frame.
+So, and then we play the animations
+and we could see what happens.
+So,
+da, da, da, da.
+In idle, of course, I don't have any data for idle.
+So there he goes nuts.
+But as soon as you go motions, you
+could see that he start to pick the animations he prefers.
+And we can see every time you pick
+the different animations right now.
+It pops, it pops.
+But it does map, you see, align the position,
+the future position there.
+The yellow is what I'm computing.
+And the black is the best animation
+is found to match my request.
+And it follows different orientations if we want.
+You can switch and you get a bunch of animations.
+Now, of course, it pops all the time.
+So the first thing that we want to do
+is to make sure that all that popping disappear
+and that we can have something smooth.
+And that's what I have here when I activate the inertialize.
+So your initializations is also an algorithm
+that has been quite popular lately.
+It's basically the way of saying that
+instead of trying to blend animations together,
+We will tell that we have a stream of motion,
+which is what we have here.
+And then every time we have a big discontinuity,
+so every time you pick the different animations,
+you compute the offsets, the amount of error
+that you have between the old animations,
+the old frame, and the new frame of animations.
+That give you an error, and then you will try to,
+So you will add that error on top of your current frame, and then you will slowly
+dampen down the amount of error correction you do.
+So basically, you have a discontinuity, you compute the offsets between the discontinuity
+and the old animations, and then you slow down, you slowly remove the amount of error
+you had between the two.
+way the initializations work it's what we have here. In this case thanks to Daniel Alden again
+and the way he developed the the spring we could use the spring to also reduce the error using
+a spring. So basically you said how much error I have right now and then I need in 0.2 seconds to
+reduce that error to zero and using a spring it would also take into account what was the
+velocities and angular velocity of your character so you're making sure that if you had a motion
+that was doing this you know it will keep the accelerations and it will not just stop and go
+down it will just keep that same motion thanks to the fact that the damper would take into account
+the velocities of each bone. So that's why we had computed the actual bone velocities and bone
+angular velocities of our animation. It's to be plugged into the initialize. So if you character
+moves in one direction, it keeps the same motions and they start to blend without any abrupt change.
+and that's because the spring use again the position and velocities.
+So in this case the positions becomes the amount of error between the two pose and the velocities
+is the direction in which the bones was going. So was it going in the right direction to remove
+that error? Was it going the wrong directions to remove that error and that kind of stuff?
+that damper works properly to reduce the amount of error to zeros and keep the the velocities.
+And so we initialize this every time we have a discontinuity. So basically every time we don't
+play the next frame we're expecting, we compute the amount of error that led to and then every frame
+we just let the spring remove the arrow slowly.
+And that gives us what we have here.
+Now, you could play with the velocities
+and how much, how quickly you want to change the values
+and that kind of stuff.
+For instance, right now it's fairly,
+the accelerations is kind of human when you accelerate,
+but it slowly stops.
+I can, for instance, change the else time
+when I'm releasing my pad, so it stops faster.
+That's a fast stop, but everything else is still the same.
+And finally, the last thing you could do
+when you talk about motion matching,
+but even in animation in general,
+is that I have,
+the red is what I'm computing,
+What I want to compute, right, is the velocities I computed through my simulation.
+And my character tries to follow that.
+What happens is at this point you see I have a code versus animations, which are to zero,
+which means that the animation plays.
+And then when I finish playing the animations, I realign my simulations to where the character
+is.
+Right now, it means that even if I ask the animation to do,
+if my simulations ask me to do something,
+the animation is not doing it,
+it's the animation that wins.
+You could have the exact opposite,
+which means that right now,
+the red is what I'm computing with my spring,
+and the animations try to address that,
+and if it doesn't manage to match,
+it slides and come back to exactly,
+it realigns where my simulation is.
+And you could blend between the two worlds.
+In this case, I kind of match the velocities, accelerations.
+There, it slides here.
+But it kind of match what we want.
+For instance, if I accelerate too much,
+that does not exist inside of my database.
+You could see that my character is sliding
+like crazy trying to catch up my simulation.
+And if I do the opposite, no matter what I'm asking the system,
+it only does what it found inside the animation, right?
+So I can go back to the proper values.
+And you could do in between, for instance.
+Now, what we've done so far is that's building the database,
+building the feature vector, matching the feature vectors,
+but we've given the same importance to everything.
+I don't have a foot IK, so I'm not locking the foot on the ground right now, I'm just
+playing animation.
+So sometimes it does slide when it blends because of the initializations, but it's kind
+of okay.
+So everything now matches with the same score, everything has the same importance, all the
+feature vectors have the exact same importance.
+We might need or want to tweak a little what is more important inside our feature vector.
+We might want to give more importance to some stuff.
+So what we need to do is that we need to weight the feature vector.
+Say all of my features might have a different weight.
+So what we need to do is that to multiply every of the values by the weights we want
+to associate them when we compute the Euclidean distance.
+But what we can do instead is realizing
+that if we have the weights here
+when we were computing the normalized feature vector,
+we can move our weights down here
+and divide our standard deviations by the weights.
+And if we do this, basically it means
+that now we have standard deviations
+that take into account the weighted importance
+we want to give to everything.
+And that means that nothing changed mathematically after.
+So if we just basically scale the standard deviations,
+the Euclidean distance, all the algorithm to do the search
+stays the same, except that now it takes
+into account the weights.
+So what I can do is this, I can have a weight saying
+that my hips velocity is important
+because I want to have some continuity inside of my motion.
+My feet position might not be that important,
+especially if I have a foot locking system.
+But the velocity is important,
+so I need to make sure that I don't pick animations
+that have the feet that doesn't go in the right positions.
+And I can give some importance to future trajectories,
+but more importance to future orientation.
+And I give it discount factor for the features every time.
+And then what we have now is that I divide my future standard deviations by the weights
+and I renormalize and if I do this now, all the weights are encoded in that one and encoded
+by that one so I don't have to change anything here, I can keep playing, except that now
+it uses the weights, giving more importance to the future orientation than positions,
+more importance to feed velocities than feed positions and you can play with those as you want.
+We get a bunch of different values.
+Now that's in a nutshell, exactly motion matching, at least when you want to do motion matching
+for locomotion.
+But there is another point that I want to talk and that I will do in a different video
+which is the link between what motion matching is compared to reinforcement learning.
+Really in a nutshell, what we could see is that we have our current pools and trajectories
+and velocities and future trajectory.
+So this is a Markov decision process.
+There is no difference from this process to anything else.
+And on top of this, if you've followed the reinforcement learning, the way I've discarded
+the future values should ring a bell on how Bellman equations and reinforcement learning
+works.
+It's exactly the same way it's used here.
+That's what reinforcement learning would have done.
+So that would be for another video when I will dig a little deeper between the relations
+with motion matching and reinforcement learning and why I wasn't sure if I had to put this
+video inside of the reinforcement learning series, but the next one will probably be.
+I hope you liked it and see you next time.

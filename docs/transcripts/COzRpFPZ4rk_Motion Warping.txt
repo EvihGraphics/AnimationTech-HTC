@@ -1,0 +1,256 @@
+You have an animation and you actually want to change the timing of that animation or you want to change some poses and
+Kind of offset the animations as if it was an animation layer
+This is the kind of functions we take for granted in all our 3d animation package and even in most of our game engines
+But once upon a time it was actually a paper
+Hi, I'm Jerome and today we'll be looking at the motion warping paper from 1995.
+The motion warping paper takes as an idea that you actually have a bunch of curves that
+represent animation and it would treat all of those curves separately and then from there
+you could actually change those curves to tweak your animation.
+So let's see how it was done and how we could implement this in NumPy.
+So basically I will import as usual all my libraries and my viewer and I will import
+my character and I will duplicate it so I get several characters so I can render several
+characters back to next to each other that make my life easier when I would want to show
+different options.
+And what I would do is actually just load one animation and I will load the file and
+support animation from the LaFan animation set.
+And from this animation, what I would do is that I will extract two different poses at
+the end of the animation.
+So you see I'm taking a pose A at frame 695 and one at 92,000 frames.
+And then I will only use a small range of the animation, so only 500 frames of animations
+that I'm interested in inside of this bigger animation.
+So this is the animation I've kept, and so you could see it's just basically a guy dancing
+on one foot and giving some kicks on one side and then coming back on the other side.
+So that's the animation I will use and that's what I want to tweak, where I want to change
+the timing and I want to change the pose and all that kind of stuff.
+So just to represent the fact that the paper is talking about a bunch of curves, I would
+display here one of the numerous curves that I have on the characters.
+So basically I'm picking the quaternions of the left up leg of this character and you
+could see so that's the four different values scalar of that quaternion so I
+get my w x y z so already just one rotation is four different curves for
+one for one bone and then I have that for all the bones and so what the the
+paper is basically saying is that you could warp your animation using two
+two different functions, and the two different functions
+that they do, so they warp the motion curves
+with defined by two functions.
+And basically what they said, they said that the new curve
+will be a function of t, and that function of t,
+that new curve will be a function of the original functions
+at time t, and then they also say that the time t
+is defined as a function of the original times.
+So they warp T prime to T in that order.
+Basically what they say in this paper,
+they say that it's easier to say,
+my new animation will have frames
+that go from zero to 100, for instance,
+and I will want to map frame zero
+with the original frame, frame 50, for instance,
+with frame 60 of my old animation, original animation,
+and frame 100 might be frame 200 of my original animation.
+So that's the functions I want to do
+to map the time differently.
+And then they have the functions
+to map the pose differently.
+And I will start from the timing function
+because it's easier to assume only one dimension, let's say.
+And what they say, the inside of the paper,
+that basically you give a bunch of keyframes saying that's the time inside of animations
+at the time inside of my old animation. And you need a smooth functions to interpolate
+those values. And the smooth function they use is the cardinal spline. They basically
+says that you could use any type of spline, but they went for the cardinal spline. So
+I will do the same. I will use the cardinal spline. So what I have is, as in the paper,
+I basically have new time, old time keyframes.
+So at frame zero, I want to be at frame zero inside
+of my old animation.
+At 40, 40, at 100, I want to be at frame 190.
+So I want to speed up quite a lot.
+And then I will slow it back down,
+saying that at the end, at frame 430,
+I will only be at frame 400 inside of the animation.
+So I will not even reach the end of the animation
+with my new animation.
+So that's the key frames I will have.
+And basically, I picked the functions from the spline theory
+papers that videos have made.
+So I will just reuse the same functions,
+so that the one that converts the cardinal spline to Hermit,
+and then how to compute an Hermit spline.
+So I will have the Hermit function
+so that I can directly use to do my mapping.
+And now, basically what I would do
+is just use the Amid functions
+to convert the different points into a curve.
+So we could see what is the mapping
+I actually want to do for the timing.
+And so this is the mapping I have.
+So basically that's the new keyframes
+I will be generating for my animation.
+So from frame zero to frame 430.
+And then we can see the corresponding frame
+I will go and pick inside of the original animation.
+So I will have at frame zero,
+I will be picking the frame zero at frame 100,
+see nearly at frame 200.
+That's what I was saying.
+200, we are on 250s and so on and so on.
+So that's the mapping that the curves allows me
+to have between my new frames and my old frames.
+The only issue I have with this kind of curves
+that every time I will want to request the values
+at a specific frame for my new animation,
+I will have to go and find the corresponding values
+inside of the AmidCurve to find where I'm supposed
+to be here and then where I will be at the end.
+So it's not really user friendly to use the AmidCurve
+directly this way.
+And what I will do is that I will resample
+this pyramid curve now for every frame down here.
+So basically, I would say now I know that
+between this point and the other points
+that I put here at frame 100, I have 100 frames.
+So I will compute 100 different values.
+So I get the perfect mapping and so on
+for every points along my entire curve.
+So that's what the resampling is doing here.
+So, it re-samples a curve that you're given, so it will give you as many frames as the
+frames you're supposed to get here, so that's the re-sample functions.
+And to show you what it means to take this Aermid curve and regenerate a new curve using
+that re-sample, basically gives me this now.
+I still have the curves as it was designed, but now I have for every keyframe in my new animation
+I have a direct mapping to where I want to be in the old one
+So I don't have to I don't have to compute anything down here now anymore
+I can just say hey, I'm computing frame one. What is the value? I'm computing frame 10
+What is the value and so on and so on so it's basically becoming a big lookup table
+Which makes my life easier when I want to execute more code after that
+So now that I know that I want to be able to compute this kind of curves with a linear spacing for all my functions, for all my frames,
+basically I will write those functions so I can reuse them and that's what those two functions are.
+I have the build curve is the one that generates these curves.
+basically saying, if you give me a bunch of keyframes that are going onto an
+omit, I will re-sample that values to give you now a mapping between for
+every frames and that values. So that's what the build curve does. So it creates
+this mapping. And then the warp curve is actually the real functions now. It's the
+one that you want to use if you want to warp a data using that curve just generated here.
+So the time warp tells you what is the data for every frame and this one allows you to go into
+that curve and modify the curve. So basically the only thing it does it looks inside a curve.
+so if the time warp said you're supposed to look at frame 10 it goes inside of the curve
+looks at the value for the value for that frame 10 and so on but then he will do
+a linear interpolation between two frames and why is doing that linear interpolation is because now
+for instance at frame one at 300 it might tell me that the value here is not a round frame it might
+be 300, it might be 300.5. So I do need to do the linear interpretation between frame 200 and frame
+201. So that's what the warp curve does. It goes and it picks the two closest frame and do the
+linear interpretation between the two and it does it on the entire curve at once and in any
+dimensions but the entire curves at once. Let's remember this one. So that's the two functions
+I will be reusing every time I try to build a curve or every time I try to warp a curve using
+a time warp. And then we could do finally that time warp now. Basically, I can use my build curve
+to create the warping curve, that blue one. And then I could use the warp curve to go and look at
+all the quaternions of my animations and warp all those curves using the time-waps curves.
+So as I said, this function is able to do it on the entire animations, but as in any dimensions.
+So basically, it can do it for every bones of the WXYZ of each quaternions. So it does it in one
+pass. So it modifies every curves, which means that now I need to normalize those curves because
+what happens is that I'm not using a slope here between the quaternions. I'm just
+warping every curve separately. So I'm basically breaking the rule that says that my quaternions
+need to be a unit quaternion. So I need to renormalize them. So I renormalize all my quaternions and
+And then I compute the new curves also for the positions
+using the warp curves function.
+And so we can display the results.
+And basically what you will see is that the yellow,
+the white one is playing the normal animation,
+and the green one plays the warped animation.
+You could see that the beginning,
+it was speeding up a lot,
+and now it's slowing down to reach that point
+at the same time as him.
+It does not even reach the end of the animation.
+So that's what the time warp was supposed to do.
+So basically, I accelerate because I
+wanted to be at frame 100.
+I wanted him to be already at the same position as frame 190.
+And then at frame 350, they had to be back together
+at the same time.
+and it was slowing down to reach frame 400 at frame 430.
+So that's the timing change of the warping functions.
+So I have the function that allows me to map a value to another one.
+And in this case, the value that I mapped to another one is the time.
+And now what we want to do is actually do the pose change.
+So do the first part of those functions here, the one that we have here that says that we
+change the curve based on a function that would change the curves itself. And what I
+will do is again, I will do keyframes. So I will have the frames for which I want to
+to change the values.
+Those frames are in the original timing.
+And for all of those frames,
+I will actually give a pose that I want to match at that time.
+So basically at frame zero,
+what I would say is that I want to have frame zero.
+So basically frame zero means at frame zero,
+I want the same pose as the pose that you already have.
+that frame 190. I want the pose A that extracted at the beginning, remember. Then frame 2 and 20
+and 3 and 20, I actually want the animation itself. And then at frame 349, I want the pose B
+that extracted earlier. And then again, the two frames coming from the animation itself.
+So that's the key frames I want to generate. So basically, it's really,
+as if I was doing in 3D software it's I'm doing a layer on top of my animations
+and that's the pose I want to put on that layer and to show you all the
+different stuff that I'm trying if I don't execute that of course I would not
+have my keyframes and so if I show you this so this is the animation that is
+playing and what I said is that at frame 190 I think is that the one yep at frame 190 that
+would be disposed in the original animation and actually I would want this pose to be visible
+instead so I want to correct to modify this pose to be this one at frame 190 and then at frame 350
+50 something, 49, 50. When it reaches this pose, instead of having his leg completely
+stretched, I want this pose here. So basically, I want to remove entirely the fact that he
+lifts the legs up. So that's the two pose that I want to change in the layer. And then
+everything else, I want him to play the normal animation with the ease in and ease out because
+I have from frame 0s up to frame 200 something here in the middle.
+That should be again the normal pose and at the end also.
+So that's what I want to do. To do this, what they do in the paper is that they treat every
+curves as just curve and they do the mathematics on top. They just do minus and add. What I would
+do in my case is knowing that I'm actually working with quaternions. So instead of directly
+just working on each curves and computing offsets on the curves, I will
+actually compute offsets in the quaternion space directly. So what I will do
+is that I will multiply all my keyframes that I have here, all those values, key
+frames, I will convert them into enough sets compared to the actual animations
+that I want to apply so I will multiply the inverse of all of my animations
+with the keyframes so that gives me an offset that gives me how much I want to
+modify the original pose compared to with the pose I have and if I so this is
+what I compute here so I turn every keyframes as offsets and now basically
+what I could do is I could use that same function that I had to map the timing from my new timing
+to the original timing. I will use that to map my local offsets inside of the actual new timing
+I want to do. So I will build a curve that will give me the amount of offsets I want to apply
+on every frame. So this is what I'm doing. So I'm basically going through a build curve
+and I will build that curve separately for each wxyz of microtonance and each xyz of my position.
+So I need to compute that separately for each curve. And basically, if I display one of the
+curve you end up with is this one. You could see that you get a quaternion that frame 0 that
+will be the identity so I mean I don't want to change anything and then at frame 190 that's
+where my big change happened and then get the identity again no change no change the big change
+and so on so and that's the same for every different
+and bones I have inside of my system.
+So that curve is already the amount offset I want to apply on every bones along the animation.
+So I could display that change directly to show you basically what it means now using
+just the position warp, one of the pose warps, and so basically you could see that it's already
+rotating the head because it knows that it would reach at frame 190, that's the pose I wanted him
+to be and that's where I want him to be now, which is the case, and he's already slowly
+applying that change along from frame zero up to there slowly happening applying that change
+and then quickly it goes back in the right pose and at the end it will also start to not kick
+because it's is framing and then because it holds the kick a long time it's starting to slowly
+catching up so that's the change in in the pose that I wanted to do basically as offsets compared
+to what animation is. And then the final step to complete the paper is to combine both to
+say that you want to change the pose and you want to change the timing by saying that instead of
+looking at the change in pose inside of the old timing you will do it in the new timing. So you
+would basically do the same. You would change the timing and change the pose. So what I'm doing is
+is that I take the curve, the offsets I've applied here,
+I take that new curve that does all the change
+and I also warp it using the time.
+And so I can have now something related to the new time
+with the new pose.
+And you get this, so the green guy will be playing
+just the retiming and the blue one will be playing
+the retiming plus the change in the pose.
+And that's what the motion warping paper was all about.
+And as I said, it's something that we take for granted
+in all of our software.
+But it's always interesting to see how it could be computed
+and all the curves that are in the background
+to compute that kind of stuff.
+It will be used in a lot of different papers after this one,
+because most of the time you would want to change timing,
+we want to change posts, we want to reach some stuff,
+and every single time it's basically this
+or something close to this that will be used.
+Hope you enjoyed it and see you next time.

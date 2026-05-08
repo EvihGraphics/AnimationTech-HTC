@@ -1,4 +1,4 @@
-﻿# Knowing When To Put Your Foot Down：脚接触标注与近邻 Oracle
+# Knowing When To Put Your Foot Down：脚接触标注与近邻 Oracle
 
 ## 元数据
 
@@ -73,9 +73,7 @@ flowchart TD
 
 > Note: Prepared notebook skips the original manual annotation UI; media uses code/log/artifact evidence for those cells.
 
-<video controls muted src="assets/00-walkthrough.webm"></video>
-
-[下载 WebM](assets/00-walkthrough.webm)
+[打开/下载 WebM](assets/00-walkthrough.webm)
 
 | Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
 | --- | --- | --- | --- | --- |
@@ -147,3 +145,31 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpaper
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 knowing_when_to_put_your_foot_down
 ```
+
+## 重点可视化 / 动画
+
+README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+
+[打开/下载总览 WebM](assets/00-walkthrough.webm)
+
+| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
+| --- | --- | --- | --- | --- |
+| Cell 8 | `table` | `supporting_evidence` | Accumulate source clip ranges and print the available training-frame count. | [结果 PNG](assets/01_clip_window_count_result.png) / [代码卡](assets/01_clip_window_count.png) |
+| Cell 10 | `code_only` | `code_evidence` | Build a local pose and velocity feature vector around leg and foot bones. | [结果 PNG](assets/02_feature_vector_construction_result.png) / [代码卡](assets/02_feature_vector_construction.png) |
+| Cell 11 | `log` | `supporting_evidence` | Record the prepared-notebook skip for the original manual contact-labeling UI. | [结果 PNG](assets/03_annotation_ui_stability_note_result.png) / [代码卡](assets/03_annotation_ui_stability_note.png) |
+| Cell 15 | `log` | `supporting_evidence` | Record the prepared skip for the manual oracle accumulation cell. | [结果 PNG](assets/04_training_set_accumulation_result.png) / [代码卡](assets/04_training_set_accumulation.png) |
+| Cell 18 | `table` | `supporting_evidence` | Create and fit the contact classifier from accumulated mirrored labels. | [结果 PNG](assets/05_classifier_training_code_result.png) / [代码卡](assets/05_classifier_training_code.png) |
+| Cell 25 | `table` | `supporting_evidence` | Load saved feature vectors and labels from disk. | [结果 PNG](assets/06_saved_feature_vectors_result.png) / [代码卡](assets/06_saved_feature_vectors.png) |
+
+## 代码 Cell 与可视化结果
+
+本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+
+| Cell / 片段 | 结果说明 | 证据 |
+| --- | --- | --- |
+| Cell 8 | The count defines how many temporal windows can contribute foot-contact examples. | [结果 PNG](assets/01_clip_window_count_result.png) / [代码卡](assets/01_clip_window_count.png) |
+| Cell 10 | The source card identifies what the classifier sees when deciding whether a foot should be planted. | [结果 PNG](assets/02_feature_vector_construction_result.png) / [代码卡](assets/02_feature_vector_construction.png) |
+| Cell 11 | This documents that the browser-safe study copy validates the pipeline without replaying the fragile annotation widget. | [结果 PNG](assets/03_annotation_ui_stability_note_result.png) / [代码卡](assets/03_annotation_ui_stability_note.png) |
+| Cell 15 | The blog can still explain the intended data flow while avoiding a non-repeatable browser labeling step. | [结果 PNG](assets/04_training_set_accumulation_result.png) / [代码卡](assets/04_training_set_accumulation.png) |
+| Cell 18 | The card marks the transition from hand labels to a reusable prediction model. | [结果 PNG](assets/05_classifier_training_code_result.png) / [代码卡](assets/05_classifier_training_code.png) |
+| Cell 25 | The artifact load is the stable validation path for the case after manual labeling has been done once. | [结果 PNG](assets/06_saved_feature_vectors_result.png) / [代码卡](assets/06_saved_feature_vectors.png) |

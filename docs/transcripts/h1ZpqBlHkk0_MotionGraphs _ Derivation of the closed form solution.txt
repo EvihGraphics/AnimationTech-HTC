@@ -1,0 +1,86 @@
+Hi, when we studied the motion graph paper we were trying to align two different point clouds
+and to do this we had an optimization function that basically says that we were trying to find
+the minimal distance between two point clouds if you did rotate and translate one of the point
+workloads and that minimization functions had a closed form solution that we could use directly
+and that's what we did in the in the study but I've never tried to actually derive those functions
+myself to see how you get from that minimization problem to the optimized closed form solutions
+so let's try to see how we could compute this so the first thing I will do so I will just define
+a bunch of symbols that will be needed for SimPy and when we start from the minimization problem
+this one is a vector is xyz points and points xyz also so I will rewrite the square distance
+formula with the actual formula for the translate we have here and basically what you will do is
+you have a function that basically says the first point x because now I have x y
+and z so x y is minus the x prime y multiplied by the cossiness of the
+angle plus the z prime multiplied by the sinus plus x zeros and the same for the
+z is multiplied cossiness minus x multiplied by the sinus. I remove the y's
+because when I'm trying to do a minimization problem here, I'm only
+rotating and translating alongs x and z, so the y will be constant, so no
+matter what the values will be for theta x0 and z0, y will always be the same, so
+it's useless inside of my minimization problem. And now because we're taking the
+square, the square distance, basically it means that I could just leave the
+functions as this, otherwise I would have to do the square roots of these to get
+the distance but then v squared would be square root squared and I don't need to deal with
+it.
+So I could just do this formula and that's what you have now in terms of x0, x is x i,
+x prime i and so on and so on.
+Has been rearranged to get rid of the parenthesis automatically by sin pi.
+Now when you try to do a minimization problem of a function, what you do, especially if
+you have square functions, you could just take the derivative of your functions and
+look where the gradient will be zero, because that will be your minimum.
+And so we will do exactly the same thing here.
+I will take the partial derivatives of my functions in respect to theta and that gives
+me that big function here and I take the partial derivative in respect to x0 and z0 and I
+get all those two here.
+Now from those functions what you do as I said you put them equal to 0 and I will expand
+them so I will propagate the sums all over the place. So I get the first
+functions equal zero, the second and the third equal zeros. What I have now is a
+bunch of sums where I can see that I have also a bunch of constants inside of
+those sums. So I will try to factor those terms and if I factor those terms
+now I have to multiply by a bunch of stuff equal zero to multiply by a bunch
+of stuff equals zero. I can get rid of those two because two x equals zero means x equals
+zero. The two is useless. So I can get rid of all those twos. And I get now this with
+all the constants outside x zero because zero with the sums. And we could see that we have
+a lot of sums that are looking always the same. I get the sum of y, z prime i, same
+it's already here, the same with a yxi. And inside of the paper they already
+replaced those sums of yixi by xbar and I will do that same substitution here
+because it would make it more readable and it would be making the life for
+SimPy a bit easier to solve. So I get the xbar, zbar, xprimebar, zprimebar
+define at this one, I can do that substitution inside of my three functions.
+Now those start to look a bit more simple and what we can see is that the
+first one still depends on x, z and theta, while the second one only depends on
+x0 and theta and the third one only on z0 and theta. So I will try to solve those
+to for x and z so I will be able to start to do substitution inside of the
+other one so I'll solve x for x0 and I'll solve for z0 and if I do this I
+basically have x0s equal x bar minus x prime bar cos theta minus z prime bar
+sin theta and it's actually these functions we actually found x0s the
+same way they've found it here and we found z zeros the same way they found set zeros here.
+Now because I have x zero and z zero only depending on theta, what I can do is I take
+my x zero and I'll replace it inside of the first functions and do the same for the z zero
+all over the place and if I do that substitution and then expand everything
+luckily enough a lot of parameters get cancelled out and you have this big
+functions and now it's on your functions of the synus and cossinus data and more
+importantly it's actually a polynomial where you could see that every term is
+either a term multiplied by cossinus or synus so it's something multiplied by
+synus by cossinus by cossinus synus so all of them is always multiplied either
+by cosinus or sinus. So I can try to rearrange these functions and collect for the sinus
+and cosinus terms. And what you end up with is something broken up. And what you end up with
+is something, a big functions multiplied by sinus theta and a big parenthesis multiplied by
+by Cosinus theta.
+Now, basically, I have A Sinus A,
+Sinus theta plus B Cosinus theta,
+which is equal to zero,
+which means that with a bunch of rearrangement,
+you can end up with A Sinus equal minus B Cosinus,
+and then Sinus divided by Cosinus equal minus B
+divided by A.
+And you finally end up with theta equal r tangent
+of minus B divided by A.
+So minus b divided by a.
+And if I do this, so minus a divided by b here,
+you get this formula, which is actually what they have here.
+It's the same functions for the theta we have solved.
+So now we have theta x0 and z0 as a closed form
+solutions in the same way the paper did.
+So this is how you derived those functions.
+Hope you liked it.
+It was a short one.
+See you next time.

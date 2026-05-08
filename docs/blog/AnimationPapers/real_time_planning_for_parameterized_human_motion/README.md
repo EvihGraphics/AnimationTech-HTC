@@ -1,4 +1,4 @@
-﻿# Real-Time Planning for Parameterized Human Motion
+# Real-Time Planning for Parameterized Human Motion
 
 ## 元数据
 
@@ -194,9 +194,7 @@ group 版 `use_optimal_policy` 还会把 group id 映射回 value function 使�
 
 本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和 PNG 学习卡片。PNG 由指定 cell 的代码摘要、输出区、viewer/canvas 或图表/日志合成，不使用整页滚动截图替代。
 
-<video controls muted src="assets/00-walkthrough.webm"></video>
-
-[下载 WebM](assets/00-walkthrough.webm)
+[打开/下载 WebM](assets/00-walkthrough.webm)
 
 | Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
 | --- | --- | --- | --- | --- |
@@ -288,3 +286,35 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 real_ti
 ```
 
 注意：该案例的验证策略是 `manual_smoke`。自动执行状态为 `passed`，但 `viewer`、timeline、controller、3D/plot 输出仍需要在 JupyterLab 中人工确认。若本机没有手柄，方向控制 cell 可以作为代码阅读入口；真正交互时需要可被 `ipywidgets.Controller(index=0)` 识别的设备。
+
+## 重点可视化 / 动画
+
+README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+
+[打开/下载总览 WebM](assets/00-walkthrough.webm)
+
+| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
+| --- | --- | --- | --- | --- |
+| Cell 4 | `log` | `supporting_evidence` | Load the character and print added heel/ball bone indices. | [结果 PNG](assets/01_source_animation_viewer_result.png) / [代码卡](assets/01_source_animation_viewer.png) |
+| Cell 13 | `table` | `supporting_evidence` | Build short motion clips and output the number of clips. | [结果 PNG](assets/02_motion_clip_contact_axes_result.png) / [代码卡](assets/02_motion_clip_contact_axes.png) |
+| Cell 25 | `log` | `supporting_evidence` | Iterate over clip pairs and compute physical continuity costs and delta states. | [结果 PNG](assets/03_player_transition_blend_result.png) / [代码卡](assets/03_player_transition_blend.png) |
+| Cell 30 | `plot` | `key_visual` | Plot the mean/min/max value-learning curve. | [结果 PNG](assets/04_orientation_policy_controller_result.png) / [代码卡](assets/04_orientation_policy_controller.png) |
+| Cell 35 | `table` | `supporting_evidence` | Print local end positions for stopping clips. | [结果 PNG](assets/05_reach_goal_target_tracking_result.png) / [代码卡](assets/05_reach_goal_target_tracking.png) |
+| Cell 45 | `plot` | `key_visual` | Plot the value function over a two-dimensional target space. | [结果 PNG](assets/06_value_surface_clip16_result.png) / [代码卡](assets/06_value_surface_clip16.png) |
+| Cell 61 | `table` | `supporting_evidence` | Build motion groups and output the group count. | [结果 PNG](assets/07_motion_group_weight_blend_result.png) / [代码卡](assets/07_motion_group_weight_blend.png) |
+| Cell 72 | `plot` | `key_visual` | Plot the parameterized MotionGroup policy-learning curve. | [结果 PNG](assets/08_group_reach_goal_result_result.png) / [代码卡](assets/08_group_reach_goal_result.png) |
+
+## 代码 Cell 与可视化结果
+
+本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+
+| Cell / 片段 | 结果说明 | 证据 |
+| --- | --- | --- |
+| Cell 4 | The planning system can reference the foot-contact helper bones later. | [结果 PNG](assets/01_source_animation_viewer_result.png) / [代码卡](assets/01_source_animation_viewer.png) |
+| Cell 13 | The clip count determines the size of transition-cost and value-function tables. | [结果 PNG](assets/02_motion_clip_contact_axes_result.png) / [代码卡](assets/02_motion_clip_contact_axes.png) |
+| Cell 25 | The progress output shows that expensive transition work is moved offline. | [结果 PNG](assets/03_player_transition_blend_result.png) / [代码卡](assets/03_player_transition_blend.png) |
+| Cell 30 | A decreasing curve indicates that the policy is stabilizing in the current state space. | [结果 PNG](assets/04_orientation_policy_controller_result.png) / [代码卡](assets/04_orientation_policy_controller.png) |
+| Cell 35 | These endpoints define target states for the reach-goal policy. | [结果 PNG](assets/05_reach_goal_target_tracking_result.png) / [代码卡](assets/05_reach_goal_target_tracking.png) |
+| Cell 45 | The surface shows the future cost of reaching different target positions from one clip. | [结果 PNG](assets/06_value_surface_clip16_result.png) / [代码卡](assets/06_value_surface_clip16.png) |
+| Cell 61 | Motion groups turn multiple clips into a parameterized action space. | [结果 PNG](assets/07_motion_group_weight_blend_result.png) / [代码卡](assets/07_motion_group_weight_blend.png) |
+| Cell 72 | The plot verifies that a useful policy can still be learned after moving from clips to motion groups. | [结果 PNG](assets/08_group_reach_goal_result_result.png) / [代码卡](assets/08_group_reach_goal_result.png) |

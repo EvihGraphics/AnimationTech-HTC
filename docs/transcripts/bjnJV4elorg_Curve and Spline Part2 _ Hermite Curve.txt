@@ -1,0 +1,209 @@
+hi in the previous video about spline and curves what we've studied was the
+Bezier curve and when we started to extend the Bezier curve to do a spline
+and to attach several Bezier curves back to back what happened is that we were
+sharing the first and last point and we were only sharing that one so we had a
+discontinuity in our curve if you remember this shape we had here the
+the first point, basically the tangent going in that direction for the first
+basic curve and then the tangent we want to get to get it to go in this
+direction for the second tangent so we don't have that discontinuities because
+we have different angle here. It is quite annoying to compute every time to
+make sure that you know that your previous points and the next point would
+actually be on a line so you have continuity inside of your curve and so
+So for this, what we will do is instead of parametrizing our curve using the four points,
+what we want to do is to be able to parametrize it using only the first and the last point
+and then giving directly the tangent we want to use.
+So saying I want it to go in that direction and then the second point will go in that
+direction and then we will be sharing that point and tangent to the next one and that
+And Salo has to more easily make sure that we have continuity between those stuff.
+So this type of curve now is what we call an Hermit curve.
+And the Hermit curve is basically defined as this, is defined as the endpoints and as
+the tangent, so basically as the derivative of the endpoints.
+So we now have the points and the first derivative
+of those points, the value we want to give to our function.
+Before being able to compute this, what we will have to do
+is to understand how we could do it just doing polynomial.
+And we will start from those mathematics,
+and then we will build the mid-curve after it.
+So if we want to fit a polynomial
+through a certain set of points,
+you could actually fit any type of polynomial
+of a certain degrees to the number of points degree n plus 1.
+So if I have a cubic polynomial,
+I can fit it to go through four points.
+And again, as we were doing cubic,
+mainly I will focus on those cubic.
+So let's say that I will have, in this case,
+if it agrees to do it, I have those four points
+and I want to define a curve, a cubic curve
+that will go through those four points.
+How we do this is that we start from the cubic function
+and the cubic function itself, you know,
+is the ATQ plus BT square plus CT plus D.
+So that's a cubic functions,
+the generic form of the cubic functions.
+So what do we know from the points we actually want to match?
+We know that when my function is at T zero,
+the value will be two.
+When a function is at T one, the value will be one.
+At T three, the value will be four.
+And at T four, the value will be one again.
+So I can have those as the values I would want to compute.
+And now what I can do is that I can actually
+substitute the 0, 1, 3, and 4 through these functions, which
+give us that d, because all the 0s will make everything
+disappear, d equals 2.
+And then everything will be 1, 1, 1.
+So a, b, c, and d, a plus b plus c plus d equal 1.
+add in the cube, 27, 9, 3, plus D equal 4,
+and same for 4, 64, 16, 4, and D equal 1.
+So that give us basically a system of four equations
+and four unknown.
+Now, that's something that we could easily solve.
+And so I will just put those,
+there was equation in the matrix form,
+and basically I have the 2141 equal my big matrix
+coming from here, the D comes from the first one,
+A, B, C, D, one, one, one, one, 27, nine, three,
+coming the next nine and so on and so on,
+and I get the A, B, C, D.
+And now that I have my matrix form,
+I can actually solve for A, B, C, D,
+and to solve through A, B, C, D.
+What I will do in this case is just use
+the linear algebra solve method from NumPy
+that would just solve this for me.
+And in my case now, I have the A, B, C and D parameters
+coming from the cubic.
+And if I replace A, B, C, D with those values,
+now I can actually have a function
+that will go through my four points.
+So that's how you compute this kind of polynomial.
+polynomial. Now that I have this and we understand how we could actually use the system of equation
+and to build them and having our functions or polynomial goes through a bunch of points,
+what we can do is we can start to look at the Hermit curve definition itself.
+And to start with the Hermit curve, what we will have to do is basically remember that we will be
+doing cubic Hermit curve again, same way. And so I'm starting from the cubic function again,
+so atq plus bt square plus ct plus d. And I will just rewrite them this as a matrix form. So it's
+basically exactly the same thing except that I've put them in a matrix form but
+it's the same formula do not worry about this one and what we will be doing now
+is again do as usual as the basic curve and all of that kind of stuff we will
+say that the amide curve is parametrized between 0 and 1 and that will
+make our life way easier. Now we could do an interpolation saying that at time zero we will be at
+point zero. At time one we will be at point one and then at time zero we want to have the derivative
+of point zero and at time one we want the derivative of point one. So what happened when you do this
+is that we actually compute also the derivative of our function. So that's my cubic functions and
+and that's the derivative of the cumming function.
+If you don't remember, you take the derivative,
+you bring the three in front and do minus one.
+So I get three AT square plus BT plus C and the D disappear.
+So that's the derivative itself.
+And now the same way as we've done
+when we were doing the polynomial,
+what we could do is substitute the different values
+for the different ABCD.
+So I will have 0.08 again.
+Everything will be zero, so 0.001 for D.
+At 0.1, everything will be at one.
+And then I will have the derivative of the 0.0.
+Again, I will put zero in these functions now.
+So everything disappeared except the C.
+And I'll have the derivative at 0.1,
+and then I will have three, two, one,
+and zero, the D has disappeared.
+So basically now I have the same system of equation
+as we had before, except that now it takes 0.1,
+the derivative of 0.0 and derivative of 0.1.
+And then we could solve for ABCD again.
+I said that this time I will not solve it numerically
+because I'm still trying to find the functions itself.
+So I will solve it by how we actually solve
+this kind of system usually.
+And to solve for ABCD, what we do is that we take
+the inverse of the matrix in the middle.
+So if you take the inverse of the matrix,
+now ABCD equal the inverse of the matrix,
+that's my minus one, multiplied by the point 0.1
+and both derivatives.
+And if I compute that inverse,
+So that's my matrix, compute the inverse.
+I end up with this matrix.
+So I could actually write it in the function directly.
+I get the ABCD equal that matrix multiplied by 0.1
+derivative and derivative.
+And now we have our ABCD here.
+What we could do with that is that remember
+that we've wrote the ABCD, the function itself
+itself as a matrix of times multiplied by a b c d so I can substitute the same way again
+my a b c d remove it completely and only keep the the times the matrix in the middle and my
+points so point zero point one both derivative remember this formula this shape is really close
+to the one we were using when we said that we want to do
+matrix form for Bezier curve. See that's the same except that the matrix is
+different and here we used p1, p2, p3 and p4
+but basically it is the same
+the same comm set now that is 0.0, 0.1 and both derivatives.
+What we have here is
+The formula, if we were actually computing everything, again you get the 0.0 multiplied
+by this, 0.1 multiplied by this, the derivative multiplied by this, and the derivative multiplied
+by this.
+And that gives us the Hermit curve, and I can now see, I've used the formula, the one
+I've computed here, not the matrix form.
+I've computed the formula, and I've used 0.0,
+two times, times cubed, minus three,
+times squares, and all that kind of stuff.
+And you could see that basically it works now.
+I have my points, my derivative, I get the curves,
+and I reach here my points towards my derivative.
+That's a 1D example.
+So for zero to one, I have two values.
+And I can do the same for a 2D example.
+So instead of having a point that just defined as t at the bottom and having a value for y,
+I can have an xy points and xy points and then my t, my parameter is 0, 1 will give me
+the curve the same way we did the Bezier curve.
+And you can see now, what we have here is a 2D example.
+So I have the direction in which I want the curve to go.
+And I get the curve to go through my parameters, my 0 to 1.
+And it's in a 2D space.
+And that's what the Amit curve is computing.
+Now there is, of course, as we define the Hermit curve,
+where you said that it's another way to compute a curve
+that goes between points and have tangents.
+There is a link between how we computed the basic curve
+and what we're doing here with the Hermit curve.
+And basically, the formula to go from one to the other
+is this, is if you
+If you have a bunch of
+Hermit, so you will have two points the point zero and point one and you get both
+Derivative to get back the four points of the basic of the only thing you do is that you take the first point as being the first point
+The last one has been the last one and then point one of my basic curve is point zero plus
+a third of the derivative of
+of 0.0 and 0.2 is the 0.1 minus a third of the derivative.
+That divided by three will come in logically a bit later
+when we talk about a few, the stuff.
+But right now, just remember that we divide by three
+to get the right point in this case.
+So to show you that it works, what I could do,
+it's basically starting from that 2D example again I have my 2D example I
+have the Bezier what I have the Hermit curve that is the black one and so by
+using the Hermit curve now I can actually put my points here you know see
+that's a third of my derivative and I get the points there for my second point
+and the third point is a third of the derivative less and I get my point here
+And that's the basic curve and that's the blue dots and you can see that they're perfectly aligned. So
+they both are
+Computing exactly the same thing just a bit differently again on how you do it
+And now if I want to do an omit spline, so I want to actually put a bunch of hermit curves back to back
+then I can just share not only the last and the first point, but also the
+tangent and say I will have a continuous function instantly. What I will do is I
+will rearrange a few of the parameters, you know, because when we build the
+matrix the first time when we said it was 0.0, 0.1, first the derivative of 0.0,
+derivative of 0.1. But if I want to share the data between a bunch of curves, it would make
+more sense if in my data I had 0.0 derivative of 0.0 0.1 derivative of 0.1. So I can just move
+forward inside of my list of points in derivative and I can build a spline this way. So this is
+This is what I've done. I've used the matrix form, except that I've swapped the column,
+so I will get a point derivative point derivative point derivative, and I can just directly reuse
+this to have a complete list, to have a list of hermit curves that goes back to
+back. So if I define now my list of points as a points and a derivative of points
+and derivative points and derivative, I can have this hermit curve that goes
+through a bunch of points. And so this was the video about the Hermit curve
+and Hermit spline and in the next one we will go through how to compute a bunch
+of stuff automatically to do what we call the cardinal spline that will make
+our life easier when we want to use a Hermit curve. See you next time.

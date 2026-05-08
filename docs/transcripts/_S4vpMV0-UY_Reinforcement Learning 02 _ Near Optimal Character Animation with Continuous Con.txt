@@ -1,0 +1,532 @@
+We continue the series about reinforcement learning in animation and last time we've
+seen how we could have a discrete state space and a discrete value function.
+This time we will see how we could have a continuous state space.
+Hi, I'm Jerome and today's paper is the new optimal character animation with continuous
+control, a paper from 2007.
+As usual for that paper, what I would do is import all the libraries I need and then
+Then I will import my character, I will import different measures that I will display, and
+the targets and that kind of stuff.
+And this time, it's a bit different instead of importing just an animation coming from
+LaFanne.
+I already pre-sliced the animation because the way this paper works, it expects to have
+a bunch of clips of animations that are represented this way.
+So you start at the crossing phase, then you get the contact, then you get the next crossing
+and then the next contact and the last crossing.
+And that is considered for them as one clip.
+You get the clip in, it goes from the first crossing to the middle crossing, and then
+the clip out is the other part.
+So I will need to have that information.
+So what I've done is that I've already picked a few animations that are needed and I've
+already set up the proper timing of when is the crossing, when is the contact and all
+that kind of stuff.
+So for instance, I've loaded all of those and if I display the first animation I have,
+it is this one and that's the animation I will be using and slicing as clips, but I've
+already pre-processed all the informations of when those contacts happen, right?
+So what I need to do is to build the motion model the same way as they've done it here,
+really splitting the clips with knowing if it's the left foot starts, when is the contact and so on.
+And so what I have is this, I get a bunch of clips, all the informations were already in,
+so I know how many clips I have that start with the left foot, I know how many clips I have that
+I start with the right foot.
+That's all the clip count I have.
+So I have 36 foot steps basically.
+And I will compute that as being a set of animations,
+a set of clips.
+So I get the cut onion and positions for each of my clips
+and the different timing.
+And so I have as many clip count as I have,
+as many frames I have, the bone counts
+and the cut onions and so on and so on.
+So now clip Q, clip P will be a bunch of clips animations.
+And so this is recomputing the route
+to realign every time all the clips to start at zero zero.
+And that's the function to compute those clips.
+So really just taking the ranges that I've decided
+and cutting all the animations, copy pasting
+and realigning everything every time.
+And that's what I'm doing.
+hey, I now have inside of all my clips and formations,
+I get all the different clips,
+all the different timings for each of those clips.
+Now, what is interesting in this model
+is that they decided to work without any IK,
+any post-process, so they need to make sure
+that when you blend the clips together,
+you don't need to post-process with the IKs.
+And the way they've done it is they decided to say,
+Basically, every time you try to blend an animation,
+so that's a clip here, the A is a clip,
+so you get the A in, A out.
+You will have the contact points,
+so that's where we decide that we have the contact.
+And you basically align the two clips,
+the two clips together at that contact time.
+So that's what you do here.
+If I need to blend between clip A to clip B,
+First thing you do is that you move clip B so the foot that is in contact would not move
+and you realign the entire animations relative to that. So every time you will blend basically
+you're sure that the foot that is in contact with the ground would not slide because you moved the
+entire animation relative to the contact positions. So what I would do is that I will compute all those
+contact position depending on the timing so I know in my timings when is the contact and I
+compute the positions of my foot every time I have a contact so that's what I'm doing here in
+this function. The way I do it is I take the the ankle and the toe and I project that on the ground
+and that represents the orientation of the position, the orientation of the foot and how I would want
+to align everything together. So now if I want to display all the different clips I have, I can see
+the different contact positions and I see the the clip motions that I have
+and when I pass the animation I don't have any more animation. So that represents one clip
+and I can go and then can pick any other clips. That's another steps. Let's see if I get something
+a bit different. One other steps and all that kind of stuff.
+And I get every time the contact with the two feet and so I will be able to blend that properly.
+So what we do is that we see how we could actually blend the animations together and see how it
+works. So what I have is I have a player again that's allowed me to keep playing animations
+depending on the states I'm in and a clip itself is this information he knows the the clip idea I
+have, he knows which frame I'm actually playing and then he will also know when I need to start
+playing because if you see here for instance when I need to go from B to C because of the contact
+happening only at the end only blend during this timing and that's me that I will only start to
+to blend coming from this animation, this frame in, out.
+But I might also,
+is that an example why you don't start at the beginning?
+But you might also not start at the beginning of in,
+depending on how you align everything.
+So that's struck me when I need to start
+to play my animations.
+I start to blend.
+That's tell me when I need to start
+to play the current animations.
+that says how many time or how long is the blend.
+So all of that is computed when I said,
+I have a clip and I want you to align to another clip.
+That's the align function, what it's doing.
+And then I get the tick to say play one frame.
+And the player itself will always have one current clip
+that it's playing and he will have the informations
+of the next clip that he wants to play.
+He will make sure that he aligns them
+and then check if it needs to play
+or if it needs to blend and that kind of stuff.
+So that's what the player would do.
+When it ticks, it ticks both and do the blending
+and everything that I need to do.
+So if I put that in use, what I will have is this.
+So I get the red skeleton is the current clip.
+The green skeleton is what I will play after
+and I could let it play basically anything.
+So what I'm doing now is I just pick randomly
+any clip to play, each choose,
+which was the next clip to play.
+You could see that you can always blend.
+So some blends are terrible,
+some blends are fairly good,
+depending on how lucky you are when you pick your next clip.
+But that's how the animations is perfectly able to blend.
+Let's restart it.
+Blend all those animations
+and make sure that your foot is never sliding.
+You don't need any post-IK solver or anything.
+This is just playing animations and blending them together.
+Now, we've seen how basically that's
+how the motion database is done.
+So it's a bunch of clips you could play.
+You could connect those clips together.
+you can blend them and it works properly.
+Now we do need to decide how we want to control this
+and how we will be able to interact with the character,
+not picking any stuff randomly.
+And so in the control part,
+what we have, they have really big state space
+with a lot of different values and that kind of stuff.
+But basically what they say in the paper is that they regrouped everything here in the paper,
+but they've never treated the state space as being that massive thing that can do everything.
+They've just learned different controllers on different parts of the state space and that kind of stuff.
+So that's what I would do also.
+I would simplify the paper and treat only one case and work from there.
+And the first thing I would do is because if I jump a bit in advance,
+the traditional thing that you will have to make sure that is trying to see if the next animations
+you want to play is coherent physically. So is the animation close together? Is the velocity
+close? And that will be the cost of what they call the physics cost that you could see here.
+So, that's the physics cost is how much, well, is how good is the transition going from clip A to clip B, is it good or bad.
+So, that we could pre-compute because computing in every time will be losing resources.
+What we could do is just compute in advance the cost of that transition for every possible transitions we can have.
+have. So this is what I will compute here. Basically what I'm doing is I'm taking one clip,
+I'm taking one clip, I realign that clip to when the contact happens,
+and then I go through all the other clips and align all the other clips. And when I do this,
+then I will start to compute the distances between every bones for all the frame during the blending.
+So let's give me basically the cost, how close both clips are in the trajectories for every bones
+during all the blends. So I pre-compute that cost and so that's what the physics cost will be
+here and that's the interesting stuff to compute for the physics cost.
+And I will let it pre-compute all of those informations for me.
+It does it for the 36 clips with all the 36 possibilities.
+And I will start to also pre-compute a bunch of other informations that are interesting in my case.
+And it's to pre-compute what will be the next states as soon as I take one of the transitions.
+So if you look at the control, what you could see is that you get the function from being
+in one specific state and going into a different clips and how you do compute the new states.
+So what is the states?
+I will not go through all of those variables in my case.
+I would only learn the one that I'm interested in.
+And C basically is the clip I'm playing.
+X and Z are the position of my character
+on the ground plane.
+And theta is the orientation of my character
+on the ground plane.
+And I will basically only work with those one.
+And that will represent a state space for me.
+That represents one state.
+So the clip, the X position, the Z positions,
+and the theta orientation.
+That represents a state.
+And then if you try to do a transition between X
+and going to a different clip,
+this is the formula that give you
+to find the new states that will be,
+so X prime will be the new states.
+And the new states will be the new clip, C prime.
+And then there will be X plus the cosine of theta
+of delta x, delta minus sin theta of delta z.
+And how do you compute delta x and delta z and delta theta?
+It is the blending algorithm
+that gives you that information.
+So basically, all the stuff that compute
+when I do clip A and align to clip B
+and detect how much time I have to blend,
+where is the contact and all that kind of stuff.
+That's what gives me the delta x, the delta z
+and the delta delta theta.
+It's really depending on each clip
+and how you blend the clips together.
+So I can, at the same times,
+I'm aligning everything to compute the physics cost.
+I can use that information to compute the delta x
+or much because I've realigned clip A
+and then I could check where clip B arrive in X, Z, and theta.
+And so I pre-compute delta X, delta Z, and delta theta.
+So I have all the information I can use.
+I get all the deltas, I get the physics costs.
+I can start to check and work with all the clips.
+Now, I would divide the physics costs by the mean.
+by the mean. So I get something, I don't get massive numbers, I get something that stays
+between zero and two, three depending. So it's all normalizing the physics costs.
+And the last thing I would do, I would say that I know that I have a bunch of clips that
+start with the left foot first, and I have a bunch of clips that start with the right
+foot first and basically I make sure that the the cost of playing the wrong foot is extremely high
+basically just making sure that I would never try to play a clip on the wrong foot and that's how
+I'm doing it here it's just I make a really big cost of going into the wrong clip. The paper was
+doing something different the paper was basically saying that every clips could blend with every clips
+and if it's a clip with the left foot that want to play and blend toward another clip left foot
+they were mirroring the clip. But I didn't want to make the video too complex because you need
+to track which foot is in front. There is a lot of mathematics at the end where you will start to
+You need to flip all the mathematics
+because you are on the mirror and animations,
+that kind of stuff.
+And it was easy in my case to just say,
+don't deal with the mirroring,
+just make sure that we will never play the wrong animation.
+So that's what I've decided to do here.
+Just make sure that you don't go into the wrong clip.
+So I've computed all the physics costs,
+I've computed all my deltas.
+I can now show what happens
+If I just let the system always play the least expensive physics cost.
+So now it will always play the animations and pick the minimum costs for physics.
+And you could see now you get something fairly smooth.
+So that's the optimal trajectory that the system can take by just checking the physics cost between all the clips.
+And I do this just by saying that the next clip will be the minimum of the physics cost,
+the one that has the least value.
+Okay, so we know how to blend the animations, we have the physics cost and all the deltas,
+we could start to play with all those real states and start to control them. So the transition
+function which is this one in my case would be a bit different just because in the paper they've
+took as a convention that the character when you try to put it on the path like this
+They put the character as to say that they will be aligned toward x and it will walk
+along the x-axis and in my case I'm used to work along z so my character is looking toward
+the z-axis and is working along the z-axis so I had to switch a bunch of stuff to turn
+all the mathematics to to move along z and not along x and so my formulas are
+here this is how I compute so the same thing except I've changed a bunch of
+stuff and so that's my transition function so what I have is I got my clip
+ID I get x z and theta so clip ID x z theta that's my state that's x in the
+formula here. That's x in the formula here. And the next clip ID is c prime. And that will return
+the x prime. So it returned the next clip ID as x prime, z prime, and theta prime,
+returning me the new state. How is the state represented? Basically, the character I would
+always want it to walk along the z-axis. So a state is always represented relative to the
+desired path I want to do. You can see that we never define the desired path in the informations.
+The only thing we define is where my character is. It could be placed anywhere on the plane,
+but that plane aims in the direction I want to walk. And basically
+The theta represents how much your character is rotated relative to the desired path, so that's the theta.
+And then your x and z is how offset you are compared to the center of that plane, basically.
+And that's the state space, that's how it is represented in this case, right?
+right? So I get my transitions to be able to transition. And now what I want to do is that I
+will want to use, as a first pass, the simple policy I could have is to go through greedy policy.
+And so what I will have is that I will have a direction cost. So
+So how good am I walking in the direction I wanted?
+And basically what we say is we know that we've,
+we say that we always want to walk forward
+and then we align everything relative
+to where that forward is.
+So what the direction cost will be
+is that I'll take my X and Z.
+which is my current positions, my x' z' that will be my future positions and
+the only thing I make sure that I make sure that the motion itself, so that's
+what you have going from here to here, the direction of the motion has to be
+basically zero, the angle of that and that of that direction has to be aligned
+to my z-axis, I want it to walk forward. That's what the direction cost is about.
+What I would do is that because I would have animations that have a small step,
+bigger steps, I'm also making sure that even if my motion is in the right
+direction, I want to make sure that at least it does a step in the
+right direction. So that's what I'm doing here. I check the z prime where I will be
+and if that doesn't make me at least 10 centimeters steps, I multiply my cost by 3.
+It's just to avoid that sometimes I will have really really really small steps but I'll
+perfectly align. I will pick that one and say I will have something that start to work and then
+make a really small steps. So that's where I would want the cost to be bigger. Say now I want
+you to make sure that you move forward, not only that you make a really small step forward.
+And what is the greedy policy? It just takes your states.
+And what I would do is that I compute the transitions for all the possible different
+transitions you could take. And from there, you start to compute, you try to find which
+one has the least cost in total. And the different costs will be what we have here. You get the state
+costs and you get the transition cost. The state cost, in my case, I would not use the second part.
+I would only use the first part, which is the derivation. I want to make sure that I'm not in
+in a state that deviates from where I would want to go.
+So not only I want you to walk in the right directions,
+but being offset, walking null in the right direction
+will give you a penalty.
+So that's what the deviation would give you.
+It says, if you start to deviate from the trajectory,
+your costs start to grow.
+And that depends on how far you went.
+You get the physics cost, so that's the one we pre-computed.
+How well is the transition doing?
+And then you get the direction cost,
+is how good am I walking in the directions
+I want you to walk.
+And then you sum all of those costs,
+and you pick the minimum cost possible.
+So let's do the direction green.
+Then I can take my gamepad.
+And now I have this character, so the yellow arrow is where I ask the system to walk.
+And so the greedy algorithm will just always check for the next clip and only for one clip.
+It's like we had in a previous video, when you go for the greedy algorithm, you picked
+only the what gives you the smallest error possible without taking the future into account.
+And so it's not too bad but see there it just flipped and that's because
+the physics cost probably I have a bunch of flipping animations that says the
+the physics cost of not doing the full flip will be too high and so as soon as it starts
+unfortunately to put the foot down into the flipping animations it has to keep doing the
+flip and that's where I have in this case the Greedy Agony makes really bad choices
+sometimes. It could keep going and do something fairly good as long as it doesn't pick that
+wrong clip by mistake. But that's the greedy algorithm. And then you could choose how much
+the physics matter, how much the direction matters, how much the deviation matters.
+Now, of course, we've learned the greedy algorithm, but what is interesting now is to see
+how to find the optimal policy. And to find the optimal policy what we have to do is again
+try to figure out the cumulative cost of picking one clip relative to another one
+and what you will be able to do in the future. And so what we have is that you try to minimize the
+sum of all the future costs you will have.
+And in this case, it could be written, of course,
+as a recursive function again,
+saying that my value function for x
+will be equal to the cost of being in a specific state
+plus the cost of picking a specific transition
+plus the value functions of being into that next state.
+Multiply by a factor to make sure that you can converge
+and then you usually put that factor around 0.9,
+0.95, something like that.
+And finding the minimal, the best policy is basically,
+the best policy is basically now you take the state cost and you take the
+minimum of all the possible transitions you can take and basically it means
+that the best policy possible is to find the minimum of the cost of the
+transition cost plus the value functions. You could see that what happens is to
+find the best policy, the state cost is not important anymore, only the value
+functions and the transition cost is important. And that's because the state
+cost itself now has been learned into the value functions. The value functions
+depend on the state cost plus the future costs, which means that the policy to find the best
+clip to play doesn't need to compute the state cost anymore. It's already integrated into the
+value functions. And that's what you will try to learn. Last time we've done it with the Bellman
+equations and recursive computations on the discrete value. We're not in a discrete world
+animal, what we want to do will be to learn it on the continuous value functions.
+And that's how you will do it instead of learning it step by step.
+we'll have is we will have to approximate that and use a linear programming to solve the system.
+So what we have to do is basically what I will want to do is that I will want to learn for
+my value functions. I will try to maximize the value functions because it's a cost function.
+So what I want to do is that I want to make sure that the cost will be as high as possible.
+But we will set a bunch of constraints to that linear programming and the constraint will say
+that my value function for a specific x needs to be smaller than the state cost for x plus the
+transition cost plus the future cost. And so by doing so what happens is that you try to grow
+the value functions as high as possible, but you limit the maximum size of it by the fact that
+it always needs to be sure that all the different value functions between them
+needs to be always smaller than the cost plus the next one. So that's because of this you've
+basically turned that Bellman equation into a linear programming optimization and that's defined
+the exact same properties as how we learned it in the last time. Now one of the issues is that
+the value functions x here is continuous. So x can be any value of x, any value of theta,
+So that value functions as a really enormous number of variable, of possible variable.
+So we cannot learn it as is. We need to approximate the value functions.
+And how we will approximate the value functions, we will basically go and says,
+we would turn that value functions into a bunch of basis function.
+because we know that the cost will be fairly smooth along all the values.
+I mean if my state is at x value 1 and I'm in value 1.1 I'm fairly close to it
+and I don't expect to pick an animation completely different because I'm so
+close to it so all those value functions will be fairly smooth so I can approximate them with
+basis functions and that's what we will do we will turn the value function of x into a bunch of
+basis functions and the basis functions that will be multiplied by coefficients and what
+we will have to learn now is the coefficients for all the basis functions and that's what we will
+learn and keep iterating on it. So I get all my basis functions and so if I turn this problem
+of maximizing vx with all those constraints, now those constraints become the value, the basis
+functions of x multiplied by my coefficients needs to be smaller than the cost plus alpha the next
+one. Now basically you could see that I have my basis functions on both sides. So it means that
+I have to take the right hand side and put it on the left side. And so it gives me delta x minus
+alpha delta x prime. It needs to be smaller than that the costs, which means that I could turn all
+of this together and the alpha x minus phi x minus alpha phi x prime for the coefficients
+and then I can learn the coefficients now for this one. That's how you actually turn
+this problem into a linear problem you can learn. So what I would do is that I will have
+my compute basis and the only thing I need to to track if I want to walk forward is how much
+I've deviated from the trajectory and how is my character rotated that will impact where my clip
+will go and that impact which animation I need to take so that's the the two bases I need to learn
+And so I will compute those two bases that give me nine bases. It's all polynomial basis
+functions. So what does it mean? It means that I have a polynomial for x. So it's one x x square.
+I get a polynomial for theta, which is theta for one theta and theta square. And then because I have
+two different polynomials to learn together. You basically need to do an
+outer product, all of them. And so that's why you get 1 x x square theta theta x
+theta x square theta square theta square theta square x theta square x square.
+I'll give you all the nine bases that you're trying to learn at once. So it's
+It's what they represent here.
+They said that they have the polynomial.
+So the simple polynomial they want to run,
+that you want to learn.
+And in the case of just having the task of walking forward,
+that's what they said, that the polynomial of degree 2
+for x and the polynomial of degree 2 for theta.
+So you multiply together, that's
+I mean, the other product to be able to learn all of those.
+And my optimal policy now when I try to find
+which one of the animation I have to play,
+it's what they've defined here.
+This says that if you remember,
+it's this one, the arc min.
+So what I do is that I take the transitions
+and that gives me the physics costs
+and I get the direction costs
+because both of them are part of the cost of the transitions.
+And that's it.
+And then I compute the basis functions
+of x prime and theta prime,
+where I would be multiplied by coefficients
+and I sum the two, so multiply by alpha.
+So I get alpha plus my value functions evaluated at x prime.
+And I'll take the argument of it.
+And that's how you take the best clip to play.
+So I get my compute basis.
+I get my optimal policy.
+And now, how you actually really learn this?
+Normally, if you wanted to learn the value functions
+and grow the value functions and do this,
+One way to do it is to first, you take a bunch of samples
+because, of course, it's a continuous value function.
+So you can learn for all the different possibilities.
+You choose a bunch of examples scattered
+along all the state space.
+So that's what I'm doing here.
+I take a bunch of x positions between minus 2 and 2 meters.
+and I take the sample theta minus, so on 360s
+to rotate everything.
+And I create a bunch of samples there.
+So I get for each possible clip,
+I will have the clip, the X somewhere
+and a theta somewhere, and that give me a bunch of samples.
+So that's what I have here.
+All the samples I would decide to use.
+So I have 900 different samples that I will learn from.
+And if you wanted to do this, usually you could pre-compute all the possible transitions
+between all the different states and put them all constraints at once and says, now try
+to maximize your value functions with all of those.
+Now it doesn't mean that in my case I will have a 900 by 900 constraint.
+That's a big heavy to learn.
+what the the paper decided to do is to do it iteratively so what you do is that
+you start with a bunch of sets you start with a set of transition so
+basically you start with the order coefficients at zero you go through all
+your samples and you ask what will be the optimal transition to take
+Basically, in that first case, that would be the greedy transition.
+And that's the list of transitions you will have, that's the list of constraints you'll
+create.
+You learn the parameters and you reiterate.
+You re-ask the system for all your samples, what will be now the best transition to take,
+and it will be, of course, a set of different transitions.
+So your L grows and you re-compute all the different constraints and you re-learn the
+value functions and you iterate until you converged to something that will not add new
+constraint, which is what I'm doing here.
+So I will start by saying that the first thing is saying that I want to maximize the value
+functions.
+What I said is that take all the samples, compute the basis functions for all the samples
+and that gives me my max Vx.
+That's what I'm trying to maximize.
+So you minimize it because you subtract it because by default linear programming we try
+to minimize.
+So if you try to maximize, you just need to flip the sign.
+So that gives me the VX to try to maximize.
+And then I go through all my samples that I've generated,
+use the optimal policies
+with all the coefficients I computed,
+check which clip it would choose.
+And if that transition does not exist already,
+I'm adding that in the transition states.
+And then that gives me all the transitions
+want to use. And then finally, you go through all those transitions, and you start to build
+the big matrix of all the coefficients. So you build the matrix of all the constraints,
+this one. And so how you do it is that you compute the basis, put that on left hand, compute the
+new basis for the future basis for the new theta, new x new theta, you subtract it from the alpha.
+On the right-hand side, you get the cost of taking the transition plus the derivation factor,
+because that's what I have here, cost of the transition plus the cost of the states plus the cost of the transitions.
+That's the right-hand side.
+And that gives you the matrix of all the coefficients you try to learn and all the right-hand side values.
+What I do also is adding all the sample also but the inverse of them just to
+make sure that basically this will mean everything needs to be smaller than the
+cost and I will do the opposite saying nothing can be smaller than zero so
+that's why I do the minus here just to make sure that I put a lower bound as a
+cost functions cannot be negative or cannot be negative so making sure that everything is up to
+zero and that's because when I would do the linear programming I would put no bounds on the values I
+would let him choose the coefficients the way he wants and so I need to give him a upper bound
+and lower bounds on everything he tries to learn so he gets the upper bound as maximum is the cost
+plus the future and lower bound is zero. That's what you do here. There is one thing that I haven't
+showed you yet is that when I do the coefficients I do have nine coefficients that's what I said
+but what the paper says is that you cannot learn a value functions that will represent
+all the clips plus all the bases, again, that will grow the dimensionality of what you're
+trying to learn. Instead, it's that you will learn different value functions for each clip.
+Each clip will have the value functions of if I'm in this clip, if you want to reach in this clip
+and you reach in the in the futures with those values X theta and X prime theta prime that
+will be the cost of reaching me. So you will learn it for every clip. That's what they call
+tabulations. So the possibility to say that you will want to learn different values for each clip.
+So I will learn different value for each clip, but I will learn everything at the same time because
+I need to make sure that the value learned from one clip is reflected in the values that the other
+clip points towards and that kind of stuff. So that's why I have for every clip I get the nine
+bases. I compute the coefficients and I put it inside of my clip ID. I put the values for the
+the compute basis and put the next clip ID, I get the minus equal alpha for the future basis
+and so on. So I'm learning all the clips at once but each clips will have different values.
+And so you can see that it has 3000 constraints and adding new constraints every time and learning
+them and that's already gone. That's the power of having only 36 clips I would say. And being
+a bit more in your future compared to the paper that we're taking around one hour to do this.
+And if you want to see what we've just learned basically for the compute basis,
+this is if I take the clip ID 3 this is the compute basis for it so you see
+that's my x so from x to minus 2 to 2 on the x-axis and minus pi to pi on the
+theta axis you could see that basically what it tells you is that it will be
+really costly to arrive in the negative x with negative theta.
+And it's basically less expensive to be on the positive side,
+that kind of stuff.
+So finds you the sweet spot of, see,
+it's not even 0, 0.
+The sweet spot is probably better to not be 0, 0 in this case.
+So that's what the value functions, the future value
+functions will give you.
+And now what I could do, of course, is use exactly that.
+So what I will have is, again, the same control.
+And my optimal policy will use my coefficients, my future
+stuff.
+So I will use the same function that I use for learning.
+And I got my x and theta coming from my controllers,
+depending on where my character is.
+And now you could see that if I walk forward,
+I should never try to do that wrong flip anymore.
+And I have my control, which is what
+they call the near optimal control,
+because you've learned for the future into a continuous matter.
+You have a continuous functions.
+You get a continuous control for the character
+asking to walk in the right direction.
+And this is it for this paper.
+There is a lot of different value functions
+that they learn, different basis functions that they've used
+but I wanted to make sure that the basics were understood
+to show how you could learn a continuous value function
+and use a continuous value function instead of the discrete one.
+I hope you liked it and see you next time.

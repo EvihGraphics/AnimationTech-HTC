@@ -1,0 +1,96 @@
+You want to see how we do 3D animation in computer science or you want to be able to read this formula?
+Hi, I'm Jerome and today we'll be looking at animation data
+First thing first when we want to animate
+we will usually start from a skeleton and a skeleton is a hierarchy of
+Transform meaning that if I move one of my bone, I will have all these children move with it in
+In computer science, when we have a hierarchy, usually we represent this as a tree and so
+I have here the tree that represents my skeleton with the hips, spine, arms and so on.
+I can give an index at each of those transforms and I will go depth first, so I will go from
+0 to 7 in the order of my tree now.
+And because I have all those index, I can easily find the parent of each transform.
+Now to speed things up, usually what we do is that we transform that tree into an array
+and I will have an array of transform and in my case here would be an array of matrix
+4.4 so I can encode translation, rotation and scale directly in each of those matrix.
+And then we also have the list of the parents that we computed before.
+So we have a list of all the transform and list of all the parents.
+We have all the information that was important for the skeleton itself.
+If we want to make a pose, we need to parametrize the pose with the minimum needed informations.
+And in this case, if I give the position of my root and the rotation of every bone, I
+can pose my character in every pose in any way in the world.
+So P0, I mean the position of the first bone,
+and all the Qs represent the rotation Q,
+because we will be more likely using quaternions.
+If I want to do a motion out of this,
+a motion is a function of time that
+is parametrized with the same information.
+But each parameter now need to be also a function of time.
+So now I have a motion that can change through time.
+And that's usually the formula we'll see in all the papers.
+Because I will be using the Ubisoft LaForge Animation
+Database, so the LaFan1.
+They encode the data in the motion a bit differently.
+And so what they do is that they decide that a motion is
+parametrized by two tensors, one for the position and one for the quaternions, and each of those tensors
+are basically all the positions through times for every bones and all the quaternions through
+time for every bones. If we look into the tensor for the positions for instance, what we see is that
+is a NumPy array that has a discrete time that has 30 frames per second and so you will have
+a bunch of rows, one row per frame and then for each of those rows you will have a column
+for all the bones. So you will get one frame with all the bones, all the position for every
+bones and now because all those positions are actually 3d vectors basically all the positions
+will be xyz and then you get a 3d vector that has number of frame number of bones xyz for the
+position and that would be the same for the quaternion. So in our case the tensor for the
+position is frame count bone count 3 and the tensor for the quaternion is frame count bone count
+four because you get the w coming from the cotonium also.
+So let's see how we can import this inside of NumPy. What I have is a framework that is
+built on top of iPy widget that's allowed me to directly draw a 3D inside of my NumPy.
+And I will load my character and I will display this character so you can see
+what we have here. So the structure of the skeleton, as I said, you get the root. Well,
+I get the root here on the ground and I get all my root, all my transform. So they're
+each time you transform and you get the link between them. So that's my skeleton for my character.
+And if I load one animation, for instance, you could see how the framework gives us this
+distances, so for the positions I get 7,000 frames, 22 bones and XYZ and quaternions 7,000 frames,
+22 bones and XYZW for the quaternion. And if I want to render this animation, I can see this
+animation. The particularity of the Lafan is that they've given the transform for every bone
+inside of the animation directly so you could see that my character now is a
+bit deformed compared to what the LaFan animation has and that's because I've
+applied the transform coming from the animation onto my skeleton so I've
+basically changed the shape of my skeleton. What I will want to do is to
+make sure that I will match the bone translate from my skeleton and for this
+I will reload the animation but giving it the character I want to use in my case and now I will
+actually have the the same animation except that is mapped onto my character so the rotation comes
+from the the from the from the tensors and I've replaced most of the translate with the
+translate of my skeleton except for the root you could see that my character doesn't have the same
+shape, doesn't have the same size. So what happened is that I have my feet on the ground
+in this case, but that's not too worry. And one other thing that we have is that my skeleton has
+a root on top of the hips, except that the Lafan one starts from the hips directly. So my animation
+has start from the hips and you see that my roots stays there in 000. When we are in video game,
+Usually what we do is is to use that route to represent where the character would be
+inside of the world. So we don't start the animation at the hips itself. Usually we have a
+route on the ground and that route represents the entity itself, represents the capsule for the physics
+where you collide and that kind of stuff. So we tend to have a route that stays
+under the character as close as possible. So what I would do is that I would start from the
+animation here from the Lafane and I will compute automatically a route that goes under
+the hips of my character. The way I'm doing this is basically taking the position of the hips
+and I project it on the ground and I take the forward axis of the hips but I have here so
+get my forward axis here and I will also project the rotation on the ground so I project the axis
+I compute the angle around. So I don't have something that rotates in any direction on the
+ground. I'll only rotate to have the forward axis of the character basically on the ground
+and I get the projection. And so I project the hips and then because I will be moving the root,
+it will actually also move the hips. So I need to compute the inverse matrix to bring this back
+at the same spot. And that's what is computed here. So projecting on the ground and bringing back
+the hips and the root and what you have then is this. So now we have the same animation as before
+except that you could see my root is right under my hips, rotated with my hips. So it gives me
+an indication of why the forward is and that kind of stuff. And the advantage of having a root like
+this is basically now I could decide if I want to play the animation on that root or not,
+and I could say, stay here, stay here in 0, 0, 0. And that's how you have the animation on spot.
+If you actually want to have the animation on spot for some reason, you could also say that you
+you want to turn off the rotation and you have it completely on spot as local motion relative to
+a root motion that now is completely turned on and off. So you could turn on and off just the
+root keeping a bunch of the motion and that kind of stuff. That's the advantage of having a root at
+the bottom. What you could see as I said before is that my character doesn't have the same proportion
+as the character from the Laffman one, so I have my foot that are on the ground
+and also they are sliding if I bring back my character, where are you?
+The feet position will not be static on the ground, they start to slide a bit and all that kind
+of stuff and that would lead us to the study of our first paper in the next video. So I hope you
+enjoyed this one and if you want you could subscribe so you can know when I
+will start to publish the next videos studying those papers. See you next time.
