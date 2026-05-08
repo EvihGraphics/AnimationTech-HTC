@@ -22,6 +22,12 @@ Run one case:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 <slug>
 ```
 
+Open the browser-safe AnimationPapers study entry:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpapers_lab.ps1
+```
+
 Re-run the full matrix:
 
 ```powershell
@@ -71,6 +77,23 @@ docs/cases/README.md
 All viewer-heavy notebooks now pass automated execution. A manual JupyterLab smoke pass is still recommended for interactive `ipyanimlab` notebooks if visual validation is required.
 
 For day-to-day interactive preview and visual debugging, use the browser JupyterLab entrypoint instead of the VSCode notebook renderer. This repository's `ipyanimlab` and `ipywebgl` cases are validated against browser JupyterLab.
+
+For AnimationPapers study sessions, prefer the managed launcher:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpapers_lab.ps1
+```
+
+The launcher reads `tools/cases.yaml`, checks the managed AnimationPapers cases, prepares missing environments, kernels, and study notebooks with `run_case.ps1`, and opens `.reports/study/AnimationPapers`. That study directory contains stable prepared notebook copies; the raw `labs/AnimationPapers/*.ipynb` files remain source references, not the guaranteed one-click learning surface.
+
+Useful launcher options:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpapers_lab.ps1 -NoOpen
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpapers_lab.ps1 -ForceVerify
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpapers_lab.ps1 -NoReuseServer
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpapers_lab.ps1 -Port 8891
+```
 
 To launch JupyterLab for a specific case environment, use the local python executable (do not rely on a globally installed `jupyter`):
 

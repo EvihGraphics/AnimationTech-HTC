@@ -32,6 +32,8 @@ Current automated result on 2026-03-19:
 
 ## Animation Papers
 
+For interactive study, use `tools/start_animationpapers_lab.ps1`. It opens the browser-safe `.reports/study/AnimationPapers` directory containing prepared copies of the 12 notebook cases. The 2 Python-module cases remain managed validation cases through `run_case.ps1`.
+
 | Slug | Entry | Template | Assets | Status | Notes |
 | --- | --- | --- | --- | --- | --- |
 | `animation_format` | `labs/AnimationPapers/Animation Format.ipynb` | `papers-core` | `lafan1`, package USD assets | `passed` | Automated execution succeeds with local dataset cache. |

@@ -1,0 +1,379 @@
+param(
+    [switch]$Strict
+)
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
+$pythonCommand = Get-Command python -ErrorAction SilentlyContinue
+if (-not $pythonCommand) {
+    Write-Error "python was not found on PATH; docs/blog checks require Python."
+    exit 1
+}
+
+$pythonScript = @'
+import json
+import re
+import shutil
+import struct
+import subprocess
+import sys
+from pathlib import Path
+
+blog_root = Path(sys.argv[1]).resolve()
+repo_root = blog_root.parents[1]
+strict = len(sys.argv) > 2 and sys.argv[2].lower() == "true"
+
+cases_path = repo_root / "tools" / "cases.yaml"
+media_manifest_path = blog_root / "media_manifest.json"
+gold_slugs = {
+    "animation_format",
+    "footskate_cleanup_for_motion_capture_editing",
+    "motion_matching",
+    "motion_graph",
+    "real_time_planning_for_parameterized_human_motion",
+    "curve_and_spline",
+}
+
+required_sections = [
+    "## \u6a21\u5757\u62c6\u89e3",
+    "## \u6267\u884c\u7ed3\u679c\u7684\u610f\u4e49",
+]
+gold_sections = [
+    "## \u9605\u8bfb\u524d\u7f6e\u77e5\u8bc6",
+    "## \u4ee3\u7801\u6267\u884c\u8def\u5f84",
+    "## \u5173\u952e cell / \u51fd\u6570\u6df1\u8bb2",
+]
+forbidden_tokens = [
+    "\u5f85\u8865",
+    "\u5360\u4f4d",
+    "TO" + "DO",
+    "?" * 3,
+]
+label_artifact_patterns = [
+    ("code-purpose label", re.compile(r"\u4ee3\u7801\u505a\u4ec0\u4e48\?")),
+    ("output label", re.compile(r"\u8fd0\u884c\u540e\u770b\u5230\u4ec0\u4e48\?")),
+    ("meaning label", re.compile(r"\u7ed3\u679c\u8bf4\u660e\u4ec0\u4e48\?")),
+    ("generated output suffix", re.compile(r"(\u56fe\u8868\u8f93\u51fa|\u8fd0\u884c\u65e5\u5fd7\u6216\u6587\u672c\u8f93\u51fa|\u8868\u683c\u6216\u7ed3\u6784\u5316\u6570\u636e\u8f93\u51fa|\u77e9\u9635\u6216\u6570\u7ec4\u8f93\u51fa|\u53ef\u89c6\u5316 viewer \u89c6\u53e3|\u5e26 timeline \u7684\u53ef\u64ad\u653e viewer|\u4ea4\u4e92\u63a7\u4ef6\u72b6\u6001|\u4ee3\u7801\u903b\u8f91\u7247\u6bb5|\u6e90\u7801\u7247\u6bb5|\u547d\u4ee4\u65e5\u5fd7|\u4ea7\u7269\u6458\u8981|\u6a21\u5757\u6d41\u7a0b\u56fe)\?")),
+]
+stale_phase_phrases = [
+    "\u91d1\u6807\u51c6\u6df1\u5199",
+    "\u5148\u628a 6 \u4e2a\u4ee3\u8868\u6848\u4f8b\u6269\u5199",
+    "\u91d1\u6807\u51c6\u6848\u4f8b",
+    "\u7b2c\u4e8c\u9636\u6bb5",
+    "\u7b2c\u4e09\u9636\u6bb5",
+    "\u7b2c\u56db\u9636\u6bb5",
+]
+
+errors = []
+
+def add_error(message):
+    errors.append(message)
+
+def read_text(path):
+    return Path(path).read_text(encoding="utf-8-sig")
+
+def count_mermaid(text):
+    return text.count("```mermaid")
+
+def resolve_blog_relative(base_file, relative_path):
+    clean = relative_path.split("#", 1)[0].split("?", 1)[0].strip()
+    if not clean:
+        return None
+    return (Path(base_file).parent / clean).resolve()
+
+def check_asset_links(file_path, text):
+    pattern = re.compile(r"!\[[^\]]*\]\((assets/[^)]+)\)|\[[^\]]+\]\((assets/[^)]+)\)")
+    for match in pattern.finditer(text):
+        asset_rel = match.group(1) or match.group(2)
+        asset_path = resolve_blog_relative(file_path, asset_rel)
+        if asset_path is not None and not asset_path.exists():
+            add_error(f"Broken asset reference in {file_path}: {asset_rel}")
+
+def check_text_artifacts(file_path, text):
+    for label, pattern in label_artifact_patterns:
+        match = pattern.search(text)
+        if match:
+            add_error(f"Generated label artifact in {file_path} ({label}): {match.group(0)}")
+
+def png_size(path):
+    with Path(path).open("rb") as handle:
+        header = handle.read(24)
+    if len(header) < 24 or not header.startswith(b"\x89PNG\r\n\x1a\n"):
+        return None
+    width, height = struct.unpack(">II", header[16:24])
+    return width, height
+
+def ffprobe_duration(path):
+    ffprobe = shutil.which("ffprobe")
+    if not ffprobe:
+        return None
+    result = subprocess.run(
+        [
+            ffprobe,
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "default=noprint_wrappers=1:nokey=1",
+            str(path),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+    try:
+        return float(result.stdout.strip())
+    except ValueError:
+        return None
+
+if not cases_path.exists():
+    add_error(f"Missing manifest: {cases_path}")
+    manifest = {"cases": []}
+else:
+    manifest = json.loads(read_text(cases_path))
+
+if media_manifest_path.exists():
+    media_manifest = json.loads(read_text(media_manifest_path))
+else:
+    media_manifest = None
+
+target_cases = [
+    case for case in manifest["cases"]
+    if case["entry"].startswith("labs/AnimationPapers/")
+    or case["entry"].startswith("labs/Theory/")
+]
+target_by_slug = {case["slug"]: case for case in target_cases}
+target_slugs = set(target_by_slug)
+
+if len(target_cases) != 19:
+    add_error(f"Expected 19 AnimationPapers/Theory cases, found {len(target_cases)}.")
+
+top_readme = blog_root / "README.md"
+top_text = read_text(top_readme) if top_readme.exists() else ""
+check_text_artifacts(top_readme, top_text)
+
+for required in [
+    "start_animationpapers_lab.ps1",
+    "run_case.ps1",
+    ".reports/study/AnimationPapers",
+    "report_blog_docs.ps1",
+]:
+    if required not in top_text:
+        add_error(f"Top README does not mention {required}.")
+
+for stale_phrase in stale_phase_phrases:
+    if stale_phrase in top_text:
+        add_error(f"Top README contains stale phase wording: {stale_phrase}")
+
+report_script = blog_root / "report_blog_docs.ps1"
+if not report_script.exists():
+    add_error(f"Missing blog report helper: {report_script}")
+
+for case in target_cases:
+    group = "AnimationPapers" if case["entry"].startswith("labs/AnimationPapers/") else "Theory"
+    slug = case["slug"]
+    case_dir = blog_root / group / slug
+    readme = case_dir / "README.md"
+    assets_dir = case_dir / "assets"
+    source_path = repo_root / case["entry"]
+    group_readme = blog_root / group / "README.md"
+
+    if not case_dir.exists():
+        add_error(f"Missing case directory: {group}/{slug}")
+        continue
+
+    if not readme.exists():
+        add_error(f"Missing README: {group}/{slug}")
+        continue
+
+    if not assets_dir.exists():
+        add_error(f"Missing assets directory: {group}/{slug}")
+
+    if not source_path.exists():
+        add_error(f"Manifest source does not exist for {slug}: {case['entry']}")
+
+    text = read_text(readme)
+    check_text_artifacts(readme, text)
+
+    if case["entry"] not in text:
+        add_error(f"README for {slug} does not mention manifest source path {case['entry']}.")
+
+    if count_mermaid(text) < 1:
+        add_error(f"README for {slug} needs at least one Mermaid block.")
+
+    for section in required_sections:
+        if section not in text:
+            add_error(f"README for {slug} is missing {section}.")
+
+    if forbidden_tokens[-1] in text:
+        add_error(f"README for {slug} contains mojibake marker.")
+
+    check_asset_links(readme, text)
+
+    if group_readme.exists():
+        group_text = read_text(group_readme)
+        check_text_artifacts(group_readme, group_text)
+        for stale_phrase in stale_phase_phrases:
+            if stale_phrase in group_text:
+                add_error(f"Group README contains stale phase wording: {group_readme}: {stale_phrase}")
+        if f"{slug}/README.md" not in group_text:
+            add_error(f"Group README does not link {slug}.")
+
+    if f"{group}/{slug}/README.md" not in top_text:
+        add_error(f"Top README does not link {group}/{slug}.")
+
+    if slug in gold_slugs:
+        for token in forbidden_tokens:
+            if token in text:
+                add_error(f"Gold README for {slug} contains forbidden token.")
+
+        if count_mermaid(text) < 2:
+            add_error(f"Gold README for {slug} needs at least two Mermaid blocks.")
+
+        for section in gold_sections:
+            if section not in text:
+                add_error(f"Gold README for {slug} is missing {section}.")
+
+        asset_readme = assets_dir / "README.md"
+        if not asset_readme.exists():
+            add_error(f"Gold case {slug} is missing assets/README.md.")
+        else:
+            asset_text = read_text(asset_readme)
+            for token in forbidden_tokens:
+                if token in asset_text:
+                    add_error(f"Gold assets README for {slug} contains forbidden token.")
+            check_asset_links(asset_readme, asset_text)
+
+unmanaged_dir = blog_root / "AnimationPapers" / "animation_format_inv"
+if unmanaged_dir.exists():
+    add_error(f"Unmanaged Animation Format_inv case directory should not exist: {unmanaged_dir}")
+
+if media_manifest is not None:
+    if int(media_manifest.get("version", 0)) != 4:
+        add_error("Media manifest must use version 4 full-coverage learning-card schema.")
+    if media_manifest.get("capture_mode") != "learning_cell_cards":
+        add_error("Media manifest capture_mode must be learning_cell_cards.")
+    media_cases = media_manifest.get("cases", [])
+    media_slugs = {case.get("slug") for case in media_cases}
+    if media_slugs != target_slugs:
+        add_error(f"Media manifest slugs do not match managed blog slugs: {sorted(media_slugs)}")
+
+    video_conf = media_manifest.get("video", {})
+    video_file = video_conf.get("file", "00-walkthrough.webm")
+    max_video_bytes = int(video_conf.get("max_bytes", 20 * 1024 * 1024))
+    max_video_seconds = float(video_conf.get("max_seconds", 15))
+
+    for case in media_cases:
+        slug = case.get("slug")
+        readme = repo_root / case.get("blog_readme", "")
+        assets_dir = repo_root / case.get("assets_dir", "")
+        asset_readme = assets_dir / "README.md"
+        if not readme.exists():
+            add_error(f"Media README missing for {slug}: {readme}")
+            continue
+        if not asset_readme.exists():
+            add_error(f"Media assets README missing for {slug}: {asset_readme}")
+            continue
+
+        readme_text = read_text(readme)
+        asset_text = read_text(asset_readme)
+        manifest_case = target_by_slug.get(slug, {})
+        case_kind = case.get("kind") or manifest_case.get("kind", "notebook")
+        if case_kind == "python_module":
+            if "## \u6e90\u7801\u6a21\u5757\u4e0e\u6267\u884c\u8bc1\u636e" not in readme_text:
+                add_error(f"README for {slug} is missing ## \u6e90\u7801\u6a21\u5757\u4e0e\u6267\u884c\u8bc1\u636e.")
+        elif "## \u4ee3\u7801 Cell \u4e0e\u53ef\u89c6\u5316\u7ed3\u679c" not in readme_text:
+            add_error(f"README for {slug} is missing ## \u4ee3\u7801 Cell \u4e0e\u53ef\u89c6\u5316\u7ed3\u679c.")
+        steps = case.get("steps", [])
+        if len(steps) < 5:
+            add_error(f"Media case {slug} needs at least 5 learning steps.")
+        media_entries = list(steps) + [{"file": video_file, "output_type": "video"}]
+        declared_media_files = {entry.get("file") for entry in media_entries if entry.get("file")}
+        for media_entry in media_entries:
+            media_file = media_entry.get("file")
+            media_path = assets_dir / media_file
+            media_ref = f"assets/{media_file}"
+            if not media_path.exists():
+                add_error(f"Media file missing for {slug}: {media_path}")
+                continue
+            if media_path.stat().st_size <= 0:
+                add_error(f"Media file is empty for {slug}: {media_path}")
+            if media_ref not in readme_text:
+                add_error(f"README for {slug} does not reference {media_ref}.")
+            if media_file not in asset_text:
+                add_error(f"assets README for {slug} does not list {media_file}.")
+
+            if media_file.lower().endswith(".png"):
+                size = png_size(media_path)
+                if size is None:
+                    add_error(f"PNG media is not readable for {slug}: {media_path}")
+                else:
+                    width, height = size
+                    if width < 800 or height < 450:
+                        add_error(f"PNG media is too small for a learning card for {slug}: {media_path} ({width}x{height})")
+                if media_path.stat().st_size < 10000:
+                    add_error(f"PNG media is suspiciously tiny for {slug}: {media_path}")
+            elif media_file.lower().endswith(".webm"):
+                if media_path.stat().st_size > max_video_bytes:
+                    add_error(f"WebM media is too large for {slug}: {media_path}")
+                duration = ffprobe_duration(media_path)
+                if duration is not None and duration > max_video_seconds + 0.75:
+                    add_error(f"WebM media is too long for {slug}: {media_path} ({duration:.2f}s)")
+
+        if assets_dir.exists():
+            for local_media in assets_dir.iterdir():
+                if local_media.suffix.lower() not in {".png", ".webm"}:
+                    continue
+                media_ref = f"assets/{local_media.name}"
+                if local_media.name not in declared_media_files:
+                    add_error(f"Media file for {slug} is not declared in media manifest: {local_media}")
+                if media_ref not in readme_text:
+                    add_error(f"README for {slug} does not reference local media file {media_ref}.")
+                if local_media.name not in asset_text:
+                    add_error(f"assets README for {slug} does not list local media file {local_media.name}.")
+
+        for step in steps:
+            required_step_fields = ["output_type", "code_purpose", "result_meaning", "title"]
+            if case_kind == "python_module":
+                required_step_fields.append("source_path")
+            else:
+                required_step_fields.append("cell_index")
+            for field in required_step_fields:
+                if field not in step:
+                    add_error(f"Media step for {slug} is missing {field}.")
+            if step.get("output_type") not in {
+                "log",
+                "table",
+                "plot",
+                "viewer",
+                "timeline_viewer",
+                "widget_controls",
+                "animation_viewer",
+                "code_only",
+                "latex",
+                "formula",
+                "matrix",
+                "source_excerpt",
+                "command_log",
+                "artifact_summary",
+                "diagram",
+            }:
+                add_error(f"Media step for {slug} has unsupported output_type: {step.get('output_type')}")
+
+if errors:
+    print("docs/blog check failed:")
+    for error in errors:
+        print(f" - {error}")
+    sys.exit(1)
+
+print(f"docs/blog check passed for {len(target_cases)} managed AnimationPapers/Theory cases.")
+if strict:
+    print("Strict mode currently uses the same checks as default mode.")
+'@
+
+$pythonScript | python - "$PSScriptRoot" "$($Strict.IsPresent)"
+exit $LASTEXITCODE
