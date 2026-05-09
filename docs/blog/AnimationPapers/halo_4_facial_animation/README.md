@@ -159,11 +159,6 @@ Notebook 用 slider 放大显示单个 component，检查它捕获的局部形�
 
 ![Lord Z Exaggerated Animation](../../../img/halo_faces.gif)
 
-> [!TIP]
-> **动态渲染演示视频**：以下是我们在 Jupyter 环境中录制的真实渲染过程，展示了程序化生成的 Lip-sync 动画和 5 倍乘数放大的视觉效果。
-
-![Jupyter 渲染演示](assets/talking_face_exaggerated.webp)
-
 ## 运行方式
 
 启动 AnimationPapers 的 JupyterLab 环境后，打开 `labs/AnimationPapers/Halo 4 Facial Animation.ipynb`，选择 kernel `animationtech-halo_4_facial_animation` 按 cell 顺序运行。
