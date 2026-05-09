@@ -145,6 +145,20 @@ Notebook 用 slider 放大显示单个 component，检查它捕获的局部形�
 
 ![GPU shader PCA reconstruction](assets/07_gpu_shader_reconstruction.png)
 
+## 工程经验与调参效果
+
+在对本案例进行深度验证与补全时，我们补充了以下关键工程特性：
+
+1. **真实面部动画数据增强**：
+   原始的自动化脚本（Synthetic Fallback）仅生成了一个带有水波纹形变的 12x10 扁平网格以防崩溃。为了更直观地验证面部 PCA，我们将资产替换为了经典的 `WaltHead` 3D 头模，并使用程序化几何形变（Procedural Deformation）结合随机“语音包络（Speech Envelope）”，为其合成了长达 220 帧的逼真发声与嘴唇运动（Lip-sync）序列，作为后续 PCA 压缩的输入 Ground Truth。
+2. **底层 WebGL 兼容性修复**：
+   原版 Notebook 的 Shader 存在属性对齐歧义和浮点转换 Bug。我们显式注入了 `layout(location = X)` 强制锁定顶点与法线属性通道，并将向 `viewer.uniform` 传递的数据类型严格转化为 `np.float32` 数组，彻底解决了 WebGL 渲染成扁平或崩溃的问题。
+3. **PCA 权重放大与“颜艺”恶搞（Lord Z 效应）**：
+   根据视频演讲稿的启发，我们在渲染阶段（Cell 26）做了一个有趣的调参实验：**将提取到的 PCA 主成分权重直接乘以 5 倍（`anim = anim_pca[frame] * 5.0`）**。
+   由于最终网格是“平均脸 + 分量偏移”线性累加的结果，放大 5 倍权重后，头模原本正常的说话动作被暴力放大，形成了极度夸张和扭曲的颜艺表情。这不仅复刻了当年爆火的“Lord Z”恶搞 Mod，也从侧面印证了 PCA 如何在不破坏底层模型拓扑的情况下，实现强大的全局非线性形变控制。
+
+![Lord Z Exaggerated Animation](../../../img/halo_faces.gif)
+
 ## 运行方式
 
 启动 AnimationPapers 的 JupyterLab 环境后，打开 `labs/AnimationPapers/Halo 4 Facial Animation.ipynb`，选择 kernel `animationtech-halo_4_facial_animation` 按 cell 顺序运行。
