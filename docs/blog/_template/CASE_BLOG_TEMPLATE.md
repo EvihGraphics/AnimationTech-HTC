@@ -85,6 +85,10 @@ flowchart LR
 
 ![动画预览](assets/<preview>.gif)
 
+`github_video_url` 可选；拿到 GitHub attachment / user-images URL 后，把裸 URL 放在 GIF 和本地播放器之间，GitHub README 会把它渲染为真正播放器：
+
+<github_video_url>
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/<result_file>.png" src="assets/<file>.mp4"></video>
 
 ## 关键数据结构
@@ -103,7 +107,7 @@ flowchart LR
 
 正文只引用有意义的算法输出媒体：plot、table、formula、canvas、viewer 或控件状态。禁止把浏览器滚动截图、整页 cell 截图、代码学习卡裁剪图、Jupyter chrome 截图或静态图平移缩放生成的假动画放在本节。
 
-动画正文必须先放 GIF 预览，再放 direct-src `<video>` 本地预览。MP4/H.264 作为本地预览主文件，WebM/VP9 保留在 manifest、素材清单和证据表中。GitHub 线上若过滤 repo-relative `<video>`，GIF 仍必须直接可见；要让线上显示真正视频播放器，必须把正文视频换成 GitHub attachment 或 user-images URL。
+动画正文必须先放 GIF 预览，再放 direct-src `<video>` 本地预览。MP4/H.264 作为本地预览主文件，WebM/VP9 保留在 manifest、素材清单和证据表中。GitHub 线上若过滤 repo-relative `<video>`，GIF 仍必须直接可见；要让线上显示真正视频播放器，必须在正文中加入 `github_video_url` 裸 URL。
 
 | Cell | 重点媒体 | 可视化主体 | 捕获方式 | 结果说明什么 |
 | --- | --- | --- | --- | --- |
@@ -159,13 +163,13 @@ rg -n "打开 MP4|打开 WebM|打开/下载" docs/blog --glob README.md
 线上检查项：
 
 - 正文动画至少必须显示 GIF 可动预览，不允许退回“打开 MP4 / 打开 WebM / 打开下载”链接。
-- 如果已经换成 GitHub attachment 或 user-images URL，正文动画还必须显示为内嵌播放器。
+- 如果已经配置 `github_video_url`，正文动画还必须显示为 GitHub 内嵌播放器。
 - `key_animation` 的本地播放器必须使用 MP4/H.264 direct `src`，manifest 和证据表仍必须保留 WebM/VP9。
 - 实际点击播放器，确认 Footskate 的 Final Processing 动画可以播放。
-- 如果 repo-relative `<video src="assets/...">` 被 GitHub 过滤或不能播放，则把视频上传为 GitHub attachment，并把正文视频 URL 改成 `https://github.com/user-attachments/assets/...`；仍然保持 GIF 保底预览，不恢复 link-only 写法。
+- 如果 repo-relative `<video src="assets/...">` 被 GitHub 过滤或不能播放，则把视频上传为 GitHub attachment，并把 `github_video_url` 裸 URL 放入 README；仍然保持 GIF 保底预览，不恢复 link-only 写法。
 
 当前经验记录：本地严格检查已经能保证 README 中存在 direct-src `<video>` 和 MP4/WebM 文件证据；GitHub public `main` 会过滤 repo-relative `<video>`，因此没有 attachment/user-images URL 时，线上直接可见的动态展示应以 GIF 为准。
 
 ## 素材清单
 
-每个案例在 `assets/README.md` 中维护素材清单。正文只引用已经存在的结果 PNG、GIF、MP4 或 WebM 文件，并说明它们来自哪个 cell、源码片段或命令输出；重点媒体还必须说明 `visual_subject`、`capture_kind` 和 `media_provenance`。
+每个案例在 `assets/README.md` 中维护素材清单。正文只引用已经存在的结果 PNG、GIF、MP4 或 WebM 文件，并说明它们来自哪个 cell、源码片段或命令输出；重点媒体还必须说明 `visual_subject`、`capture_kind` 和 `media_provenance`。若有 GitHub attachment / user-images 视频 URL，在 manifest step 中记录 `github_video_url`，并在 README 正文同一动画位置放置该裸 URL。

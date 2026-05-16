@@ -171,6 +171,8 @@ extra_assets = []
 embedded_video_count = 0
 direct_src_video_count = 0
 github_attachment_video_count = 0
+manifest_github_video_count = 0
+manifest_github_video_missing_readme_count = 0
 legacy_link_only_video_count = 0
 embedded_webm_without_mp4_companion_count = 0
 
@@ -216,6 +218,9 @@ for case in media_cases:
             for field in ("visual_subject", "capture_kind", "capture_selector", "publish_media_required"):
                 if field not in step:
                     key_missing_required_metadata_count += 1
+        github_video_url = step.get("github_video_url")
+        if github_video_url:
+            manifest_github_video_count += 1
 
     readme_text = read_text(readme) if readme.exists() else ""
     asset_text = read_text(asset_readme) if asset_readme.exists() else ""
@@ -225,6 +230,11 @@ for case in media_cases:
     embedded_video_count += len(video_blocks)
     direct_src_video_count += len(direct_src_video_blocks(readme_text))
     github_attachment_video_count += len(github_attachment_video_urls(readme_text))
+    manifest_github_video_missing_readme_count += sum(
+        1
+        for step in case.get("steps", [])
+        if step.get("github_video_url") and step.get("github_video_url") not in readme_text
+    )
     legacy_link_only_video_count += len(legacy_video_link_pattern.findall(readme_text))
     embedded_webm_without_mp4_companion_count += sum(
         1 for block in video_blocks if ".webm" in block.lower() and ".mp4" not in block.lower()
@@ -294,6 +304,8 @@ report = {
         "embedded_video_count": embedded_video_count,
         "direct_src_video_count": direct_src_video_count,
         "github_attachment_video_count": github_attachment_video_count,
+        "manifest_github_video_count": manifest_github_video_count,
+        "manifest_github_video_missing_readme_count": manifest_github_video_missing_readme_count,
         "legacy_link_only_video_count": legacy_link_only_video_count,
         "embedded_webm_without_mp4_companion_count": embedded_webm_without_mp4_companion_count,
     },
@@ -324,6 +336,8 @@ print(f"WebM videos: {webm_count} ({fmt_bytes(webm_bytes)})")
 print(f"Embedded video tags: {embedded_video_count}")
 print(f"Direct-src local video tags: {direct_src_video_count}")
 print(f"GitHub attachment video URLs: {github_attachment_video_count}")
+print(f"Manifest GitHub video URLs: {manifest_github_video_count}")
+print(f"Manifest GitHub video URLs missing from README: {manifest_github_video_missing_readme_count}")
 print(f"Legacy link-only video opens: {legacy_link_only_video_count}")
 print(f"Embedded WebM without MP4 companion: {embedded_webm_without_mp4_companion_count}")
 print("Output types:")

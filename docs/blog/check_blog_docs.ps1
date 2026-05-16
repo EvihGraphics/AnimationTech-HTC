@@ -135,6 +135,10 @@ legacy_video_link_pattern = re.compile(
     r"\[(?:\u6253\u5f00|\u6253\u5f00/\u4e0b\u8f7d)[^\]]*(?:MP4|WebM)[^\]]*\]\(assets/[^)]+\.(?:mp4|webm)\)",
     re.I,
 )
+github_video_url_pattern = re.compile(
+    r"^https://(?:github\.com/user-attachments/assets/[A-Za-z0-9_-]+|user-images\.githubusercontent\.com/[^\s<>)\"']+\.(?:mp4|webm|mov))$",
+    re.I,
+)
 
 def asset_refs_in_text(text):
     for match in asset_ref_pattern.finditer(text):
@@ -235,6 +239,9 @@ def has_video_preview(text, mp4_ref, webm_ref):
         if webm_ref in block and mp4_ref in text:
             return True
     return False
+
+def is_github_video_url(value):
+    return isinstance(value, str) and bool(github_video_url_pattern.match(value.strip()))
 
 def ffprobe_duration(path):
     ffprobe = shutil.which("ffprobe")
@@ -566,6 +573,12 @@ if media_manifest is not None:
                         add_error(f"Key animation for {slug} must reference GIF preview {gif_ref}: {step.get('id')}")
                     if not has_video_preview(readme_text, mp4_ref, webm_ref):
                         add_error(f"Key animation for {slug} must provide a local video preview for {mp4_ref}: {step.get('id')}")
+                    github_video_url = step.get("github_video_url")
+                    if github_video_url:
+                        if not is_github_video_url(github_video_url):
+                            add_error(f"Key animation for {slug} has invalid github_video_url: {step.get('id')}")
+                        elif github_video_url not in readme_text:
+                            add_error(f"Key animation for {slug} must reference github_video_url in README: {step.get('id')}")
                 if step.get("media_provenance") == "static_pan_zoom":
                     add_error(f"Key animation for {slug} cannot use static_pan_zoom provenance: {step.get('id')}")
                 if not has_real_controls(step, {"timeline", "parameter"}):
