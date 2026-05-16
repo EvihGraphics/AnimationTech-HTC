@@ -1,87 +1,87 @@
 # Halo 4 Facial Animation：PCA 顶点动画压缩
 
-## 元数据
+## 元数�?
 
-| 字段 | 值 |
+| 字段 | �?|
 | --- | --- |
 | slug | `halo_4_facial_animation` |
 | source path | `labs/AnimationPapers/Halo 4 Facial Animation.ipynb` |
 | env prefix | `.envs/halo_4_facial_animation` |
 | kernel | `animationtech-halo_4_facial_animation` |
-| validation status | `passed`（`manual_smoke`；自动执行通过，仍需 JupyterLab 手动冒烟） |
+| validation status | `passed`（`manual_smoke`；自动执行通过，仍需 JupyterLab 手动冒烟�?|
 
 ## 问题背景
 
-Halo 4 facial animations 这个 notebook 演示如何用主成分分析压缩面部顶点动画。原始数据是逐帧的完整头部顶点位置流：每帧都要把大量位置数据送到 GPU，内存和带宽都很昂贵。Notebook 先实现最直接的动态顶点流渲染，再用 PCA 把 220 帧面部动画压缩成 7 个主成分权重，最后写 shader 在 GPU 端用 mean head 和 7 个 component head 重建最终顶点位置。
+Halo 4 facial animations 这个 notebook 演示如何用主成分分析压缩面部顶点动画。原始数据是逐帧的完整头部顶点位置流：每帧都要把大量位置数据送到 GPU，内存和带宽都很昂贵。Notebook 先实现最直接的动态顶点流渲染，再�?PCA �?220 帧面部动画压缩成 7 个主成分权重，最后写 shader �?GPU 端用 mean head �?7 �?component head 重建最终顶点位置�?
 
-案例配置中记录的生成产物是 `labs/AnimationPapers/animated_face.dat`，公开资源包含 `halo_animated_face` 和 `ipyanimlab_package_assets`。
+案例配置中记录的生成产物�?`labs/AnimationPapers/animated_face.dat`，公开资源包含 `halo_animated_face` �?`ipyanimlab_package_assets`�?
 
 ## 总模块图
 
 ```mermaid
 flowchart TD
     A[读取 animated_face.dat] --> B[得到 indices/normals/frames]
-    B --> C[创建动态 VBO 与 VAO]
+    B --> C[创建动�?VBO �?VAO]
     C --> D[streaming shader 逐帧上传顶点]
     D --> E[评估原始顶点流内存成本]
     E --> F[PCA 拟合 7 个主成分]
     F --> G[把每帧投影成 anim_pca 权重]
     G --> H[inverse_transform 对比重建效果]
-    H --> I[最终 shader 用 mean + components + weights 重建]
+    H --> I[最�?shader �?mean + components + weights 重建]
 ```
 
 ## 模块拆解
 
 ### 1. 数据读取
 
-Notebook 通过 `pickle` 打开 `animated_face.dat`，读取 `indices`、`normals` 和 `frames`。其中 `frames` 是 220 帧顶点位置动画，后续会被 reshape 成 `[220, -1]` 作为 PCA 输入矩阵。
+Notebook 通过 `pickle` 打开 `animated_face.dat`，读�?`indices`、`normals` �?`frames`。其�?`frames` �?220 帧顶点位置动画，后续会被 reshape �?`[220, -1]` 作为 PCA 输入矩阵�?
 
 ### 2. 构建 streaming shader
 
-第一版渲染直接把 `frames[frame]` 展平成动态 VBO：`viewer.bind_buffer(buffer=vbo)` 后调用 `viewer.buffer_data(...)` 更新当前帧顶点位置。`vbo_normals` 保存法线，`vao` 描述顶点属性，shader 负责把流式顶点位置送入常规渲染管线。
+第一版渲染直接把 `frames[frame]` 展平成动�?VBO：`viewer.bind_buffer(buffer=vbo)` 后调�?`viewer.buffer_data(...)` 更新当前帧顶点位置。`vbo_normals` 保存法线，`vao` 描述顶点属性，shader 负责把流式顶点位置送入常规渲染管线�?
 
 ### 3. 暴露原始数据成本
 
-Notebook 用 `frames.size * 4 / 1024 / 1024` 估算完整顶点流的内存占用。这个步骤说明为什么不能只依赖逐帧顶点缓存：面部表情细节多、帧数多时，直接 streaming 会很快变成存储和传输瓶颈。
+Notebook �?`frames.size * 4 / 1024 / 1024` 估算完整顶点流的内存占用。这个步骤说明为什么不能只依赖逐帧顶点缓存：面部表情细节多、帧数多时，直接 streaming 会很快变成存储和传输瓶颈�?
 
 ### 4. PCA 压缩
 
-`data = frames.reshape(220, -1)` 后，`decomposition.PCA(n_components=7)` 提取 7 个主成分。PCA 会保留 `pca.mean_` 作为平均脸，并把主要变化方向放进 `pca.components_`。这些 component 可以理解为可加权的“表情基”。
+`data = frames.reshape(220, -1)` 后，`decomposition.PCA(n_components=7)` 提取 7 个主成分。PCA 会保�?`pca.mean_` 作为平均脸，并把主要变化方向放进 `pca.components_`。这�?component 可以理解为可加权的“表情基”�?
 
 ### 5. 主成分检查与逐帧权重
 
-Notebook 用 slider 放大显示单个 component，检查它捕获的局部形变是否合理。随后 `anim_pca = pca.transform(data)` 将每一帧压成 7 个系数。原来每帧需要完整顶点数组，现在每帧只需要 7 个权重加上共享的 mean/components。
+Notebook �?slider 放大显示单个 component，检查它捕获的局部形变是否合理。随�?`anim_pca = pca.transform(data)` 将每一帧压�?7 个系数。原来每帧需要完整顶点数组，现在每帧只需�?7 个权重加上共享的 mean/components�?
 
-### 6. PCA 重建与最终 shader
+### 6. PCA 重建与最�?shader
 
-中间版本用 `pca.inverse_transform(anim_pca[frame])` 在 CPU 端重建完整头部，并把原始流与 PCA 重建结果并排比较。最终版本创建 `vbo_mean` 和 `vbo_pca_0` 到 `vbo_pca_6`，shader 接收 7 个权重，在顶点阶段直接计算最终位置，避免每帧上传完整顶点流。
+中间版本�?`pca.inverse_transform(anim_pca[frame])` �?CPU 端重建完整头部，并把原始流与 PCA 重建结果并排比较。最终版本创�?`vbo_mean` �?`vbo_pca_0` �?`vbo_pca_6`，shader 接收 7 个权重，在顶点阶段直接计算最终位置，避免每帧上传完整顶点流�?
 
 ## 关键数据结构
 
-| 名称 | 形状或类型 | 作用 |
+| 名称 | 形状或类�?| 作用 |
 | --- | --- | --- |
-| `indices` | index buffer | 头模三角形索引 |
+| `indices` | index buffer | 头模三角形索�?|
 | `normals` | `[vertex_count, 3]` | 顶点法线 |
-| `frames` | `[220, vertex_count, 3]` | 原始逐帧顶点位置流 |
-| `data` | `[220, vertex_count * 3]` | PCA 的二维输入矩阵 |
-| `pca.mean_` | `[vertex_count * 3]` | 平均脸顶点位置 |
+| `frames` | `[220, vertex_count, 3]` | 原始逐帧顶点位置�?|
+| `data` | `[220, vertex_count * 3]` | PCA 的二维输入矩�?|
+| `pca.mean_` | `[vertex_count * 3]` | 平均脸顶点位�?|
 | `pca.components_` | `[7, vertex_count * 3]` | 7 个主成分形变方向 |
-| `anim_pca` | `[220, 7]` | 每帧的 PCA 权重 |
+| `anim_pca` | `[220, 7]` | 每帧�?PCA 权重 |
 | `vbo_mean` / `vbo_pca_*` | GPU buffer | shader 重建时使用的共享形变数据 |
 
-## 执行结果的意义
+## 执行结果的意�?
 
-这份 notebook 展示了一个典型的面部动画压缩思路：把高维顶点序列拆成少量共享形变基和逐帧权重。PCA 重建结果如果与原始流足够接近，就说明主要表情变化已被 7 个分量捕获；最终 shader 版本则说明这些权重可以直接用于实时渲染管线，而不必每帧上传完整 mesh。
+这份 notebook 展示了一个典型的面部动画压缩思路：把高维顶点序列拆成少量共享形变基和逐帧权重。PCA 重建结果如果与原始流足够接近，就说明主要表情变化已被 7 个分量捕获；最�?shader 版本则说明这些权重可以直接用于实时渲染管线，而不必每帧上传完�?mesh�?
 
 ## 关键 cell / 函数深讲
 
 ### Cell 5 - Face mesh data loading
 
-加载被序列化为 picke 文件的三角面片索引、法线，以及逐帧的顶点位置流。
+加载被序列化�?picke 文件的三角面片索引、法线，以及逐帧的顶点位置流�?
 
 ```mermaid
 flowchart LR
-    A[animated_face.dat] --> B[读取 indices 和 normals]
+    A[animated_face.dat] --> B[读取 indices �?normals]
     A --> C[读取 frames 动画序列]
     B --> D[校验网格拓扑]
     C --> E[提取逐帧顶点位置]
@@ -97,7 +97,7 @@ flowchart LR
 
 ### Cell 11 - Raw vertex-stream face playback
 
-将逐帧顶点上传到 WebGL buffer 中，直接渲染动画的人脸网格。不加任何压缩。
+将逐帧顶点上传�?WebGL buffer 中，直接渲染动画的人脸网格。不加任何压缩�?
 
 ```mermaid
 flowchart LR
@@ -117,16 +117,16 @@ flowchart LR
 
 ![Raw vertex-stream face playback preview](assets/02_raw_vertex_stream_viewer_preview.gif)
 
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_raw_vertex_stream_viewer_result.png" src="assets/02_raw_vertex_stream_viewer_preview.mp4"></video>
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_raw_vertex_stream_viewer_result.png" src="https://github.com/EvihGraphics/AnimationTech-HTC/raw/main/docs/blog/AnimationPapers/halo_4_facial_animation/assets/02_raw_vertex_stream_viewer_preview.mp4"></video>
 
 ### Cell 13 - Raw animation memory size
 
-估算原始顶点动画序列占据的内存大小，说明为什么使用全顶点流的代价非常昂贵。
+估算原始顶点动画序列占据的内存大小，说明为什么使用全顶点流的代价非常昂贵�?
 
 ```mermaid
 flowchart LR
     A[frames 数组] --> B[计算 bytes 大小]
-    B --> C[换算为 MB]
+    B --> C[换算�?MB]
     C --> D[证明数据量庞大，需压缩]
 ```
 
@@ -140,7 +140,7 @@ flowchart LR
 
 ### Cell 17 - Seven PCA component layout
 
-将顶点数据展平后，拟合 7 个分量的 PCA。将一个大体积的顶点流变成了均值加上少数特征向量。
+将顶点数据展平后，拟�?7 个分量的 PCA。将一个大体积的顶点流变成了均值加上少数特征向量�?
 
 ```mermaid
 flowchart LR
@@ -161,7 +161,7 @@ flowchart LR
 
 ### Cell 19 - PCA component deformation viewer
 
-通过控件观察单个 PCA 分量的形变。这反映了面部的基础运动基向量，并且根据语音稿，这里可以调节数值产生例如 Lord Z 恶搞的效果。
+通过控件观察单个 PCA 分量的形变。这反映了面部的基础运动基向量，并且根据语音稿，这里可以调节数值产生例�?Lord Z 恶搞的效果�?
 
 ```mermaid
 flowchart LR
@@ -180,16 +180,16 @@ flowchart LR
 
 ![PCA component deformation viewer preview](assets/05_pca_component_viewer_preview.gif)
 
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/05_pca_component_viewer_result.png" src="assets/05_pca_component_viewer_preview.mp4"></video>
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/05_pca_component_viewer_result.png" src="https://github.com/EvihGraphics/AnimationTech-HTC/raw/main/docs/blog/AnimationPapers/halo_4_facial_animation/assets/05_pca_component_viewer_preview.mp4"></video>
 
 ### Cell 23 - CPU PCA reconstruction playback
 
-在 CPU 端重建 PCA 并绘制与原动作的对比图。用来验证少数成分是否能还原主要的表情动作。
+�?CPU 端重�?PCA 并绘制与原动作的对比图。用来验证少数成分是否能还原主要的表情动作�?
 
 ```mermaid
 flowchart LR
     A[PCA weights] --> B[pca.inverse_transform]
-    B --> C[在 CPU 端恢复完整顶点流]
+    B --> C[�?CPU 端恢复完整顶点流]
     C --> D[同时渲染 ground truth 和重建脸]
     D --> E[视觉上对比质量]
 ```
@@ -204,16 +204,16 @@ flowchart LR
 
 ![CPU PCA reconstruction playback preview](assets/06_cpu_reconstruction_compare_preview.gif)
 
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_cpu_reconstruction_compare_result.png" src="assets/06_cpu_reconstruction_compare_preview.mp4"></video>
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_cpu_reconstruction_compare_result.png" src="https://github.com/EvihGraphics/AnimationTech-HTC/raw/main/docs/blog/AnimationPapers/halo_4_facial_animation/assets/06_cpu_reconstruction_compare_preview.mp4"></video>
 
 ### Cell 26 - GPU shader PCA reconstruction
 
-把平均脸和 7 个分量作为 VBO 传输到 GPU，shader 通过统一的权重在顶点着色器中即时求和重建动作。
+把平均脸�?7 个分量作�?VBO 传输�?GPU，shader 通过统一的权重在顶点着色器中即时求和重建动作�?
 
 ```mermaid
 flowchart LR
-    A[vbo_mean 和 vbo_pca_0..6] --> B[GPU 显存]
-    C[逐帧 7 个 weights 数组] --> D[shader uniform]
+    A[vbo_mean �?vbo_pca_0..6] --> B[GPU 显存]
+    C[逐帧 7 �?weights 数组] --> D[shader uniform]
     B --> E[Vertex Shader]
     D --> E
     E --> F[基于基向量动态组装面部顶点]
@@ -230,61 +230,61 @@ flowchart LR
 
 ![GPU shader PCA reconstruction preview](assets/07_gpu_shader_reconstruction_preview.gif)
 
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_gpu_shader_reconstruction_result.png" src="assets/07_gpu_shader_reconstruction_preview.mp4"></video>
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_gpu_shader_reconstruction_result.png" src="https://github.com/EvihGraphics/AnimationTech-HTC/raw/main/docs/blog/AnimationPapers/halo_4_facial_animation/assets/07_gpu_shader_reconstruction_preview.mp4"></video>
 
-## 工程经验与调参效果
+## 工程经验与调参效�?
 
 在对本案例进行深度验证与补全时，我们补充了以下关键工程特性：
 
-1. **真实面部动画数据增强**：
-   原始的自动化脚本（Synthetic Fallback）仅生成了一个带有水波纹形变的 12x10 扁平网格以防崩溃。为了更直观地验证面部 PCA，我们将资产替换为了经典的 `WaltHead` 3D 头模，并使用程序化几何形变（Procedural Deformation）结合随机“语音包络（Speech Envelope）”，为其合成了长达 220 帧的逼真发声与嘴唇运动（Lip-sync）序列，作为后续 PCA 压缩的输入 Ground Truth。
-2. **底层 WebGL 兼容性修复**：
-   原版 Notebook 的 Shader 存在属性对齐歧义和浮点转换 Bug。我们显式注入了 `layout(location = X)` 强制锁定顶点与法线属性通道，并将向 `viewer.uniform` 传递的数据类型严格转化为 `np.float32` 数组，彻底解决了 WebGL 渲染成扁平或崩溃的问题。
-3. **PCA 权重放大与“颜艺”恶搞（Lord Z 效应）**：
-   根据视频演讲稿的启发，我们在渲染阶段（Cell 26）做了一个有趣的调参实验：**将提取到的 PCA 主成分权重直接乘以 5 倍（`anim = anim_pca[frame] * 5.0`）**。
-   由于最终网格是“平均脸 + 分量偏移”线性累加的结果，放大 5 倍权重后，头模原本正常的说话动作被暴力放大，形成了极度夸张和扭曲的颜艺表情。这不仅复刻了当年爆火的“Lord Z”恶搞 Mod，也从侧面印证了 PCA 如何在不破坏底层模型拓扑的情况下，实现强大的全局非线性形变控制。
+1. **真实面部动画数据增强**�?
+   原始的自动化脚本（Synthetic Fallback）仅生成了一个带有水波纹形变�?12x10 扁平网格以防崩溃。为了更直观地验证面�?PCA，我们将资产替换为了经典�?`WaltHead` 3D 头模，并使用程序化几何形变（Procedural Deformation）结合随机“语音包络（Speech Envelope）”，为其合成了长�?220 帧的逼真发声与嘴唇运动（Lip-sync）序列，作为后续 PCA 压缩的输�?Ground Truth�?
+2. **底层 WebGL 兼容性修�?*�?
+   原版 Notebook �?Shader 存在属性对齐歧义和浮点转换 Bug。我们显式注入了 `layout(location = X)` 强制锁定顶点与法线属性通道，并将向 `viewer.uniform` 传递的数据类型严格转化�?`np.float32` 数组，彻底解决了 WebGL 渲染成扁平或崩溃的问题�?
+3. **PCA 权重放大与“颜艺”恶搞（Lord Z 效应�?*�?
+   根据视频演讲稿的启发，我们在渲染阶段（Cell 26）做了一个有趣的调参实验�?*将提取到�?PCA 主成分权重直接乘�?5 倍（`anim = anim_pca[frame] * 5.0`�?*�?
+   由于最终网格是“平均脸 + 分量偏移”线性累加的结果，放�?5 倍权重后，头模原本正常的说话动作被暴力放大，形成了极度夸张和扭曲的颜艺表情。这不仅复刻了当年爆火的“Lord Z”恶�?Mod，也从侧面印证了 PCA 如何在不破坏底层模型拓扑的情况下，实现强大的全局非线性形变控制�?
 
 ![Lord Z Exaggerated Animation](../../../img/halo_faces.gif)
 
 ## 运行方式
 
-启动 AnimationPapers 的 JupyterLab 环境后，打开 `labs/AnimationPapers/Halo 4 Facial Animation.ipynb`，选择 kernel `animationtech-halo_4_facial_animation` 按 cell 顺序运行。
+启动 AnimationPapers �?JupyterLab 环境后，打开 `labs/AnimationPapers/Halo 4 Facial Animation.ipynb`，选择 kernel `animationtech-halo_4_facial_animation` �?cell 顺序运行�?
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpapers_lab.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 halo_4_facial_animation
 ```
 
-本文档只整理 notebook 结构与工程含义，未重新执行 notebook。
+本文档只整理 notebook 结构与工程含义，未重新执�?notebook�?
 
-## 重点可视化 / 动画
+## 重点可视�?/ 动画
 
-本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
+本节只放 `key_visual` �?`key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复�?cell 或源码上下文�?
 
 
 ![Raw vertex-stream face playback](assets/02_raw_vertex_stream_viewer_preview.gif)
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_raw_vertex_stream_viewer_result.png">
-  <source src="assets/02_raw_vertex_stream_viewer_preview.mp4" type="video/mp4">
-  <source src="assets/02_raw_vertex_stream_viewer_preview.webm" type="video/webm">
+  <source src="https://github.com/EvihGraphics/AnimationTech-HTC/raw/main/docs/blog/AnimationPapers/halo_4_facial_animation/assets/02_raw_vertex_stream_viewer_preview.mp4" type="video/mp4">
+  <source src="https://github.com/EvihGraphics/AnimationTech-HTC/raw/main/docs/blog/AnimationPapers/halo_4_facial_animation/assets/02_raw_vertex_stream_viewer_preview.webm" type="video/webm">
 </video>
 
 
 **Cell 23 - CPU PCA reconstruction playback**
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_cpu_reconstruction_compare_result.png">
-  <source src="assets/06_cpu_reconstruction_compare_preview.mp4" type="video/mp4">
-  <source src="assets/06_cpu_reconstruction_compare_preview.webm" type="video/webm">
+  <source src="https://github.com/EvihGraphics/AnimationTech-HTC/raw/main/docs/blog/AnimationPapers/halo_4_facial_animation/assets/06_cpu_reconstruction_compare_preview.mp4" type="video/mp4">
+  <source src="https://github.com/EvihGraphics/AnimationTech-HTC/raw/main/docs/blog/AnimationPapers/halo_4_facial_animation/assets/06_cpu_reconstruction_compare_preview.webm" type="video/webm">
 </video>
 
 **Cell 26 - GPU shader PCA reconstruction**
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_gpu_shader_reconstruction_result.png">
-  <source src="assets/07_gpu_shader_reconstruction_preview.mp4" type="video/mp4">
-  <source src="assets/07_gpu_shader_reconstruction_preview.webm" type="video/webm">
+  <source src="https://github.com/EvihGraphics/AnimationTech-HTC/raw/main/docs/blog/AnimationPapers/halo_4_facial_animation/assets/07_gpu_shader_reconstruction_preview.mp4" type="video/mp4">
+  <source src="https://github.com/EvihGraphics/AnimationTech-HTC/raw/main/docs/blog/AnimationPapers/halo_4_facial_animation/assets/07_gpu_shader_reconstruction_preview.webm" type="video/webm">
 </video>
 
-| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| Cell | 输出类型 | 媒体角色 | 可视化主�?| 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |
 | Cell 11 | `timeline_viewer` | `key_animation` | Raw vertex-stream face playback: This shows the raw per-frame geometry playback before any compression. | `canvas` | [结果 PNG](assets/02_raw_vertex_stream_viewer_result.png) / [GIF](assets/02_raw_vertex_stream_viewer_preview.gif) / [MP4](assets/02_raw_vertex_stream_viewer_preview.mp4) / [WebM](assets/02_raw_vertex_stream_viewer_preview.webm) |
 | Cell 19 | `widget_controls` | `key_visual` | PCA component deformation viewer: The widget makes a basis component visible as a facial deformation direction. | `widget_controls` | [结果 PNG](assets/05_pca_component_viewer_result.png) / [GIF](assets/05_pca_component_viewer_preview.gif) / [MP4](assets/05_pca_component_viewer_preview.mp4) / [WebM](assets/05_pca_component_viewer_preview.webm) |
@@ -294,7 +294,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 halo_4_
 
 ## 代码 Cell 与可视化结果
 
-本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+本节保留每个 cell 的可复现证据。结�?PNG 用于正文阅读，代码卡记录代码摘要与输出来源；�?timeline 或参数滑杆的 cell 同时提供 GIF、MP4 �?WebM�?
 
 | Cell / 片段 | 结果说明 | 证据 |
 | --- | --- | --- |
