@@ -287,6 +287,8 @@ notebook 先用普通版本生成 `solved_animation`，后面又用 `L4 = 1000` 
 
 ![Final Processing boundary smoothing](assets/06_final_processing_compare_result.png)
 
+![Final Processing boundary smoothing preview](assets/06_final_processing_compare_preview.gif)
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_final_processing_compare_result.png">
   <source src="assets/06_final_processing_compare_preview.mp4" type="video/mp4">
   <source src="assets/06_final_processing_compare_preview.webm" type="video/webm">
@@ -311,6 +313,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 footska
   <source src="assets/00-walkthrough.mp4" type="video/mp4">
   <source src="assets/00-walkthrough.webm" type="video/webm">
 </video>
+
+![Final Processing boundary smoothing preview](assets/06_final_processing_compare_preview.gif)
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_final_processing_compare_result.png">
   <source src="assets/06_final_processing_compare_preview.mp4" type="video/mp4">

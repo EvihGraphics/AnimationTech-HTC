@@ -81,7 +81,9 @@ flowchart LR
 
 ![重点结果](assets/<result_file>.png)
 
-若本 cell 有 timeline 或参数滑杆，在正文中优先放内嵌视频播放器。MP4/H.264 作为主 source，WebM/VP9 作为 fallback source；GIF 只保留为轻量预览、poster 或附录证据：
+若本 cell 有 timeline 或参数滑杆，正文必须先放可直接预览的 GIF，再放视频播放器。GitHub README 会过滤仓库相对路径的 `<video>`，所以 repo-local MP4/WebM 的 `<video>` 只能作为源码语义和本地预览；线上要显示真正播放器时，必须把 `<source>` 替换成 GitHub attachment 或 user-images URL。GIF 是 GitHub README 的保底可动预览，不需要读者额外打开：
+
+![动画预览](assets/<preview>.gif)
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/<result_file>.png">
   <source src="assets/<file>.mp4" type="video/mp4">
@@ -104,7 +106,7 @@ flowchart LR
 
 正文只引用有意义的算法输出媒体：plot、table、formula、canvas、viewer 或控件状态。禁止把浏览器滚动截图、整页 cell 截图、代码学习卡裁剪图、Jupyter chrome 截图或静态图平移缩放生成的假动画放在本节。
 
-动画正文必须直接嵌入 `<video>` 播放器：MP4/H.264 作为主 source，WebM/VP9 作为 fallback source。GIF 只作为 poster、轻量预览或附录证据，不替代正文播放器。
+动画正文必须先放 GIF 预览，再放 `<video>` 播放器。MP4/H.264 作为主 source，WebM/VP9 作为 fallback source。GitHub 线上若过滤 repo-relative `<video>`，GIF 仍必须直接可见；要让线上显示真正视频播放器，必须把 source 换成 GitHub attachment 或 user-images URL。
 
 | Cell | 重点媒体 | 可视化主体 | 捕获方式 | 结果说明什么 |
 | --- | --- | --- | --- | --- |
@@ -133,6 +135,39 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpaper
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 <slug>
 ```
+
+## 发布验收清单
+
+本地检查只保证 README 写法、manifest 字段和媒体文件存在；GitHub 最终渲染结果必须以上线页面为准。处理完成后由 Codex 自行打开 GitHub 页面核对，不需要向用户确认是否可以访问。
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\docs\blog\check_blog_docs.ps1 -Strict
+powershell -NoProfile -ExecutionPolicy Bypass -File .\docs\blog\report_blog_docs.ps1
+rg -n "打开 MP4|打开 WebM|打开/下载" docs/blog --glob README.md
+```
+
+验收标准：
+
+- `check_blog_docs.ps1 -Strict` 通过。
+- `report_blog_docs.ps1` 中 `Legacy link-only video opens` 为 `0`，`Embedded WebM without MP4 companion` 为 `0`，`Potential issues` 为 `0`。
+- `rg` 不应在任何博客 README 中找到旧式视频入口。
+- `ffprobe` 抽查重点动画：MP4 为 H.264，WebM 为 VP9。
+
+## GitHub 发布验证
+
+推送后打开对应 GitHub README 页面，而不是只看本地 Markdown。以 Footskate 为例：
+
+<https://github.com/EvihGraphics/AnimationTech-HTC/tree/main/docs/blog/AnimationPapers/footskate_cleanup_for_motion_capture_editing>
+
+线上检查项：
+
+- 正文动画至少必须显示 GIF 可动预览，不允许退回“打开 MP4 / 打开 WebM / 打开下载”链接。
+- 如果已经换成 GitHub attachment 或 user-images URL，正文动画还必须显示为内嵌播放器。
+- `key_animation` 的播放器必须包含 MP4/H.264 source 和 WebM/VP9 source。
+- 实际点击播放器，确认 Footskate 的 Final Processing 动画可以播放。
+- 如果 repo-relative `<source src="assets/...">` 被 GitHub 过滤或不能播放，则把视频上传为 GitHub attachment，并将 `<source>` 改成 `https://github.com/user-attachments/assets/...`；仍然保持 GIF 保底预览，不恢复 link-only 写法。
+
+当前经验记录：本地严格检查已经能保证 README 中存在 `<video>` 和 MP4/WebM source；GitHub public `main` 会过滤 repo-relative `<video>`，因此没有 attachment/user-images URL 时，线上直接可见的动态展示应以 GIF 为准。
 
 ## 素材清单
 
