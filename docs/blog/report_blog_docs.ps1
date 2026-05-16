@@ -94,6 +94,16 @@ def asset_refs_in_text(text):
 def html_video_blocks(text):
     return re.findall(r"<video\b[^>]*>.*?</video>", text, flags=re.I | re.S)
 
+def direct_src_video_blocks(text):
+    return re.findall(r"<video\b[^>]*\bsrc=[\"'][^\"']+[\"'][^>]*>.*?</video>", text, flags=re.I | re.S)
+
+def github_attachment_video_urls(text):
+    pattern = re.compile(
+        r"https://(?:github\.com/user-attachments/assets/[A-Za-z0-9_-]+|user-images\.githubusercontent\.com/[^\s<>)\"']+\.(?:mp4|webm|mov))",
+        re.I,
+    )
+    return pattern.findall(text)
+
 manifest = json.loads(read_text(cases_path))
 media_manifest = json.loads(read_text(media_manifest_path))
 
@@ -159,6 +169,8 @@ cell_mermaid_counts = {}
 unreferenced_assets = []
 extra_assets = []
 embedded_video_count = 0
+direct_src_video_count = 0
+github_attachment_video_count = 0
 legacy_link_only_video_count = 0
 embedded_webm_without_mp4_companion_count = 0
 
@@ -211,6 +223,8 @@ for case in media_cases:
     cell_mermaid_counts[slug] = count_cell_mermaid(readme_text)
     video_blocks = html_video_blocks(readme_text)
     embedded_video_count += len(video_blocks)
+    direct_src_video_count += len(direct_src_video_blocks(readme_text))
+    github_attachment_video_count += len(github_attachment_video_urls(readme_text))
     legacy_link_only_video_count += len(legacy_video_link_pattern.findall(readme_text))
     embedded_webm_without_mp4_companion_count += sum(
         1 for block in video_blocks if ".webm" in block.lower() and ".mp4" not in block.lower()
@@ -278,6 +292,8 @@ report = {
         "key_missing_provenance_count": key_missing_provenance_count,
         "key_missing_required_metadata_count": key_missing_required_metadata_count,
         "embedded_video_count": embedded_video_count,
+        "direct_src_video_count": direct_src_video_count,
+        "github_attachment_video_count": github_attachment_video_count,
         "legacy_link_only_video_count": legacy_link_only_video_count,
         "embedded_webm_without_mp4_companion_count": embedded_webm_without_mp4_companion_count,
     },
@@ -306,6 +322,8 @@ print(f"GIF previews: {gif_count} ({fmt_bytes(gif_bytes)})")
 print(f"MP4 videos: {mp4_count} ({fmt_bytes(mp4_bytes)})")
 print(f"WebM videos: {webm_count} ({fmt_bytes(webm_bytes)})")
 print(f"Embedded video tags: {embedded_video_count}")
+print(f"Direct-src local video tags: {direct_src_video_count}")
+print(f"GitHub attachment video URLs: {github_attachment_video_count}")
 print(f"Legacy link-only video opens: {legacy_link_only_video_count}")
 print(f"Embedded WebM without MP4 companion: {embedded_webm_without_mp4_companion_count}")
 print("Output types:")

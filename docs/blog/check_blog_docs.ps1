@@ -228,9 +228,11 @@ def section_between(text, heading, next_prefix="\n## "):
 def html_video_blocks(text):
     return re.findall(r"<video\b[^>]*>.*?</video>", text, flags=re.I | re.S)
 
-def has_video_embed(text, mp4_ref, webm_ref):
+def has_video_preview(text, mp4_ref, webm_ref):
     for block in html_video_blocks(text):
-        if mp4_ref in block and webm_ref in block:
+        if mp4_ref in block:
+            return True
+        if webm_ref in block and mp4_ref in text:
             return True
     return False
 
@@ -557,10 +559,13 @@ if media_manifest is not None:
                 if not (step.get("video_mp4") and step.get("video_webm")):
                     add_error(f"Key animation for {slug} requires both video_mp4 and video_webm: {step.get('id')}")
                 elif strict:
+                    gif_ref = f"assets/{step.get('preview_gif')}"
                     mp4_ref = f"assets/{step.get('video_mp4')}"
                     webm_ref = f"assets/{step.get('video_webm')}"
-                    if not has_video_embed(readme_text, mp4_ref, webm_ref):
-                        add_error(f"Key animation for {slug} must embed video sources {mp4_ref} and {webm_ref}: {step.get('id')}")
+                    if gif_ref not in readme_text:
+                        add_error(f"Key animation for {slug} must reference GIF preview {gif_ref}: {step.get('id')}")
+                    if not has_video_preview(readme_text, mp4_ref, webm_ref):
+                        add_error(f"Key animation for {slug} must provide a local video preview for {mp4_ref}: {step.get('id')}")
                 if step.get("media_provenance") == "static_pan_zoom":
                     add_error(f"Key animation for {slug} cannot use static_pan_zoom provenance: {step.get('id')}")
                 if not has_real_controls(step, {"timeline", "parameter"}):
