@@ -79,7 +79,10 @@ flowchart LR
 
 ![Cell 7-18 - 从原始样例到 canonical clips preview](assets/04_resampled_canonical_clips_preview.gif)
 
-[打开 MP4](assets/04_resampled_canonical_clips_preview.mp4) / [打开 WebM](assets/04_resampled_canonical_clips_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_resampled_canonical_clips_result.png">
+  <source src="assets/04_resampled_canonical_clips_preview.mp4" type="video/mp4">
+  <source src="assets/04_resampled_canonical_clips_preview.webm" type="video/webm">
+</video>
 
 ### Cell 20-23 - B-spline 压缩与重建
 
@@ -97,7 +100,10 @@ B-spline viewer 验证曲线压缩是否仍能播放，而不是只在数值上�
 
 ![Cell 20-23 - B-spline 压缩与重建 preview](assets/06_bspline_reconstruction_viewer_preview.gif)
 
-[打开 MP4](assets/06_bspline_reconstruction_viewer_preview.mp4) / [打开 WebM](assets/06_bspline_reconstruction_viewer_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_bspline_reconstruction_viewer_result.png">
+  <source src="assets/06_bspline_reconstruction_viewer_preview.mp4" type="video/mp4">
+  <source src="assets/06_bspline_reconstruction_viewer_preview.webm" type="video/webm">
+</video>
 
 ### Cell 26-33 - RBF runtime controls
 
@@ -118,7 +124,10 @@ flowchart LR
 
 ![Cell 26-33 - RBF runtime controls preview](assets/08_final_interpolated_adverb_controls_preview.gif)
 
-[打开 MP4](assets/08_final_interpolated_adverb_controls_preview.mp4) / [打开 WebM](assets/08_final_interpolated_adverb_controls_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_final_interpolated_adverb_controls_result.png">
+  <source src="assets/08_final_interpolated_adverb_controls_preview.mp4" type="video/mp4">
+  <source src="assets/08_final_interpolated_adverb_controls_preview.webm" type="video/webm">
+</video>
 
 ## 关键数据结构
 
@@ -136,11 +145,49 @@ canonical clips 验证相位对齐；B-spline viewer 验证曲线压缩可播放
 
 本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
-[打开/下载总览 WebM](assets/00-walkthrough.webm)
 
 ![Raw sample clip overview](assets/01_raw_sample_clips_preview.gif)
 
-[打开 MP4](assets/01_raw_sample_clips_preview.mp4) / [打开 WebM](assets/01_raw_sample_clips_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/01_raw_sample_clips_result.png">
+  <source src="assets/01_raw_sample_clips_preview.mp4" type="video/mp4">
+  <source src="assets/01_raw_sample_clips_preview.webm" type="video/webm">
+</video>
+
+
+**Cell 10 - Canonical timing and contact inspection**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_canonical_timing_contacts_result.png">
+  <source src="assets/02_canonical_timing_contacts_preview.mp4" type="video/mp4">
+  <source src="assets/02_canonical_timing_contacts_preview.webm" type="video/webm">
+</video>
+
+**Cell 14 - Looping animation comparison**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/03_looping_animation_compare_result.png">
+  <source src="assets/03_looping_animation_compare_preview.mp4" type="video/mp4">
+  <source src="assets/03_looping_animation_compare_preview.webm" type="video/webm">
+</video>
+
+**Cell 18 - Resampled canonical clips**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_resampled_canonical_clips_result.png">
+  <source src="assets/04_resampled_canonical_clips_preview.mp4" type="video/mp4">
+  <source src="assets/04_resampled_canonical_clips_preview.webm" type="video/webm">
+</video>
+
+**Cell 23 - B-spline reconstruction viewer**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_bspline_reconstruction_viewer_result.png">
+  <source src="assets/06_bspline_reconstruction_viewer_preview.mp4" type="video/mp4">
+  <source src="assets/06_bspline_reconstruction_viewer_preview.webm" type="video/webm">
+</video>
+
+**Cell 33 - Final interpolated adverb controls**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_final_interpolated_adverb_controls_result.png">
+  <source src="assets/08_final_interpolated_adverb_controls_preview.mp4" type="video/mp4">
+  <source src="assets/08_final_interpolated_adverb_controls_preview.webm" type="video/webm">
+</video>
 
 | Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |

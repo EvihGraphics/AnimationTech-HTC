@@ -80,7 +80,10 @@ contact viewer 验证片段切分是否保留物理约束。
 
 ![Cell 5-16 - Clip 与 contact 约束 preview](assets/04_contact_constraint_viewer_preview.gif)
 
-[打开 MP4](assets/04_contact_constraint_viewer_preview.mp4) / [打开 WebM](assets/04_contact_constraint_viewer_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_contact_constraint_viewer_result.png">
+  <source src="assets/04_contact_constraint_viewer_preview.mp4" type="video/mp4">
+  <source src="assets/04_contact_constraint_viewer_preview.webm" type="video/webm">
+</video>
 
 ### Cell 18-21 - Transition Player 与离线代价
 
@@ -98,7 +101,10 @@ transition cost log 说明昂贵计算已经离线，random player 检查转移�
 
 ![Cell 18-21 - Transition Player 与离线代价 preview](assets/05_random_transition_player_preview.gif)
 
-[打开 MP4](assets/05_random_transition_player_preview.mp4) / [打开 WebM](assets/05_random_transition_player_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/05_random_transition_player_result.png">
+  <source src="assets/05_random_transition_player_preview.mp4" type="video/mp4">
+  <source src="assets/05_random_transition_player_preview.webm" type="video/webm">
+</video>
 
 ### Cell 30-38 - Value Surface 与 near-optimal controller
 
@@ -116,7 +122,10 @@ value surface 让未来代价可见，final viewer 检查 policy 是否能持续
 
 ![Cell 30-38 - Value Surface 与 near-optimal controller preview](assets/08_optimal_policy_player_preview.gif)
 
-[打开 MP4](assets/08_optimal_policy_player_preview.mp4) / [打开 WebM](assets/08_optimal_policy_player_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_optimal_policy_player_result.png">
+  <source src="assets/08_optimal_policy_player_preview.mp4" type="video/mp4">
+  <source src="assets/08_optimal_policy_player_preview.webm" type="video/webm">
+</video>
 
 ## 关键数据结构
 
@@ -134,11 +143,35 @@ contact viewer 验证物理约束；transition cost 说明离线控制模型；v
 
 本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
-[打开/下载总览 WebM](assets/00-walkthrough.webm)
 
 ![Source clip playback](assets/02_source_clip_playback_preview.gif)
 
-[打开 MP4](assets/02_source_clip_playback_preview.mp4) / [打开 WebM](assets/02_source_clip_playback_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_source_clip_playback_result.png">
+  <source src="assets/02_source_clip_playback_preview.mp4" type="video/mp4">
+  <source src="assets/02_source_clip_playback_preview.webm" type="video/webm">
+</video>
+
+
+**Cell 16 - Clip contact constraints**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_contact_constraint_viewer_result.png">
+  <source src="assets/04_contact_constraint_viewer_preview.mp4" type="video/mp4">
+  <source src="assets/04_contact_constraint_viewer_preview.webm" type="video/webm">
+</video>
+
+**Cell 19 - Random transition player**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/05_random_transition_player_result.png">
+  <source src="assets/05_random_transition_player_preview.mp4" type="video/mp4">
+  <source src="assets/05_random_transition_player_preview.webm" type="video/webm">
+</video>
+
+**Cell 38 - Optimal-policy controller**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_optimal_policy_player_result.png">
+  <source src="assets/08_optimal_policy_player_preview.mp4" type="video/mp4">
+  <source src="assets/08_optimal_policy_player_preview.webm" type="video/webm">
+</video>
 
 | Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |

@@ -63,7 +63,6 @@ flowchart TD
 
 本节把 Python module 当作支撑子工程来阅读：每个条目绑定源码片段、命令日志、产物摘要或流程图，说明它如何服务对应 notebook 案例。
 
-[打开/下载 WebM](assets/00-walkthrough.webm)
 
 | 片段 | 输出类型 | 代码/证据做什么 | 结果说明什么 | 素材 |
 | --- | --- | --- | --- | --- |
@@ -137,7 +136,6 @@ $env:ANIMATIONTECH_TREE_N_JOBS = "1"
 
 本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
-[打开/下载总览 WebM](assets/00-walkthrough.webm)
 
 | Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |

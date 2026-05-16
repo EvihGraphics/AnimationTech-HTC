@@ -81,11 +81,12 @@ flowchart LR
 
 ![重点结果](assets/<result_file>.png)
 
-若本 cell 有 timeline 或参数滑杆，在正文中优先放 GIF 预览，并把 MP4/WebM 作为 GitHub 可点击播放/下载链接：
+若本 cell 有 timeline 或参数滑杆，在正文中优先放内嵌视频播放器。MP4/H.264 作为主 source，WebM/VP9 作为 fallback source；GIF 只保留为轻量预览、poster 或附录证据：
 
-![动画预览](assets/<preview>.gif)
-
-[打开 MP4](assets/<file>.mp4) / [打开 WebM](assets/<file>.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/<result_file>.png">
+  <source src="assets/<file>.mp4" type="video/mp4">
+  <source src="assets/<file>.webm" type="video/webm">
+</video>
 
 ## 关键数据结构
 
@@ -103,11 +104,11 @@ flowchart LR
 
 正文只引用有意义的算法输出媒体：plot、table、formula、canvas、viewer 或控件状态。禁止把浏览器滚动截图、整页 cell 截图、代码学习卡裁剪图、Jupyter chrome 截图或静态图平移缩放生成的假动画放在本节。
 
-GIF 用作 GitHub README 的动态预览；MP4/H.264 与 WebM/VP9 只作为可点击播放/下载链接，不使用 `<video>`。
+动画正文必须直接嵌入 `<video>` 播放器：MP4/H.264 作为主 source，WebM/VP9 作为 fallback source。GIF 只作为 poster、轻量预览或附录证据，不替代正文播放器。
 
 | Cell | 重点媒体 | 可视化主体 | 捕获方式 | 结果说明什么 |
 | --- | --- | --- | --- | --- |
-| `<cell_index>` | [结果图](assets/<result_file>.png) / [GIF](assets/<preview>.gif) | `<visual_subject>` | `<capture_kind>` | `<result_meaning>` |
+| `<cell_index>` | [结果图](assets/<result_file>.png) / `<video>` / [GIF](assets/<preview>.gif) | `<visual_subject>` | `<capture_kind>` | `<result_meaning>` |
 
 ## 代码 Cell 与可视化证据
 

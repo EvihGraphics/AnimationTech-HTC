@@ -1449,6 +1449,7 @@
       "cell_mermaid_policy": "per_step_optional",
       "walkthrough": {
         "webm": "00-walkthrough.webm",
+        "mp4": "00-walkthrough.mp4",
         "role": "supporting_evidence",
         "title": "Footskate cleanup learning walkthrough"
       }
@@ -3643,9 +3644,10 @@
     }
   ],
   "media_policy": {
-    "readme_preview": "gif",
+    "readme_preview": "embedded_video",
     "primary_video": "mp4_h264",
     "fallback_video": "webm_vp9",
+    "github_embed_mode": "html_video",
     "legacy_cards": "retained_as_evidence"
   },
   "animation": {

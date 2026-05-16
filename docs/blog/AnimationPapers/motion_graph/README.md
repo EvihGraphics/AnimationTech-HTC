@@ -143,7 +143,6 @@ Notebook 的前半段是离线建图：`Keep only a few ranges`、`Build point c
 
 本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和 PNG 学习卡片。PNG 由指定 cell 的代码摘要、输出区、viewer/canvas 或图表/日志合成，不使用整页滚动截图替代。
 
-[打开/下载 WebM](assets/00-walkthrough.webm)
 
 | Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
 | --- | --- | --- | --- | --- |
@@ -238,11 +237,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 motion_
 
 本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
-[打开/下载总览 WebM](assets/00-walkthrough.webm)
 
 ![Follow-path result viewer](assets/follow_path_visualization_preview.gif)
 
-[打开 MP4](assets/follow_path_visualization_preview.mp4) / [打开 WebM](assets/follow_path_visualization_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/follow_path_visualization_result.png">
+  <source src="assets/follow_path_visualization_preview.mp4" type="video/mp4">
+  <source src="assets/follow_path_visualization_preview.webm" type="video/webm">
+</video>
 
 | Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |

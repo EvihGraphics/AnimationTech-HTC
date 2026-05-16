@@ -73,7 +73,6 @@ flowchart TD
 
 > Note: Prepared notebook skips the original manual annotation UI; media uses code/log/artifact evidence for those cells.
 
-[打开/下载 WebM](assets/00-walkthrough.webm)
 
 | Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
 | --- | --- | --- | --- | --- |
@@ -150,7 +149,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 knowing
 
 本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
-[打开/下载总览 WebM](assets/00-walkthrough.webm)
 
 | Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |

@@ -78,7 +78,10 @@ source graph viewer 说明可选动作来自真实 motion graph。
 
 ![Cell 5-9 - Motion Graph 输入 preview](assets/02_source_motion_graph_playback_preview.gif)
 
-[打开 MP4](assets/02_source_motion_graph_playback_preview.mp4) / [打开 WebM](assets/02_source_motion_graph_playback_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_source_motion_graph_playback_result.png">
+  <source src="assets/02_source_motion_graph_playback_preview.mp4" type="video/mp4">
+  <source src="assets/02_source_motion_graph_playback_preview.webm" type="video/webm">
+</video>
 
 ### Cell 11-16 - State/Action 与播放器
 
@@ -96,7 +99,10 @@ random action viewer 验证动作能连续播放，FootLock 负责减少脚部�
 
 ![Cell 11-16 - State/Action 与播放器 preview](assets/04_random_action_playback_preview.gif)
 
-[打开 MP4](assets/04_random_action_playback_preview.mp4) / [打开 WebM](assets/04_random_action_playback_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_random_action_playback_result.png">
+  <source src="assets/04_random_action_playback_preview.mp4" type="video/mp4">
+  <source src="assets/04_random_action_playback_preview.webm" type="video/webm">
+</video>
 
 ### Cell 18-27 - Reward 到 Value Policy
 
@@ -115,7 +121,10 @@ value-policy viewer 验证预计算策略能根据目标选择更有远见的动
 
 ![Cell 18-27 - Reward 到 Value Policy preview](assets/08_mdp_value_policy_viewer_preview.gif)
 
-[打开 MP4](assets/08_mdp_value_policy_viewer_preview.mp4) / [打开 WebM](assets/08_mdp_value_policy_viewer_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_mdp_value_policy_viewer_result.png">
+  <source src="assets/08_mdp_value_policy_viewer_preview.mp4" type="video/mp4">
+  <source src="assets/08_mdp_value_policy_viewer_preview.webm" type="video/webm">
+</video>
 
 ## 关键数据结构
 
@@ -133,11 +142,35 @@ source graph viewer 说明动作来源；random action viewer 验证播放连续
 
 本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
-[打开/下载总览 WebM](assets/00-walkthrough.webm)
 
 ![Source motion graph playback](assets/02_source_motion_graph_playback_preview.gif)
 
-[打开 MP4](assets/02_source_motion_graph_playback_preview.mp4) / [打开 WebM](assets/02_source_motion_graph_playback_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_source_motion_graph_playback_result.png">
+  <source src="assets/02_source_motion_graph_playback_preview.mp4" type="video/mp4">
+  <source src="assets/02_source_motion_graph_playback_preview.webm" type="video/webm">
+</video>
+
+
+**Cell 16 - Random graph action playback**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_random_action_playback_result.png">
+  <source src="assets/04_random_action_playback_preview.mp4" type="video/mp4">
+  <source src="assets/04_random_action_playback_preview.webm" type="video/webm">
+</video>
+
+**Cell 22 - Immediate reward policy viewer**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_reward_policy_viewer_result.png">
+  <source src="assets/07_reward_policy_viewer_preview.mp4" type="video/mp4">
+  <source src="assets/07_reward_policy_viewer_preview.webm" type="video/webm">
+</video>
+
+**Cell 27 - MDP value-policy viewer**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_mdp_value_policy_viewer_result.png">
+  <source src="assets/08_mdp_value_policy_viewer_preview.mp4" type="video/mp4">
+  <source src="assets/08_mdp_value_policy_viewer_preview.webm" type="video/webm">
+</video>
 
 | Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |

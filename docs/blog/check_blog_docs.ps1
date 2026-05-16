@@ -125,10 +125,23 @@ def resolve_blog_relative(base_file, relative_path):
         return None
     return (Path(base_file).parent / clean).resolve()
 
+asset_ref_pattern = re.compile(
+    r"!\[[^\]]*\]\((assets/[^)]+)\)"
+    r"|\[[^\]]+\]\((assets/[^)]+)\)"
+    r"|(?:src|poster)=[\"'](assets/[^\"']+)[\"']",
+    re.I,
+)
+legacy_video_link_pattern = re.compile(
+    r"\[(?:\u6253\u5f00|\u6253\u5f00/\u4e0b\u8f7d)[^\]]*(?:MP4|WebM)[^\]]*\]\(assets/[^)]+\.(?:mp4|webm)\)",
+    re.I,
+)
+
+def asset_refs_in_text(text):
+    for match in asset_ref_pattern.finditer(text):
+        yield next(group for group in match.groups() if group)
+
 def check_asset_links(file_path, text):
-    pattern = re.compile(r"!\[[^\]]*\]\((assets/[^)]+)\)|\[[^\]]+\]\((assets/[^)]+)\)")
-    for match in pattern.finditer(text):
-        asset_rel = match.group(1) or match.group(2)
+    for asset_rel in asset_refs_in_text(text):
         asset_path = resolve_blog_relative(file_path, asset_rel)
         if asset_path is not None and not asset_path.exists():
             add_error(f"Broken asset reference in {file_path}: {asset_rel}")
@@ -211,6 +224,15 @@ def section_between(text, heading, next_prefix="\n## "):
         return ""
     end = text.find(next_prefix, start + 1)
     return text[start:] if end < 0 else text[start:end]
+
+def html_video_blocks(text):
+    return re.findall(r"<video\b[^>]*>.*?</video>", text, flags=re.I | re.S)
+
+def has_video_embed(text, mp4_ref, webm_ref):
+    for block in html_video_blocks(text):
+        if mp4_ref in block and webm_ref in block:
+            return True
+    return False
 
 def ffprobe_duration(path):
     ffprobe = shutil.which("ffprobe")
@@ -417,8 +439,17 @@ if media_manifest is not None:
             for key in ("result_file", "card_file", "preview_gif", "video_mp4", "video_webm"):
                 if step.get(key):
                     media_entries.append({"file": step.get(key), "output_type": step.get("output_type"), "key": key, "step": step})
-        media_entries.append({"file": video_file, "output_type": "video", "key": "walkthrough"})
+        walkthrough_conf = case.get("walkthrough", {})
+        walkthrough_webm = walkthrough_conf.get("webm") or video_file
+        media_entries.append({"file": walkthrough_webm, "output_type": "video", "key": "walkthrough_webm"})
+        if walkthrough_conf.get("mp4"):
+            media_entries.append({"file": walkthrough_conf.get("mp4"), "output_type": "video", "key": "walkthrough_mp4"})
         declared_media_files = {entry.get("file") for entry in media_entries if entry.get("file")}
+        optional_readme_media_files = {
+            entry.get("file")
+            for entry in media_entries
+            if str(entry.get("key", "")).startswith("walkthrough_")
+        }
         for media_entry in media_entries:
             media_file = media_entry.get("file")
             media_path = assets_dir / media_file
@@ -428,7 +459,7 @@ if media_manifest is not None:
                 continue
             if media_path.stat().st_size <= 0:
                 add_error(f"Media file is empty for {slug}: {media_path}")
-            if media_ref not in readme_text:
+            if media_file not in optional_readme_media_files and media_ref not in readme_text:
                 add_error(f"README for {slug} does not reference {media_ref}.")
             if media_file not in asset_text:
                 add_error(f"assets README for {slug} does not list {media_file}.")
@@ -467,7 +498,7 @@ if media_manifest is not None:
                 media_ref = f"assets/{local_media.name}"
                 if local_media.name not in declared_media_files:
                     add_error(f"Media file for {slug} is not declared in media manifest: {local_media}")
-                if media_ref not in readme_text:
+                if local_media.name not in optional_readme_media_files and media_ref not in readme_text:
                     add_error(f"README for {slug} does not reference local media file {media_ref}.")
                 if local_media.name not in asset_text:
                     add_error(f"assets README for {slug} does not list local media file {local_media.name}.")
@@ -525,6 +556,11 @@ if media_manifest is not None:
                     add_error(f"Key animation for {slug} missing preview_gif: {step.get('id')}")
                 if not (step.get("video_mp4") and step.get("video_webm")):
                     add_error(f"Key animation for {slug} requires both video_mp4 and video_webm: {step.get('id')}")
+                elif strict:
+                    mp4_ref = f"assets/{step.get('video_mp4')}"
+                    webm_ref = f"assets/{step.get('video_webm')}"
+                    if not has_video_embed(readme_text, mp4_ref, webm_ref):
+                        add_error(f"Key animation for {slug} must embed video sources {mp4_ref} and {webm_ref}: {step.get('id')}")
                 if step.get("media_provenance") == "static_pan_zoom":
                     add_error(f"Key animation for {slug} cannot use static_pan_zoom provenance: {step.get('id')}")
                 if not has_real_controls(step, {"timeline", "parameter"}):
@@ -556,6 +592,8 @@ if media_manifest is not None:
                 "diagram",
             }:
                 add_error(f"Media step for {slug} has unsupported output_type: {step.get('output_type')}")
+        if strict and key_media_section and legacy_video_link_pattern.search(key_media_section):
+            add_error(f"Key media section for {slug} still uses link-only video open/download text.")
 
 if errors:
     print("docs/blog check failed:")

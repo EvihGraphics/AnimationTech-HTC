@@ -216,7 +216,10 @@ notebook 先用普通版本生成 `solved_animation`，后面又用 `L4 = 1000` 
 
 本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和真实结果媒体。重点 PNG/GIF/视频来自 plot 或浏览器中的 viewer canvas；代码学习卡只作为附录证据。
 
-[打开/下载 WebM](assets/00-walkthrough.webm)
+<video controls muted playsinline preload="metadata" width="100%">
+  <source src="assets/00-walkthrough.mp4" type="video/mp4">
+  <source src="assets/00-walkthrough.webm" type="video/webm">
+</video>
 
 | Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
 | --- | --- | --- | --- | --- |
@@ -284,9 +287,10 @@ notebook 先用普通版本生成 `solved_animation`，后面又用 `L4 = 1000` 
 
 ![Final Processing boundary smoothing](assets/06_final_processing_compare_result.png)
 
-![Final Processing boundary smoothing preview](assets/06_final_processing_compare_preview.gif)
-
-[打开 MP4](assets/06_final_processing_compare_preview.mp4) / [打开 WebM](assets/06_final_processing_compare_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_final_processing_compare_result.png">
+  <source src="assets/06_final_processing_compare_preview.mp4" type="video/mp4">
+  <source src="assets/06_final_processing_compare_preview.webm" type="video/webm">
+</video>
 
 ## 运行方式
 
@@ -303,11 +307,15 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 footska
 
 本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
-[打开/下载总览 WebM](assets/00-walkthrough.webm)
+<video controls muted playsinline preload="metadata" width="100%">
+  <source src="assets/00-walkthrough.mp4" type="video/mp4">
+  <source src="assets/00-walkthrough.webm" type="video/webm">
+</video>
 
-![Final Processing boundary smoothing](assets/06_final_processing_compare_preview.gif)
-
-[打开 MP4](assets/06_final_processing_compare_preview.mp4) / [打开 WebM](assets/06_final_processing_compare_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_final_processing_compare_result.png">
+  <source src="assets/06_final_processing_compare_preview.mp4" type="video/mp4">
+  <source src="assets/06_final_processing_compare_preview.webm" type="video/webm">
+</video>
 
 | Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |

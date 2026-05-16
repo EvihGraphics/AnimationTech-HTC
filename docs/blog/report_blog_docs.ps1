@@ -76,6 +76,24 @@ def count_cell_mermaid(text):
     pattern = re.compile(r"^### (?:Cell|[A-Za-z0-9_-]+).*?(?=^### |\Z)", re.M | re.S)
     return sum(1 for block in pattern.findall(text) if "```mermaid" in block)
 
+asset_ref_pattern = re.compile(
+    r"!\[[^\]]*\]\((assets/[^)]+)\)"
+    r"|\[[^\]]+\]\((assets/[^)]+)\)"
+    r"|(?:src|poster)=[\"'](assets/[^\"']+)[\"']",
+    re.I,
+)
+legacy_video_link_pattern = re.compile(
+    r"\[(?:\u6253\u5f00|\u6253\u5f00/\u4e0b\u8f7d)[^\]]*(?:MP4|WebM)[^\]]*\]\(assets/[^)]+\.(?:mp4|webm)\)",
+    re.I,
+)
+
+def asset_refs_in_text(text):
+    for match in asset_ref_pattern.finditer(text):
+        yield next(group for group in match.groups() if group)
+
+def html_video_blocks(text):
+    return re.findall(r"<video\b[^>]*>.*?</video>", text, flags=re.I | re.S)
+
 manifest = json.loads(read_text(cases_path))
 media_manifest = json.loads(read_text(media_manifest_path))
 
@@ -140,8 +158,9 @@ mermaid_counts = {}
 cell_mermaid_counts = {}
 unreferenced_assets = []
 extra_assets = []
-
-asset_link_pattern = re.compile(r"(?:!\[[^\]]*\]|\[[^\]]+\])\((assets/[^)]+)\)")
+embedded_video_count = 0
+legacy_link_only_video_count = 0
+embedded_webm_without_mp4_companion_count = 0
 
 for case in media_cases:
     slug = case.get("slug", "<unknown>")
@@ -154,7 +173,13 @@ for case in media_cases:
         for key in ("result_file", "card_file", "preview_gif", "video_mp4", "video_webm"):
             if step.get(key):
                 expected_files.add(step.get(key))
-    expected_files.add(video_file)
+    walkthrough_conf = case.get("walkthrough", {})
+    expected_files.add(walkthrough_conf.get("webm") or video_file)
+    if walkthrough_conf.get("mp4"):
+        expected_files.add(walkthrough_conf.get("mp4"))
+    optional_readme_files = {walkthrough_conf.get("webm") or video_file}
+    if walkthrough_conf.get("mp4"):
+        optional_readme_files.add(walkthrough_conf.get("mp4"))
 
     step_count += len(case.get("steps", []))
     output_types.update(step.get("output_type", "<missing>") for step in case.get("steps", []))
@@ -184,9 +209,15 @@ for case in media_cases:
     asset_text = read_text(asset_readme) if asset_readme.exists() else ""
     mermaid_counts[slug] = count_mermaid(readme_text)
     cell_mermaid_counts[slug] = count_cell_mermaid(readme_text)
+    video_blocks = html_video_blocks(readme_text)
+    embedded_video_count += len(video_blocks)
+    legacy_link_only_video_count += len(legacy_video_link_pattern.findall(readme_text))
+    embedded_webm_without_mp4_companion_count += sum(
+        1 for block in video_blocks if ".webm" in block.lower() and ".mp4" not in block.lower()
+    )
     linked_assets = {
-        Path(match.group(1)).name
-        for match in asset_link_pattern.finditer(readme_text)
+        Path(asset_ref).name
+        for asset_ref in asset_refs_in_text(readme_text)
     }
 
     for file_name in expected_files:
@@ -194,7 +225,7 @@ for case in media_cases:
         if not media_path.exists():
             issues.append(f"Missing media for {slug}: {media_path}")
             continue
-        if file_name not in linked_assets:
+        if file_name not in optional_readme_files and file_name not in linked_assets:
             issues.append(f"README for {slug} does not link assets/{file_name}")
         if file_name not in asset_text:
             issues.append(f"assets README for {slug} does not list {file_name}")
@@ -246,6 +277,9 @@ report = {
         "footskate_non_allowlisted_count": footskate_non_allowlisted_count,
         "key_missing_provenance_count": key_missing_provenance_count,
         "key_missing_required_metadata_count": key_missing_required_metadata_count,
+        "embedded_video_count": embedded_video_count,
+        "legacy_link_only_video_count": legacy_link_only_video_count,
+        "embedded_webm_without_mp4_companion_count": embedded_webm_without_mp4_companion_count,
     },
     "mermaid": {
         "case_blocks": mermaid_counts,
@@ -271,6 +305,9 @@ print(f"PNG media: {png_count} ({fmt_bytes(png_bytes)})")
 print(f"GIF previews: {gif_count} ({fmt_bytes(gif_bytes)})")
 print(f"MP4 videos: {mp4_count} ({fmt_bytes(mp4_bytes)})")
 print(f"WebM videos: {webm_count} ({fmt_bytes(webm_bytes)})")
+print(f"Embedded video tags: {embedded_video_count}")
+print(f"Legacy link-only video opens: {legacy_link_only_video_count}")
+print(f"Embedded WebM without MP4 companion: {embedded_webm_without_mp4_companion_count}")
 print("Output types:")
 for key, value in sorted(output_types.items()):
     print(f" - {key}: {value}")

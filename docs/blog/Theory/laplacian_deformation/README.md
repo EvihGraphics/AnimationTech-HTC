@@ -94,7 +94,10 @@ edge length 让结构不被过度拉长，rotation-invariant 项让局部形状�
 
 ![Cell 18-29 - 3D 与 rotation-invariant 求解 preview](assets/06_rotation_invariance_controls_preview.gif)
 
-[打开 MP4](assets/06_rotation_invariance_controls_preview.mp4) / [打开 WebM](assets/06_rotation_invariance_controls_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_rotation_invariance_controls_result.png">
+  <source src="assets/06_rotation_invariance_controls_preview.mp4" type="video/mp4">
+  <source src="assets/06_rotation_invariance_controls_preview.webm" type="video/webm">
+</video>
 
 ### Cell 36-46 - 把 locomotion 变成可编辑图
 
@@ -114,7 +117,10 @@ flowchart LR
 
 ![Cell 36-46 - 把 locomotion 变成可编辑图 preview](assets/08_curved_locomotion_result_preview.gif)
 
-[打开 MP4](assets/08_curved_locomotion_result_preview.mp4) / [打开 WebM](assets/08_curved_locomotion_result_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_curved_locomotion_result_result.png">
+  <source src="assets/08_curved_locomotion_result_preview.mp4" type="video/mp4">
+  <source src="assets/08_curved_locomotion_result_preview.webm" type="video/webm">
+</video>
 
 ## 关键数据结构
 
@@ -132,11 +138,28 @@ flowchart LR
 
 本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
-[打开/下载总览 WebM](assets/00-walkthrough.webm)
 
 ![Rotation-invariant deformation controls](assets/06_rotation_invariance_controls_preview.gif)
 
-[打开 MP4](assets/06_rotation_invariance_controls_preview.mp4) / [打开 WebM](assets/06_rotation_invariance_controls_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_rotation_invariance_controls_result.png">
+  <source src="assets/06_rotation_invariance_controls_preview.mp4" type="video/mp4">
+  <source src="assets/06_rotation_invariance_controls_preview.webm" type="video/webm">
+</video>
+
+
+**Cell 40 - Animation graph reconstruction**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_animation_graph_deformation_result.png">
+  <source src="assets/07_animation_graph_deformation_preview.mp4" type="video/mp4">
+  <source src="assets/07_animation_graph_deformation_preview.webm" type="video/webm">
+</video>
+
+**Cell 46 - Curved locomotion result**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_curved_locomotion_result_result.png">
+  <source src="assets/08_curved_locomotion_result_preview.mp4" type="video/mp4">
+  <source src="assets/08_curved_locomotion_result_preview.webm" type="video/webm">
+</video>
 
 | Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |

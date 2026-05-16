@@ -1216,6 +1216,11 @@ def make_video_from_cards(case: dict, video_conf: dict, assets_dir: Path) -> Non
     output_path = assets_dir / video_conf["file"]
     encode_webm(frames, output_path, int(video_conf.get("fps", 4)))
     validate_video(output_path, int(video_conf["max_seconds"]), int(video_conf["max_bytes"]))
+    mp4_file = case.get("walkthrough", {}).get("mp4") or video_conf.get("mp4_file")
+    if mp4_file:
+        mp4_path = assets_dir / mp4_file
+        encode_mp4(frames, mp4_path, int(video_conf.get("fps", 4)))
+        validate_video(mp4_path, int(video_conf["max_seconds"]), int(video_conf["max_bytes"]))
 
 
 def fit_video_frame(image: Image.Image) -> Image.Image:
@@ -1349,6 +1354,11 @@ def make_video_from_live(page, case: dict, source_nb, video_conf: dict, assets_d
     output_path = assets_dir / video_conf["file"]
     encode_webm(frames, output_path, int(video_conf.get("fps", 4)))
     validate_video(output_path, int(video_conf["max_seconds"]), int(video_conf["max_bytes"]))
+    mp4_file = case.get("walkthrough", {}).get("mp4") or video_conf.get("mp4_file")
+    if mp4_file:
+        mp4_path = assets_dir / mp4_file
+        encode_mp4(frames, mp4_path, int(video_conf.get("fps", 4)))
+        validate_video(mp4_path, int(video_conf["max_seconds"]), int(video_conf["max_bytes"]))
 
 
 def capture_live_motion_frames(page, step: dict, animation_conf: dict, context: dict | None = None) -> list[Image.Image]:

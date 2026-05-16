@@ -5,6 +5,7 @@
 | 文件 | 来源 | 类型 | 角色 | 捕获来源 | 说明 |
 | --- | --- | --- | --- | --- | --- |
 | `00-walkthrough.webm` | case walkthrough | `walkthrough_webm` | `supporting_evidence` | `step_sequence` | 总览短视频 |
+| `00-walkthrough.mp4` | case walkthrough | `walkthrough_mp4` | `supporting_evidence` | `step_sequence` | 总览短视频的 H.264 companion，用于 GitHub README 内嵌播放。 |
 | `07_keep_translation_compare_result.png` | Cell 12 | `result_png` | `key_visual` | `live_canvas` | keep_translation comparison：The comparison clarifies the responsibility split between root translation and local joint offsets. |
 | `07_keep_translation_compare.png` | Cell 12 | `learning_card` | `code_evidence` | `learning_card` | 代码学习卡；不作为正文重点视觉。 |
 | `03_contact_signal_timeline_result.png` | Cell 16 | `result_png` | `key_visual` | `executed_plot_image` | Four foot-contact signals：These signals decide which foot points should stay fixed in world space. |

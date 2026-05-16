@@ -93,7 +93,10 @@ flowchart LR
 
 ![Cell 10-20 - Time warp lookup preview](assets/05_timewarped_animation_compare_preview.gif)
 
-[打开 MP4](assets/05_timewarped_animation_compare_preview.mp4) / [打开 WebM](assets/05_timewarped_animation_compare_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/05_timewarped_animation_compare_result.png">
+  <source src="assets/05_timewarped_animation_compare_preview.mp4" type="video/mp4">
+  <source src="assets/05_timewarped_animation_compare_preview.webm" type="video/webm">
+</video>
 
 ### Cell 22-31 - Pose offset layer
 
@@ -111,7 +114,10 @@ pose warp 的输出应该像在目标窗口附近轻推姿态，而不是整段�
 
 ![Cell 22-31 - Pose offset layer preview](assets/08_combined_warped_animation_preview.gif)
 
-[打开 MP4](assets/08_combined_warped_animation_preview.mp4) / [打开 WebM](assets/08_combined_warped_animation_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_combined_warped_animation_result.png">
+  <source src="assets/08_combined_warped_animation_preview.mp4" type="video/mp4">
+  <source src="assets/08_combined_warped_animation_preview.webm" type="video/webm">
+</video>
 
 ## 关键数据结构
 
@@ -129,11 +135,28 @@ Time warp 图验证事件是否发生在新时间；pose warp viewer 验证关�
 
 本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
-[打开/下载总览 WebM](assets/00-walkthrough.webm)
 
 ![Source animation playback](assets/01_source_animation_playback_preview.gif)
 
-[打开 MP4](assets/01_source_animation_playback_preview.mp4) / [打开 WebM](assets/01_source_animation_playback_preview.webm)
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/01_source_animation_playback_result.png">
+  <source src="assets/01_source_animation_playback_preview.mp4" type="video/mp4">
+  <source src="assets/01_source_animation_playback_preview.webm" type="video/webm">
+</video>
+
+
+**Cell 20 - Time-warped animation comparison**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/05_timewarped_animation_compare_result.png">
+  <source src="assets/05_timewarped_animation_compare_preview.mp4" type="video/mp4">
+  <source src="assets/05_timewarped_animation_compare_preview.webm" type="video/webm">
+</video>
+
+**Cell 31 - Final time and pose warped animation**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_combined_warped_animation_result.png">
+  <source src="assets/08_combined_warped_animation_preview.mp4" type="video/mp4">
+  <source src="assets/08_combined_warped_animation_preview.webm" type="video/webm">
+</video>
 
 | Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |
