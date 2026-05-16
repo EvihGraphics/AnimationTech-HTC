@@ -63,61 +63,168 @@ pose warp 先取关键姿态差异，转换成局部 offset，再用曲线控制
 
 ## 关键 cell / 函数深讲
 
-### Cell 5-8 - 动画作为曲线
+## 关键 cell / 函数深讲
+
+### Cell 5 - Source animation playback
+
+播放并观察未经修改的原始动作。这是建立后续 Warp 对比基准的第一步。
 
 ```mermaid
 flowchart LR
-    C5[Source playback] --> C6[Quaternion channel plot]
-    C6 --> C8[time_wrap_points]
-    C8 --> I[确定事件时间映射]
+    A[加载原始 BVH] --> B[渲染 Timeline Viewer]
+    B --> C[观察关键事件动作帧]
 ```
 
-这一步把动画问题转成曲线问题。读图时先看原始通道是否连续，再看关键事件应该如何重定时。
+- 代码做什么：Source animation playback: This baseline lets later warped outputs be compared against the original motion.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：This baseline lets later warped outputs be compared against the original motion.
+- 可视化主体：Source animation playback
+- 捕获方式：`canvas`
 
-![Cell 5-8 - 动画作为曲线](assets/02_raw_quaternion_channel_result.png)
+![Source animation playback](assets/01_source_animation_playback_result.png)
 
-### Cell 10-20 - Time warp lookup
+![Source animation playback preview](assets/01_source_animation_playback_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/01_source_animation_playback_result.png" src="assets/01_source_animation_playback_preview.mp4"></video>
+
+### Cell 6 - Raw quaternion channel plot
+
+将原始四元数通道数据作为曲线图展示，揭示了动画的数值连续性本质，是后续进行重采样和曲线编辑的理论依据。
 
 ```mermaid
 flowchart LR
-    K[Timing keys] --> H[Cardinal to Hermite]
-    H --> R[resample_curve]
-    R --> Q[old-frame lookup]
-    Q --> W[warp quats/pos]
-    W --> V[time-warped viewer]
+    A[提取 Root 节点的 Quaternion 通道] --> B[按时间展开绘制为 4 条曲线]
+    B --> C[分析动作发生突变的时间点]
 ```
 
-结果重点看同一个动作事件是否被挪到目标帧，同时姿态连续性是否保留。
+- 代码做什么：Raw quaternion channel plot: The graph shows that animation warping often starts as curve manipulation.
+- 运行后看到什么：`plot`
+- 结果说明什么：The graph shows that animation warping often starts as curve manipulation.
+- 可视化主体：Raw quaternion channel plot
+- 捕获方式：`plot`
 
-![Cell 10-20 - Time warp lookup](assets/05_timewarped_animation_compare_result.png)
+![Raw quaternion channel plot](assets/02_raw_quaternion_channel_result.png)
 
-![Cell 10-20 - Time warp lookup preview](assets/05_timewarped_animation_compare_preview.gif)
+### Cell 12 - Time-warp keypoints and tangents
 
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/05_timewarped_animation_compare_result.png">
-  <source src="assets/05_timewarped_animation_compare_preview.mp4" type="video/mp4">
-  <source src="assets/05_timewarped_animation_compare_preview.webm" type="video/webm">
-</video>
-
-### Cell 22-31 - Pose offset layer
+手动定义一系列时间映射的关键帧（Timing Keys），建立旧时间与期望新时间之间的映射关系。
 
 ```mermaid
 flowchart LR
-    P[Pose keyframes] --> O[local offset poses]
-    O --> C[offset curve]
-    C --> T[retime offsets]
-    T --> F[combine with time-warped clip]
+    A[设定原动画中的事件帧] --> B[设定目标期望的新时间帧]
+    B --> C[计算样条插值所需的切线]
 ```
 
-pose warp 的输出应该像在目标窗口附近轻推姿态，而不是整段动画突然换姿势。
+- 代码做什么：Time-warp keypoints and tangents: The plot shows how sparse timing edits become a continuous time-warp curve.
+- 运行后看到什么：`plot`
+- 结果说明什么：The plot shows how sparse timing edits become a continuous time-warp curve.
+- 可视化主体：Time-warp keypoints and tangents
+- 捕获方式：`plot`
 
-![Cell 22-31 - Pose offset layer](assets/08_combined_warped_animation_result.png)
+![Time-warp keypoints and tangents](assets/03_timewarp_keypoints_result.png)
 
-![Cell 22-31 - Pose offset layer preview](assets/08_combined_warped_animation_preview.gif)
+### Cell 15 - Resampled time-warp curve
 
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_combined_warped_animation_result.png">
-  <source src="assets/08_combined_warped_animation_preview.mp4" type="video/mp4">
-  <source src="assets/08_combined_warped_animation_preview.webm" type="video/webm">
-</video>
+使用 Hermite 样条曲线对稀疏的 Timing Keys 进行密集插值重采样，生成一根完整的时间映射曲线。
+
+```mermaid
+flowchart LR
+    A[稀疏的 Time Warp 关键点] --> B[Hermite Spline 插值]
+    B --> C[在目标帧数范围内逐帧采样]
+    C --> D[获得密集映射查找表]
+```
+
+- 代码做什么：Resampled time-warp curve: The output shows the actual per-frame time lookup used for animation sampling.
+- 运行后看到什么：`plot`
+- 结果说明什么：The output shows the actual per-frame time lookup used for animation sampling.
+- 可视化主体：Resampled time-warp curve
+- 捕获方式：`plot`
+
+![Resampled time-warp curve](assets/04_resampled_timewarp_curve_result.png)
+
+### Cell 20 - Time-warped animation comparison
+
+应用生成的 Time Warp 查找表，重采样子动作并播放，验证关键事件是否被成功“挪动”到了目标时间点，且动作过渡仍然平滑。
+
+```mermaid
+flowchart LR
+    A[新时间轴上的当前帧 i] --> B[查找表得到旧时间点 t]
+    B --> C[在原动画中插值采样姿态]
+    C --> D[生成仅改变了节奏的动画]
+```
+
+- 代码做什么：Time-warped animation comparison: The viewer reveals the timing change without changing the underlying pose content.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：The viewer reveals the timing change without changing the underlying pose content.
+- 可视化主体：Time-warped animation comparison
+- 捕获方式：`canvas`
+
+![Time-warped animation comparison](assets/05_timewarped_animation_compare_result.png)
+
+![Time-warped animation comparison preview](assets/05_timewarped_animation_compare_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/05_timewarped_animation_compare_result.png" src="assets/05_timewarped_animation_compare_preview.mp4"></video>
+
+### Cell 23 - Pose-warp key poses
+
+定义空间上的姿态偏移关键帧（如改变打拳的高度或击打方向）。计算新姿态相对于旧姿态的局部差值（Offset）。
+
+```mermaid
+flowchart LR
+    A[目标修改帧的原姿态] --> B[编辑后的新姿态]
+    B --> C[计算四元数局部偏差 Offset]
+    C --> D[记录修改量而非绝对坐标]
+```
+
+- 代码做什么：Pose-warp key poses: The key-pose viewer shows what spatial correction will be blended into the clip.
+- 运行后看到什么：`viewer`
+- 结果说明什么：The key-pose viewer shows what spatial correction will be blended into the clip.
+- 可视化主体：Pose-warp key poses
+- 捕获方式：`canvas`
+
+![Pose-warp key poses](assets/06_pose_warp_key_poses_result.png)
+
+### Cell 27 - Offset warp curve
+
+生成控制姿态偏移量的权重曲线，让 Offset 能够随着时间渐入渐出，避免姿态发生突变。
+
+```mermaid
+flowchart LR
+    A[确定修改帧及其前后影响范围] --> B[构建淡入淡出的样条曲线]
+    B --> C[生成逐帧的权重因子]
+    C --> D[用于缩放 Offset 偏差量]
+```
+
+- 代码做什么：Offset warp curve: The curve explains how local pose edits are distributed smoothly.
+- 运行后看到什么：`plot`
+- 结果说明什么：The curve explains how local pose edits are distributed smoothly.
+- 可视化主体：Offset warp curve
+- 捕获方式：`plot`
+
+![Offset warp curve](assets/07_offset_warp_curve_result.png)
+
+### Cell 31 - Final time and pose warped animation
+
+将节奏改变后的动画（Time Warped）与随时间衰减的姿态偏移（Pose Warped）结合，生成最终既对齐了新时间戳又达成了新目标点的高级编辑动作。
+
+```mermaid
+flowchart LR
+    A[时间重采样后的基础动画] --> B[按时间拉伸后的姿态偏移权重]
+    B --> C[局部空间叠加 Offset]
+    C --> D[输出最终双重 Warp 动画]
+```
+
+- 代码做什么：Final time and pose warped animation: This final viewer checks whether timing and pose edits combine into a coherent motion.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：This final viewer checks whether timing and pose edits combine into a coherent motion.
+- 可视化主体：Final time and pose warped animation
+- 捕获方式：`canvas`
+
+![Final time and pose warped animation](assets/08_combined_warped_animation_result.png)
+
+![Final time and pose warped animation preview](assets/08_combined_warped_animation_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_combined_warped_animation_result.png" src="assets/08_combined_warped_animation_preview.mp4"></video>
 
 ## 关键数据结构
 

@@ -64,68 +64,117 @@ greedy policy 只看当前 deviation、physics 和 direction；near-optimal poli
 
 ## 关键 cell / 函数深讲
 
-### Cell 5-16 - Clip 与 contact 约束
+## 关键 cell / 函数深讲
+
+### Cell 9 - Source clip playback
+
+渲染最初被裁切出的所有离散片段，建立动作规划的可用词汇表。
 
 ```mermaid
 flowchart LR
-    H[helper bones] --> C[source clip playback]
-    C --> N[clip count]
-    N --> R[compute_root / compute_clip]
-    R --> K[contact constraint viewer]
+    A[加载原始运动数据] --> B[按预定义区间切分成离散 clips]
+    B --> C[在 Timeline Viewer 中依次播放]
 ```
 
-contact viewer 验证片段切分是否保留物理约束。
+- 代码做什么：Source clip playback: The viewer establishes the motion vocabulary available to the planner.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：The viewer establishes the motion vocabulary available to the planner.
+- 可视化主体：Source clip playback
+- 捕获方式：`canvas`
 
-![Cell 5-16 - Clip 与 contact 约束](assets/04_contact_constraint_viewer_result.png)
+![Source clip playback](assets/02_source_clip_playback_result.png)
 
-![Cell 5-16 - Clip 与 contact 约束 preview](assets/04_contact_constraint_viewer_preview.gif)
+![Source clip playback preview](assets/02_source_clip_playback_preview.gif)
 
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_contact_constraint_viewer_result.png">
-  <source src="assets/04_contact_constraint_viewer_preview.mp4" type="video/mp4">
-  <source src="assets/04_contact_constraint_viewer_preview.webm" type="video/webm">
-</video>
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_source_clip_playback_result.png" src="assets/02_source_clip_playback_preview.mp4"></video>
 
-### Cell 18-21 - Transition Player 与离线代价
+### Cell 16 - Clip contact constraints
+
+提取每个片段的脚部接触窗口和位置，用以约束后续拼接动作的物理合理性。
 
 ```mermaid
 flowchart LR
-    P[ClipPlayer + Player] --> R[random transition playback]
-    R --> C[transition-cost precompute]
-    C --> D[physics_costs + delta_x/z/theta]
-    D --> S[least-cost sanity check]
+    A[获取片段各帧骨骼位置] --> B[检测 Foot 与 Toe 的离地高度]
+    B --> C[生成布尔型 contact 约束数组]
+    C --> D[渲染带有地面接触标记的动作]
 ```
 
-transition cost log 说明昂贵计算已经离线，random player 检查转移播放是否平滑。
+- 代码做什么：Clip contact constraints: The viewer shows how physical plausibility is represented before planning.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：The viewer shows how physical plausibility is represented before planning.
+- 可视化主体：Clip contact constraints
+- 捕获方式：`canvas`
 
-![Cell 18-21 - Transition Player 与离线代价](assets/05_random_transition_player_result.png)
+![Clip contact constraints](assets/04_contact_constraint_viewer_result.png)
 
-![Cell 18-21 - Transition Player 与离线代价 preview](assets/05_random_transition_player_preview.gif)
+![Clip contact constraints preview](assets/04_contact_constraint_viewer_preview.gif)
 
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/05_random_transition_player_result.png">
-  <source src="assets/05_random_transition_player_preview.mp4" type="video/mp4">
-  <source src="assets/05_random_transition_player_preview.webm" type="video/webm">
-</video>
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_contact_constraint_viewer_result.png" src="assets/04_contact_constraint_viewer_preview.mp4"></video>
 
-### Cell 30-38 - Value Surface 与 near-optimal controller
+### Cell 19 - Random transition player
+
+通过随机选择可接续的动作片段进行播放，验证基础过渡算法能否顺利将片段拼接起来。
 
 ```mermaid
 flowchart LR
-    G[greedy policy baseline] --> B[polynomial basis over x/z/theta]
-    B --> L[learn value coefficients]
-    L --> S[value surface plot]
-    S --> O[optimal-policy player]
+    A[选择当前片段的退出状态] --> B[选择下一片段的起始状态]
+    B --> C[使用 Root Delta 对齐]
+    C --> D[过渡 Blend 并连续播放]
 ```
 
-value surface 让未来代价可见，final viewer 检查 policy 是否能持续选择合理片段。
+- 代码做什么：Random transition player: This validates that clips can be stitched into continuous playback.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：This validates that clips can be stitched into continuous playback.
+- 可视化主体：Random transition player
+- 捕获方式：`canvas`
 
-![Cell 30-38 - Value Surface 与 near-optimal controller](assets/08_optimal_policy_player_result.png)
+![Random transition player](assets/05_random_transition_player_result.png)
 
-![Cell 30-38 - Value Surface 与 near-optimal controller preview](assets/08_optimal_policy_player_preview.gif)
+![Random transition player preview](assets/05_random_transition_player_preview.gif)
 
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_optimal_policy_player_result.png">
-  <source src="assets/08_optimal_policy_player_preview.mp4" type="video/mp4">
-  <source src="assets/08_optimal_policy_player_preview.webm" type="video/webm">
-</video>
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/05_random_transition_player_result.png" src="assets/05_random_transition_player_preview.mp4"></video>
+
+### Cell 36 - Learned value surface
+
+使用多项式基函数拟合未来收益（Value Function），并将空间状态对应的代价分布可视化。
+
+```mermaid
+flowchart LR
+    A[定义关于 (x, z, theta) 的基函数] --> B[迭代计算每个状态的 Bellman Cost]
+    B --> C[回归得到系数 coefficients]
+    C --> D[将未来收益绘制成等高线/曲面图]
+```
+
+- 代码做什么：Learned value surface: The surface makes the optimal-control objective visible as future cost.
+- 运行后看到什么：`plot`
+- 结果说明什么：The surface makes the optimal-control objective visible as future cost.
+- 可视化主体：Learned value surface
+- 捕获方式：`plot`
+
+![Learned value surface](assets/07_learned_value_surface_result.png)
+
+### Cell 38 - Optimal-policy controller
+
+在运行时评估贪婪选择和价值表（Value Policy），让角色自主做出更长远的最优动作规划。
+
+```mermaid
+flowchart LR
+    A[评估候选项的物理过渡代价 physics_cost] --> B[加上评估的未来代价 value]
+    B --> C[选择总代价最小的转移]
+    C --> D[控制器平滑播放选中的最佳片段]
+```
+
+- 代码做什么：Optimal-policy controller: The viewer checks that the policy callback advances without requiring a physical gamepad.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：The viewer checks that the policy callback advances without requiring a physical gamepad.
+- 可视化主体：Optimal-policy controller
+- 捕获方式：`canvas`
+
+![Optimal-policy controller](assets/08_optimal_policy_player_result.png)
+
+![Optimal-policy controller preview](assets/08_optimal_policy_player_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_optimal_policy_player_result.png" src="assets/08_optimal_policy_player_preview.mp4"></video>
 
 ## 关键数据结构
 

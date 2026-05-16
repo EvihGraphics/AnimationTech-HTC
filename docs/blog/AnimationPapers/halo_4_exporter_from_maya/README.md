@@ -76,53 +76,124 @@ flowchart TD
 | `artifact-summary` | `artifact_summary` | Inspect the generated pickle artifact. | The summary verifies that the artifact contains topology, normals, and per-frame vertices. | [PNG](assets/05_animated_face_artifact_summary.png) |
 | `dataflow` | `diagram` | Summarize the exporter path from Maya or synthetic fallback into a notebook-readable .dat file. | The diagram links the supporting script to the Halo 4 Facial Animation notebook. | [PNG](assets/06_exporter_dataflow.png) |
 
+## 源码模块与执行证据深讲
+
 ### maya-fallback - Maya API fallback and synthetic writer
 
-- 代码/证据做什么?Show argparse/pickle imports, Maya detection, and synthetic asset writer import.
-- 运行后看到什么：源码片段。
-- 结果说明什么：The script can run inside Maya or fall back to generating a compatible synthetic face asset.
+导入必要的环境并检测是否在 Maya 内部运行。如果不是，则启用合成数据生成器作为回退机制。
 
-![Maya API fallback and synthetic writer](assets/01_maya_fallback_imports.png)
+```mermaid
+flowchart LR
+    A[执行脚本] --> B{尝试 import maya.cmds}
+    B -- 成功 --> C[获取当前 Maya 环境的场景数据]
+    B -- 失败 --> D[调用 write_synthetic_face_asset]
+```
+
+- 代码/证据做什么：Show argparse/pickle imports, Maya detection, and synthetic asset writer import.
+- 运行后看到什么：`source_excerpt`
+- 结果说明什么：The script can run inside Maya or fall back to generating a compatible synthetic face asset.
+- 可视化主体：maya-fallback
+- 捕获方式：`source_excerpt`
+
+![Maya API fallback and synthetic writer](assets/01_maya_fallback_imports_result.png)
 
 ### export_from_maya - Maya mesh export function
 
-- 代码/证据做什么?Show the selected mesh, topology extraction, normals, frame sampling, and pickle write.
-- 运行后看到什么：源码片段。
-- 结果说明什么：The exporter records topology once and vertex positions over time for facial animation playback.
+负责从选中的模型网格提取拓扑，并在时间轴上遍历记录每一帧的面部顶点位置。
 
-![Maya mesh export function](assets/02_maya_export_function.png)
+```mermaid
+flowchart LR
+    A[获取选中的 Mesh] --> B[一次性提取 indices 与 normals]
+    B --> C[遍历 0 到 FRAME_COUNT 帧]
+    C --> D[提取逐帧顶点位置 frames]
+    D --> E[序列化为 pickle 保存]
+```
+
+- 代码/证据做什么：Show the selected mesh, topology extraction, normals, frame sampling, and pickle write.
+- 运行后看到什么：`source_excerpt`
+- 结果说明什么：The exporter records topology once and vertex positions over time for facial animation playback.
+- 可视化主体：export_from_maya
+- 捕获方式：`source_excerpt`
+
+![Maya mesh export function](assets/02_maya_export_function_result.png)
 
 ### cli-path - CLI output path and fallback switch
 
-- 代码/证据做什么?Show CLI arguments and the --force-synthetic path.
-- 运行后看到什么：源码片段。
-- 结果说明什么：The command-line path makes the case reproducible without an interactive Maya session.
+定义命令行参数，允许外部自动化脚本通过强制开关绕过 Maya 环境直接输出合成文件。
 
-![CLI output path and fallback switch](assets/03_cli_entrypoint.png)
+```mermaid
+flowchart LR
+    A[接收命令行参数] --> B[--output 指定输出位置]
+    A --> C[--force-synthetic 强制回退]
+    B --> D[指导 main 函数逻辑分支]
+    C --> D
+```
+
+- 代码/证据做什么：Show CLI arguments and the --force-synthetic path.
+- 运行后看到什么：`source_excerpt`
+- 结果说明什么：The command-line path makes the case reproducible without an interactive Maya session.
+- 可视化主体：cli-path
+- 捕获方式：`source_excerpt`
+
+![CLI output path and fallback switch](assets/03_cli_entrypoint_result.png)
 
 ### export-log - Exporter validation log
 
-- 代码/证据做什么?Show the managed run log for the exporter.
-- 运行后看到什么：命令日志。
-- 结果说明什么：The log records the generated artifact path used by the notebook case.
+展示导出脚本自动化运行的命令行验证日志。
 
-![Exporter validation log](assets/04_export_command_log.png)
+```mermaid
+flowchart LR
+    A[run_case.ps1 调用脚本] --> B[执行合成数据 fallback]
+    B --> C[输出 successfully written 日志]
+```
+
+- 代码/证据做什么：Show the managed run log for the exporter.
+- 运行后看到什么：`command_log`
+- 结果说明什么：The log records the generated artifact path used by the notebook case.
+- 可视化主体：export-log
+- 捕获方式：`command_log`
+
+![Exporter validation log](assets/04_export_command_log_result.png)
 
 ### artifact-summary - animated_face.dat artifact summary
 
-- 代码/证据做什么?Inspect the generated pickle artifact.
-- 运行后看到什么：产物摘要。
-- 结果说明什么：The summary verifies that the artifact contains topology, normals, and per-frame vertices.
+验证产出的 picke 文件包含了正确的顶点和动画数据量，以供下游 PCA 处理。
 
-![animated_face.dat artifact summary](assets/05_animated_face_artifact_summary.png)
+```mermaid
+flowchart LR
+    A[读取 animated_face.dat] --> B[检查 indices 数量]
+    A --> C[检查 frames 数据量 (220 帧)]
+    C --> D[确认供后续使用的顶点信息结构]
+```
+
+- 代码/证据做什么：Inspect the generated pickle artifact.
+- 运行后看到什么：`artifact_summary`
+- 结果说明什么：The summary verifies that the artifact contains topology, normals, and per-frame vertices.
+- 可视化主体：artifact-summary
+- 捕获方式：`artifact_summary`
+
+![animated_face.dat artifact summary](assets/05_animated_face_artifact_summary_result.png)
 
 ### dataflow - Exporter data flow
 
-- 代码/证据做什么?Summarize the exporter path from Maya or synthetic fallback into a notebook-readable .dat file.
-- 运行后看到什么：模块流程图。
-- 结果说明什么：The diagram links the supporting script to the Halo 4 Facial Animation notebook.
+整个工程的宏观数据链路图，展示从 Maya/Python 到 notebook 消费数据的流转。
 
-![Exporter data flow](assets/06_exporter_dataflow.png)
+```mermaid
+flowchart LR
+    A[Maya Scene] --> B[export_from_maya]
+    C[Synthetic Generator] --> D[write_synthetic_face_asset]
+    B --> E[animated_face.dat]
+    D --> E
+    E --> F[被 halo_4_facial_animation 使用]
+```
+
+- 代码/证据做什么：Summarize the exporter path from Maya or synthetic fallback into a notebook-readable .dat file.
+- 运行后看到什么：`diagram`
+- 结果说明什么：The diagram links the supporting script to the Halo 4 Facial Animation notebook.
+- 可视化主体：dataflow
+- 捕获方式：`diagram`
+
+![Exporter data flow](assets/06_exporter_dataflow_result.png)
 
 ## 运行方式
 

@@ -80,53 +80,120 @@ flowchart TD
 | 16 | `formula` | Solve the translation equations for x0 and z0. | The result separates translation from the remaining rotation solve. | [PNG](assets/05_translation_solution.png) |
 | 20 | `formula` | Collect sine/cosine terms and derive the atan form. | The final expression is the closed-form rotation used for point-cloud alignment. | [PNG](assets/06_theta_solution.png) |
 
+## 关键 cell / 函数深讲
+
 ### Cell 4 - Weighted point-cloud objective
 
-- 代码做什么：Display the weighted squared-distance objective for point-cloud alignment.
-- 运行后看到什么：公式推导输出?
-- 结果说明什么：The formula states exactly what motion-graph transition alignment minimizes.
+定义两组点云之间的带权平方误差函数，用以衡量空间对齐的优劣。
 
-![Weighted point-cloud objective](assets/01_alignment_objective_formula.png)
+```mermaid
+flowchart LR
+    A[第一段动作帧点云 p_i] --> C[施加旋转 theta 和平移 x0, z0]
+    B[第二段动作帧点云 p'_i] --> C
+    C --> D[计算带权残差平方和 S]
+```
+
+- 代码做什么：Display the weighted squared-distance objective for point-cloud alignment.
+- 运行后看到什么：`formula`
+- 结果说明什么：The formula states exactly what motion-graph transition alignment minimizes.
+- 可视化主体：Weighted point-cloud objective
+- 捕获方式：`formula`
+
+![Weighted point-cloud objective](assets/01_alignment_objective_formula_result.png)
 
 ### Cell 6 - Partial derivatives
 
-- 代码做什么：Differentiate the objective with respect to rotation and translation.
-- 运行后看到什么：公式/LaTeX 输出?
-- 结果说明什么：The derivatives define the first-order conditions for the optimal alignment.
+将误差目标函数分别对未知的旋转角和两个平移量求偏导数。
 
-![Partial derivatives](assets/02_partial_derivatives.png)
+```mermaid
+flowchart LR
+    A[误差函数 S] --> B[对 theta 求偏导 tdif]
+    A --> C[对 x0 求偏导 xdif]
+    A --> D[对 z0 求偏导 zdif]
+```
+
+- 代码做什么：Differentiate the objective with respect to rotation and translation.
+- 运行后看到什么：`latex`
+- 结果说明什么：The derivatives define the first-order conditions for the optimal alignment.
+- 可视化主体：Partial derivatives
+- 捕获方式：`latex`
+
+![Partial derivatives](assets/02_partial_derivatives_result.png)
 
 ### Cell 8 - Expanded stationarity equations
 
-- 代码做什么：Expand the derivative equations before substitution.
-- 运行后看到什么：公式/LaTeX 输出?
-- 结果说明什么：The raw equations show where the sine, cosine, and translation terms come from.
+展开偏导方程，准备后续分离变量。
 
-![Expanded stationarity equations](assets/03_expanded_stationarity.png)
+```mermaid
+flowchart LR
+    A[偏导数等于 0] --> B[展开求和符号内部项]
+    B --> C[分离出 sine, cosine 和 平移变量]
+```
+
+- 代码做什么：Expand the derivative equations before substitution.
+- 运行后看到什么：`latex`
+- 结果说明什么：The raw equations show where the sine, cosine, and translation terms come from.
+- 可视化主体：Expanded stationarity equations
+- 捕获方式：`latex`
+
+![Expanded stationarity equations](assets/03_expanded_stationarity_result.png)
 
 ### Cell 13 - Weighted-sum shorthand
 
-- 代码做什么：Introduce compact weighted-sum symbols for the derivation.
-- 运行后看到什么：公式/LaTeX 输出?
-- 结果说明什么：The shorthand turns large sums into readable centroid-like expressions.
+用简化的符号替代复杂的加权坐标和，以便于观察公式的物理意义（例如质心）。
 
-![Weighted-sum shorthand](assets/04_weighted_sum_shorthand.png)
+```mermaid
+flowchart LR
+    A[繁杂的 Sum w_i x_i 等] --> B[代换为 wixi, wizi 等符号]
+    B --> C[简化方程结构]
+```
+
+- 代码做什么：Introduce compact weighted-sum symbols for the derivation.
+- 运行后看到什么：`latex`
+- 结果说明什么：The shorthand turns large sums into readable centroid-like expressions.
+- 可视化主体：Weighted-sum shorthand
+- 捕获方式：`latex`
+
+![Weighted-sum shorthand](assets/04_weighted_sum_shorthand_result.png)
 
 ### Cell 16 - Closed-form translation solution
 
-- 代码做什么：Solve the translation equations for x0 and z0.
-- 运行后看到什么：公式推导输出?
-- 结果说明什么：The result separates translation from the remaining rotation solve.
+求解平移的偏导方程，得到 x0 和 z0 的闭式解。
 
-![Closed-form translation solution](assets/05_translation_solution.png)
+```mermaid
+flowchart LR
+    A[展开并简化的 xdif = 0 和 zdif = 0] --> B[解出 x0_sol]
+    A --> C[解出 z0_sol]
+    B --> D[平移等价于对齐加权质心]
+    C --> D
+```
+
+- 代码做什么：Solve the translation equations for x0 and z0.
+- 运行后看到什么：`formula`
+- 结果说明什么：The result separates translation from the remaining rotation solve.
+- 可视化主体：Closed-form translation solution
+- 捕获方式：`formula`
+
+![Closed-form translation solution](assets/05_translation_solution_result.png)
 
 ### Cell 20 - Final theta solution
 
-- 代码做什么：Collect sine/cosine terms and derive the atan form.
-- 运行后看到什么：公式推导输出?
-- 结果说明什么：The final expression is the closed-form rotation used for point-cloud alignment.
+将平移解代回旋转方程，分离正余弦并求得解析解 atan 公式。
 
-![Final theta solution](assets/06_theta_solution.png)
+```mermaid
+flowchart LR
+    A[将 x0_sol 和 z0_sol 代入 tdif = 0] --> B[化简为 a sin(theta) + b cos(theta) = 0]
+    B --> C[提取 theta = atan(-b/a)]
+    C --> D[获得纯解析的配准计算公式]
+```
+
+- 代码做什么：Collect sine/cosine terms and derive the atan form.
+- 运行后看到什么：`formula`
+- 结果说明什么：The final expression is the closed-form rotation used for point-cloud alignment.
+- 可视化主体：Final theta solution
+- 捕获方式：`formula`
+
+![Final theta solution](assets/06_theta_solution_result.png)
 
 ## 运行方式
 

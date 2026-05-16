@@ -91,69 +91,158 @@ flowchart TD
 | 20 | `matrix` | Compute distances, scales, D matrix, and residual coefficients. | The system transforms residual examples into a smooth correction field. | [PNG](assets/07_radial_system_solve.png) |
 | 21 | `plot` | Plot the final field after adding the RBF residual correction. | The field shows local semantic control beyond the linear trend. | [PNG](assets/08_final_rbf_field.png) |
 
+## 关键 cell / 函数深讲
+
 ### Cell 3 - Sample adverb color space
 
-- 代码做什么：Plot sample points in a two-dimensional adverb space.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The plot connects semantic directions to observed color/motion samples.
+在二维网格点上展示每个位置采集的颜色样本，作为后续动作插值空间的数据基础。
 
-![Sample adverb color space](assets/01_sample_adverb_space.png)
+```mermaid
+flowchart LR
+    A[定义各个语义位置 points] --> B[分配对应的 RGB 值 data]
+    B --> C[绘制二维空间的颜色分布图]
+```
+
+- 代码做什么：Plot sample points in a two-dimensional adverb space.
+- 运行后看到什么：`plot`
+- 结果说明什么：The plot connects semantic directions to observed color/motion samples.
+- 可视化主体：Sample adverb color space
+- 捕获方式：`plot`
+
+![Sample adverb color space](assets/01_sample_adverb_space_result.png)
 
 ### Cell 4 - Four-dimensional adverb encoding
 
-- 代码做什么：Encode right, left, up, and down adverb components.
-- 运行后看到什么：矩阵或数组输出。
-- 结果说明什么：The matrix is the feature space used for linear and radial interpolation.
+将二维位置变换为分别代表四个逻辑方向（右、左、上、下）的非负分量矩阵。
 
-![Four-dimensional adverb encoding](assets/02_4d_adverb_encoding.png)
+```mermaid
+flowchart LR
+    A[二维坐标 x, y] --> B[分别提取正负部分]
+    B --> C[拼接为四维向量: right, left, up, down]
+    C --> D[形成后续插值的特征空间 adverbs]
+```
+
+- 代码做什么：Encode right, left, up, and down adverb components.
+- 运行后看到什么：`matrix`
+- 结果说明什么：The matrix is the feature space used for linear and radial interpolation.
+- 可视化主体：Four-dimensional adverb encoding
+- 捕获方式：`matrix`
+
+![Four-dimensional adverb encoding](assets/02_4d_adverb_encoding_result.png)
 
 ### Cell 7 - Linear model coefficients
 
-- 代码做什么：Fit and print least-squares linear coefficients.
-- 运行后看到什么：表格或结构化数据输出。
-- 结果说明什么：The coefficients capture the broad global trend in adverb space.
+基于提取的特征向量和颜色样本，使用最小二乘法估计出一个线性的全局近似模型。
 
-![Linear model coefficients](assets/03_linear_coefficients.png)
+```mermaid
+flowchart LR
+    A[输入特征 adverbs] --> B[组合偏置项构造矩阵]
+    C[样本值 data] --> D[最小二乘法 lstsq]
+    B --> D
+    D --> E[输出系数 linear_coefficients]
+```
+
+- 代码做什么：Fit and print least-squares linear coefficients.
+- 运行后看到什么：`table`
+- 结果说明什么：The coefficients capture the broad global trend in adverb space.
+- 可视化主体：Linear model coefficients
+- 捕获方式：`table/output`
+
+![Linear model coefficients](assets/03_linear_coefficients_result.png)
 
 ### Cell 9 - Linear color field
 
-- 代码做什么：Plot the color field produced by the linear model.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The broad field shows what linear interpolation can and cannot explain.
+用求出的线性系数生成插值网格上的连续分布图，观察纯线性模型能达到什么样的平滑效果。
 
-![Linear color field](assets/04_linear_color_field.png)
+```mermaid
+flowchart LR
+    A[密集查询网格 interpolation_adverbs] --> B[乘以线性系数]
+    B --> C[生成颜色/动作状态图]
+    C --> D[暴露出线性表达能力的局限性]
+```
+
+- 代码做什么：Plot the color field produced by the linear model.
+- 运行后看到什么：`plot`
+- 结果说明什么：The broad field shows what linear interpolation can and cannot explain.
+- 可视化主体：Linear color field
+- 捕获方式：`plot`
+
+![Linear color field](assets/04_linear_color_field_result.png)
 
 ### Cell 11 - Linear residuals
 
-- 代码做什么：Print the residuals left after the linear model.
-- 运行后看到什么：表格或结构化数据输出。
-- 结果说明什么：Residuals are the local details that the radial basis layer must recover.
+计算真实样本值与线性模型预测值之间的差值（残差），这部分信息将被交由 RBF 层处理。
 
-![Linear residuals](assets/05_linear_residuals.png)
+```mermaid
+flowchart LR
+    A[真实数据 data] --> B[减去线性模型预测值]
+    B --> C[得到 residuals]
+```
+
+- 代码做什么：Print the residuals left after the linear model.
+- 运行后看到什么：`table`
+- 结果说明什么：Residuals are the local details that the radial basis layer must recover.
+- 可视化主体：Linear residuals
+- 捕获方式：`table/output`
+
+![Linear residuals](assets/05_linear_residuals_result.png)
 
 ### Cell 14 - Cubic B-spline radial basis
 
-- 代码做什么：Plot the B3 radial basis shape.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The compact-support basis defines how far each example influences the field.
+展示选取的三次 B 样条核函数，确认其有限支撑性质，确保其只会影响局部而非全局。
 
-![Cubic B-spline radial basis](assets/06_cubic_bspline_basis.png)
+```mermaid
+flowchart LR
+    A[距离输入 r] --> B[计算 B3(r)]
+    B --> C[绘制基函数形状]
+    C --> D[确认当 r>2 时影响衰减为 0]
+```
+
+- 代码做什么：Plot the B3 radial basis shape.
+- 运行后看到什么：`plot`
+- 结果说明什么：The compact-support basis defines how far each example influences the field.
+- 可视化主体：Cubic B-spline radial basis
+- 捕获方式：`plot`
+
+![Cubic B-spline radial basis](assets/06_cubic_bspline_basis_result.png)
 
 ### Cell 20 - Radial coefficient solve
 
-- 代码做什么：Compute distances, scales, D matrix, and residual coefficients.
-- 运行后看到什么：矩阵或数组输出。
-- 结果说明什么：The system transforms residual examples into a smooth correction field.
+为各样本设置衰减半径，根据它们两两之间的距离构造矩阵 D 并求出针对残差的权重系数。
 
-![Radial coefficient solve](assets/07_radial_system_solve.png)
+```mermaid
+flowchart LR
+    A[距离矩阵 distances 与 alphas] --> B[计算 RBF 核矩阵 D]
+    B --> C[求解 D * r_coeff = residuals]
+    C --> D[得到残差修补系数]
+```
+
+- 代码做什么：Compute distances, scales, D matrix, and residual coefficients.
+- 运行后看到什么：`matrix`
+- 结果说明什么：The system transforms residual examples into a smooth correction field.
+- 可视化主体：Radial coefficient solve
+- 捕获方式：`matrix`
+
+![Radial coefficient solve](assets/07_radial_system_solve_result.png)
 
 ### Cell 21 - Residual-corrected RBF field
 
-- 代码做什么：Plot the final field after adding the RBF residual correction.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The field shows local semantic control beyond the linear trend.
+将线性结果与 RBF 计算得出的残差进行叠加，展示最终的高精度颜色（动作）插值场。
 
-![Residual-corrected RBF field](assets/08_final_rbf_field.png)
+```mermaid
+flowchart LR
+    A[网格点的线性估计值 linear_color] --> B[加上 RBF 对网格计算的残差 interpolated_rbf]
+    B --> C[生成 final_color]
+    C --> D[绘制完美还原样本的最终图]
+```
+
+- 代码做什么：Plot the final field after adding the RBF residual correction.
+- 运行后看到什么：`plot`
+- 结果说明什么：The field shows local semantic control beyond the linear trend.
+- 可视化主体：Residual-corrected RBF field
+- 捕获方式：`plot`
+
+![Residual-corrected RBF field](assets/08_final_rbf_field_result.png)
 
 ## 运行方式
 

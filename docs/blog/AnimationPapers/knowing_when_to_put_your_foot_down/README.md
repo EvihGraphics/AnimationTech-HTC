@@ -83,53 +83,121 @@ flowchart TD
 | 18 | `table` | Create and fit the contact classifier from accumulated mirrored labels. | The card marks the transition from hand labels to a reusable prediction model. | [PNG](assets/05_classifier_training_code.png) |
 | 25 | `table` | Load saved feature vectors and labels from disk. | The artifact load is the stable validation path for the case after manual labeling has been done once. | [PNG](assets/06_saved_feature_vectors.png) |
 
+## 关键 cell / 函数深讲
+
 ### Cell 8 - Animation windows and frame count
 
-- 代码做什么：Accumulate source clip ranges and print the available training-frame count.
-- 运行后看到什么：表格或结构化数据输出。
-- 结果说明什么：The count defines how many temporal windows can contribute foot-contact examples.
+统计加载的动画片段，并确认总共可用的帧数，为后续的时间窗口特征提取设定基准。
 
-![Animation windows and frame count](assets/01_clip_window_count.png)
+```mermaid
+flowchart LR
+    A[加载原始 BVH 文件] --> B[截取有效 ranges]
+    B --> C[附加前后 window padding]
+    C --> D[统计合并后的有效训练帧数]
+```
+
+- 代码做什么：Accumulate source clip ranges and print the available training-frame count.
+- 运行后看到什么：`table`
+- 结果说明什么：The count defines how many temporal windows can contribute foot-contact examples.
+- 可视化主体：Animation windows and frame count
+- 捕获方式：`table/output`
+
+![Animation windows and frame count](assets/01_clip_window_count_result.png)
 
 ### Cell 10 - Foot-contact feature vector construction
 
-- 代码做什么：Build a local pose and velocity feature vector around leg and foot bones.
-- 运行后看到什么：代码逻辑片段。
-- 结果说明什么：The source card identifies what the classifier sees when deciding whether a foot should be planted.
+提取包含双腿和双脚骨骼的局部窗口特征（时间上前 5 帧和后 5 帧），这些特征将作为 k-NN 判定接触的关键证据。
 
-![Foot-contact feature vector construction](assets/02_feature_vector_construction.png)
+```mermaid
+flowchart LR
+    A[选定 Left/Right 的 Leg/Foot/Toe] --> B[在时间窗内采样坐标]
+    B --> C[转换到 Root 局部坐标系]
+    C --> D[展平得到 11 帧特征向量]
+```
+
+- 代码做什么：Build a local pose and velocity feature vector around leg and foot bones.
+- 运行后看到什么：`code_only`
+- 结果说明什么：The source card identifies what the classifier sees when deciding whether a foot should be planted.
+- 可视化主体：Foot-contact feature vector construction
+- 捕获方式：`source_excerpt`
+
+![Foot-contact feature vector construction](assets/02_feature_vector_construction_result.png)
 
 ### Cell 11 - Manual annotation UI stability note
 
-- 代码做什么：Record the prepared-notebook skip for the original manual contact-labeling UI.
-- 运行后看到什么：运行日志或文本输出。
-- 结果说明什么：This documents that the browser-safe study copy validates the pipeline without replaying the fragile annotation widget.
+因为原始的脚部接触标记过程高度依赖交互式 Canvas 和人工修正，自动化流水线在这里会跳过界面以保证运行稳定。
 
-![Manual annotation UI stability note](assets/03_annotation_ui_stability_note.png)
+```mermaid
+flowchart LR
+    A[Jupyter Widget Canvas] --> B[人工修正接触标签]
+    B --> C[容易导致环境崩溃或阻塞]
+    C --> D[笔记记录并跳过]
+```
+
+- 代码做什么：Record the prepared-notebook skip for the original manual contact-labeling UI.
+- 运行后看到什么：`log`
+- 结果说明什么：This documents that the browser-safe study copy validates the pipeline without replaying the fragile annotation widget.
+- 可视化主体：Manual annotation UI stability note
+- 捕获方式：`log`
+
+![Manual annotation UI stability note](assets/03_annotation_ui_stability_note_result.png)
 
 ### Cell 15 - Training-set accumulation stability note
 
-- 代码做什么：Record the prepared skip for the manual oracle accumulation cell.
-- 运行后看到什么：运行日志或文本输出。
-- 结果说明什么：The blog can still explain the intended data flow while avoiding a non-repeatable browser labeling step.
+这里负责把上述的人工标注特征追加进特征库，同样为了自动化验证而被跳过。
 
-![Training-set accumulation stability note](assets/04_training_set_accumulation.png)
+```mermaid
+flowchart LR
+    A[单次标注的结果] --> B[判断是否纳入训练集]
+    B --> C[追加到 trained_feature_vector]
+```
+
+- 代码做什么：Record the prepared skip for the manual oracle accumulation cell.
+- 运行后看到什么：`log`
+- 结果说明什么：The blog can still explain the intended data flow while avoiding a non-repeatable browser labeling step.
+- 可视化主体：Training-set accumulation stability note
+- 捕获方式：`log`
+
+![Training-set accumulation stability note](assets/04_training_set_accumulation_result.png)
 
 ### Cell 18 - Classifier construction
 
-- 代码做什么：Create and fit the contact classifier from accumulated mirrored labels.
-- 运行后看到什么：表格或结构化数据输出。
-- 结果说明什么：The card marks the transition from hand labels to a reusable prediction model.
+用左右脚对称镜像的方式进行数据增强，之后构建 k-NN 最近邻分类器。
 
-![Classifier construction](assets/05_classifier_training_code.png)
+```mermaid
+flowchart LR
+    A[累积的 trained_feature_vector] --> B[镜像左脚到右脚特征]
+    B --> C[合并形成成倍的数据]
+    C --> D[训练 NearestNeighbors]
+    D --> E[输出可复用的模型]
+```
+
+- 代码做什么：Create and fit the contact classifier from accumulated mirrored labels.
+- 运行后看到什么：`table`
+- 结果说明什么：The card marks the transition from hand labels to a reusable prediction model.
+- 可视化主体：Classifier construction
+- 捕获方式：`table/output`
+
+![Classifier construction](assets/05_classifier_training_code_result.png)
 
 ### Cell 25 - Saved feature-vector artifact load
 
-- 代码做什么：Load saved feature vectors and labels from disk.
-- 运行后看到什么：表格或结构化数据输出。
-- 结果说明什么：The artifact load is the stable validation path for the case after manual labeling has been done once.
+展示如何加载之前成功标注并持久化存储好的特征库和标签，供其它用例或复现使用。
 
-![Saved feature-vector artifact load](assets/06_saved_feature_vectors.png)
+```mermaid
+flowchart LR
+    A[foot_feature_vector.dat] --> B[读取 Numpy 数据]
+    B --> C[直接跳过人工标注阶段]
+    C --> D[供系统验证和下游任务使用]
+```
+
+- 代码做什么：Load saved feature vectors and labels from disk.
+- 运行后看到什么：`table`
+- 结果说明什么：The artifact load is the stable validation path for the case after manual labeling has been done once.
+- 可视化主体：Saved feature-vector artifact load
+- 捕获方式：`table/output`
+
+![Saved feature-vector artifact load](assets/06_saved_feature_vectors_result.png)
 
 ## 运行方式
 

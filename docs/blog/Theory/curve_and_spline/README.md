@@ -212,109 +212,257 @@ B-Spline 图要看平滑性和局部支撑。曲线通常不穿过所有控制�
 | 88 | `plot` | Show a non-uniform Bezier time curve and recovered internal parameter. | Animation systems often need to solve internal curve parameters from frame time. | [PNG](assets/12-bezier-time-root.png) |
 | 92 | `plot` | Fit a complex sampled function with a uniform cubic B-Spline. | The fitted curve does not need to pass through every sample, but it preserves a stable trend. | [PNG](assets/13-bspline-fitting.png) |
 
+## 关键 cell / 函数深讲
+
 ### Cell 13 - Bezier control polygons and curves
 
-- 代码做什么：Plot Bezier curves of different orders with their control points.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The curve is constrained by the control polygon rather than being an isolated function plot.
+展示由不同控制多边形生成的 Bezier 曲线，说明曲线形状是如何被控制点拉动的。
 
-![Bezier control polygons and curves](assets/01-bezier-de-casteljau.png)
+```mermaid
+flowchart LR
+    A[控制点集合 P] --> B[castlejau 递归求值]
+    B --> C[计算给定 t 的曲线点]
+    C --> D[绘制控制多边形与最终曲线]
+```
+
+- 代码做什么：Plot Bezier curves of different orders with their control points.
+- 运行后看到什么：`plot`
+- 结果说明什么：The curve is constrained by the control polygon rather than being an isolated function plot.
+- 可视化主体：Bezier control polygons and curves
+- 捕获方式：`plot`
+
+![Bezier control polygons and curves](assets/01-bezier-de-casteljau_result.png)
 
 ### Cell 64 - Cox-De Boor basis functions
 
-- 代码做什么：Plot recursively constructed B-Spline basis functions.
-- 运行后看到什么：图表输出。
-- 结果说明什么：Local support explains why one B-Spline control point affects only a local curve span.
+绘制 B-Spline 的基函数曲线，展示其局部支撑性质。
 
-![Cox-De Boor basis functions](assets/02-bernstein-basis.png)
+```mermaid
+flowchart LR
+    A[节点向量 t] --> B[递归计算 0 阶基函数]
+    B --> C[组合得到高阶 Cox-De Boor 基函数]
+    C --> D[绘制每个控制点对应基函数的权重分布]
+```
+
+- 代码做什么：Plot recursively constructed B-Spline basis functions.
+- 运行后看到什么：`plot`
+- 结果说明什么：Local support explains why one B-Spline control point affects only a local curve span.
+- 可视化主体：Cox-De Boor basis functions
+- 捕获方式：`plot`
+
+![Cox-De Boor basis functions](assets/02-bernstein-basis_result.png)
 
 ### Cell 22 - Multi-segment Bezier spline
 
-- 代码做什么：Connect multiple cubic Bezier spans and draw their control points.
-- 运行后看到什么：图表输出。
-- 结果说明什么：Long paths are built from local spans, and shared endpoints control continuity.
+将多段三次 Bezier 曲线连接在一起，展示分段样条的构造。
 
-![Multi-segment Bezier spline](assets/03-bezier-control-polygon.png)
+```mermaid
+flowchart LR
+    A[输入连续的控制点段 P] --> B[对每四个控制点求三次 Bezier]
+    B --> C[拼接多段曲线]
+    C --> D[保证 C0 连续性（端点共享）]
+```
+
+- 代码做什么：Connect multiple cubic Bezier spans and draw their control points.
+- 运行后看到什么：`plot`
+- 结果说明什么：Long paths are built from local spans, and shared endpoints control continuity.
+- 可视化主体：Multi-segment Bezier spline
+- 捕获方式：`plot`
+
+![Multi-segment Bezier spline](assets/03-bezier-control-polygon_result.png)
 
 ### Cell 15 - De Casteljau versus Bernstein derivation
 
-- 代码做什么：Expand the De Casteljau form using SymPy.
-- 运行后看到什么：运行日志或文本输出。
-- 结果说明什么：The symbolic output proves that recursive interpolation and Bernstein polynomials describe the same cubic Bezier.
+利用 SymPy 将递归的 De Casteljau 算法展开为符号表达式。
 
-![De Casteljau versus Bernstein derivation](assets/04-rational-bezier-weight.png)
+```mermaid
+flowchart LR
+    A[De Casteljau 递归定义] --> B[SymPy 符号推导]
+    B --> C[展开为关于 t 的多项式]
+    C --> D[证明其等价于 Bernstein 基函数表达]
+```
+
+- 代码做什么：Expand the De Casteljau form using SymPy.
+- 运行后看到什么：`log`
+- 结果说明什么：The symbolic output proves that recursive interpolation and Bernstein polynomials describe the same cubic Bezier.
+- 可视化主体：De Casteljau versus Bernstein derivation
+- 捕获方式：`log`
+
+![De Casteljau versus Bernstein derivation](assets/04-rational-bezier-weight_result.png)
 
 ### Cell 24 - Cubic curve shape control
 
-- 代码做什么：Compare low-order and cubic polynomial interpolation behavior.
-- 运行后看到什么：图表输出。
-- 结果说明什么：Cubic curves can control both position and derivative, which is why they are common in animation curves.
+比较低阶多项式与三次多项式的曲线形态。
 
-![Cubic curve shape control](assets/05-cubic-bezier-spline.png)
+```mermaid
+flowchart LR
+    A[低阶插值点] --> B[直线/抛物线插值]
+    C[端点及切线信息] --> D[三次多项式插值]
+    B --> E[对比观察速度与位置的联合控制]
+    D --> E
+```
+
+- 代码做什么：Compare low-order and cubic polynomial interpolation behavior.
+- 运行后看到什么：`plot`
+- 结果说明什么：Cubic curves can control both position and derivative, which is why they are common in animation curves.
+- 可视化主体：Cubic curve shape control
+- 捕获方式：`plot`
+
+![Cubic curve shape control](assets/05-cubic-bezier-spline_result.png)
 
 ### Cell 40 - Hermite endpoints and tangents
 
-- 代码做什么：Plot a 2D Hermite curve with endpoint tangent controls.
-- 运行后看到什么：图表输出。
-- 结果说明什么：Velocity and tangent information are as important as position values in animation curves.
+利用端点位置和切线向量绘制 2D Hermite 曲线。
 
-![Hermite endpoints and tangents](assets/06-hermite-tangents.png)
+```mermaid
+flowchart LR
+    A[起点/终点位置] --> B[构建 Hermite 矩阵 H]
+    C[起点/终点切线] --> B
+    B --> D[计算随 t 变化的曲线点]
+    D --> E[绘制切线对曲线弯曲方向的引导]
+```
+
+- 代码做什么：Plot a 2D Hermite curve with endpoint tangent controls.
+- 运行后看到什么：`plot`
+- 结果说明什么：Velocity and tangent information are as important as position values in animation curves.
+- 可视化主体：Hermite endpoints and tangents
+- 捕获方式：`plot`
+
+![Hermite endpoints and tangents](assets/06-hermite-tangents_result.png)
 
 ### Cell 56 - Cardinal spline tension
 
-- 代码做什么：Plot a Cardinal spline with control points.
-- 运行后看到什么：图表输出。
-- 结果说明什么：Cardinal splines estimate tangents from neighboring points and pass through key points.
+绘制一条通过一系列控制点的 Cardinal 样条，并观察张力（tension）参数的作用。
 
-![Cardinal spline tension](assets/07-cardinal-tension.png)
+```mermaid
+flowchart LR
+    A[一系列插值点 P] --> B[利用有限差分估计相邻切线]
+    B --> C[引入 tension 缩放切线长度]
+    C --> D[转化为 Hermite 分段曲线]
+    D --> E[绘制结果展示松紧变化]
+```
+
+- 代码做什么：Plot a Cardinal spline with control points.
+- 运行后看到什么：`plot`
+- 结果说明什么：Cardinal splines estimate tangents from neighboring points and pass through key points.
+- 可视化主体：Cardinal spline tension
+- 捕获方式：`plot`
+
+![Cardinal spline tension](assets/07-cardinal-tension_result.png)
 
 ### Cell 62 - Continuity construction
 
-- 代码做什么：Plot interpolation points, midpoints, and helper structures for continuity.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The output separates positional continuity, velocity continuity, and higher-order smoothness.
+分解样条在连接点处的位置、速度以及更高级别的连续性差异。
 
-![Continuity construction](assets/08-cardinal-continuity.png)
+```mermaid
+flowchart LR
+    A[连接点两侧的函数分段] --> B[求取位置值差分]
+    B --> C[求取一阶导数（速度）差分]
+    C --> D[图表对比各类连续性 (C0/C1)]
+```
+
+- 代码做什么：Plot interpolation points, midpoints, and helper structures for continuity.
+- 运行后看到什么：`plot`
+- 结果说明什么：The output separates positional continuity, velocity continuity, and higher-order smoothness.
+- 可视化主体：Continuity construction
+- 捕获方式：`plot`
+
+![Continuity construction](assets/08-cardinal-continuity_result.png)
 
 ### Cell 72 - Uniform cubic B-Spline
 
-- 代码做什么：Plot a uniform cubic B-Spline and its control points.
-- 运行后看到什么：图表输出。
-- 结果说明什么：B-Splines are smooth approximations and usually do not pass through every control point.
+绘制均匀三次 B-Spline，强调其平滑的拟合特点及不强制穿过控制点的特性。
 
-![Uniform cubic B-Spline](assets/09-bspline-local-support.png)
+```mermaid
+flowchart LR
+    A[控制点序列] --> B[应用三次 B-Spline 基准矩阵]
+    B --> C[基于局部 4 个点生成分段曲线]
+    C --> D[整体拟合出平滑路径]
+```
+
+- 代码做什么：Plot a uniform cubic B-Spline and its control points.
+- 运行后看到什么：`plot`
+- 结果说明什么：B-Splines are smooth approximations and usually do not pass through every control point.
+- 可视化主体：Uniform cubic B-Spline
+- 捕获方式：`plot`
+
+![Uniform cubic B-Spline](assets/09-bspline-local-support_result.png)
 
 ### Cell 77 - 1D Hermite keyframe curve
 
-- 代码做什么：Generate a 1D Hermite curve from key time, key value, and tangent.
-- 运行后看到什么：图表输出。
-- 结果说明什么：This transfers geometric curve ideas to animation-editor keyframe curves.
+将前文的几何曲线概念迁移到一维关键帧动画曲线，利用关键时间、关键值和切线生成动画轨迹。
 
-![1D Hermite keyframe curve](assets/10-keyframe-hermite.png)
+```mermaid
+flowchart LR
+    A[真实关键帧时间与值] --> B[时间轴参数化至 [0, 1] t]
+    C[关键帧切线(变化率)] --> B
+    B --> D[计算每一帧的插值输出]
+```
+
+- 代码做什么：Generate a 1D Hermite curve from key time, key value, and tangent.
+- 运行后看到什么：`plot`
+- 结果说明什么：This transfers geometric curve ideas to animation-editor keyframe curves.
+- 可视化主体：1D Hermite keyframe curve
+- 捕获方式：`plot`
+
+![1D Hermite keyframe curve](assets/10-keyframe-hermite_result.png)
 
 ### Cell 83 - Non-uniform Cardinal time
 
-- 代码做什么：Compare Cardinal sampling under non-uniform key times.
-- 运行后看到什么：图表输出。
-- 结果说明什么：Treating parameter t as real time can place samples incorrectly.
+展示在非均匀关键帧时间下，单纯将参数 t 视作真实时间所带来的采样偏移问题。
 
-![Non-uniform Cardinal time](assets/11-nonuniform-cardinal-time.png)
+```mermaid
+flowchart LR
+    A[非均匀间隔的时间轴] --> B[按照均匀 t 代入公式]
+    B --> C[计算出扭曲的插值结果]
+    C --> D[对比真实时间求值与单纯参数 t 求值]
+```
+
+- 代码做什么：Compare Cardinal sampling under non-uniform key times.
+- 运行后看到什么：`plot`
+- 结果说明什么：Treating parameter t as real time can place samples incorrectly.
+- 可视化主体：Non-uniform Cardinal time
+- 捕获方式：`plot`
+
+![Non-uniform Cardinal time](assets/11-nonuniform-cardinal-time_result.png)
 
 ### Cell 88 - Bezier time root solving
 
-- 代码做什么：Show a non-uniform Bezier time curve and recovered internal parameter.
-- 运行后看到什么：图表输出。
-- 结果说明什么：Animation systems often need to solve internal curve parameters from frame time.
+演示如何反解 Bezier 参数曲线以找出内部参数 t 对应的真实帧号。
 
-![Bezier time root solving](assets/12-bezier-time-root.png)
+```mermaid
+flowchart LR
+    A[目标真实帧号] --> B[Newton 迭代/根求解器 find_bezier_root]
+    B --> C[解出 Bezier 曲线的内部 t]
+    C --> D[用 t 代回求取对应的关键帧属性值]
+```
+
+- 代码做什么：Show a non-uniform Bezier time curve and recovered internal parameter.
+- 运行后看到什么：`plot`
+- 结果说明什么：Animation systems often need to solve internal curve parameters from frame time.
+- 可视化主体：Bezier time root solving
+- 捕获方式：`plot`
+
+![Bezier time root solving](assets/12-bezier-time-root_result.png)
 
 ### Cell 92 - B-Spline least-squares fitting
 
-- 代码做什么：Fit a complex sampled function with a uniform cubic B-Spline.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The fitted curve does not need to pass through every sample, but it preserves a stable trend.
+利用最小二乘法拟合 B-Spline 控制点，使其逼近一段复杂的采样函数。
 
-![B-Spline least-squares fitting](assets/13-bspline-fitting.png)
+```mermaid
+flowchart LR
+    A[复杂采样函数数据] --> B[设定最小二乘误差目标]
+    B --> C[优化 B-Spline 的未知控制值]
+    C --> D[生成稳定且平滑的逼近曲线]
+```
+
+- 代码做什么：Fit a complex sampled function with a uniform cubic B-Spline.
+- 运行后看到什么：`plot`
+- 结果说明什么：The fitted curve does not need to pass through every sample, but it preserves a stable trend.
+- 可视化主体：B-Spline least-squares fitting
+- 捕获方式：`plot`
+
+![B-Spline least-squares fitting](assets/13-bspline-fitting_result.png)
 
 ## 运行方式
 

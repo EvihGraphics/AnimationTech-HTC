@@ -63,71 +63,161 @@ flowchart LR
 
 ## 关键 cell / 函数深讲
 
-### Cell 7-18 - 从原始样例到 canonical clips
+### Cell 7 - Raw sample clips
+
+渲染所有未经处理的走/跑动作原始片段，作为风格插值系统的输入语料库。
 
 ```mermaid
 flowchart LR
-    R[Raw sample clips] --> T[contact/timing labels]
-    T --> L[loop repair]
-    L --> W[time warp]
-    W --> C[canonical 401-frame clips]
+    A[加载多个方向/风格的动作剪辑] --> B[并排显示在 Timeline Viewer]
+    B --> C[观察片段之间存在的相位和时序差异]
 ```
 
-前半段 viewer 验证样例是否已同相位。若接触时刻没有对齐，后续插值会把不同步的脚步混在一起。
+- 代码做什么：Raw sample clip overview: The viewer establishes the motion examples that will be normalized and blended.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：The viewer establishes the motion examples that will be normalized and blended.
+- 可视化主体：Raw sample clip overview
+- 捕获方式：`canvas`
 
-![Cell 7-18 - 从原始样例到 canonical clips](assets/04_resampled_canonical_clips_result.png)
+![Raw sample clip overview](assets/01_raw_sample_clips_result.png)
 
-![Cell 7-18 - 从原始样例到 canonical clips preview](assets/04_resampled_canonical_clips_preview.gif)
+![Raw sample clip overview preview](assets/01_raw_sample_clips_preview.gif)
 
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_resampled_canonical_clips_result.png">
-  <source src="assets/04_resampled_canonical_clips_preview.mp4" type="video/mp4">
-  <source src="assets/04_resampled_canonical_clips_preview.webm" type="video/webm">
-</video>
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/01_raw_sample_clips_result.png" src="assets/01_raw_sample_clips_preview.mp4"></video>
 
-### Cell 20-23 - B-spline 压缩与重建
+### Cell 10 - Canonical timing and contact inspection
+
+为了避免直接混合导致错步，将所有片段对齐到一个统一的特征时间轴（Phase），并在此检验接触状态的一致性。
 
 ```mermaid
 flowchart LR
-    A[canonical samples] --> B[uniform B-spline basis]
-    B --> C[optimize control points]
-    C --> D[reconstruct quats/pos]
-    D --> V[viewer validation]
+    A[原始动画时间 t] --> B[人工/算法标注关键脚落地事件]
+    B --> C[映射到通用步态相位 Generic Time]
+    C --> D[时间规整后的片段对齐显示]
 ```
 
-B-spline viewer 验证曲线压缩是否仍能播放，而不是只在数值上拟合。
+- 代码做什么：Canonical timing and contact inspection: Canonical timing aligns examples before interpolation.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：Canonical timing aligns examples before interpolation.
+- 可视化主体：Canonical timing and contact inspection
+- 捕获方式：`canvas`
 
-![Cell 20-23 - B-spline 压缩与重建](assets/06_bspline_reconstruction_viewer_result.png)
+![Canonical timing and contact inspection](assets/02_canonical_timing_contacts_result.png)
 
-![Cell 20-23 - B-spline 压缩与重建 preview](assets/06_bspline_reconstruction_viewer_preview.gif)
+![Canonical timing and contact inspection preview](assets/02_canonical_timing_contacts_preview.gif)
 
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_bspline_reconstruction_viewer_result.png">
-  <source src="assets/06_bspline_reconstruction_viewer_preview.mp4" type="video/mp4">
-  <source src="assets/06_bspline_reconstruction_viewer_preview.webm" type="video/webm">
-</video>
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_canonical_timing_contacts_result.png" src="assets/02_canonical_timing_contacts_preview.mp4"></video>
 
-### Cell 26-33 - RBF runtime controls
+### Cell 14 - Looping animation comparison
+
+修复动作的首尾循环瑕疵，消除动作接缝处的弹跳感，使得动作可无限播放。
 
 ```mermaid
 flowchart LR
-    A[angle/mood query] --> R[RBF weights]
-    R --> T[timing coefficients]
-    R --> C[control point coefficients]
-    T --> P[generic time]
-    C --> B[B-spline pose]
-    P --> O[interpolated animation]
-    B --> O
+    A[剪裁一周期动作片段] --> B[计算首尾姿态与速度差异]
+    B --> C[应用平滑函数将误差分摊至各帧]
+    C --> D[生成无缝 Looping 动画]
 ```
 
-最终控件同时改变方向和风格。观察重点是动作是否连续、脚步是否还锁得住、风格变化是否不是简单线性混合。
+- 代码做什么：Looping animation comparison: Looping makes repeated motion comparable across clips.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：Looping makes repeated motion comparable across clips.
+- 可视化主体：Looping animation comparison
+- 捕获方式：`canvas`
 
-![Cell 26-33 - RBF runtime controls](assets/08_final_interpolated_adverb_controls_result.png)
+![Looping animation comparison](assets/03_looping_animation_compare_result.png)
 
-![Cell 26-33 - RBF runtime controls preview](assets/08_final_interpolated_adverb_controls_preview.gif)
+![Looping animation comparison preview](assets/03_looping_animation_compare_preview.gif)
 
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_final_interpolated_adverb_controls_result.png">
-  <source src="assets/08_final_interpolated_adverb_controls_preview.mp4" type="video/mp4">
-  <source src="assets/08_final_interpolated_adverb_controls_preview.webm" type="video/webm">
-</video>
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/03_looping_animation_compare_result.png" src="assets/03_looping_animation_compare_preview.mp4"></video>
+
+### Cell 18 - Resampled canonical clips
+
+将规整并修复循环后的剪辑重采样到一致的帧数（如 401 帧），确保数据在数组维度上的对齐。
+
+```mermaid
+flowchart LR
+    A[不同原始长度的 Loop 动画] --> B[依据 Generic Time 均匀重采样]
+    B --> C[生成等长数组 Resampled Clips]
+    C --> D[在 Viewer 中同时同频播放]
+```
+
+- 代码做什么：Resampled canonical clips: The viewer checks that examples share a common timing domain.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：The viewer checks that examples share a common timing domain.
+- 可视化主体：Resampled canonical clips
+- 捕获方式：`canvas`
+
+![Resampled canonical clips](assets/04_resampled_canonical_clips_result.png)
+
+![Resampled canonical clips preview](assets/04_resampled_canonical_clips_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_resampled_canonical_clips_result.png" src="assets/04_resampled_canonical_clips_preview.mp4"></video>
+
+### Cell 22 - B-spline curve fit
+
+对密集的重采样动画执行 B 样条拟合降维，用少量控制点（如 23 个）来表示复杂的曲线，大幅降低插值计算量。
+
+```mermaid
+flowchart LR
+    A[401 帧的高维动作数据] --> B[解算最优 B-spline 控制点位置]
+    B --> C[生成 23 个稀疏控制点]
+    C --> D[绘制包含控制点和拟合曲线的折线图]
+```
+
+- 代码做什么：B-spline curve fit: The plot shows how sparse motion samples become smooth parameterized curves.
+- 运行后看到什么：`plot`
+- 结果说明什么：The plot shows how sparse motion samples become smooth parameterized curves.
+- 可视化主体：B-spline curve fit
+- 捕获方式：`plot`
+
+![B-spline curve fit](assets/05_bspline_fit_plot_result.png)
+
+### Cell 23 - B-spline reconstruction viewer
+
+使用降维后的 B 样条控制点重新构建动画并播放，肉眼验证拟合压缩过程没有损失明显的视觉质量。
+
+```mermaid
+flowchart LR
+    A[B-spline 控制点] --> B[应用 B-spline 基函数重建全帧]
+    B --> C[转换回姿态四元数与 Root 坐标]
+    C --> D[在 Viewer 中播放重建动画以验证]
+```
+
+- 代码做什么：B-spline reconstruction viewer: The viewer validates the curve representation as playable motion.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：The viewer validates the curve representation as playable motion.
+- 可视化主体：B-spline reconstruction viewer
+- 捕获方式：`canvas`
+
+![B-spline reconstruction viewer](assets/06_bspline_reconstruction_viewer_result.png)
+
+![B-spline reconstruction viewer preview](assets/06_bspline_reconstruction_viewer_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_bspline_reconstruction_viewer_result.png" src="assets/06_bspline_reconstruction_viewer_preview.mp4"></video>
+
+### Cell 33 - Final interpolated adverb controls
+
+集成径向基函数（RBF），通过交互式的 `angle`（方向）和 `mood`（心情/速度）滑杆，在潜空间实时插值出全新的动作。
+
+```mermaid
+flowchart LR
+    A[输入 Adverb 参数 Angle/Mood] --> B[通过 RBF 拟合对应的 B-spline 控制点和 Timing]
+    B --> C[按插值控制点重建当前帧姿态]
+    C --> D[Viewer 实时渲染生成的新动作]
+```
+
+- 代码做什么：Final interpolated adverb controls: The final viewer shows how verb and adverb coordinates produce a new animation.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：The final viewer shows how verb and adverb coordinates produce a new animation.
+- 可视化主体：Final interpolated adverb controls
+- 捕获方式：`canvas`
+
+![Final interpolated adverb controls](assets/08_final_interpolated_adverb_controls_result.png)
+
+![Final interpolated adverb controls preview](assets/08_final_interpolated_adverb_controls_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_final_interpolated_adverb_controls_result.png" src="assets/08_final_interpolated_adverb_controls_preview.mp4"></video>
 
 ## 关键数据结构
 

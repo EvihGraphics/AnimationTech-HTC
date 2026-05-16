@@ -103,61 +103,141 @@ Polynomial augmentation 的结果说明，RBF 不一定只负责完整函数本�
 | 21 | `matrix` | Build and print the polynomial basis matrix P. | The augmentation adds a global trend term alongside local kernels. | [PNG](assets/06_polynomial_basis_matrix.png) |
 | 27 | `plot` | Plot the final polynomial-augmented RBF interpolation. | The final curve preserves both sparse samples and stable large-scale behavior. | [PNG](assets/07_augmented_rbf_fit.png) |
 
+## 关键 cell / 函数深讲
+
 ### Cell 6 - Sample function and sparse points
 
-- 代码做什么：Plot the target function and sparse interpolation samples.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The plot establishes what the RBF interpolator must reconstruct.
+建立一条用于测试插值的连续目标函数，并抽取部分稀疏样本作为 RBF 的中心点。
 
-![Sample function and sparse points](assets/01_sample_function_points.png)
+```mermaid
+flowchart LR
+    A[定义真实的一维目标函数 f] --> B[在稀疏位置 xs 采样]
+    B --> C[获取样本值 ys]
+    C --> D[绘制出必须被重建的目标图]
+```
+
+- 代码做什么：Plot the target function and sparse interpolation samples.
+- 运行后看到什么：`plot`
+- 结果说明什么：The plot establishes what the RBF interpolator must reconstruct.
+- 可视化主体：Sample function and sparse points
+- 捕获方式：`plot`
+
+![Sample function and sparse points](assets/01_sample_function_points_result.png)
 
 ### Cell 7 - Gaussian kernel influence
 
-- 代码做什么：Plot per-sample Gaussian radial basis functions.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The graph shows each sample as a local influence field.
+观察每一个稀疏样本如果作为 Gaussian kernel 的中心，它对周围空间的影响分布情况。
 
-![Gaussian kernel influence](assets/02_gaussian_kernel_influence.png)
+```mermaid
+flowchart LR
+    A[选择样本中心 x_i] --> B[设定参数 eps]
+    B --> C[计算 Gaussian kernel]
+    C --> D[绘制单个核函数在定义域的形状]
+```
+
+- 代码做什么：Plot per-sample Gaussian radial basis functions.
+- 运行后看到什么：`plot`
+- 结果说明什么：The graph shows each sample as a local influence field.
+- 可视化主体：Gaussian kernel influence
+- 捕获方式：`plot`
+
+![Gaussian kernel influence](assets/02_gaussian_kernel_influence_result.png)
 
 ### Cell 9 - Distance and kernel matrices
 
-- 代码做什么：Print the pairwise distances and Phi kernel matrix.
-- 运行后看到什么：矩阵或数组输出。
-- 结果说明什么：The matrix is the linear system that determines interpolation weights.
+计算样本两两之间的距离矩阵，并将其转换为 Gaussian Kernel 矩阵 Phi。
 
-![Distance and kernel matrices](assets/03_distance_kernel_matrix.png)
+```mermaid
+flowchart LR
+    A[样本中心坐标序列 xs] --> B[计算全成对距离矩阵 distances]
+    B --> C[应用 Gaussian 函数]
+    C --> D[生成核矩阵 Phi]
+```
+
+- 代码做什么：Print the pairwise distances and Phi kernel matrix.
+- 运行后看到什么：`matrix`
+- 结果说明什么：The matrix is the linear system that determines interpolation weights.
+- 可视化主体：Distance and kernel matrices
+- 捕获方式：`matrix`
+
+![Distance and kernel matrices](assets/03_distance_kernel_matrix_result.png)
 
 ### Cell 10 - Solved RBF weights
 
-- 代码做什么：Solve Phi w = y and print the weights.
-- 运行后看到什么：表格或结构化数据输出。
-- 结果说明什么：The weights tell how much each radial basis contributes to the reconstruction.
+基于样本的实际输出值，求解一组线性方程以获取每个径向基函数的权重。
 
-![Solved RBF weights](assets/04_rbf_weights.png)
+```mermaid
+flowchart LR
+    A[核矩阵 Phi] --> B[求解线性方程组 Phi * w = ys]
+    C[样本值 ys] --> B
+    B --> D[得到每个基的权重 w]
+```
+
+- 代码做什么：Solve Phi w = y and print the weights.
+- 运行后看到什么：`table`
+- 结果说明什么：The weights tell how much each radial basis contributes to the reconstruction.
+- 可视化主体：Solved RBF weights
+- 捕获方式：`table/output`
+
+![Solved RBF weights](assets/04_rbf_weights_result.png)
 
 ### Cell 16 - Interpolated curve and query sample
 
-- 代码做什么：Evaluate the RBF curve and mark a query point.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The plot checks that local kernels reconstruct the target curve between samples.
+利用解得的权重和 Gaussian Kernel 组合计算整个定义域上的 RBF 拟合结果，并测试某个特定查询点。
 
-![Interpolated curve and query sample](assets/05_interpolated_query_result.png)
+```mermaid
+flowchart LR
+    A[查询点集 plot_x] --> B[计算到每个样本中心 xs 的距离]
+    B --> C[计算核值]
+    C --> D[乘以对应权重 w 并求和]
+    D --> E[绘制最终的 RBF 连续插值曲线]
+```
+
+- 代码做什么：Evaluate the RBF curve and mark a query point.
+- 运行后看到什么：`plot`
+- 结果说明什么：The plot checks that local kernels reconstruct the target curve between samples.
+- 可视化主体：Interpolated curve and query sample
+- 捕获方式：`plot`
+
+![Interpolated curve and query sample](assets/05_interpolated_query_result_result.png)
 
 ### Cell 21 - Polynomial augmentation matrix
 
-- 代码做什么：Build and print the polynomial basis matrix P.
-- 运行后看到什么：矩阵或数组输出。
-- 结果说明什么：The augmentation adds a global trend term alongside local kernels.
+引入多项式增强，解决分布不均时可能出现的边界失控问题，首先需要构造多项式的基矩阵。
 
-![Polynomial augmentation matrix](assets/06_polynomial_basis_matrix.png)
+```mermaid
+flowchart LR
+    A[样本中心坐标 xs] --> B[构造 1, x, x^2 的列向量]
+    B --> C[合并为多项式基矩阵 P]
+```
+
+- 代码做什么：Build and print the polynomial basis matrix P.
+- 运行后看到什么：`matrix`
+- 结果说明什么：The augmentation adds a global trend term alongside local kernels.
+- 可视化主体：Polynomial augmentation matrix
+- 捕获方式：`matrix`
+
+![Polynomial augmentation matrix](assets/06_polynomial_basis_matrix_result.png)
 
 ### Cell 27 - Augmented RBF fit
 
-- 代码做什么：Plot the final polynomial-augmented RBF interpolation.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The final curve preserves both sparse samples and stable large-scale behavior.
+计算包含线性或多项式全局项的增强 RBF 系统，并查看更稳定的组合插值效果。
 
-![Augmented RBF fit](assets/07_augmented_rbf_fit.png)
+```mermaid
+flowchart LR
+    A[核矩阵 Phi] --> B[结合多项式矩阵 P 构造大矩阵系统]
+    C[加入多项式正交约束方程] --> B
+    B --> D[联合求解径向权重与多项式系数]
+    D --> E[绘制带有全局趋势支持的 RBF 曲线]
+```
+
+- 代码做什么：Plot the final polynomial-augmented RBF interpolation.
+- 运行后看到什么：`plot`
+- 结果说明什么：The final curve preserves both sparse samples and stable large-scale behavior.
+- 可视化主体：Augmented RBF fit
+- 捕获方式：`plot`
+
+![Augmented RBF fit](assets/07_augmented_rbf_fit_result.png)
 
 ## 运行方式
 

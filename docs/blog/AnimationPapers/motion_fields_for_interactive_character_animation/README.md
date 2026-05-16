@@ -63,47 +63,140 @@ greedy action 只看即时目标；transition table 和 value function 让系统
 
 ## 关键 cell / 函数深讲
 
-### Cell 7-17 - 从 pose algebra 到 motion field
+## 关键 cell / 函数深讲
+
+### Cell 7 - Interactive UI skip note
+
+考虑到浏览器自动化验证和渲染的稳定性，该笔记记录了原案例中部分易崩溃的探索性 UI 控件的跳过情况。
 
 ```mermaid
 flowchart LR
-    N[interactive skip note] --> P[PoseData helpers]
-    P --> S[states_x states_v states_y states_c]
-    S --> M[metric_matrix]
-    M --> U[UMAP motion-field embedding]
+    A[Jupyter Notebook] --> B[交互式 Widget Canvas]
+    B --> C[在自动化脚本环境中阻塞运行]
+    C --> D[由脚本自动检测并跳过]
 ```
 
-UMAP 图只用来理解样本场结构，不是运行时算法本身。
+- 代码做什么：The note separates browser-safe validation from the original exploratory UI.
+- 运行后看到什么：`log`
+- 结果说明什么：The note separates browser-safe validation from the original exploratory UI.
+- 可视化主体：Interactive UI skip note
+- 捕获方式：`log`
 
-![Cell 7-17 - 从 pose algebra 到 motion field](assets/03_umap_motion_field_result.png)
+![Interactive UI skip note](assets/01_interactive_ui_skip_note_result.png)
 
-### Cell 20-25 - k-NN 查询与控制入口
+### Cell 11 - State table build
+
+基于包含 Pose 及其对应的下一帧 Velocity 信息的样本库，搭建供系统运行时高速匹配查询的状态数据库。
 
 ```mermaid
 flowchart LR
-    K[Torch k-NN helper] --> W[neighbor weights]
-    W --> I[compute_v_to_reach_state]
-    I --> N[compute_new_state with tug_ratio]
-    N --> C[controller widget / greedy reward]
+    A[Raw BVH clips] --> B[打包成 states_x 和 states_v]
+    B --> C[结合 contact 信息]
+    C --> D[生成状态矩阵]
 ```
 
-k-NN helper 说明 controller state 如何变成候选未来动作。
+- 代码做什么：The table-like log shows the scale and layout of the state database.
+- 运行后看到什么：`log`
+- 结果说明什么：The table-like log shows the scale and layout of the state database.
+- 可视化主体：State table build
+- 捕获方式：`log`
 
-![Cell 20-25 - k-NN 查询与控制入口](assets/04_torch_knn_functions_result.png)
+![State table build](assets/02_state_table_build_result.png)
 
-### Cell 32-35 - Transition Table 与 Value Learning
+### Cell 17 - UMAP motion-field embedding
+
+使用 UMAP 对高维状态空间特征进行降维投影，从可视化的二维散点图中确认近邻样本的合理性和聚类情况。
 
 ```mermaid
 flowchart LR
-    P[precompute all state-action next states] --> T[value neighbors + weights]
-    T --> B[Torch Bellman backup]
-    B --> L[value-learning score curve]
-    L --> R[walk/jog policy selection]
+    A[states_x 高维数据] --> B[metric_matrix 加权处理]
+    B --> C[输入 UMAP 模型]
+    C --> D[生成二维散点簇并绘制]
 ```
 
-value-learning 曲线验证离线策略是否稳定。
+- 代码做什么：UMAP motion-field embedding: The plot makes the motion-field neighborhood structure visible.
+- 运行后看到什么：`plot`
+- 结果说明什么：The plot makes the motion-field neighborhood structure visible.
+- 可视化主体：UMAP motion-field embedding
+- 捕获方式：`plot`
 
-![Cell 32-35 - Transition Table 与 Value Learning](assets/07_value_learning_curve_result.png)
+![UMAP motion-field embedding](assets/03_umap_motion_field_result.png)
+
+### Cell 20 - Torch k-NN functions
+
+利用 GPU 加速的 PyTorch 实现运行时 K 近邻搜索（k-NN），根据角色当前姿态与摇杆意图从库里召回最佳下一步候选。
+
+```mermaid
+flowchart LR
+    A[当前控制意图与实时 Pose] --> B[Torch k-NN 搜索最邻近样本]
+    B --> C[计算样本间混合权重]
+    C --> D[生成插值后的下一帧状态]
+```
+
+- 代码做什么：The source card explains how a controller state becomes candidate future motions.
+- 运行后看到什么：`code_only`
+- 结果说明什么：The source card explains how a controller state becomes candidate future motions.
+- 可视化主体：Torch k-NN functions
+- 捕获方式：`source_excerpt`
+
+![Torch k-NN functions](assets/04_torch_knn_functions_result.png)
+
+### Cell 25 - Controller widget note
+
+该部分对外部控制器的默认映射进行说明，强调验证模式下使用模拟输入而非强制物理外设。
+
+```mermaid
+flowchart LR
+    A[控制器 Widget 模块] --> B[检查是否有真实 Gamepad]
+    B --> C[无则提供模拟默认摇杆参数]
+    C --> D[进行下一步贪婪代价测试]
+```
+
+- 代码做什么：The log documents why browser capture uses default input rather than requiring physical hardware.
+- 运行后看到什么：`log`
+- 结果说明什么：The log documents why browser capture uses default input rather than requiring physical hardware.
+- 可视化主体：Controller widget note
+- 捕获方式：`log`
+
+![Controller widget note](assets/05_controller_widget_note_result.png)
+
+### Cell 32 - Transition table precompute
+
+预先计算任意起始状态和可能输入操作（Action）下的下一状态及其评估收益，以空间换取交互时间。
+
+```mermaid
+flowchart LR
+    A[所有 state_id] --> B[组合各种 Action 输入]
+    B --> C[计算 k-NN 下一状态转移概率]
+    C --> D[构建 offline 转移概率大表]
+```
+
+- 代码做什么：Moving the expensive search offline is what makes runtime interaction feasible.
+- 运行后看到什么：`log`
+- 结果说明什么：Moving the expensive search offline is what makes runtime interaction feasible.
+- 可视化主体：Transition table precompute
+- 捕获方式：`log`
+
+![Transition table precompute](assets/06_transition_table_precompute_result.png)
+
+### Cell 35 - Value learning curve
+
+训练基于 Bellman 方程的值函数策略，对当前策略执行效果进行自我强化迭代并绘制损失历史。
+
+```mermaid
+flowchart LR
+    A[获取预计算的离线 Transition 表] --> B[评估 immediate_reward]
+    B --> C[Torch 加速 Bellman Backup]
+    C --> D[多轮迭代直至价值收敛]
+```
+
+- 代码做什么：Value-learning score curve: The curve gives a quick read on whether the learned policy is stabilizing.
+- 运行后看到什么：`plot`
+- 结果说明什么：The curve gives a quick read on whether the learned policy is stabilizing.
+- 可视化主体：Value learning curve
+- 捕获方式：`plot`
+
+![Value learning curve](assets/07_value_learning_curve_result.png)
 
 ## 关键数据结构
 

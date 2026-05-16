@@ -155,69 +155,163 @@ Notebook 的前半段是离线建图：`Keep only a few ranges`、`Build point c
 | 33 | `viewer` | Play along graph edges while printing the current node and frame. | This validates Node and Edge abstractions as a playable animation sequence. | [PNG](assets/graph_nodes_edges.png) |
 | 45 | `timeline_viewer` | Display the graph-search result and the Bezier target path together. | The final viewer checks whether graph search can serve a path-following goal. | [PNG](assets/follow_path_visualization.png) |
 
+## 关键 cell / 函数深讲
+
 ### Cell 2 - Runtime environment log
 
-- 代码做什么：Initialize Warp, NumPy, ipyanimlab, and graph dependencies.
-- 运行后看到什么：运行日志或文本输出。
-- 结果说明什么：The log confirms that distance matrices and local minima can be computed in the available environment.
+初始化基础运算依赖包，确认当前环境能够支撑图算法、Warp 距离矩阵计算。
 
-![Runtime environment log](assets/cropped_ranges_padding.png)
+```mermaid
+flowchart LR
+    A[加载 Warp/NumPy/ipyanimlab] --> B[检查底层 C++/CUDA 环境]
+    B --> C[输出环境配置日志]
+```
+
+- 代码做什么：Initialize Warp, NumPy, ipyanimlab, and graph dependencies.
+- 运行后看到什么：`log`
+- 结果说明什么：The log confirms that distance matrices and local minima can be computed in the available environment.
+- 可视化主体：Runtime environment log
+- 捕获方式：`log`
+
+![Runtime environment log](assets/cropped_ranges_padding_result.png)
 
 ### Cell 6 - Raw walk clip playback
 
-- 代码做什么：Render the source walking animation used to build the graph.
-- 运行后看到什么：可视化 viewer 视口。
-- 结果说明什么：The graph input is a playable sequence of walking frames.
+渲染最初被裁切出的步行片段，它将作为构建 Motion Graph 的源数据。
 
-![Raw walk clip playback](assets/motion_graph_overview.png)
+```mermaid
+flowchart LR
+    A[BVH 加载] --> B[裁切有效 ranges]
+    B --> C[动画骨骼结构驱动 Mesh]
+    C --> D[播放基础的循环或长直走动作]
+```
+
+- 代码做什么：Render the source walking animation used to build the graph.
+- 运行后看到什么：`viewer`
+- 结果说明什么：The graph input is a playable sequence of walking frames.
+- 可视化主体：Raw walk clip playback
+- 捕获方式：`canvas`
+
+![Raw walk clip playback](assets/motion_graph_overview_result.png)
 
 ### Cell 12 - Point-cloud pose representation
 
-- 代码做什么：Convert the skeleton pose to world-space point samples.
-- 运行后看到什么：可视化 viewer 视口。
-- 结果说明什么：Point-cloud distance is closer to visible pose similarity than comparing only root or quaternions.
+展示怎样把抽象的骨架四元数转换为世界空间中覆盖身体关键部位的点云，用于更直观地衡量姿态相似度。
 
-![Point-cloud pose representation](assets/point_cloud_pose.png)
+```mermaid
+flowchart LR
+    A[设定 point_cloud_def 采样点] --> B[经过 FK 变换到世界坐标]
+    B --> C[生成 cloud_animation]
+    C --> D[可视化散布在骨架周围的点云]
+```
+
+- 代码做什么：Convert the skeleton pose to world-space point samples.
+- 运行后看到什么：`viewer`
+- 结果说明什么：Point-cloud distance is closer to visible pose similarity than comparing only root or quaternions.
+- 可视化主体：Point-cloud pose representation
+- 捕获方式：`canvas`
+
+![Point-cloud pose representation](assets/point_cloud_pose_result.png)
 
 ### Cell 15 - Window alignment between two clips
 
-- 代码做什么：Show source and target windows after horizontal translation and rotation alignment.
-- 运行后看到什么：可视化 viewer 视口。
-- 结果说明什么：Similar gait windows can transition even when their world positions differ.
+提取两段待匹配的时间窗，在水平面（XZ 平面）进行平移和旋转对齐，使不同世界坐标下的动作能够公平比较。
 
-![Window alignment between two clips](assets/alignment_pair.png)
+```mermaid
+flowchart LR
+    A[源窗口与目标窗口] --> B[解算水平面最优旋转和平移]
+    B --> C[对齐两个窗口的空间位置]
+    C --> D[重叠显示比对姿态相似性]
+```
+
+- 代码做什么：Show source and target windows after horizontal translation and rotation alignment.
+- 运行后看到什么：`viewer`
+- 结果说明什么：Similar gait windows can transition even when their world positions differ.
+- 可视化主体：Window alignment between two clips
+- 捕获方式：`canvas`
+
+![Window alignment between two clips](assets/alignment_pair_result.png)
 
 ### Cell 21 - Distance matrix and local minima
 
-- 代码做什么：Plot the distance heatmap and mark local_minima candidates.
-- 运行后看到什么：图表输出。
-- 结果说明什么：Low-error regions in the matrix become potential transition edges.
+绘制帧两两之间的点云距离矩阵热力图，并标出局部极小值（即可以作为转移边的候选项）。
 
-![Distance matrix and local minima](assets/distance_matrix_minima.png)
+```mermaid
+flowchart LR
+    A[距离矩阵 distances] --> B[设置 max_error 过滤阈值]
+    B --> C[执行八邻域局部最小筛选 wp_local_minima]
+    C --> D[生成转移边候选 local_minima]
+```
+
+- 代码做什么：Plot the distance heatmap and mark local_minima candidates.
+- 运行后看到什么：`plot`
+- 结果说明什么：Low-error regions in the matrix become potential transition edges.
+- 可视化主体：Distance matrix and local minima
+- 捕获方式：`plot`
+
+![Distance matrix and local minima](assets/distance_matrix_minima_result.png)
 
 ### Cell 28 - Tarjan SCC pruning log
 
-- 代码做什么：Print the strongly connected component pruning process.
-- 运行后看到什么：运行日志或文本输出。
-- 结果说明什么：Pruning keeps the runtime graph from entering dead ends that cannot continue generating motion.
+执行 Tarjan 算法，裁剪掉不能回到主流循环的死胡同节点，保留最大强连通分量，从而支撑无限的随机游走。
 
-![Tarjan SCC pruning log](assets/scc_pruning.png)
+```mermaid
+flowchart LR
+    A[原始构建的有向图] --> B[执行 Tarjan SCC]
+    B --> C[识别出最大的循环强连通子图]
+    C --> D[修剪掉所有孤岛或单向出路的分支]
+```
+
+- 代码做什么：Print the strongly connected component pruning process.
+- 运行后看到什么：`log`
+- 结果说明什么：Pruning keeps the runtime graph from entering dead ends that cannot continue generating motion.
+- 可视化主体：Tarjan SCC pruning log
+- 捕获方式：`log`
+
+![Tarjan SCC pruning log](assets/scc_pruning_result.png)
 
 ### Cell 33 - Graph traversal playback debug
 
-- 代码做什么：Play along graph edges while printing the current node and frame.
-- 运行后看到什么：可视化 viewer 视口。
-- 结果说明什么：This validates Node and Edge abstractions as a playable animation sequence.
+在图上执行一轮简单的随机或者顺序遍历，渲染为可以播放的动画并实时在日志中打印出经过的节点和转移类型。
 
-![Graph traversal playback debug](assets/graph_nodes_edges.png)
+```mermaid
+flowchart LR
+    A[从起始节点触发] --> B[播放连续边 append_no_blend]
+    B --> C[遇到出边分支时根据代价随机选择]
+    C --> D[播放转移边 append_blend]
+    D --> B
+```
+
+- 代码做什么：Play along graph edges while printing the current node and frame.
+- 运行后看到什么：`viewer`
+- 结果说明什么：This validates Node and Edge abstractions as a playable animation sequence.
+- 可视化主体：Graph traversal playback debug
+- 捕获方式：`canvas`
+
+![Graph traversal playback debug](assets/graph_nodes_edges_result.png)
 
 ### Cell 45 - Follow-path result viewer
 
-- 代码做什么：Display the graph-search result and the Bezier target path together.
-- 运行后看到什么：带 timeline 的可播放 viewer。
-- 结果说明什么：The final viewer checks whether graph search can serve a path-following goal.
+将图搜索路径生成的角色动画与贝塞尔曲线目标轨迹叠加显示，评估依靠图转移是否能完成具有特定转向和位移目标的导航任务。
 
-![Follow-path result viewer](assets/follow_path_visualization.png)
+```mermaid
+flowchart LR
+    A[定义 Bezier 目标路径] --> B[图搜索优先拓展低偏差的转移路径]
+    B --> C[合成动作序列与对应的 root 轨迹]
+    C --> D[叠加渲染动画与目标路径]
+```
+
+- 代码做什么：Display the graph-search result and the Bezier target path together.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：The final viewer checks whether graph search can serve a path-following goal.
+- 可视化主体：Follow-path result viewer
+- 捕获方式：`canvas`
+
+![Follow-path result viewer](assets/follow_path_visualization_result.png)
+
+![Follow-path result viewer preview](assets/follow_path_visualization_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/follow_path_visualization_result.png" src="assets/follow_path_visualization_preview.mp4"></video>
 
 ## 运行方式
 

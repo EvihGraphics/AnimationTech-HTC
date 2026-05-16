@@ -63,64 +63,170 @@ flowchart LR
 
 ## 关键 cell / 函数深讲
 
-### Cell 5-10 - 从 nullspace 到 anchor
+### Cell 5 - Generated strip mesh baseline
+
+生成用于演示 Laplacian 变形的基础条带网格结构。
 
 ```mermaid
 flowchart LR
-    C5[Cell 5 strip baseline] --> C7[delta = L * V]
-    C7 --> N[无 anchor: 只有局部差分]
-    N --> C9[两个端点 anchor]
-    C9 --> C10[第三控制点驱动形变]
+    A[网格宽度和高度参数] --> B[生成顶点坐标 vertices]
+    B --> C[建立连通性 Adjacency]
+    C --> D[绘制原始网格]
 ```
 
-这些 cell 说明 Laplacian 坐标为什么必须配合 anchor。结果图中如果整体位置漂移，问题通常不是 delta 错，而是约束没有钉住全局自由度。
+- 代码做什么：This baseline shows the graph vertices and edges before Laplacian reconstruction.
+- 运行后看到什么：`viewer`
+- 结果说明什么：生成的基准网格展示了不带有 Laplacian 变形时的图结构。
+- 可视化主体：Generated strip mesh baseline
+- 捕获方式：`canvas`
 
-![Cell 5-10 - 从 nullspace 到 anchor](assets/04_three_anchor_deformation_result.png)
+![Generated strip mesh baseline](assets/01_strip_mesh_baseline_result.png)
 
-### Cell 18-29 - 3D 与 rotation-invariant 求解
+### Cell 7 - Unanchored Laplacian reconstruction
+
+展示仅使用 Laplacian 坐标（差分）在无锚点约束下还原的漂移结果。
 
 ```mermaid
 flowchart LR
-    L[L scalar graph] --> K[Kronecker L3D]
-    K --> A[3D anchors]
-    A --> E[edge length targets]
-    E --> R[local rotation update]
-    R --> V[viewer controls]
+    A[Laplacian 矩阵 L] --> B[计算差分 delta = L @ vertices]
+    B --> C[使用伪逆还原 V = pinv(L) @ delta]
+    C --> D[无 anchor 时全局位置漂移]
 ```
 
-edge length 让结构不被过度拉长，rotation-invariant 项让局部形状跟着旋转，而不是被线性系统剪切。
+- 代码做什么：The result shows why Laplacian coordinates alone do not fix global placement.
+- 运行后看到什么：`viewer`
+- 结果说明什么：仅有局部差分信息无法固定全局位置，结果会发生自由漂移。
+- 可视化主体：Unanchored Laplacian reconstruction
+- 捕获方式：`canvas`
 
-![Cell 18-29 - 3D 与 rotation-invariant 求解](assets/06_rotation_invariance_controls_result.png)
+![Unanchored Laplacian reconstruction](assets/02_unanchored_reconstruction_result.png)
 
-![Cell 18-29 - 3D 与 rotation-invariant 求解 preview](assets/06_rotation_invariance_controls_preview.gif)
+### Cell 9 - Two-anchor reconstruction
 
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_rotation_invariance_controls_result.png">
-  <source src="assets/06_rotation_invariance_controls_preview.mp4" type="video/mp4">
-  <source src="assets/06_rotation_invariance_controls_preview.webm" type="video/webm">
-</video>
-
-### Cell 36-46 - 把 locomotion 变成可编辑图
+加入两个端点锚点，利用硬约束恢复带有确定位置和形状的网格。
 
 ```mermaid
 flowchart LR
-    A[walk quats/pos] --> B[FK 得到骨骼点]
-    B --> C[跨帧连接成图]
-    C --> D[路径 / 脚高 / 腿长约束]
-    D --> E[Laplacian deform]
-    E --> F[还原 quats/pos]
-    F --> G[curved locomotion]
+    A[构建锚点选择矩阵 A_anchor] --> B[设定目标位置 d_anchors]
+    B --> C[拼接 KKT 系统约束]
+    C --> D[求解后完美还原带约束的图]
 ```
 
-最终结果不是简单移动 root，而是对一段动画的时空结构求解。观察重点是脚步是否贴地、腿长是否稳定、转弯是否连续。
+- 代码做什么：Anchors turn relative differential coordinates into a positioned shape.
+- 运行后看到什么：`viewer`
+- 结果说明什么：锚点将相对的差分坐标转化为了具有绝对定位的形状。
+- 可视化主体：Two-anchor reconstruction
+- 捕获方式：`canvas`
 
-![Cell 36-46 - 把 locomotion 变成可编辑图](assets/08_curved_locomotion_result_result.png)
+![Two-anchor reconstruction](assets/03_two_anchor_solve_result.png)
 
-![Cell 36-46 - 把 locomotion 变成可编辑图 preview](assets/08_curved_locomotion_result_preview.gif)
+### Cell 10 - Three-anchor deformation
 
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_curved_locomotion_result_result.png">
-  <source src="assets/08_curved_locomotion_result_preview.mp4" type="video/mp4">
-  <source src="assets/08_curved_locomotion_result_preview.webm" type="video/webm">
-</video>
+引入第三个控制点驱动网格形变，观察 Laplacian 变形如何在局部传播。
+
+```mermaid
+flowchart LR
+    A[移动第三个 anchor 的目标位置] --> B[更新 d_anchors]
+    B --> C[求解 KKT 系统]
+    C --> D[网格基于差分产生平滑形变]
+```
+
+- 代码做什么：The viewer shows local deformation propagating through the graph.
+- 运行后看到什么：`viewer`
+- 结果说明什么：可以观察到局部的变形约束如何通过图的 Laplacian 系统平滑传播到整体。
+- 可视化主体：Three-anchor deformation
+- 捕获方式：`canvas`
+
+![Three-anchor deformation](assets/04_three_anchor_deformation_result.png)
+
+### Cell 19 - Vectorized 3D Laplacian solve
+
+将二维系统的标量系统扩展至 3D 的 Kronecker 系统，以支持 3D 角色动画的顶点。
+
+```mermaid
+flowchart LR
+    A[原始 Laplacian L] --> B[使用 Kronecker product 扩展 L3D]
+    B --> C[处理 3D 动画图顶点的差分]
+    C --> D[在三维空间进行求解]
+```
+
+- 代码做什么：The same linear machinery scales from 2D graph points to 3D animation vertices.
+- 运行后看到什么：`viewer`
+- 结果说明什么：同样的线性机制从二维空间顺利拓展到支持 3D 骨骼和动画顶点。
+- 可视化主体：Vectorized 3D Laplacian solve
+- 捕获方式：`canvas`
+
+![Vectorized 3D Laplacian solve](assets/05_vectorized_3d_solve_result.png)
+
+### Cell 29 - Rotation-invariant deformation controls
+
+展示带有 Edge Length 约束和旋转不变约束的滑块控件，通过调节这些约束可以保持原始动画的骨骼长度与局部体积感。
+
+```mermaid
+flowchart LR
+    A[3D 锚点变形] --> B[施加 edge length 目标]
+    B --> C[施加 rotation-invariant 约束]
+    C --> D[迭代求解防止非线性剪切形变]
+```
+
+- 代码做什么：The controls reveal which constraints preserve shape while allowing deformation.
+- 运行后看到什么：`widget_controls`
+- 结果说明什么：控制面板揭示了旋转不变性约束如何在允许变形的同时防止局部网格过度扭曲。
+- 可视化主体：Rotation-invariant deformation controls
+- 捕获方式：`widget_controls`
+
+![Rotation-invariant deformation controls](assets/06_rotation_invariance_controls_result.png)
+
+![Rotation-invariant deformation controls preview](assets/06_rotation_invariance_controls_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_rotation_invariance_controls_result.png" src="assets/06_rotation_invariance_controls_preview.mp4"></video>
+
+### Cell 40 - Animation graph reconstruction
+
+对实际的角色运动序列提取图结构，验证 Laplacian 框架如何影响带时间轴的跨帧动画。
+
+```mermaid
+flowchart LR
+    A[原始走跑动画序列] --> B[FK 展开得到骨骼点]
+    B --> C[加入跨帧边构成时空图]
+    C --> D[Laplacian 差分平滑跨帧跳变]
+```
+
+- 代码做什么：The timeline viewer shows Laplacian deformation applied to animated pose data.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：时序 viewer 展示了应用于动画姿态数据的三维时空 Laplacian 变形效果。
+- 可视化主体：Animation graph reconstruction
+- 捕获方式：`canvas`
+
+![Animation graph reconstruction](assets/07_animation_graph_deformation_result.png)
+
+![Animation graph reconstruction preview](assets/07_animation_graph_deformation_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_animation_graph_deformation_result.png" src="assets/07_animation_graph_deformation_preview.mp4"></video>
+
+### Cell 46 - Curved locomotion result
+
+通过添加路径 anchor、脚底高度等约束，利用全局图优化直接让角色走出弯曲路径。
+
+```mermaid
+flowchart LR
+    A[原始直线行走图] --> B[弯曲的根骨骼路径约束]
+    B --> C[脚底位置和高度锁定约束]
+    C --> D[Laplacian Deform 时空图]
+    D --> E[逆向 IK 还原可播放的弯曲走跑动画]
+```
+
+- 代码做什么：The final viewer checks whether graph deformation can redirect locomotion smoothly.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：结果验证了这套基于图的时空变形方案能够稳定、平滑地将角色的运动轨迹重定向到指定的弯曲路线上。
+- 可视化主体：Curved locomotion result
+- 捕获方式：`canvas`
+
+![Curved locomotion result](assets/08_curved_locomotion_result_result.png)
+
+![Curved locomotion result preview](assets/08_curved_locomotion_result_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_curved_locomotion_result_result.png" src="assets/08_curved_locomotion_result_preview.mp4"></video>
 
 ## 关键数据结构
 

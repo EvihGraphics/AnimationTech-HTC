@@ -63,68 +63,100 @@ immediate reward 只看当前动作，容易短视。Bellman 更新把未来 rew
 
 ## 关键 cell / 函数深讲
 
-### Cell 5-9 - Motion Graph 输入
+## 关键 cell / 函数深讲
+
+### Cell 9 - Source motion graph playback
+
+播放和预览由 Motion Graph 算法生成的离散动作片段，作为后续构建决策状态的基础数据源。
 
 ```mermaid
 flowchart LR
-    H[helper bone indices] --> D[motion_graph_walking_rawdata.dat]
-    D --> F[FK + foot_tags smoothing]
-    F --> V[source motion graph playback]
+    A[读取 Motion Graph 产出数据] --> B[重构动作片段]
+    B --> C[在 Timeline Viewer 中循环播放]
 ```
 
-source graph viewer 说明可选动作来自真实 motion graph。
+- 代码做什么：Source motion graph playback: The viewer shows the action fragments from which avatar behavior is assembled.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：The viewer shows the action fragments from which avatar behavior is assembled.
+- 可视化主体：Source motion graph playback
+- 捕获方式：`canvas`
 
-![Cell 5-9 - Motion Graph 输入](assets/02_source_motion_graph_playback_result.png)
+![Source motion graph playback](assets/02_source_motion_graph_playback_result.png)
 
-![Cell 5-9 - Motion Graph 输入 preview](assets/02_source_motion_graph_playback_preview.gif)
+![Source motion graph playback preview](assets/02_source_motion_graph_playback_preview.gif)
 
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_source_motion_graph_playback_result.png">
-  <source src="assets/02_source_motion_graph_playback_preview.mp4" type="video/mp4">
-  <source src="assets/02_source_motion_graph_playback_preview.webm" type="video/webm">
-</video>
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_source_motion_graph_playback_result.png" src="assets/02_source_motion_graph_playback_preview.mp4"></video>
 
-### Cell 11-16 - State/Action 与播放器
+### Cell 16 - Random graph action playback
+
+使用提取出的 State 和 Action 拓扑图，通过随机选择下一步动作，验证图的连通性和片段间播放的连续性。
 
 ```mermaid
 flowchart LR
-    S[State dataclass] --> A[Action dataclass]
-    A --> C[collapse single-exit chains]
-    C --> T[precompute local trajectories]
-    T --> P[random graph action playback]
+    A[从起始 State 节点开始] --> B[随机抽取一条出路 Action]
+    B --> C[播放该 Action 对应的动作片段]
+    C --> D[转移到下一个 State 节点]
+    D --> B
 ```
 
-random action viewer 验证动作能连续播放，FootLock 负责减少脚部伪影。
+- 代码做什么：Random graph action playback: The viewer validates that graph actions can produce continuous animated output.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：The viewer validates that graph actions can produce continuous animated output.
+- 可视化主体：Random graph action playback
+- 捕获方式：`canvas`
 
-![Cell 11-16 - State/Action 与播放器](assets/04_random_action_playback_result.png)
+![Random graph action playback](assets/04_random_action_playback_result.png)
 
-![Cell 11-16 - State/Action 与播放器 preview](assets/04_random_action_playback_preview.gif)
+![Random graph action playback preview](assets/04_random_action_playback_preview.gif)
 
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_random_action_playback_result.png">
-  <source src="assets/04_random_action_playback_preview.mp4" type="video/mp4">
-  <source src="assets/04_random_action_playback_preview.webm" type="video/webm">
-</video>
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_random_action_playback_result.png" src="assets/04_random_action_playback_preview.mp4"></video>
 
-### Cell 18-27 - Reward 到 Value Policy
+### Cell 22 - Immediate reward policy viewer
+
+不考虑长远未来，仅根据当前离目标采样点的距离立即给出最大奖励，生成短视（Myopic）的最优动作策略。
 
 ```mermaid
 flowchart LR
-    C18[action count / max length] --> C19[target-position rings]
-    C19 --> R[immediate_rewards + next_states]
-    R --> I[immediate reward policy]
-    R --> B[Bellman backup]
-    B --> V[MDP value-policy viewer]
+    A[角色当前所处的 State 节点] --> B[遍历所有出路 Action]
+    B --> C[计算每个 Action 执行后的物理距离收益 immediate_reward]
+    C --> D[直接选择收益最大的 Action 播放]
 ```
 
-value-policy viewer 验证预计算策略能根据目标选择更有远见的动作。
+- 代码做什么：Immediate reward policy viewer: The viewer shows how local target rewards can choose graph actions.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：The viewer shows how local target rewards can choose graph actions.
+- 可视化主体：Immediate reward policy viewer
+- 捕获方式：`canvas`
 
-![Cell 18-27 - Reward 到 Value Policy](assets/08_mdp_value_policy_viewer_result.png)
+![Immediate reward policy viewer](assets/07_reward_policy_viewer_result.png)
 
-![Cell 18-27 - Reward 到 Value Policy preview](assets/08_mdp_value_policy_viewer_preview.gif)
+![Immediate reward policy viewer preview](assets/07_reward_policy_viewer_preview.gif)
 
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_mdp_value_policy_viewer_result.png">
-  <source src="assets/08_mdp_value_policy_viewer_preview.mp4" type="video/mp4">
-  <source src="assets/08_mdp_value_policy_viewer_preview.webm" type="video/webm">
-</video>
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_reward_policy_viewer_result.png" src="assets/07_reward_policy_viewer_preview.mp4"></video>
+
+### Cell 27 - MDP value-policy viewer
+
+通过 Bellman 方程预计算的价值函数（Value Function），在运行时只需查表即可做出具有长远预见性的动作决策。
+
+```mermaid
+flowchart LR
+    A[预先离线进行 Bellman Value Iteration] --> B[生成 State x Target 的价值表]
+    B --> C[运行时获取当前 State 和 Target]
+    C --> D[查表选择 Value 最大的 Action]
+    D --> E[驱动角色走向目标]
+```
+
+- 代码做什么：MDP value-policy viewer: The final viewer checks that the learned value function can drive action selection.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：The final viewer checks that the learned value function can drive action selection.
+- 可视化主体：MDP value-policy viewer
+- 捕获方式：`canvas`
+
+![MDP value-policy viewer](assets/08_mdp_value_policy_viewer_result.png)
+
+![MDP value-policy viewer preview](assets/08_mdp_value_policy_viewer_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_mdp_value_policy_viewer_result.png" src="assets/08_mdp_value_policy_viewer_preview.mp4"></video>
 
 ## 关键数据结构
 

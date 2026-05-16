@@ -147,61 +147,150 @@ sequenceDiagram
 | 26 | `timeline_viewer` | Build a query, find the best frame, jump playback, and smooth the transition with inertialization. | This is the closed loop that connects input prediction, feature search, and visual playback. | [PNG](assets/inertialization_transition.png) |
 | 26 | `timeline_viewer` | Inspect another runtime frame in the Player cell. | Stop and sharp-turn cases are useful stress tests for matching quality. | [PNG](assets/fast_stop_turn_cases.png) |
 
+## 关键 cell / 函数深讲
+
 ### Cell 9 - Spring-damper future trajectory
 
-- 代码做什么：Update root position, velocity, and orientation with a spring-damper model.
-- 运行后看到什么：可视化 viewer 视口。
-- 结果说明什么：This is the source of the future trajectory target used in the motion-matching query.
+根据摇杆输入使用弹簧阻尼模型预测角色的未来轨迹，为特征匹配提供带有惯性的意图目标。
 
-![Spring-damper future trajectory](assets/spring_damper_prediction.png)
+```mermaid
+flowchart LR
+    A[接收速度和朝向输入] --> B[应用 spring-damper 更新]
+    B --> C[生成平滑的 root 轨迹与旋转]
+    C --> D[提取未来 10, 20, 30 帧的预期状态]
+```
+
+- 代码做什么：Update root position, velocity, and orientation with a spring-damper model.
+- 运行后看到什么：`viewer`
+- 结果说明什么：This is the source of the future trajectory target used in the motion-matching query.
+- 可视化主体：Spring-damper future trajectory
+- 捕获方式：`canvas`
+
+![Spring-damper future trajectory](assets/spring_damper_prediction_result.png)
 
 ### Cell 14 - Source locomotion clip playback
 
-- 代码做什么：Render the imported locomotion clips.
-- 运行后看到什么：可视化 viewer 视口。
-- 结果说明什么：The database is built from real motion frames, not from generated poses.
+加载并显示用于构建特征库的原始动画，确认基础数据的正确性。
 
-![Source locomotion clip playback](assets/motion_matching_overview.png)
+```mermaid
+flowchart LR
+    A[导入 AnimLabSimpleMale] --> B[加载 Lafan1 动捕片段]
+    B --> C[通过 AnimMapper 映射骨架]
+    C --> D[渲染展示原始的跑/走动作]
+```
+
+- 代码做什么：Render the imported locomotion clips.
+- 运行后看到什么：`viewer`
+- 结果说明什么：The database is built from real motion frames, not from generated poses.
+- 可视化主体：Source locomotion clip playback
+- 捕获方式：`canvas`
+
+![Source locomotion clip playback](assets/motion_matching_overview_result.png)
 
 ### Cell 18 - Filtered root displacement and orientation
 
-- 代码做什么：Visualize filtered bone positions, root velocity, and facing direction.
-- 运行后看到什么：可视化 viewer 视口。
-- 结果说明什么：Stable velocity and orientation estimates reduce noise in nearest-neighbor search.
+对根节点的运动数据进行滤波处理，消除微小抖动，确保生成的特征库在检索时足够稳定。
 
-![Filtered root displacement and orientation](assets/trajectory_query_runtime.png)
+```mermaid
+flowchart LR
+    A[提取 Root 平移和旋转] --> B[Savitzky-Golay 滤波平滑]
+    B --> C[计算骨骼局部线速度和角速度]
+    C --> D[可视化带箭头的过滤后轨迹]
+```
+
+- 代码做什么：Visualize filtered bone positions, root velocity, and facing direction.
+- 运行后看到什么：`viewer`
+- 结果说明什么：Stable velocity and orientation estimates reduce noise in nearest-neighbor search.
+- 可视化主体：Filtered root displacement and orientation
+- 捕获方式：`canvas`
+
+![Filtered root displacement and orientation](assets/trajectory_query_runtime_result.png)
 
 ### Cell 21 - 33-dimensional feature layout
 
-- 代码做什么：Show hips, foot, and future-trajectory debug lines in the viewer.
-- 运行后看到什么：可视化 viewer 视口。
-- 结果说明什么：The abstract feature vector becomes visible as body parts and trajectory targets.
+将复杂的身体姿态和未来轨迹目标映射为可以被直接比较的 33 维数值向量，并在 viewer 中展示对应含义。
 
-![33-dimensional feature layout](assets/feature_vector_layout.png)
+```mermaid
+flowchart LR
+    A[当前身体特征 15维] --> B[未来轨迹特征 18维]
+    B --> C[合并为 33维特征向量]
+    C --> D[所有位置均相对于当前 Root 局部空间]
+```
+
+- 代码做什么：Show hips, foot, and future-trajectory debug lines in the viewer.
+- 运行后看到什么：`viewer`
+- 结果说明什么：The abstract feature vector becomes visible as body parts and trajectory targets.
+- 可视化主体：33-dimensional feature layout
+- 捕获方式：`canvas`
+
+![33-dimensional feature layout](assets/feature_vector_layout_result.png)
 
 ### Cell 23 - Feature normalization code
 
-- 代码做什么：Compute features_mean, features_std, and the normalized database.
-- 运行后看到什么：代码逻辑片段。
-- 结果说明什么：Different physical quantities must be normalized before Euclidean nearest-neighbor search.
+对包含不同物理单位（米、速度、方向）的 33 维特征进行标准化，并应用语义权重，以防止某些维度在距离计算中占据绝对主导。
 
-![Feature normalization code](assets/feature_database_debug.png)
+```mermaid
+flowchart LR
+    A[计算特征均值与方差] --> B[所有特征减去均值并除以方差]
+    B --> C[应用自定义 feature_weights]
+    C --> D[生成 normalized database 备查]
+```
+
+- 代码做什么：Compute features_mean, features_std, and the normalized database.
+- 运行后看到什么：`code_only`
+- 结果说明什么：Different physical quantities must be normalized before Euclidean nearest-neighbor search.
+- 可视化主体：Feature normalization code
+- 捕获方式：`source_excerpt`
+
+![Feature normalization code](assets/feature_database_debug_result.png)
 
 ### Cell 26 - Runtime Player search loop
 
-- 代码做什么：Build a query, find the best frame, jump playback, and smooth the transition with inertialization.
-- 运行后看到什么：带 timeline 的可播放 viewer。
-- 结果说明什么：This is the closed loop that connects input prediction, feature search, and visual playback.
+执行实时检索循环：收集当前姿态，拼装预测的未来轨迹形成 Query，检索最匹配帧，并在跳转时应用惯性化平滑。
 
-![Runtime Player search loop](assets/inertialization_transition.png)
+```mermaid
+flowchart LR
+    A[构造 Query 向量并归一化] --> B[在特征库中计算最小平方距离]
+    B --> C[确定 best_frame]
+    C --> D{是否连续?}
+    D -- 否 --> E[计算 Inertialization Offset 并跳转]
+    D -- 是 --> F[继续播放下一帧]
+```
+
+- 代码做什么：Build a query, find the best frame, jump playback, and smooth the transition with inertialization.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：This is the closed loop that connects input prediction, feature search, and visual playback.
+- 可视化主体：Runtime Player search loop
+- 捕获方式：`canvas`
+
+![Runtime Player search loop](assets/inertialization_transition_result.png)
+
+![Runtime Player search loop preview](assets/inertialization_transition_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/inertialization_transition_result.png" src="assets/inertialization_transition_preview.mp4"></video>
 
 ### Cell 26 - Stop and turn debug frame
 
-- 代码做什么：Inspect another runtime frame in the Player cell.
-- 运行后看到什么：带 timeline 的可播放 viewer。
-- 结果说明什么：Stop and sharp-turn cases are useful stress tests for matching quality.
+验证系统在极端输入（如急停和急转弯）下的表现，测试特征库检索和惯性化过渡是否依然稳健。
 
-![Stop and turn debug frame](assets/fast_stop_turn_cases.png)
+```mermaid
+flowchart LR
+    A[输入急停/急转信号] --> B[spring-damper 产生骤变轨迹]
+    B --> C[检索系统寻找减速/转身素材]
+    C --> D[Player 在大落差下依靠 Inertialization 维持视觉平滑]
+```
+
+- 代码做什么：Inspect another runtime frame in the Player cell.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：Stop and sharp-turn cases are useful stress tests for matching quality.
+- 可视化主体：Stop and turn debug frame
+- 捕获方式：`canvas`
+
+![Stop and turn debug frame](assets/fast_stop_turn_cases_result.png)
+
+![Stop and turn debug frame preview](assets/fast_stop_turn_cases_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/fast_stop_turn_cases_result.png" src="assets/fast_stop_turn_cases_preview.mp4"></video>
 
 ## 运行方式
 

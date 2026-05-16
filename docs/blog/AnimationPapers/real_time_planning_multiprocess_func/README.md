@@ -74,43 +74,95 @@ flowchart TD
 
 ### imports - Module dependencies
 
-- 代码/证据做什么?Show the imports for NumPy and ExtraTreesRegressor.
-- 运行后看到什么：源码片段。
-- 结果说明什么：The module is a small worker dependency for value-function fitting, not a standalone viewer case.
+展示此多进程支持模块所依赖的基础库，例如 NumPy 和 ExtraTreesRegressor。
 
-![Module dependencies](assets/01_module_imports.png)
+```mermaid
+flowchart LR
+    A[import numpy] --> B[导入依赖库]
+    C[import ExtraTreesRegressor] --> B
+```
+
+- 代码/证据做什么：Show the imports for NumPy and ExtraTreesRegressor.
+- 运行后看到什么：`source_excerpt`
+- 结果说明什么：The module is a small worker dependency for value-function fitting, not a standalone viewer case.
+- 可视化主体：Module dependencies
+- 捕获方式：`source_excerpt`
+
+![Module dependencies](assets/01_module_imports_result.png)
 
 ### reach_train_value_function - reach_train_value_function contract
 
-- 代码/证据做什么?Show the function signature and primary inputs.
-- 运行后看到什么：源码片段。
-- 结果说明什么：The function maps training samples and precompute query indices to a reshaped value table.
+定义用于在独立进程中运行的函数签名及核心输入参数。
 
-![reach_train_value_function contract](assets/02_function_contract.png)
+```mermaid
+flowchart LR
+    A[接收 X_train / y_train] --> B[拟合价值函数]
+    B --> C[预测 PRE_COMPUTE_TABLE_INDICES]
+```
+
+- 代码/证据做什么：Show the function signature and primary inputs.
+- 运行后看到什么：`source_excerpt`
+- 结果说明什么：The function maps training samples and precompute query indices to a reshaped value table.
+- 可视化主体：reach_train_value_function contract
+- 捕获方式：`source_excerpt`
+
+![reach_train_value_function contract](assets/02_function_contract_result.png)
 
 ### empty-guard - Empty training-set guard
 
-- 代码/证据做什么?Show the zero-table fallback for empty training data.
-- 运行后看到什么：源码片段。
-- 结果说明什么：The guard keeps multiprocessing workers deterministic when a motion group has no samples.
+处理输入样本为空的边界情况，避免并行任务异常中断。
 
-![Empty training-set guard](assets/03_empty_training_guard.png)
+```mermaid
+flowchart LR
+    A[检查 X_train 长度] --> B{长度为 0 ?}
+    B -- 是 --> C[返回全零矩阵]
+    B -- 否 --> D[继续训练模型]
+```
+
+- 代码/证据做什么：Show the zero-table fallback for empty training data.
+- 运行后看到什么：`source_excerpt`
+- 结果说明什么：The guard keeps multiprocessing workers deterministic when a motion group has no samples.
+- 可视化主体：Empty training-set guard
+- 捕获方式：`source_excerpt`
+
+![Empty training-set guard](assets/03_empty_training_guard_result.png)
 
 ### extra-trees - ExtraTrees value fitting
 
-- 代码/证据做什么?Show the n_jobs setting, ExtraTreesRegressor fit, prediction, and reshape.
-- 运行后看到什么：源码片段。
-- 结果说明什么：This is the offline regression step used to fill a value-function table.
+使用 ExtraTreesRegressor 模型对传入的数据进行训练，并重新整形为预期的表格格式输出。
 
-![ExtraTrees value fitting](assets/04_extra_trees_regressor.png)
+```mermaid
+flowchart LR
+    A[配置 n_jobs 线程数] --> B[初始化 ExtraTreesRegressor]
+    B --> C[使用样本 fit 模型]
+    C --> D[对网格做 predict 并 reshape]
+```
+
+- 代码/证据做什么：Show the n_jobs setting, ExtraTreesRegressor fit, prediction, and reshape.
+- 运行后看到什么：`source_excerpt`
+- 结果说明什么：This is the offline regression step used to fill a value-function table.
+- 可视化主体：ExtraTrees value fitting
+- 捕获方式：`source_excerpt`
+
+![ExtraTrees value fitting](assets/04_extra_trees_regressor_result.png)
 
 ### import-check - Import validation log
 
-- 代码/证据做什么?Show the managed validation import check output.
-- 运行后看到什么：命令日志。
-- 结果说明什么：A quiet log means the module imports successfully in the managed environment.
+通过自动化导入测试日志，验证脚本是否可以在干净的环境中被安全地作为模块加载。
 
-![Import validation log](assets/05_import_validation_log.png)
+```mermaid
+flowchart LR
+    A[自动化测试脚本] --> B[尝试 import 该模块]
+    B --> C[无报错且环境就绪]
+```
+
+- 代码/证据做什么：Show the managed validation import check output.
+- 运行后看到什么：`command_log`
+- 结果说明什么：A quiet log means the module imports successfully in the managed environment.
+- 可视化主体：Import validation log
+- 捕获方式：`command_log`
+
+![Import validation log](assets/05_import_validation_log_result.png)
 
 ## 运行方式
 

@@ -208,67 +208,152 @@ group 版 `use_optimal_policy` 还会把 group id 映射回 value function 使�
 
 ### Cell 4 - Character and foot-helper bone loading
 
-- 代码做什么：Load the character and print added heel/ball bone indices.
-- 运行后看到什么：运行日志或文本输出。
-- 结果说明什么：The planning system can reference the foot-contact helper bones later.
+导入 3D 角色模型并注册专门用于脚部接触约束检测的辅助骨骼。
 
-![Character and foot-helper bone loading](assets/01_source_animation_viewer.png)
+```mermaid
+flowchart LR
+    A[加载 AnimLabSimpleMale 模型] --> B[查找 heel 和 ball 骨骼]
+    B --> C[注册 helper indices]
+```
+
+- 代码做什么：Load the character and print added heel/ball bone indices.
+- 运行后看到什么：`log`
+- 结果说明什么：The planning system can reference the foot-contact helper bones later.
+- 可视化主体：Character and foot-helper bone loading
+- 捕获方式：`log`
+
+![Character and foot-helper bone loading](assets/01_source_animation_viewer_result.png)
 
 ### Cell 13 - MotionClip count output
 
-- 代码做什么：Build short motion clips and output the number of clips.
-- 运行后看到什么：表格或结构化数据输出。
-- 结果说明什么：The clip count determines the size of transition-cost and value-function tables.
+将原始动画拆分为固定长度的 clip，并统计生成的离散状态数量。
 
-![MotionClip count output](assets/02_motion_clip_contact_axes.png)
+```mermaid
+flowchart LR
+    A[遍历源动画帧] --> B[根据步态区间提取片段]
+    B --> C[规范化局部坐标和时长]
+    C --> D[生成 MotionClip 列表]
+```
+
+- 代码做什么：Build short motion clips and output the number of clips.
+- 运行后看到什么：`table`
+- 结果说明什么：The clip count determines the size of transition-cost and value-function tables.
+- 可视化主体：MotionClip count output
+- 捕获方式：`table/output`
+
+![MotionClip count output](assets/02_motion_clip_contact_axes_result.png)
 
 ### Cell 25 - Transition-cost precompute output
 
-- 代码做什么：Iterate over clip pairs and compute physical continuity costs and delta states.
-- 运行后看到什么：运行日志或文本输出。
-- 结果说明什么：The progress output shows that expensive transition work is moved offline.
+离线计算所有片段之间两两跳转的物理连续性代价。
 
-![Transition-cost precompute output](assets/03_player_transition_blend.png)
+```mermaid
+flowchart LR
+    A[片段对 i 和 j] --> B[模拟拼接与过渡 Blend]
+    B --> C[评估速度、姿态跳变与接触匹配]
+    C --> D[记录 physics_costs 与局部增量 delta]
+```
+
+- 代码做什么：Iterate over clip pairs and compute physical continuity costs and delta states.
+- 运行后看到什么：`log`
+- 结果说明什么：The progress output shows that expensive transition work is moved offline.
+- 可视化主体：Transition-cost precompute output
+- 捕获方式：`log`
+
+![Transition-cost precompute output](assets/03_player_transition_blend_result.png)
 
 ### Cell 30 - Orientation policy value-learning curve
 
-- 代码做什么：Plot the mean/min/max value-learning curve.
-- 运行后看到什么：图表输出。
-- 结果说明什么：A decreasing curve indicates that the policy is stabilizing in the current state space.
+训练一维朝向（Orientation）的值函数策略，并监控收敛过程。
 
-![Orientation policy value-learning curve](assets/04_orientation_policy_controller.png)
+```mermaid
+flowchart LR
+    A[离散化朝向误差 theta] --> B[执行 Bellman 更新收集样本]
+    B --> C[ExtraTreesRegressor 拟合收益]
+    C --> D[绘制损失收敛曲线]
+```
+
+- 代码做什么：Plot the mean/min/max value-learning curve.
+- 运行后看到什么：`plot`
+- 结果说明什么：A decreasing curve indicates that the policy is stabilizing in the current state space.
+- 可视化主体：Orientation policy value-learning curve
+- 捕获方式：`plot`
+
+![Orientation policy value-learning curve](assets/04_orientation_policy_controller_result.png)
 
 ### Cell 35 - Reach-goal stopping positions
 
-- 代码做什么：Print local end positions for stopping clips.
-- 运行后看到什么：表格或结构化数据输出。
-- 结果说明什么：These endpoints define target states for the reach-goal policy.
+记录停止类型动画片段的最终相对位置，作为目标追踪任务的终止状态。
 
-![Reach-goal stopping positions](assets/05_reach_goal_target_tracking.png)
+```mermaid
+flowchart LR
+    A[筛选 Stop 语义片段] --> B[提取末端帧的局部位置]
+    B --> C[标记为 Reach-goal 的目标点]
+```
+
+- 代码做什么：Print local end positions for stopping clips.
+- 运行后看到什么：`table`
+- 结果说明什么：These endpoints define target states for the reach-goal policy.
+- 可视化主体：Reach-goal stopping positions
+- 捕获方式：`table/output`
+
+![Reach-goal stopping positions](assets/05_reach_goal_target_tracking_result.png)
 
 ### Cell 45 - clip 16 value surface
 
-- 代码做什么：Plot the value function over a two-dimensional target space.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The surface shows the future cost of reaching different target positions from one clip.
+展示某个片段对二维目标空间 (x, z) 的价值函数曲面，以可视化到达代价。
 
-![clip 16 value surface](assets/06_value_surface_clip16.png)
+```mermaid
+flowchart LR
+    A[固定 Clip 16 为当前状态] --> B[遍历二维目标空间采样点]
+    B --> C[查询训练好的 ExtraTreesRegressor]
+    C --> D[绘制未来代价等高线曲面]
+```
+
+- 代码做什么：Plot the value function over a two-dimensional target space.
+- 运行后看到什么：`plot`
+- 结果说明什么：The surface shows the future cost of reaching different target positions from one clip.
+- 可视化主体：clip 16 value surface
+- 捕获方式：`plot`
+
+![clip 16 value surface](assets/06_value_surface_clip16_result.png)
 
 ### Cell 61 - MotionGroup count output
 
-- 代码做什么：Build motion groups and output the group count.
-- 运行后看到什么：表格或结构化数据输出。
-- 结果说明什么：Motion groups turn multiple clips into a parameterized action space.
+通过混合参数，将离散的片段合成连续的参数化 Motion Group，大幅增加规划器选项。
 
-![MotionGroup count output](assets/07_motion_group_weight_blend.png)
+```mermaid
+flowchart LR
+    A[手动按语义聚类片段组] --> B[生成多组插值权重]
+    B --> C[构建新的 MotionGroup 对象集合]
+```
+
+- 代码做什么：Build motion groups and output the group count.
+- 运行后看到什么：`table`
+- 结果说明什么：Motion groups turn multiple clips into a parameterized action space.
+- 可视化主体：MotionGroup count output
+- 捕获方式：`table/output`
+
+![MotionGroup count output](assets/07_motion_group_weight_blend_result.png)
 
 ### Cell 72 - MotionGroup policy-learning curve
 
-- 代码做什么：Plot the parameterized MotionGroup policy-learning curve.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The plot verifies that a useful policy can still be learned after moving from clips to motion groups.
+为参数化组（MotionGroup）训练二维目标值函数，并验证其收敛性。
 
-![MotionGroup policy-learning curve](assets/08_group_reach_goal_result.png)
+```mermaid
+flowchart LR
+    A[使用 MotionGroup 作为状态空间] --> B[Rollback 生成高效训练样本]
+    B --> C[Multiprocessing 并行拟合回归树]
+    C --> D[绘制带参数混合支持的策略学习曲线]
+```
+
+- 代码做什么：Plot the parameterized MotionGroup policy-learning curve.
+- 运行后看到什么：`plot`
+- 结果说明什么：The plot verifies that a useful policy can still be learned after moving from clips to motion groups.
+- 可视化主体：MotionGroup policy-learning curve
+- 捕获方式：`plot`
+
+![MotionGroup policy-learning curve](assets/08_group_reach_goal_result_result.png)
 
 ## 运行方式
 

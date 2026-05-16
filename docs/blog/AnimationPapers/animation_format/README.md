@@ -239,61 +239,153 @@ Root 投影 cell 是本篇最关键的工程 cell。它展示了如何把“角�
 | 24 | `timeline_viewer` | Use static_position/static_rotation controls to inspect root motion and local pelvis motion. | The result explains how global displacement and local body pose are stored separately. | [PNG](assets/06_root_projection_motion.png) |
 | 24 | `timeline_viewer` | Enable a Root toggle and observe which motion remains in the local skeleton. | This makes the role of Root translation and rotation visible in the animated result. | [PNG](assets/07_static_root_toggles.png) |
 
+## 关键 cell / 函数深讲
+
 ### Cell 11 - Character bind pose and skeleton viewer
 
-- 代码做什么：Run render(frame), convert BVH channels to character bone matrices, then draw the character, ground, skeleton lines, and local axes.
-- 运行后看到什么：可视化 viewer 视口。
-- 结果说明什么：This confirms that the animation data can drive the live viewer; later format, mapping, and root-motion discussions use this visual baseline.
+使用 `render(frame)` 函数将 BVH 通道数据转换为角色骨骼矩阵，并驱动资产模型、地面和骨架的绘制，以确认动画流可以正确激活引擎内的 Mesh。
 
-![Character bind pose and skeleton viewer](assets/01_character_bind_pose.png)
+```mermaid
+flowchart LR
+    A[BVH pos/quats 通道数据] --> B[quat_to_mat 转换为变换矩阵]
+    B --> C[结合 character 与 bones 构建渲染树]
+    C --> D[viewer.draw 执行绘制]
+```
+
+- 代码做什么：Run render(frame), convert BVH channels to character bone matrices, then draw the character, ground, skeleton lines, and local axes.
+- 运行后看到什么：`viewer`
+- 结果说明什么：This confirms that the animation data can drive the live viewer; later format, mapping, and root-motion discussions use this visual baseline.
+- 可视化主体：Character bind pose and skeleton viewer
+- 捕获方式：`canvas`
+
+![Character bind pose and skeleton viewer](assets/01_character_bind_pose_result.png)
 
 ### Cell 12 - Raw BVH skeleton-only view
 
-- 代码做什么：Run render_skeleton(frame) and draw only BVH skeleton lines and joint axes.
-- 运行后看到什么：可视化 viewer 视口。
-- 结果说明什么：Separating the mesh from the skeleton lets the reader inspect the joint hierarchy directly.
+脱离具体的 Mesh 模型，仅绘制 BVH 原生骨架的线条和关节坐标系，以便直接观察关节层级。
 
-![Raw BVH skeleton-only view](assets/02_raw_bvh_skeleton.png)
+```mermaid
+flowchart LR
+    A[仅传入 BVH 姿态矩阵] --> B[跳过 mesh 绑定]
+    B --> C[根据 parents 构建线段连接]
+    C --> D[纯净展示骨骼层级拓扑]
+```
+
+- 代码做什么：Run render_skeleton(frame) and draw only BVH skeleton lines and joint axes.
+- 运行后看到什么：`viewer`
+- 结果说明什么：Separating the mesh from the skeleton lets the reader inspect the joint hierarchy directly.
+- 可视化主体：Raw BVH skeleton-only view
+- 捕获方式：`canvas`
+
+![Raw BVH skeleton-only view](assets/02_raw_bvh_skeleton_result.png)
 
 ### Cell 9 - pos/quats tensor shape output
 
-- 代码做什么：Print the position and quaternion tensor shapes after importing BVH data.
-- 运行后看到什么：运行日志或文本输出。
-- 结果说明什么：The log shows that an animation is represented as frame x bone x channel arrays.
+打印读取到的 BVH 张量维度，确认动作在内存中的物理排布。
 
-![pos/quats tensor shape output](assets/03_tensor_shape_output.png)
+```mermaid
+flowchart LR
+    A[读取 bvh 文件] --> B[提取平移信息 pos]
+    A --> C[提取旋转信息 quats]
+    B --> D[输出形状 帧数 x 骨骼数 x 3]
+    C --> E[输出形状 帧数 x 骨骼数 x 4]
+```
+
+- 代码做什么：Print the position and quaternion tensor shapes after importing BVH data.
+- 运行后看到什么：`log`
+- 结果说明什么：The log shows that an animation is represented as frame x bone x channel arrays.
+- 可视化主体：pos/quats tensor shape output
+- 捕获方式：`log`
+
+![pos/quats tensor shape output](assets/03_tensor_shape_output_result.png)
 
 ### Cell 19 - Raw skeleton versus mapped skeleton
 
-- 代码做什么：Render the raw BVH skeleton beside the AnimMapper result on the target character.
-- 运行后看到什么：可视化 viewer 视口。
-- 结果说明什么：This shows that mapping adapts hierarchy and pose to the character while preserving the time structure.
+将未经过滤的 BVH 原生骨架与经过 `AnimMapper` 重定向到角色模型上的骨架并排显示，观察它们在时间流上的完全匹配，以及空间拓扑上的差异。
 
-![Raw skeleton versus mapped skeleton](assets/04_raw_vs_mapped_compare.png)
+```mermaid
+flowchart LR
+    A[原生 BVH 骨架] --> B[AnimMapper 映射表]
+    B --> C[对齐到角色标准骨架]
+    A --> D[对比同帧下的两套骨架位姿]
+    C --> D
+```
+
+- 代码做什么：Render the raw BVH skeleton beside the AnimMapper result on the target character.
+- 运行后看到什么：`viewer`
+- 结果说明什么：This shows that mapping adapts hierarchy and pose to the character while preserving the time structure.
+- 可视化主体：Raw skeleton versus mapped skeleton
+- 捕获方式：`canvas`
+
+![Raw skeleton versus mapped skeleton](assets/04_raw_vs_mapped_compare_result.png)
 
 ### Cell 21 - Skeleton parent tree output
 
-- 代码做什么：Print the raw and mapped skeleton parent trees.
-- 运行后看到什么：运行日志或文本输出。
-- 结果说明什么：The textual tree turns the viewer difference into an inspectable parent-child hierarchy.
+将抽象的 `parents` 一维数组通过深度优先遍历转化为层次分明的树状文本输出，对比映射前后的拓扑根节点差异。
 
-![Skeleton parent tree output](assets/05_skeleton_tree_output.png)
+```mermaid
+flowchart LR
+    A[原生 parents 数组] --> B[映射后 parents 数组]
+    B --> C[DFS 生成树状字符串]
+    C --> D[直观显示 Root 的插入]
+```
+
+- 代码做什么：Print the raw and mapped skeleton parent trees.
+- 运行后看到什么：`log`
+- 结果说明什么：The textual tree turns the viewer difference into an inspectable parent-child hierarchy.
+- 可视化主体：Skeleton parent tree output
+- 捕获方式：`log`
+
+![Skeleton parent tree output](assets/05_skeleton_tree_output_result.png)
 
 ### Cell 24 - Root projection and Root/Hips split
 
-- 代码做什么：Use static_position/static_rotation controls to inspect root motion and local pelvis motion.
-- 运行后看到什么：带 timeline 的可播放 viewer。
-- 结果说明什么：The result explains how global displacement and local body pose are stored separately.
+演示将骨盆（Hips）在水平地面上的位移和偏航角（Yaw）剥离，转移给全新的 `Root` 骨骼，将全局移动与局部姿态解耦。
 
-![Root projection and Root/Hips split](assets/06_root_projection_motion.png)
+```mermaid
+flowchart LR
+    A[Hips 的全局旋转和平移] --> B[提取水平位移和 Yaw 朝向]
+    B --> C[赋值给 Root 节点]
+    A --> D[求逆并与 Root 变换相乘]
+    C --> E[驱动整个角色移动]
+    D --> F[保留作为局部骨盆姿态]
+```
+
+- 代码做什么：Use static_position/static_rotation controls to inspect root motion and local pelvis motion.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：The result explains how global displacement and local body pose are stored separately.
+- 可视化主体：Root projection and Root/Hips split
+- 捕获方式：`canvas`
+
+![Root projection and Root/Hips split](assets/06_root_projection_motion_result.png)
+
+![Root projection and Root/Hips split preview](assets/06_root_projection_motion_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_root_projection_motion_result.png" src="assets/06_root_projection_motion_preview.mp4"></video>
 
 ### Cell 24 - Static Root toggle comparison
 
-- 代码做什么：Enable a Root toggle and observe which motion remains in the local skeleton.
-- 运行后看到什么：带 timeline 的可播放 viewer。
-- 结果说明什么：This makes the role of Root translation and rotation visible in the animated result.
+通过切换交互开关锁定 `Root` 的变换，直观展现当全局位移被抽离后，仅剩的局部关节动画（原地跑步等）的样子。
 
-![Static Root toggle comparison](assets/07_static_root_toggles.png)
+```mermaid
+flowchart LR
+    A[开启 static_position 锁定] --> B[清除 Root 的平移增量]
+    C[开启 static_rotation 锁定] --> D[清除 Root 的旋转增量]
+    B --> E[观察被困在原地的身体局部姿态运动]
+    D --> E
+```
+
+- 代码做什么：Enable a Root toggle and observe which motion remains in the local skeleton.
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：This makes the role of Root translation and rotation visible in the animated result.
+- 可视化主体：Static Root toggle comparison
+- 捕获方式：`canvas`
+
+![Static Root toggle comparison](assets/07_static_root_toggles_result.png)
+
+![Static Root toggle comparison preview](assets/07_static_root_toggles_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_static_root_toggles_result.png" src="assets/07_static_root_toggles_preview.mp4"></video>
 
 ## 运行方式
 
