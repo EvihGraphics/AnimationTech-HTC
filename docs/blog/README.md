@@ -7,6 +7,7 @@
 - 案例覆盖：19 个受管案例全部有独立子工程、`assets/` 目录、模块图、模块拆解和运行方式。
 - 媒体覆盖：19 个案例全部迁移到 v5 媒体结构，包含 142 张结果 PNG、142 张学习卡 PNG、30 个 GIF 预览、30 个 MP4/H.264、30 个 WebM/VP9 和 19 段 walkthrough WebM。
 - 深写状态：12 个代表案例已经深写完成，剩余 7 个案例保持媒体完整的发布基底，后续可继续扩写正文密度。
+- 媒体质量：正文重点图和动画必须是算法输出本身；禁止使用浏览器滚动截图、整页 cell 截图、代码学习卡裁剪图或静态图平移缩放生成的假动画。
 
 ## 学习入口
 
@@ -118,6 +119,8 @@ flowchart LR
 | `viewer` / `timeline_viewer` | 角色姿态、动画播放、motion graph 搜索和交互控制结果。 |
 | `log` / `table` / `command_log` | 环境验证、数据规模、训练状态、导出路径和脚本运行证据。 |
 | `source_excerpt` / `artifact_summary` / `diagram` | Python module 的源码职责、产物结构和与 notebook 的关系。 |
+
+正文中的“重点可视化 / 动画”只放 `key_visual` 与 `key_animation` 的结果媒体；代码学习卡只作为附录证据，用来复现 cell 与源码上下文。
 
 ## 深写完成案例
 

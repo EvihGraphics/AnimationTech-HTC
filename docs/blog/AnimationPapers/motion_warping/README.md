@@ -127,24 +127,25 @@ Time warp 图验证事件是否发生在新时间；pose warp viewer 验证关�
 
 ## 重点可视化 / 动画
 
-README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 [打开/下载总览 WebM](assets/00-walkthrough.webm)
 
-![Final time and pose warped animation](assets/08_combined_warped_animation_preview.gif)
+![Source animation playback](assets/01_source_animation_playback_preview.gif)
 
-[打开 MP4](assets/08_combined_warped_animation_preview.mp4) / [打开 WebM](assets/08_combined_warped_animation_preview.webm)
+[打开 MP4](assets/01_source_animation_playback_preview.mp4) / [打开 WebM](assets/01_source_animation_playback_preview.webm)
 
-| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
-| --- | --- | --- | --- | --- |
-| Cell 5 | `timeline_viewer` | `key_animation` | Render the source animation before time or pose warping. | [结果 PNG](assets/01_source_animation_playback_result.png) / [GIF](assets/01_source_animation_playback_preview.gif) / [MP4](assets/01_source_animation_playback_preview.mp4) / [WebM](assets/01_source_animation_playback_preview.webm) / [代码卡](assets/01_source_animation_playback.png) |
-| Cell 6 | `plot` | `key_visual` | Plot a selected quaternion channel over time. | [结果 PNG](assets/02_raw_quaternion_channel_result.png) / [代码卡](assets/02_raw_quaternion_channel.png) |
-| Cell 12 | `plot` | `key_visual` | Build a cardinal/Hermite curve from time remapping keypoints. | [结果 PNG](assets/03_timewarp_keypoints_result.png) / [代码卡](assets/03_timewarp_keypoints.png) |
-| Cell 15 | `plot` | `key_visual` | Resample the time-warp curve at animation-frame resolution. | [结果 PNG](assets/04_resampled_timewarp_curve_result.png) / [代码卡](assets/04_resampled_timewarp_curve.png) |
-| Cell 20 | `timeline_viewer` | `key_animation` | Render the original and time-warped animation together. | [结果 PNG](assets/05_timewarped_animation_compare_result.png) / [GIF](assets/05_timewarped_animation_compare_preview.gif) / [MP4](assets/05_timewarped_animation_compare_preview.mp4) / [WebM](assets/05_timewarped_animation_compare_preview.webm) / [代码卡](assets/05_timewarped_animation_compare.png) |
-| Cell 23 | `viewer` | `key_visual` | Render key poses used to define a pose-space offset. | [结果 PNG](assets/06_pose_warp_key_poses_result.png) / [代码卡](assets/06_pose_warp_key_poses.png) |
-| Cell 27 | `plot` | `key_visual` | Plot the computed warp offsets over time. | [结果 PNG](assets/07_offset_warp_curve_result.png) / [代码卡](assets/07_offset_warp_curve.png) |
-| Cell 31 | `timeline_viewer` | `key_animation` | Render the final animation after time and pose warping. | [结果 PNG](assets/08_combined_warped_animation_result.png) / [GIF](assets/08_combined_warped_animation_preview.gif) / [MP4](assets/08_combined_warped_animation_preview.mp4) / [WebM](assets/08_combined_warped_animation_preview.webm) / [代码卡](assets/08_combined_warped_animation.png) |
+| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+| Cell 5 | `timeline_viewer` | `key_animation` | Source animation playback: This baseline lets later warped outputs be compared against the original motion. | `canvas` | [结果 PNG](assets/01_source_animation_playback_result.png) / [GIF](assets/01_source_animation_playback_preview.gif) / [MP4](assets/01_source_animation_playback_preview.mp4) / [WebM](assets/01_source_animation_playback_preview.webm) |
+| Cell 6 | `plot` | `key_visual` | Raw quaternion channel plot: The graph shows that animation warping often starts as curve manipulation. | `plot` | [结果 PNG](assets/02_raw_quaternion_channel_result.png) |
+| Cell 12 | `plot` | `key_visual` | Time-warp keypoints and tangents: The plot shows how sparse timing edits become a continuous time-warp curve. | `plot` | [结果 PNG](assets/03_timewarp_keypoints_result.png) |
+| Cell 15 | `plot` | `key_visual` | Resampled time-warp curve: The output shows the actual per-frame time lookup used for animation sampling. | `plot` | [结果 PNG](assets/04_resampled_timewarp_curve_result.png) |
+| Cell 20 | `timeline_viewer` | `key_animation` | Time-warped animation comparison: The viewer reveals the timing change without changing the underlying pose content. | `canvas` | [结果 PNG](assets/05_timewarped_animation_compare_result.png) / [GIF](assets/05_timewarped_animation_compare_preview.gif) / [MP4](assets/05_timewarped_animation_compare_preview.mp4) / [WebM](assets/05_timewarped_animation_compare_preview.webm) |
+| Cell 23 | `viewer` | `key_visual` | Pose-warp key poses: The key-pose viewer shows what spatial correction will be blended into the clip. | `canvas` | [结果 PNG](assets/06_pose_warp_key_poses_result.png) |
+| Cell 27 | `plot` | `key_visual` | Offset warp curve: The curve explains how local pose edits are distributed smoothly. | `plot` | [结果 PNG](assets/07_offset_warp_curve_result.png) |
+| Cell 31 | `timeline_viewer` | `key_animation` | Final time and pose warped animation: This final viewer checks whether timing and pose edits combine into a coherent motion. | `canvas` | [结果 PNG](assets/08_combined_warped_animation_result.png) / [GIF](assets/08_combined_warped_animation_preview.gif) / [MP4](assets/08_combined_warped_animation_preview.mp4) / [WebM](assets/08_combined_warped_animation_preview.webm) |
+
 
 ## 代码 Cell 与可视化结果
 

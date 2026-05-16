@@ -135,17 +135,13 @@ $env:ANIMATIONTECH_TREE_N_JOBS = "1"
 
 ## 重点可视化 / 动画
 
-README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 [打开/下载总览 WebM](assets/00-walkthrough.webm)
 
-| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
-| --- | --- | --- | --- | --- |
-| imports | `source_excerpt` | `code_evidence` | Show the imports for NumPy and ExtraTreesRegressor. | [结果 PNG](assets/01_module_imports_result.png) / [代码卡](assets/01_module_imports.png) |
-| function-contract | `source_excerpt` | `code_evidence` | Show the function signature and primary inputs. | [结果 PNG](assets/02_function_contract_result.png) / [代码卡](assets/02_function_contract.png) |
-| empty-guard | `source_excerpt` | `code_evidence` | Show the zero-table fallback for empty training data. | [结果 PNG](assets/03_empty_training_guard_result.png) / [代码卡](assets/03_empty_training_guard.png) |
-| extra-trees | `source_excerpt` | `code_evidence` | Show the n_jobs setting, ExtraTreesRegressor fit, prediction, and reshape. | [结果 PNG](assets/04_extra_trees_regressor_result.png) / [代码卡](assets/04_extra_trees_regressor.png) |
-| import-check | `command_log` | `code_evidence` | Show the managed validation import check output. | [结果 PNG](assets/05_import_validation_log_result.png) / [代码卡](assets/05_import_validation_log.png) |
+| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+
 
 ## 代码 Cell 与可视化结果
 

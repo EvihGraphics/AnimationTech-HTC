@@ -143,18 +143,13 @@ python "labs/AnimationPapers/Halo 4 exporter from maya.py" --force-synthetic --o
 
 ## 重点可视化 / 动画
 
-README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 [打开/下载总览 WebM](assets/00-walkthrough.webm)
 
-| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
-| --- | --- | --- | --- | --- |
-| maya-fallback | `source_excerpt` | `code_evidence` | Show argparse/pickle imports, Maya detection, and synthetic asset writer import. | [结果 PNG](assets/01_maya_fallback_imports_result.png) / [代码卡](assets/01_maya_fallback_imports.png) |
-| maya-export | `source_excerpt` | `code_evidence` | Show the selected mesh, topology extraction, normals, frame sampling, and pickle write. | [结果 PNG](assets/02_maya_export_function_result.png) / [代码卡](assets/02_maya_export_function.png) |
-| cli-path | `source_excerpt` | `code_evidence` | Show CLI arguments and the --force-synthetic path. | [结果 PNG](assets/03_cli_entrypoint_result.png) / [代码卡](assets/03_cli_entrypoint.png) |
-| export-log | `command_log` | `code_evidence` | Show the managed run log for the exporter. | [结果 PNG](assets/04_export_command_log_result.png) / [代码卡](assets/04_export_command_log.png) |
-| artifact-summary | `artifact_summary` | `code_evidence` | Inspect the generated pickle artifact. | [结果 PNG](assets/05_animated_face_artifact_summary_result.png) / [代码卡](assets/05_animated_face_artifact_summary.png) |
-| dataflow | `diagram` | `code_evidence` | Summarize the exporter path from Maya or synthetic fallback into a notebook-readable .dat file. | [结果 PNG](assets/06_exporter_dataflow_result.png) / [代码卡](assets/06_exporter_dataflow.png) |
+| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+
 
 ## 代码 Cell 与可视化结果
 

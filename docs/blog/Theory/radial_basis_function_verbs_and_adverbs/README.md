@@ -169,20 +169,17 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 radial_
 
 ## 重点可视化 / 动画
 
-README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 [打开/下载总览 WebM](assets/00-walkthrough.webm)
 
-| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
-| --- | --- | --- | --- | --- |
-| Cell 3 | `plot` | `key_visual` | Plot sample points in a two-dimensional adverb space. | [结果 PNG](assets/01_sample_adverb_space_result.png) / [代码卡](assets/01_sample_adverb_space.png) |
-| Cell 4 | `matrix` | `supporting_evidence` | Encode right, left, up, and down adverb components. | [结果 PNG](assets/02_4d_adverb_encoding_result.png) / [代码卡](assets/02_4d_adverb_encoding.png) |
-| Cell 7 | `table` | `supporting_evidence` | Fit and print least-squares linear coefficients. | [结果 PNG](assets/03_linear_coefficients_result.png) / [代码卡](assets/03_linear_coefficients.png) |
-| Cell 9 | `plot` | `key_visual` | Plot the color field produced by the linear model. | [结果 PNG](assets/04_linear_color_field_result.png) / [代码卡](assets/04_linear_color_field.png) |
-| Cell 11 | `table` | `supporting_evidence` | Print the residuals left after the linear model. | [结果 PNG](assets/05_linear_residuals_result.png) / [代码卡](assets/05_linear_residuals.png) |
-| Cell 14 | `plot` | `key_visual` | Plot the B3 radial basis shape. | [结果 PNG](assets/06_cubic_bspline_basis_result.png) / [代码卡](assets/06_cubic_bspline_basis.png) |
-| Cell 20 | `matrix` | `supporting_evidence` | Compute distances, scales, D matrix, and residual coefficients. | [结果 PNG](assets/07_radial_system_solve_result.png) / [代码卡](assets/07_radial_system_solve.png) |
-| Cell 21 | `plot` | `key_visual` | Plot the final field after adding the RBF residual correction. | [结果 PNG](assets/08_final_rbf_field_result.png) / [代码卡](assets/08_final_rbf_field.png) |
+| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+| Cell 3 | `plot` | `key_visual` | Sample adverb color space: The plot connects semantic directions to observed color/motion samples. | `plot` | [结果 PNG](assets/01_sample_adverb_space_result.png) |
+| Cell 9 | `plot` | `key_visual` | Linear color field: The broad field shows what linear interpolation can and cannot explain. | `plot` | [结果 PNG](assets/04_linear_color_field_result.png) |
+| Cell 14 | `plot` | `key_visual` | Cubic B-spline radial basis: The compact-support basis defines how far each example influences the field. | `plot` | [结果 PNG](assets/06_cubic_bspline_basis_result.png) |
+| Cell 21 | `plot` | `key_visual` | Residual-corrected RBF field: The field shows local semantic control beyond the linear trend. | `plot` | [结果 PNG](assets/08_final_rbf_field_result.png) |
+
 
 ## 代码 Cell 与可视化结果
 

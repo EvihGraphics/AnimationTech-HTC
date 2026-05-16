@@ -309,23 +309,22 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 animati
 
 ## 重点可视化 / 动画
 
-README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 [打开/下载总览 WebM](assets/00-walkthrough.webm)
 
-![Static Root toggle comparison](assets/07_static_root_toggles_preview.gif)
+![Root projection and Root/Hips split](assets/06_root_projection_motion_preview.gif)
 
-[打开 MP4](assets/07_static_root_toggles_preview.mp4) / [打开 WebM](assets/07_static_root_toggles_preview.webm)
+[打开 MP4](assets/06_root_projection_motion_preview.mp4) / [打开 WebM](assets/06_root_projection_motion_preview.webm)
 
-| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
-| --- | --- | --- | --- | --- |
-| Cell 11 | `viewer` | `key_visual` | Run render(frame), convert BVH channels to character bone matrices, then draw the character, ground, skeleton lines, and local axes. | [结果 PNG](assets/01_character_bind_pose_result.png) / [代码卡](assets/01_character_bind_pose.png) |
-| Cell 12 | `viewer` | `key_visual` | Run render_skeleton(frame) and draw only BVH skeleton lines and joint axes. | [结果 PNG](assets/02_raw_bvh_skeleton_result.png) / [代码卡](assets/02_raw_bvh_skeleton.png) |
-| Cell 9 | `log` | `supporting_evidence` | Print the position and quaternion tensor shapes after importing BVH data. | [结果 PNG](assets/03_tensor_shape_output_result.png) / [代码卡](assets/03_tensor_shape_output.png) |
-| Cell 19 | `viewer` | `key_visual` | Render the raw BVH skeleton beside the AnimMapper result on the target character. | [结果 PNG](assets/04_raw_vs_mapped_compare_result.png) / [代码卡](assets/04_raw_vs_mapped_compare.png) |
-| Cell 21 | `log` | `supporting_evidence` | Print the raw and mapped skeleton parent trees. | [结果 PNG](assets/05_skeleton_tree_output_result.png) / [代码卡](assets/05_skeleton_tree_output.png) |
-| Cell 24 | `timeline_viewer` | `key_animation` | Use static_position/static_rotation controls to inspect root motion and local pelvis motion. | [结果 PNG](assets/06_root_projection_motion_result.png) / [GIF](assets/06_root_projection_motion_preview.gif) / [MP4](assets/06_root_projection_motion_preview.mp4) / [WebM](assets/06_root_projection_motion_preview.webm) / [代码卡](assets/06_root_projection_motion.png) |
-| Cell 24 | `timeline_viewer` | `key_animation` | Enable a Root toggle and observe which motion remains in the local skeleton. | [结果 PNG](assets/07_static_root_toggles_result.png) / [GIF](assets/07_static_root_toggles_preview.gif) / [MP4](assets/07_static_root_toggles_preview.mp4) / [WebM](assets/07_static_root_toggles_preview.webm) / [代码卡](assets/07_static_root_toggles.png) |
+| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+| Cell 11 | `viewer` | `key_visual` | Character bind pose and skeleton viewer: This confirms that the animation data can drive the live viewer; later format, mapping, and root-motion discussions use this visual baseline. | `canvas` | [结果 PNG](assets/01_character_bind_pose_result.png) |
+| Cell 12 | `viewer` | `key_visual` | Raw BVH skeleton-only view: Separating the mesh from the skeleton lets the reader inspect the joint hierarchy directly. | `canvas` | [结果 PNG](assets/02_raw_bvh_skeleton_result.png) |
+| Cell 19 | `viewer` | `key_visual` | Raw skeleton versus mapped skeleton: This shows that mapping adapts hierarchy and pose to the character while preserving the time structure. | `canvas` | [结果 PNG](assets/04_raw_vs_mapped_compare_result.png) |
+| Cell 24 | `timeline_viewer` | `key_animation` | Root projection and Root/Hips split: The result explains how global displacement and local body pose are stored separately. | `canvas` | [结果 PNG](assets/06_root_projection_motion_result.png) / [GIF](assets/06_root_projection_motion_preview.gif) / [MP4](assets/06_root_projection_motion_preview.mp4) / [WebM](assets/06_root_projection_motion_preview.webm) |
+| Cell 24 | `timeline_viewer` | `key_animation` | Static Root toggle comparison: This makes the role of Root translation and rotation visible in the animated result. | `canvas` | [结果 PNG](assets/07_static_root_toggles_result.png) / [GIF](assets/07_static_root_toggles_preview.gif) / [MP4](assets/07_static_root_toggles_preview.mp4) / [WebM](assets/07_static_root_toggles_preview.webm) |
+
 
 ## 代码 Cell 与可视化结果
 

@@ -131,24 +131,21 @@ source graph viewer 说明动作来源；random action viewer 验证播放连续
 
 ## 重点可视化 / 动画
 
-README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 [打开/下载总览 WebM](assets/00-walkthrough.webm)
 
-![MDP value-policy viewer](assets/08_mdp_value_policy_viewer_preview.gif)
+![Source motion graph playback](assets/02_source_motion_graph_playback_preview.gif)
 
-[打开 MP4](assets/08_mdp_value_policy_viewer_preview.mp4) / [打开 WebM](assets/08_mdp_value_policy_viewer_preview.webm)
+[打开 MP4](assets/02_source_motion_graph_playback_preview.mp4) / [打开 WebM](assets/02_source_motion_graph_playback_preview.webm)
 
-| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
-| --- | --- | --- | --- | --- |
-| Cell 5 | `log` | `supporting_evidence` | Load character and helper bones used by the behavior system. | [结果 PNG](assets/01_character_helper_indices_result.png) / [代码卡](assets/01_character_helper_indices.png) |
-| Cell 9 | `timeline_viewer` | `key_animation` | Render the source motion graph clips. | [结果 PNG](assets/02_source_motion_graph_playback_result.png) / [GIF](assets/02_source_motion_graph_playback_preview.gif) / [MP4](assets/02_source_motion_graph_playback_preview.mp4) / [WebM](assets/02_source_motion_graph_playback_preview.webm) / [代码卡](assets/02_source_motion_graph_playback.png) |
-| Cell 11 | `code_only` | `code_evidence` | Define dataclasses that hold graph states, actions, rewards, and transitions. | [结果 PNG](assets/03_state_action_graph_result.png) / [代码卡](assets/03_state_action_graph.png) |
-| Cell 16 | `timeline_viewer` | `key_animation` | Play random actions through the graph with FootLock correction. | [结果 PNG](assets/04_random_action_playback_result.png) / [GIF](assets/04_random_action_playback_preview.gif) / [MP4](assets/04_random_action_playback_preview.mp4) / [WebM](assets/04_random_action_playback_preview.webm) / [代码卡](assets/04_random_action_playback.png) |
-| Cell 18 | `table` | `supporting_evidence` | Compute action counts and maximum clip lengths. | [结果 PNG](assets/05_action_count_table_result.png) / [代码卡](assets/05_action_count_table.png) |
-| Cell 19 | `table` | `supporting_evidence` | Build target position samples around the avatar. | [结果 PNG](assets/06_target_position_rings_result.png) / [代码卡](assets/06_target_position_rings.png) |
-| Cell 22 | `timeline_viewer` | `key_animation` | Run the policy viewer with default controller input. | [结果 PNG](assets/07_reward_policy_viewer_result.png) / [GIF](assets/07_reward_policy_viewer_preview.gif) / [MP4](assets/07_reward_policy_viewer_preview.mp4) / [WebM](assets/07_reward_policy_viewer_preview.webm) / [代码卡](assets/07_reward_policy_viewer.png) |
-| Cell 27 | `timeline_viewer` | `key_animation` | Run the value-based behavior policy after offline learning. | [结果 PNG](assets/08_mdp_value_policy_viewer_result.png) / [GIF](assets/08_mdp_value_policy_viewer_preview.gif) / [MP4](assets/08_mdp_value_policy_viewer_preview.mp4) / [WebM](assets/08_mdp_value_policy_viewer_preview.webm) / [代码卡](assets/08_mdp_value_policy_viewer.png) |
+| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+| Cell 9 | `timeline_viewer` | `key_animation` | Source motion graph playback: The viewer shows the action fragments from which avatar behavior is assembled. | `canvas` | [结果 PNG](assets/02_source_motion_graph_playback_result.png) / [GIF](assets/02_source_motion_graph_playback_preview.gif) / [MP4](assets/02_source_motion_graph_playback_preview.mp4) / [WebM](assets/02_source_motion_graph_playback_preview.webm) |
+| Cell 16 | `timeline_viewer` | `key_animation` | Random graph action playback: The viewer validates that graph actions can produce continuous animated output. | `canvas` | [结果 PNG](assets/04_random_action_playback_result.png) / [GIF](assets/04_random_action_playback_preview.gif) / [MP4](assets/04_random_action_playback_preview.mp4) / [WebM](assets/04_random_action_playback_preview.webm) |
+| Cell 22 | `timeline_viewer` | `key_animation` | Immediate reward policy viewer: The viewer shows how local target rewards can choose graph actions. | `canvas` | [结果 PNG](assets/07_reward_policy_viewer_result.png) / [GIF](assets/07_reward_policy_viewer_preview.gif) / [MP4](assets/07_reward_policy_viewer_preview.mp4) / [WebM](assets/07_reward_policy_viewer_preview.webm) |
+| Cell 27 | `timeline_viewer` | `key_animation` | MDP value-policy viewer: The final viewer checks that the learned value function can drive action selection. | `canvas` | [结果 PNG](assets/08_mdp_value_policy_viewer_result.png) / [GIF](assets/08_mdp_value_policy_viewer_preview.gif) / [MP4](assets/08_mdp_value_policy_viewer_preview.mp4) / [WebM](assets/08_mdp_value_policy_viewer_preview.webm) |
+
 
 ## 代码 Cell 与可视化结果
 

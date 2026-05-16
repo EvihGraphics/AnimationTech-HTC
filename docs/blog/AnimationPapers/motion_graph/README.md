@@ -236,7 +236,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 motion_
 
 ## 重点可视化 / 动画
 
-README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 [打开/下载总览 WebM](assets/00-walkthrough.webm)
 
@@ -244,16 +244,15 @@ README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡�
 
 [打开 MP4](assets/follow_path_visualization_preview.mp4) / [打开 WebM](assets/follow_path_visualization_preview.webm)
 
-| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
-| --- | --- | --- | --- | --- |
-| Cell 2 | `log` | `supporting_evidence` | Initialize Warp, NumPy, ipyanimlab, and graph dependencies. | [结果 PNG](assets/cropped_ranges_padding_result.png) / [代码卡](assets/cropped_ranges_padding.png) |
-| Cell 6 | `viewer` | `key_visual` | Render the source walking animation used to build the graph. | [结果 PNG](assets/motion_graph_overview_result.png) / [代码卡](assets/motion_graph_overview.png) |
-| Cell 12 | `viewer` | `key_visual` | Convert the skeleton pose to world-space point samples. | [结果 PNG](assets/point_cloud_pose_result.png) / [代码卡](assets/point_cloud_pose.png) |
-| Cell 15 | `viewer` | `key_visual` | Show source and target windows after horizontal translation and rotation alignment. | [结果 PNG](assets/alignment_pair_result.png) / [代码卡](assets/alignment_pair.png) |
-| Cell 21 | `plot` | `key_visual` | Plot the distance heatmap and mark local_minima candidates. | [结果 PNG](assets/distance_matrix_minima_result.png) / [代码卡](assets/distance_matrix_minima.png) |
-| Cell 28 | `log` | `supporting_evidence` | Print the strongly connected component pruning process. | [结果 PNG](assets/scc_pruning_result.png) / [代码卡](assets/scc_pruning.png) |
-| Cell 33 | `viewer` | `key_visual` | Play along graph edges while printing the current node and frame. | [结果 PNG](assets/graph_nodes_edges_result.png) / [代码卡](assets/graph_nodes_edges.png) |
-| Cell 45 | `timeline_viewer` | `key_animation` | Display the graph-search result and the Bezier target path together. | [结果 PNG](assets/follow_path_visualization_result.png) / [GIF](assets/follow_path_visualization_preview.gif) / [MP4](assets/follow_path_visualization_preview.mp4) / [WebM](assets/follow_path_visualization_preview.webm) / [代码卡](assets/follow_path_visualization.png) |
+| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+| Cell 6 | `viewer` | `key_visual` | Raw walk clip playback: The graph input is a playable sequence of walking frames. | `canvas` | [结果 PNG](assets/motion_graph_overview_result.png) |
+| Cell 12 | `viewer` | `key_visual` | Point-cloud pose representation: Point-cloud distance is closer to visible pose similarity than comparing only root or quaternions. | `canvas` | [结果 PNG](assets/point_cloud_pose_result.png) |
+| Cell 15 | `viewer` | `key_visual` | Window alignment between two clips: Similar gait windows can transition even when their world positions differ. | `canvas` | [结果 PNG](assets/alignment_pair_result.png) |
+| Cell 21 | `plot` | `key_visual` | Distance matrix and local minima: Low-error regions in the matrix become potential transition edges. | `plot` | [结果 PNG](assets/distance_matrix_minima_result.png) |
+| Cell 33 | `viewer` | `key_visual` | Graph traversal playback debug: This validates Node and Edge abstractions as a playable animation sequence. | `canvas` | [结果 PNG](assets/graph_nodes_edges_result.png) |
+| Cell 45 | `timeline_viewer` | `key_animation` | Follow-path result viewer: The final viewer checks whether graph search can serve a path-following goal. | `canvas` | [结果 PNG](assets/follow_path_visualization_result.png) / [GIF](assets/follow_path_visualization_preview.gif) / [MP4](assets/follow_path_visualization_preview.mp4) / [WebM](assets/follow_path_visualization_preview.webm) |
+
 
 ## 代码 Cell 与可视化结果
 

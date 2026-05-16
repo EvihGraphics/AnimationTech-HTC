@@ -172,23 +172,21 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 halo_4_
 
 ## 重点可视化 / 动画
 
-README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 [打开/下载总览 WebM](assets/00-walkthrough.webm)
 
-![GPU shader PCA reconstruction](assets/07_gpu_shader_reconstruction_preview.gif)
+![Raw vertex-stream face playback](assets/02_raw_vertex_stream_viewer_preview.gif)
 
-[打开 MP4](assets/07_gpu_shader_reconstruction_preview.mp4) / [打开 WebM](assets/07_gpu_shader_reconstruction_preview.webm)
+[打开 MP4](assets/02_raw_vertex_stream_viewer_preview.mp4) / [打开 WebM](assets/02_raw_vertex_stream_viewer_preview.webm)
 
-| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
-| --- | --- | --- | --- | --- |
-| Cell 5 | `table` | `supporting_evidence` | Load pickled triangle indices, normals, and per-frame vertex positions. | [结果 PNG](assets/01_data_load_shapes_result.png) / [代码卡](assets/01_data_load_shapes.png) |
-| Cell 11 | `timeline_viewer` | `key_animation` | Upload frame vertices to WebGL buffers and draw the animated face mesh. | [结果 PNG](assets/02_raw_vertex_stream_viewer_result.png) / [GIF](assets/02_raw_vertex_stream_viewer_preview.gif) / [MP4](assets/02_raw_vertex_stream_viewer_preview.mp4) / [WebM](assets/02_raw_vertex_stream_viewer_preview.webm) / [代码卡](assets/02_raw_vertex_stream_viewer.png) |
-| Cell 13 | `log` | `supporting_evidence` | Print the raw vertex animation memory footprint. | [结果 PNG](assets/03_memory_size_log_result.png) / [代码卡](assets/03_memory_size_log.png) |
-| Cell 17 | `table` | `supporting_evidence` | Fit PCA to flattened frame data and print the component shape. | [结果 PNG](assets/04_pca_components_shape_result.png) / [代码卡](assets/04_pca_components_shape.png) |
-| Cell 19 | `widget_controls` | `key_visual` | Move pose and multiplier controls to inspect an individual PCA component. | [结果 PNG](assets/05_pca_component_viewer_result.png) / [GIF](assets/05_pca_component_viewer_preview.gif) / [MP4](assets/05_pca_component_viewer_preview.mp4) / [WebM](assets/05_pca_component_viewer_preview.webm) / [代码卡](assets/05_pca_component_viewer.png) |
-| Cell 23 | `timeline_viewer` | `key_animation` | Inverse-transform PCA coefficients and draw original/reconstructed animation. | [结果 PNG](assets/06_cpu_reconstruction_compare_result.png) / [GIF](assets/06_cpu_reconstruction_compare_preview.gif) / [MP4](assets/06_cpu_reconstruction_compare_preview.mp4) / [WebM](assets/06_cpu_reconstruction_compare_preview.webm) / [代码卡](assets/06_cpu_reconstruction_compare.png) |
-| Cell 26 | `timeline_viewer` | `key_animation` | Run the shader path that reconstructs vertex positions on the GPU. | [结果 PNG](assets/07_gpu_shader_reconstruction_result.png) / [GIF](assets/07_gpu_shader_reconstruction_preview.gif) / [MP4](assets/07_gpu_shader_reconstruction_preview.mp4) / [WebM](assets/07_gpu_shader_reconstruction_preview.webm) / [代码卡](assets/07_gpu_shader_reconstruction.png) |
+| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+| Cell 11 | `timeline_viewer` | `key_animation` | Raw vertex-stream face playback: This shows the raw per-frame geometry playback before any compression. | `canvas` | [结果 PNG](assets/02_raw_vertex_stream_viewer_result.png) / [GIF](assets/02_raw_vertex_stream_viewer_preview.gif) / [MP4](assets/02_raw_vertex_stream_viewer_preview.mp4) / [WebM](assets/02_raw_vertex_stream_viewer_preview.webm) |
+| Cell 19 | `widget_controls` | `key_visual` | PCA component deformation viewer: The widget makes a basis component visible as a facial deformation direction. | `widget_controls` | [结果 PNG](assets/05_pca_component_viewer_result.png) / [GIF](assets/05_pca_component_viewer_preview.gif) / [MP4](assets/05_pca_component_viewer_preview.mp4) / [WebM](assets/05_pca_component_viewer_preview.webm) |
+| Cell 23 | `timeline_viewer` | `key_animation` | CPU PCA reconstruction playback: The viewer checks whether the compressed representation preserves the visible expression motion. | `canvas` | [结果 PNG](assets/06_cpu_reconstruction_compare_result.png) / [GIF](assets/06_cpu_reconstruction_compare_preview.gif) / [MP4](assets/06_cpu_reconstruction_compare_preview.mp4) / [WebM](assets/06_cpu_reconstruction_compare_preview.webm) |
+| Cell 26 | `timeline_viewer` | `key_animation` | GPU shader PCA reconstruction: The final viewer shows the runtime-friendly form of the PCA facial animation pipeline. | `canvas` | [结果 PNG](assets/07_gpu_shader_reconstruction_result.png) / [GIF](assets/07_gpu_shader_reconstruction_preview.gif) / [MP4](assets/07_gpu_shader_reconstruction_preview.mp4) / [WebM](assets/07_gpu_shader_reconstruction_preview.webm) |
+
 
 ## 代码 Cell 与可视化结果
 

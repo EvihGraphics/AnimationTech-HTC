@@ -173,19 +173,17 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 radial_
 
 ## 重点可视化 / 动画
 
-README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 [打开/下载总览 WebM](assets/00-walkthrough.webm)
 
-| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
-| --- | --- | --- | --- | --- |
-| Cell 6 | `plot` | `key_visual` | Plot the target function and sparse interpolation samples. | [结果 PNG](assets/01_sample_function_points_result.png) / [代码卡](assets/01_sample_function_points.png) |
-| Cell 7 | `plot` | `key_visual` | Plot per-sample Gaussian radial basis functions. | [结果 PNG](assets/02_gaussian_kernel_influence_result.png) / [代码卡](assets/02_gaussian_kernel_influence.png) |
-| Cell 9 | `matrix` | `supporting_evidence` | Print the pairwise distances and Phi kernel matrix. | [结果 PNG](assets/03_distance_kernel_matrix_result.png) / [代码卡](assets/03_distance_kernel_matrix.png) |
-| Cell 10 | `table` | `supporting_evidence` | Solve Phi w = y and print the weights. | [结果 PNG](assets/04_rbf_weights_result.png) / [代码卡](assets/04_rbf_weights.png) |
-| Cell 16 | `plot` | `key_visual` | Evaluate the RBF curve and mark a query point. | [结果 PNG](assets/05_interpolated_query_result_result.png) / [代码卡](assets/05_interpolated_query_result.png) |
-| Cell 21 | `matrix` | `supporting_evidence` | Build and print the polynomial basis matrix P. | [结果 PNG](assets/06_polynomial_basis_matrix_result.png) / [代码卡](assets/06_polynomial_basis_matrix.png) |
-| Cell 27 | `plot` | `key_visual` | Plot the final polynomial-augmented RBF interpolation. | [结果 PNG](assets/07_augmented_rbf_fit_result.png) / [代码卡](assets/07_augmented_rbf_fit.png) |
+| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+| Cell 6 | `plot` | `key_visual` | Sample function and sparse points: The plot establishes what the RBF interpolator must reconstruct. | `plot` | [结果 PNG](assets/01_sample_function_points_result.png) |
+| Cell 7 | `plot` | `key_visual` | Gaussian kernel influence: The graph shows each sample as a local influence field. | `plot` | [结果 PNG](assets/02_gaussian_kernel_influence_result.png) |
+| Cell 16 | `plot` | `key_visual` | Interpolated curve and query sample: The plot checks that local kernels reconstruct the target curve between samples. | `plot` | [结果 PNG](assets/05_interpolated_query_result_result.png) |
+| Cell 27 | `plot` | `key_visual` | Augmented RBF fit: The final curve preserves both sparse samples and stable large-scale behavior. | `plot` | [结果 PNG](assets/07_augmented_rbf_fit_result.png) |
+
 
 ## 代码 Cell 与可视化结果
 

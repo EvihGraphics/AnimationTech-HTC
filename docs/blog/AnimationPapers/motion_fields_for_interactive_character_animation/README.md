@@ -119,19 +119,15 @@ value-learning 曲线验证离线策略是否稳定。
 
 ## 重点可视化 / 动画
 
-README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 [打开/下载总览 WebM](assets/00-walkthrough.webm)
 
-| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
-| --- | --- | --- | --- | --- |
-| Cell 7 | `log` | `supporting_evidence` | Record the prepared skip for the first interactive viewer cell. | [结果 PNG](assets/01_interactive_ui_skip_note_result.png) / [代码卡](assets/01_interactive_ui_skip_note.png) |
-| Cell 11 | `table` | `supporting_evidence` | Allocate pose, velocity, and trajectory state arrays for the motion field. | [结果 PNG](assets/02_state_table_build_result.png) / [代码卡](assets/02_state_table_build.png) |
-| Cell 17 | `plot` | `key_visual` | Project high-dimensional motion states to a two-dimensional field. | [结果 PNG](assets/03_umap_motion_field_result.png) / [代码卡](assets/03_umap_motion_field.png) |
-| Cell 20 | `code_only` | `code_evidence` | Define vector-based nearest-neighbor queries for runtime motion lookup. | [结果 PNG](assets/04_torch_knn_functions_result.png) / [代码卡](assets/04_torch_knn_functions.png) |
-| Cell 25 | `log` | `supporting_evidence` | Create the browser gamepad/controller widget with safe defaults. | [结果 PNG](assets/05_controller_widget_note_result.png) / [代码卡](assets/05_controller_widget_note.png) |
-| Cell 32 | `log` | `supporting_evidence` | Run the precompute cell that fills transition/value tables. | [结果 PNG](assets/06_transition_table_precompute_result.png) / [代码卡](assets/06_transition_table_precompute.png) |
-| Cell 35 | `plot` | `key_visual` | Plot the learning score over epochs. | [结果 PNG](assets/07_value_learning_curve_result.png) / [代码卡](assets/07_value_learning_curve.png) |
+| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+| Cell 17 | `plot` | `key_visual` | UMAP motion-field embedding: The plot makes the motion-field neighborhood structure visible. | `plot` | [结果 PNG](assets/03_umap_motion_field_result.png) |
+| Cell 35 | `plot` | `key_visual` | Value-learning score curve: The curve gives a quick read on whether the learned policy is stabilizing. | `plot` | [结果 PNG](assets/07_value_learning_curve_result.png) |
+
 
 ## 代码 Cell 与可视化结果
 

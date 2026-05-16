@@ -289,20 +289,16 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 real_ti
 
 ## 重点可视化 / 动画
 
-README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 [打开/下载总览 WebM](assets/00-walkthrough.webm)
 
-| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
-| --- | --- | --- | --- | --- |
-| Cell 4 | `log` | `supporting_evidence` | Load the character and print added heel/ball bone indices. | [结果 PNG](assets/01_source_animation_viewer_result.png) / [代码卡](assets/01_source_animation_viewer.png) |
-| Cell 13 | `table` | `supporting_evidence` | Build short motion clips and output the number of clips. | [结果 PNG](assets/02_motion_clip_contact_axes_result.png) / [代码卡](assets/02_motion_clip_contact_axes.png) |
-| Cell 25 | `log` | `supporting_evidence` | Iterate over clip pairs and compute physical continuity costs and delta states. | [结果 PNG](assets/03_player_transition_blend_result.png) / [代码卡](assets/03_player_transition_blend.png) |
-| Cell 30 | `plot` | `key_visual` | Plot the mean/min/max value-learning curve. | [结果 PNG](assets/04_orientation_policy_controller_result.png) / [代码卡](assets/04_orientation_policy_controller.png) |
-| Cell 35 | `table` | `supporting_evidence` | Print local end positions for stopping clips. | [结果 PNG](assets/05_reach_goal_target_tracking_result.png) / [代码卡](assets/05_reach_goal_target_tracking.png) |
-| Cell 45 | `plot` | `key_visual` | Plot the value function over a two-dimensional target space. | [结果 PNG](assets/06_value_surface_clip16_result.png) / [代码卡](assets/06_value_surface_clip16.png) |
-| Cell 61 | `table` | `supporting_evidence` | Build motion groups and output the group count. | [结果 PNG](assets/07_motion_group_weight_blend_result.png) / [代码卡](assets/07_motion_group_weight_blend.png) |
-| Cell 72 | `plot` | `key_visual` | Plot the parameterized MotionGroup policy-learning curve. | [结果 PNG](assets/08_group_reach_goal_result_result.png) / [代码卡](assets/08_group_reach_goal_result.png) |
+| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+| Cell 30 | `plot` | `key_visual` | Orientation policy value-learning curve: A decreasing curve indicates that the policy is stabilizing in the current state space. | `plot` | [结果 PNG](assets/04_orientation_policy_controller_result.png) |
+| Cell 45 | `plot` | `key_visual` | clip 16 value surface: The surface shows the future cost of reaching different target positions from one clip. | `plot` | [结果 PNG](assets/06_value_surface_clip16_result.png) |
+| Cell 72 | `plot` | `key_visual` | MotionGroup policy-learning curve: The plot verifies that a useful policy can still be learned after moving from clips to motion groups. | `plot` | [结果 PNG](assets/08_group_reach_goal_result_result.png) |
+
 
 ## 代码 Cell 与可视化结果
 

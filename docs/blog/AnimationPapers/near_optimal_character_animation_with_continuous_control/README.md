@@ -132,24 +132,22 @@ contact viewer 验证物理约束；transition cost 说明离线控制模型；v
 
 ## 重点可视化 / 动画
 
-README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 [打开/下载总览 WebM](assets/00-walkthrough.webm)
 
-![Optimal-policy controller](assets/08_optimal_policy_player_preview.gif)
+![Source clip playback](assets/02_source_clip_playback_preview.gif)
 
-[打开 MP4](assets/08_optimal_policy_player_preview.mp4) / [打开 WebM](assets/08_optimal_policy_player_preview.webm)
+[打开 MP4](assets/02_source_clip_playback_preview.mp4) / [打开 WebM](assets/02_source_clip_playback_preview.webm)
 
-| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
-| --- | --- | --- | --- | --- |
-| Cell 5 | `log` | `supporting_evidence` | Load the character and add helper bones for foot constraints. | [结果 PNG](assets/01_load_character_helpers_result.png) / [代码卡](assets/01_load_character_helpers.png) |
-| Cell 9 | `timeline_viewer` | `key_animation` | Render source locomotion clips before planning. | [结果 PNG](assets/02_source_clip_playback_result.png) / [GIF](assets/02_source_clip_playback_preview.gif) / [MP4](assets/02_source_clip_playback_preview.mp4) / [WebM](assets/02_source_clip_playback_preview.webm) / [代码卡](assets/02_source_clip_playback.png) |
-| Cell 11 | `table` | `supporting_evidence` | Slice source motion into fixed-length clips and print the count. | [结果 PNG](assets/03_clip_count_table_result.png) / [代码卡](assets/03_clip_count_table.png) |
-| Cell 16 | `timeline_viewer` | `key_animation` | Render a selected clip with contact and constraint debug information. | [结果 PNG](assets/04_contact_constraint_viewer_result.png) / [GIF](assets/04_contact_constraint_viewer_preview.gif) / [MP4](assets/04_contact_constraint_viewer_preview.mp4) / [WebM](assets/04_contact_constraint_viewer_preview.webm) / [代码卡](assets/04_contact_constraint_viewer.png) |
-| Cell 19 | `timeline_viewer` | `key_animation` | Play through clip transitions with the Player abstraction. | [结果 PNG](assets/05_random_transition_player_result.png) / [GIF](assets/05_random_transition_player_preview.gif) / [MP4](assets/05_random_transition_player_preview.mp4) / [WebM](assets/05_random_transition_player_preview.webm) / [代码卡](assets/05_random_transition_player.png) |
-| Cell 21 | `log` | `supporting_evidence` | Compute transition costs between candidate clips. | [结果 PNG](assets/06_transition_cost_precompute_result.png) / [代码卡](assets/06_transition_cost_precompute.png) |
-| Cell 36 | `plot` | `key_visual` | Plot a learned value function over position and orientation state. | [结果 PNG](assets/07_learned_value_surface_result.png) / [代码卡](assets/07_learned_value_surface.png) |
-| Cell 38 | `timeline_viewer` | `key_animation` | Run the final optimal-policy player with browser-safe default controller input. | [结果 PNG](assets/08_optimal_policy_player_result.png) / [GIF](assets/08_optimal_policy_player_preview.gif) / [MP4](assets/08_optimal_policy_player_preview.mp4) / [WebM](assets/08_optimal_policy_player_preview.webm) / [代码卡](assets/08_optimal_policy_player.png) |
+| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+| Cell 9 | `timeline_viewer` | `key_animation` | Source clip playback: The viewer establishes the motion vocabulary available to the planner. | `canvas` | [结果 PNG](assets/02_source_clip_playback_result.png) / [GIF](assets/02_source_clip_playback_preview.gif) / [MP4](assets/02_source_clip_playback_preview.mp4) / [WebM](assets/02_source_clip_playback_preview.webm) |
+| Cell 16 | `timeline_viewer` | `key_animation` | Clip contact constraints: The viewer shows how physical plausibility is represented before planning. | `canvas` | [结果 PNG](assets/04_contact_constraint_viewer_result.png) / [GIF](assets/04_contact_constraint_viewer_preview.gif) / [MP4](assets/04_contact_constraint_viewer_preview.mp4) / [WebM](assets/04_contact_constraint_viewer_preview.webm) |
+| Cell 19 | `timeline_viewer` | `key_animation` | Random transition player: This validates that clips can be stitched into continuous playback. | `canvas` | [结果 PNG](assets/05_random_transition_player_result.png) / [GIF](assets/05_random_transition_player_preview.gif) / [MP4](assets/05_random_transition_player_preview.mp4) / [WebM](assets/05_random_transition_player_preview.webm) |
+| Cell 36 | `plot` | `key_visual` | Learned value surface: The surface makes the optimal-control objective visible as future cost. | `plot` | [结果 PNG](assets/07_learned_value_surface_result.png) |
+| Cell 38 | `timeline_viewer` | `key_animation` | Optimal-policy controller: The viewer checks that the policy callback advances without requiring a physical gamepad. | `canvas` | [结果 PNG](assets/08_optimal_policy_player_result.png) / [GIF](assets/08_optimal_policy_player_preview.gif) / [MP4](assets/08_optimal_policy_player_preview.mp4) / [WebM](assets/08_optimal_policy_player_preview.webm) |
+
 
 ## 代码 Cell 与可视化结果
 

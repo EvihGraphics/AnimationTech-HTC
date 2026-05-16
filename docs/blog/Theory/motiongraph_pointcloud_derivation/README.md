@@ -142,18 +142,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 motiong
 
 ## 重点可视化 / 动画
 
-README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 [打开/下载总览 WebM](assets/00-walkthrough.webm)
 
-| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
-| --- | --- | --- | --- | --- |
-| Cell 4 | `formula` | `supporting_evidence` | Display the weighted squared-distance objective for point-cloud alignment. | [结果 PNG](assets/01_alignment_objective_formula_result.png) / [代码卡](assets/01_alignment_objective_formula.png) |
-| Cell 6 | `latex` | `supporting_evidence` | Differentiate the objective with respect to rotation and translation. | [结果 PNG](assets/02_partial_derivatives_result.png) / [代码卡](assets/02_partial_derivatives.png) |
-| Cell 8 | `latex` | `supporting_evidence` | Expand the derivative equations before substitution. | [结果 PNG](assets/03_expanded_stationarity_result.png) / [代码卡](assets/03_expanded_stationarity.png) |
-| Cell 13 | `latex` | `supporting_evidence` | Introduce compact weighted-sum symbols for the derivation. | [结果 PNG](assets/04_weighted_sum_shorthand_result.png) / [代码卡](assets/04_weighted_sum_shorthand.png) |
-| Cell 16 | `formula` | `supporting_evidence` | Solve the translation equations for x0 and z0. | [结果 PNG](assets/05_translation_solution_result.png) / [代码卡](assets/05_translation_solution.png) |
-| Cell 20 | `formula` | `supporting_evidence` | Collect sine/cosine terms and derive the atan form. | [结果 PNG](assets/06_theta_solution_result.png) / [代码卡](assets/06_theta_solution.png) |
+| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+
 
 ## 代码 Cell 与可视化结果
 

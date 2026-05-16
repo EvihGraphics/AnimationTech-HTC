@@ -220,23 +220,23 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 motion_
 
 ## 重点可视化 / 动画
 
-README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 [打开/下载总览 WebM](assets/00-walkthrough.webm)
 
-![Stop and turn debug frame](assets/fast_stop_turn_cases_preview.gif)
+![Runtime Player search loop](assets/inertialization_transition_preview.gif)
 
-[打开 MP4](assets/fast_stop_turn_cases_preview.mp4) / [打开 WebM](assets/fast_stop_turn_cases_preview.webm)
+[打开 MP4](assets/inertialization_transition_preview.mp4) / [打开 WebM](assets/inertialization_transition_preview.webm)
 
-| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
-| --- | --- | --- | --- | --- |
-| Cell 9 | `viewer` | `key_visual` | Update root position, velocity, and orientation with a spring-damper model. | [结果 PNG](assets/spring_damper_prediction_result.png) / [代码卡](assets/spring_damper_prediction.png) |
-| Cell 14 | `viewer` | `key_visual` | Render the imported locomotion clips. | [结果 PNG](assets/motion_matching_overview_result.png) / [代码卡](assets/motion_matching_overview.png) |
-| Cell 18 | `viewer` | `key_visual` | Visualize filtered bone positions, root velocity, and facing direction. | [结果 PNG](assets/trajectory_query_runtime_result.png) / [代码卡](assets/trajectory_query_runtime.png) |
-| Cell 21 | `viewer` | `key_visual` | Show hips, foot, and future-trajectory debug lines in the viewer. | [结果 PNG](assets/feature_vector_layout_result.png) / [代码卡](assets/feature_vector_layout.png) |
-| Cell 23 | `code_only` | `code_evidence` | Compute features_mean, features_std, and the normalized database. | [结果 PNG](assets/feature_database_debug_result.png) / [代码卡](assets/feature_database_debug.png) |
-| Cell 26 | `timeline_viewer` | `key_animation` | Build a query, find the best frame, jump playback, and smooth the transition with inertialization. | [结果 PNG](assets/inertialization_transition_result.png) / [GIF](assets/inertialization_transition_preview.gif) / [MP4](assets/inertialization_transition_preview.mp4) / [WebM](assets/inertialization_transition_preview.webm) / [代码卡](assets/inertialization_transition.png) |
-| Cell 26 | `timeline_viewer` | `key_animation` | Inspect another runtime frame in the Player cell. | [结果 PNG](assets/fast_stop_turn_cases_result.png) / [GIF](assets/fast_stop_turn_cases_preview.gif) / [MP4](assets/fast_stop_turn_cases_preview.mp4) / [WebM](assets/fast_stop_turn_cases_preview.webm) / [代码卡](assets/fast_stop_turn_cases.png) |
+| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+| Cell 9 | `viewer` | `key_visual` | Spring-damper future trajectory: This is the source of the future trajectory target used in the motion-matching query. | `canvas` | [结果 PNG](assets/spring_damper_prediction_result.png) |
+| Cell 14 | `viewer` | `key_visual` | Source locomotion clip playback: The database is built from real motion frames, not from generated poses. | `canvas` | [结果 PNG](assets/motion_matching_overview_result.png) |
+| Cell 18 | `viewer` | `key_visual` | Filtered root displacement and orientation: Stable velocity and orientation estimates reduce noise in nearest-neighbor search. | `canvas` | [结果 PNG](assets/trajectory_query_runtime_result.png) |
+| Cell 21 | `viewer` | `key_visual` | 33-dimensional feature layout: The abstract feature vector becomes visible as body parts and trajectory targets. | `canvas` | [结果 PNG](assets/feature_vector_layout_result.png) |
+| Cell 26 | `timeline_viewer` | `key_animation` | Runtime Player search loop: This is the closed loop that connects input prediction, feature search, and visual playback. | `canvas` | [结果 PNG](assets/inertialization_transition_result.png) / [GIF](assets/inertialization_transition_preview.gif) / [MP4](assets/inertialization_transition_preview.mp4) / [WebM](assets/inertialization_transition_preview.webm) |
+| Cell 26 | `timeline_viewer` | `key_animation` | Stop and turn debug frame: Stop and sharp-turn cases are useful stress tests for matching quality. | `canvas` | [结果 PNG](assets/fast_stop_turn_cases_result.png) / [GIF](assets/fast_stop_turn_cases_preview.gif) / [MP4](assets/fast_stop_turn_cases_preview.mp4) / [WebM](assets/fast_stop_turn_cases_preview.webm) |
+
 
 ## 代码 Cell 与可视化结果
 

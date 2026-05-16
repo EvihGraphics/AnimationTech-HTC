@@ -33,18 +33,28 @@
           "result_meaning": "The curve is constrained by the control polygon rather than being an isolated function plot.",
           "card_file": "01-bezier-de-casteljau.png",
           "result_file": "01-bezier-de-casteljau_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Bezier control polygons and curves: The curve is constrained by the control polygon rather than being an isolated function plot.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "bspline-basis",
           "cell_index": 64,
-          "output_type": "plot",
+          "output_type": "viewer",
           "title": "Cox-De Boor basis functions",
           "code_purpose": "Plot recursively constructed B-Spline basis functions.",
           "result_meaning": "Local support explains why one B-Spline control point affects only a local curve span.",
           "card_file": "02-bernstein-basis.png",
           "result_file": "02-bernstein-basis_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Cox-De Boor basis functions: Local support explains why one B-Spline control point affects only a local curve span.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "bezier-spline",
@@ -55,7 +65,12 @@
           "result_meaning": "Long paths are built from local spans, and shared endpoints control continuity.",
           "card_file": "03-bezier-control-polygon.png",
           "result_file": "03-bezier-control-polygon_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Multi-segment Bezier spline: Long paths are built from local spans, and shared endpoints control continuity.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "symbolic-derivation",
@@ -66,7 +81,12 @@
           "result_meaning": "The symbolic output proves that recursive interpolation and Bernstein polynomials describe the same cubic Bezier.",
           "card_file": "04-rational-bezier-weight.png",
           "result_file": "04-rational-bezier-weight_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "De Casteljau versus Bernstein derivation: The symbolic output proves that recursive interpolation and Bernstein polynomials describe the same cubic Bezier.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "cubic-motivation",
@@ -77,7 +97,12 @@
           "result_meaning": "Cubic curves can control both position and derivative, which is why they are common in animation curves.",
           "card_file": "05-cubic-bezier-spline.png",
           "result_file": "05-cubic-bezier-spline_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Cubic curve shape control: Cubic curves can control both position and derivative, which is why they are common in animation curves.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "hermite",
@@ -88,7 +113,12 @@
           "result_meaning": "Velocity and tangent information are as important as position values in animation curves.",
           "card_file": "06-hermite-tangents.png",
           "result_file": "06-hermite-tangents_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Hermite endpoints and tangents: Velocity and tangent information are as important as position values in animation curves.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "cardinal",
@@ -99,7 +129,12 @@
           "result_meaning": "Cardinal splines estimate tangents from neighboring points and pass through key points.",
           "card_file": "07-cardinal-tension.png",
           "result_file": "07-cardinal-tension_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Cardinal spline tension: Cardinal splines estimate tangents from neighboring points and pass through key points.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "continuity",
@@ -110,7 +145,12 @@
           "result_meaning": "The output separates positional continuity, velocity continuity, and higher-order smoothness.",
           "card_file": "08-cardinal-continuity.png",
           "result_file": "08-cardinal-continuity_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Continuity construction: The output separates positional continuity, velocity continuity, and higher-order smoothness.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "bspline-local",
@@ -121,7 +161,12 @@
           "result_meaning": "B-Splines are smooth approximations and usually do not pass through every control point.",
           "card_file": "09-bspline-local-support.png",
           "result_file": "09-bspline-local-support_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Uniform cubic B-Spline: B-Splines are smooth approximations and usually do not pass through every control point.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "keyframe-hermite",
@@ -132,7 +177,12 @@
           "result_meaning": "This transfers geometric curve ideas to animation-editor keyframe curves.",
           "card_file": "10-keyframe-hermite.png",
           "result_file": "10-keyframe-hermite_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "1D Hermite keyframe curve: This transfers geometric curve ideas to animation-editor keyframe curves.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "nonuniform-cardinal",
@@ -143,7 +193,12 @@
           "result_meaning": "Treating parameter t as real time can place samples incorrectly.",
           "card_file": "11-nonuniform-cardinal-time.png",
           "result_file": "11-nonuniform-cardinal-time_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Non-uniform Cardinal time: Treating parameter t as real time can place samples incorrectly.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "bezier-root",
@@ -154,7 +209,12 @@
           "result_meaning": "Animation systems often need to solve internal curve parameters from frame time.",
           "card_file": "12-bezier-time-root.png",
           "result_file": "12-bezier-time-root_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Bezier time root solving: Animation systems often need to solve internal curve parameters from frame time.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "bspline-fitting",
@@ -165,7 +225,12 @@
           "result_meaning": "The fitted curve does not need to pass through every sample, but it preserves a stable trend.",
           "card_file": "13-bspline-fitting.png",
           "result_file": "13-bspline-fitting_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "B-Spline least-squares fitting: The fitted curve does not need to pass through every sample, but it preserves a stable trend.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         }
       ],
       "video_step": {
@@ -215,7 +280,12 @@
               "role": "timeline",
               "fraction": 0.5
             }
-          ]
+          ],
+          "capture_kind": "canvas",
+          "visual_subject": "Generated strip mesh baseline: This baseline shows the graph vertices and edges before Laplacian reconstruction.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas"
         },
         {
           "id": "unanchored-reconstruction",
@@ -226,7 +296,12 @@
           "result_meaning": "The result shows why Laplacian coordinates alone do not fix global placement.",
           "card_file": "02_unanchored_reconstruction.png",
           "result_file": "02_unanchored_reconstruction_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "canvas",
+          "visual_subject": "Unanchored Laplacian reconstruction: The result shows why Laplacian coordinates alone do not fix global placement.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas"
         },
         {
           "id": "two-anchor-solve",
@@ -237,7 +312,12 @@
           "result_meaning": "Anchors turn relative differential coordinates into a positioned shape.",
           "card_file": "03_two_anchor_solve.png",
           "result_file": "03_two_anchor_solve_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "canvas",
+          "visual_subject": "Two-anchor reconstruction: Anchors turn relative differential coordinates into a positioned shape.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas"
         },
         {
           "id": "three-anchor-deform",
@@ -248,7 +328,12 @@
           "result_meaning": "The viewer shows local deformation propagating through the graph.",
           "card_file": "04_three_anchor_deformation.png",
           "result_file": "04_three_anchor_deformation_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "canvas",
+          "visual_subject": "Three-anchor deformation: The viewer shows local deformation propagating through the graph.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas"
         },
         {
           "id": "vectorized-3d",
@@ -259,7 +344,12 @@
           "result_meaning": "The same linear machinery scales from 2D graph points to 3D animation vertices.",
           "card_file": "05_vectorized_3d_solve.png",
           "result_file": "05_vectorized_3d_solve_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "canvas",
+          "visual_subject": "Vectorized 3D Laplacian solve: The same linear machinery scales from 2D graph points to 3D animation vertices.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas"
         },
         {
           "id": "rotation-invariance",
@@ -305,7 +395,12 @@
           ],
           "preview_gif": "06_rotation_invariance_controls_preview.gif",
           "video_mp4": "06_rotation_invariance_controls_preview.mp4",
-          "video_webm": "06_rotation_invariance_controls_preview.webm"
+          "video_webm": "06_rotation_invariance_controls_preview.webm",
+          "capture_kind": "widget_controls",
+          "visual_subject": "Rotation-invariant deformation controls: The controls reveal which constraints preserve shape while allowing deformation.",
+          "capture_selector": "output widget controls",
+          "publish_media_required": true,
+          "media_provenance": "live_widget_controls"
         },
         {
           "id": "animation-graph",
@@ -328,7 +423,13 @@
           ],
           "preview_gif": "07_animation_graph_deformation_preview.gif",
           "video_mp4": "07_animation_graph_deformation_preview.mp4",
-          "video_webm": "07_animation_graph_deformation_preview.webm"
+          "video_webm": "07_animation_graph_deformation_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Animation graph reconstruction: The timeline viewer shows Laplacian deformation applied to animated pose data.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "curved-locomotion",
@@ -351,7 +452,13 @@
           ],
           "preview_gif": "08_curved_locomotion_result_preview.gif",
           "video_mp4": "08_curved_locomotion_result_preview.mp4",
-          "video_webm": "08_curved_locomotion_result_preview.webm"
+          "video_webm": "08_curved_locomotion_result_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Curved locomotion result: The final viewer checks whether graph deformation can redirect locomotion smoothly.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         }
       ],
       "video_step": {
@@ -387,7 +494,12 @@
           "result_meaning": "The formula states exactly what motion-graph transition alignment minimizes.",
           "card_file": "01_alignment_objective_formula.png",
           "result_file": "01_alignment_objective_formula_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "formula",
+          "visual_subject": "Weighted point-cloud objective: The formula states exactly what motion-graph transition alignment minimizes.",
+          "capture_selector": "executed output text/latex|text/plain formula",
+          "publish_media_required": false,
+          "media_provenance": "executed_formula_output"
         },
         {
           "id": "derivatives",
@@ -398,7 +510,12 @@
           "result_meaning": "The derivatives define the first-order conditions for the optimal alignment.",
           "card_file": "02_partial_derivatives.png",
           "result_file": "02_partial_derivatives_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "formula",
+          "visual_subject": "Partial derivatives: The derivatives define the first-order conditions for the optimal alignment.",
+          "capture_selector": "executed output text/latex|text/plain formula",
+          "publish_media_required": false,
+          "media_provenance": "executed_formula_output"
         },
         {
           "id": "expanded-equations",
@@ -409,7 +526,12 @@
           "result_meaning": "The raw equations show where the sine, cosine, and translation terms come from.",
           "card_file": "03_expanded_stationarity.png",
           "result_file": "03_expanded_stationarity_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "formula",
+          "visual_subject": "Expanded stationarity equations: The raw equations show where the sine, cosine, and translation terms come from.",
+          "capture_selector": "executed output text/latex|text/plain formula",
+          "publish_media_required": false,
+          "media_provenance": "executed_formula_output"
         },
         {
           "id": "weighted-shorthand",
@@ -420,7 +542,12 @@
           "result_meaning": "The shorthand turns large sums into readable centroid-like expressions.",
           "card_file": "04_weighted_sum_shorthand.png",
           "result_file": "04_weighted_sum_shorthand_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "formula",
+          "visual_subject": "Weighted-sum shorthand: The shorthand turns large sums into readable centroid-like expressions.",
+          "capture_selector": "executed output text/latex|text/plain formula",
+          "publish_media_required": false,
+          "media_provenance": "executed_formula_output"
         },
         {
           "id": "translation-solution",
@@ -431,7 +558,12 @@
           "result_meaning": "The result separates translation from the remaining rotation solve.",
           "card_file": "05_translation_solution.png",
           "result_file": "05_translation_solution_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "formula",
+          "visual_subject": "Closed-form translation solution: The result separates translation from the remaining rotation solve.",
+          "capture_selector": "executed output text/latex|text/plain formula",
+          "publish_media_required": false,
+          "media_provenance": "executed_formula_output"
         },
         {
           "id": "theta-solution",
@@ -442,7 +574,12 @@
           "result_meaning": "The final expression is the closed-form rotation used for point-cloud alignment.",
           "card_file": "06_theta_solution.png",
           "result_file": "06_theta_solution_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "formula",
+          "visual_subject": "Final theta solution: The final expression is the closed-form rotation used for point-cloud alignment.",
+          "capture_selector": "executed output text/latex|text/plain formula",
+          "publish_media_required": false,
+          "media_provenance": "executed_formula_output"
         }
       ],
       "video_step": {
@@ -478,7 +615,12 @@
           "result_meaning": "The plot establishes what the RBF interpolator must reconstruct.",
           "card_file": "01_sample_function_points.png",
           "result_file": "01_sample_function_points_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Sample function and sparse points: The plot establishes what the RBF interpolator must reconstruct.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "gaussian-kernels",
@@ -489,7 +631,12 @@
           "result_meaning": "The graph shows each sample as a local influence field.",
           "card_file": "02_gaussian_kernel_influence.png",
           "result_file": "02_gaussian_kernel_influence_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Gaussian kernel influence: The graph shows each sample as a local influence field.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "kernel-matrix",
@@ -500,7 +647,12 @@
           "result_meaning": "The matrix is the linear system that determines interpolation weights.",
           "card_file": "03_distance_kernel_matrix.png",
           "result_file": "03_distance_kernel_matrix_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Distance and kernel matrices: The matrix is the linear system that determines interpolation weights.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "rbf-weights",
@@ -511,7 +663,12 @@
           "result_meaning": "The weights tell how much each radial basis contributes to the reconstruction.",
           "card_file": "04_rbf_weights.png",
           "result_file": "04_rbf_weights_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Solved RBF weights: The weights tell how much each radial basis contributes to the reconstruction.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "interpolation-result",
@@ -522,7 +679,12 @@
           "result_meaning": "The plot checks that local kernels reconstruct the target curve between samples.",
           "card_file": "05_interpolated_query_result.png",
           "result_file": "05_interpolated_query_result_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Interpolated curve and query sample: The plot checks that local kernels reconstruct the target curve between samples.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "polynomial-basis",
@@ -533,7 +695,12 @@
           "result_meaning": "The augmentation adds a global trend term alongside local kernels.",
           "card_file": "06_polynomial_basis_matrix.png",
           "result_file": "06_polynomial_basis_matrix_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Polynomial augmentation matrix: The augmentation adds a global trend term alongside local kernels.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "augmented-fit",
@@ -544,7 +711,12 @@
           "result_meaning": "The final curve preserves both sparse samples and stable large-scale behavior.",
           "card_file": "07_augmented_rbf_fit.png",
           "result_file": "07_augmented_rbf_fit_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Augmented RBF fit: The final curve preserves both sparse samples and stable large-scale behavior.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         }
       ],
       "video_step": {
@@ -580,7 +752,12 @@
           "result_meaning": "The plot connects semantic directions to observed color/motion samples.",
           "card_file": "01_sample_adverb_space.png",
           "result_file": "01_sample_adverb_space_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Sample adverb color space: The plot connects semantic directions to observed color/motion samples.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "adverb-encoding",
@@ -591,7 +768,12 @@
           "result_meaning": "The matrix is the feature space used for linear and radial interpolation.",
           "card_file": "02_4d_adverb_encoding.png",
           "result_file": "02_4d_adverb_encoding_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Four-dimensional adverb encoding: The matrix is the feature space used for linear and radial interpolation.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "linear-coefficients",
@@ -602,7 +784,12 @@
           "result_meaning": "The coefficients capture the broad global trend in adverb space.",
           "card_file": "03_linear_coefficients.png",
           "result_file": "03_linear_coefficients_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Linear model coefficients: The coefficients capture the broad global trend in adverb space.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "linear-field",
@@ -613,7 +800,12 @@
           "result_meaning": "The broad field shows what linear interpolation can and cannot explain.",
           "card_file": "04_linear_color_field.png",
           "result_file": "04_linear_color_field_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Linear color field: The broad field shows what linear interpolation can and cannot explain.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "residuals",
@@ -624,7 +816,12 @@
           "result_meaning": "Residuals are the local details that the radial basis layer must recover.",
           "card_file": "05_linear_residuals.png",
           "result_file": "05_linear_residuals_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Linear residuals: Residuals are the local details that the radial basis layer must recover.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "b3-basis",
@@ -635,7 +832,12 @@
           "result_meaning": "The compact-support basis defines how far each example influences the field.",
           "card_file": "06_cubic_bspline_basis.png",
           "result_file": "06_cubic_bspline_basis_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Cubic B-spline radial basis: The compact-support basis defines how far each example influences the field.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "radial-system",
@@ -646,7 +848,12 @@
           "result_meaning": "The system transforms residual examples into a smooth correction field.",
           "card_file": "07_radial_system_solve.png",
           "result_file": "07_radial_system_solve_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Radial coefficient solve: The system transforms residual examples into a smooth correction field.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "final-rbf-field",
@@ -657,7 +864,12 @@
           "result_meaning": "The field shows local semantic control beyond the linear trend.",
           "card_file": "08_final_rbf_field.png",
           "result_file": "08_final_rbf_field_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Residual-corrected RBF field: The field shows local semantic control beyond the linear trend.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         }
       ],
       "video_step": {
@@ -701,7 +913,12 @@
               "role": "timeline",
               "fraction": 0.2
             }
-          ]
+          ],
+          "capture_kind": "canvas",
+          "visual_subject": "Character bind pose and skeleton viewer: This confirms that the animation data can drive the live viewer; later format, mapping, and root-motion discussions use this visual baseline.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas"
         },
         {
           "id": "raw-bvh-skeleton",
@@ -721,7 +938,12 @@
               "role": "timeline",
               "fraction": 0.35
             }
-          ]
+          ],
+          "capture_kind": "canvas",
+          "visual_subject": "Raw BVH skeleton-only view: Separating the mesh from the skeleton lets the reader inspect the joint hierarchy directly.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas"
         },
         {
           "id": "tensor-shapes",
@@ -732,7 +954,12 @@
           "result_meaning": "The log shows that an animation is represented as frame x bone x channel arrays.",
           "card_file": "03_tensor_shape_output.png",
           "result_file": "03_tensor_shape_output_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "pos/quats tensor shape output: The log shows that an animation is represented as frame x bone x channel arrays.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "raw-vs-mapped",
@@ -752,7 +979,12 @@
               "role": "timeline",
               "fraction": 0.45
             }
-          ]
+          ],
+          "capture_kind": "canvas",
+          "visual_subject": "Raw skeleton versus mapped skeleton: This shows that mapping adapts hierarchy and pose to the character while preserving the time structure.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas"
         },
         {
           "id": "skeleton-tree",
@@ -763,7 +995,12 @@
           "result_meaning": "The textual tree turns the viewer difference into an inspectable parent-child hierarchy.",
           "card_file": "05_skeleton_tree_output.png",
           "result_file": "05_skeleton_tree_output_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Skeleton parent tree output: The textual tree turns the viewer difference into an inspectable parent-child hierarchy.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "root-projection",
@@ -786,7 +1023,13 @@
           ],
           "preview_gif": "06_root_projection_motion_preview.gif",
           "video_mp4": "06_root_projection_motion_preview.mp4",
-          "video_webm": "06_root_projection_motion_preview.webm"
+          "video_webm": "06_root_projection_motion_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Root projection and Root/Hips split: The result explains how global displacement and local body pose are stored separately.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "static-root-toggles",
@@ -817,7 +1060,13 @@
           ],
           "preview_gif": "07_static_root_toggles_preview.gif",
           "video_mp4": "07_static_root_toggles_preview.mp4",
-          "video_webm": "07_static_root_toggles_preview.webm"
+          "video_webm": "07_static_root_toggles_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Static Root toggle comparison: This makes the role of Root translation and rotation visible in the animated result.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         }
       ],
       "video_step": {
@@ -862,7 +1111,24 @@
               "role": "timeline",
               "fraction": 0.25
             }
-          ]
+          ],
+          "capture_kind": "canvas",
+          "visual_subject": "keep_translation comparison: root motion channel versus local joint offset responsibility.",
+          "capture_selector": "page canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "camera": {
+            "target": "animation_root",
+            "offset": [
+              -186.0,
+              120.0,
+              211.0
+            ],
+            "pitch": -20,
+            "yaw": -45
+          },
+          "live_render": "render_compare_spheres({frame})"
         },
         {
           "id": "contact-signal",
@@ -873,7 +1139,12 @@
           "result_meaning": "These signals decide which foot points should stay fixed in world space.",
           "card_file": "03_contact_signal_timeline.png",
           "result_file": "03_contact_signal_timeline_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Four foot-contact signals: These signals decide which foot points should stay fixed in world space.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_image"
         },
         {
           "id": "contact-targets",
@@ -893,11 +1164,29 @@
               "role": "timeline",
               "fraction": 0.4
             }
-          ]
+          ],
+          "capture_kind": "canvas",
+          "visual_subject": "Contact target points: heel and ball anchors remain fixed during detected contact spans.",
+          "capture_selector": "page canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "camera": {
+            "target": "animation_root",
+            "offset": [
+              -186.0,
+              120.0,
+              211.0
+            ],
+            "pitch": -20,
+            "yaw": -45
+          },
+          "live_prepare_cell": 19,
+          "live_render": "render({frame})"
         },
         {
           "id": "ankle-root-axes",
-          "cell_index": 22,
+          "cell_index": 25,
           "output_type": "viewer",
           "title": "Ankle and root debug axes",
           "code_purpose": "Render ankle and root helper axes while the contact constraints are active.",
@@ -913,7 +1202,25 @@
               "role": "timeline",
               "fraction": 0.5
             }
-          ]
+          ],
+          "capture_kind": "canvas",
+          "visual_subject": "Ankle and root debug axes: orientation and root compensation vectors are visible at the constrained joints.",
+          "capture_selector": "page canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "camera": {
+            "target": "animation_root",
+            "offset": [
+              -186.0,
+              120.0,
+              211.0
+            ],
+            "pitch": -20,
+            "yaw": -45
+          },
+          "live_prepare_cell": 25,
+          "live_render": "render({frame})"
         },
         {
           "id": "knee-damping",
@@ -924,7 +1231,12 @@
           "result_meaning": "The curve explains how correction error is smoothly distributed through the leg chain.",
           "card_file": "04_constraint_buffer_debug.png",
           "result_file": "04_constraint_buffer_debug_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "IK knee damping curve: The curve explains how correction error is smoothly distributed through the leg chain.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_image"
         },
         {
           "id": "solved-comparison",
@@ -943,8 +1255,67 @@
               "index": 0,
               "role": "timeline",
               "fraction": 0.55
+            },
+            {
+              "kind": "checkbox",
+              "index": 0,
+              "checked": true
             }
-          ]
+          ],
+          "capture_variants": [
+            {
+              "label": "Original",
+              "controls": [
+                {
+                  "kind": "slider",
+                  "index": 0,
+                  "role": "timeline",
+                  "fraction": 0.55
+                },
+                {
+                  "kind": "checkbox",
+                  "index": 0,
+                  "checked": false
+                }
+              ],
+              "live_render": "render({frame}, solved=False)"
+            },
+            {
+              "label": "Compute IK",
+              "controls": [
+                {
+                  "kind": "slider",
+                  "index": 0,
+                  "role": "timeline",
+                  "fraction": 0.55
+                },
+                {
+                  "kind": "checkbox",
+                  "index": 0,
+                  "checked": true
+                }
+              ],
+              "live_render": "render({frame}, solved=True)"
+            }
+          ],
+          "capture_kind": "canvas",
+          "visual_subject": "Original versus IK-solved animation: foot drift is reduced toward the planted-foot band.",
+          "capture_selector": "page canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "camera": {
+            "target": "animation_root",
+            "offset": [
+              -186.0,
+              120.0,
+              211.0
+            ],
+            "pitch": -20,
+            "yaw": -45
+          },
+          "live_prepare_cell": 29,
+          "live_render": "render({frame}, solved=True)"
         },
         {
           "id": "final-processing",
@@ -963,11 +1334,107 @@
               "index": 0,
               "role": "timeline",
               "fraction": 0.6
+            },
+            {
+              "kind": "checkbox",
+              "index": 0,
+              "checked": true
+            },
+            {
+              "kind": "checkbox",
+              "index": 1,
+              "checked": true
+            }
+          ],
+          "capture_variants": [
+            {
+              "label": "Original",
+              "controls": [
+                {
+                  "kind": "slider",
+                  "index": 0,
+                  "role": "timeline",
+                  "fraction": 0.6
+                },
+                {
+                  "kind": "checkbox",
+                  "index": 0,
+                  "checked": false
+                },
+                {
+                  "kind": "checkbox",
+                  "index": 1,
+                  "checked": true
+                }
+              ],
+              "live_render": "render({frame}, solved=False, final_processing=True)"
+            },
+            {
+              "label": "Compute IK",
+              "controls": [
+                {
+                  "kind": "slider",
+                  "index": 0,
+                  "role": "timeline",
+                  "fraction": 0.6
+                },
+                {
+                  "kind": "checkbox",
+                  "index": 0,
+                  "checked": true
+                },
+                {
+                  "kind": "checkbox",
+                  "index": 1,
+                  "checked": false
+                }
+              ],
+              "live_render": "render({frame}, solved=True, final_processing=False)"
+            },
+            {
+              "label": "Final Process",
+              "controls": [
+                {
+                  "kind": "slider",
+                  "index": 0,
+                  "role": "timeline",
+                  "fraction": 0.6
+                },
+                {
+                  "kind": "checkbox",
+                  "index": 0,
+                  "checked": true
+                },
+                {
+                  "kind": "checkbox",
+                  "index": 1,
+                  "checked": true
+                }
+              ],
+              "live_render": "render({frame}, solved=True, final_processing=True)"
             }
           ],
           "preview_gif": "06_final_processing_compare_preview.gif",
           "video_mp4": "06_final_processing_compare_preview.mp4",
-          "video_webm": "06_final_processing_compare_preview.webm"
+          "video_webm": "06_final_processing_compare_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Final Processing smoothstep blend: correction weight fades in/out across contact boundaries.",
+          "capture_selector": "page canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "camera": {
+            "target": "animation_root",
+            "offset": [
+              -186.0,
+              120.0,
+              211.0
+            ],
+            "pitch": -20,
+            "yaw": -45
+          },
+          "live_prepare_cell": 34,
+          "live_render": "render({frame}, solved=True, final_processing=True)"
         }
       ],
       "video_step": {
@@ -1004,7 +1471,12 @@
           "result_meaning": "The output confirms the face animation is stored as mesh topology plus a frame-indexed vertex stream.",
           "card_file": "01_data_load_shapes.png",
           "result_file": "01_data_load_shapes_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Face mesh data loading: The output confirms the face animation is stored as mesh topology plus a frame-indexed vertex stream.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "raw-face",
@@ -1027,7 +1499,13 @@
           ],
           "preview_gif": "02_raw_vertex_stream_viewer_preview.gif",
           "video_mp4": "02_raw_vertex_stream_viewer_preview.mp4",
-          "video_webm": "02_raw_vertex_stream_viewer_preview.webm"
+          "video_webm": "02_raw_vertex_stream_viewer_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Raw vertex-stream face playback: This shows the raw per-frame geometry playback before any compression.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "memory-size",
@@ -1038,7 +1516,12 @@
           "result_meaning": "The memory log motivates PCA compression by showing why full vertex streams are expensive.",
           "card_file": "03_memory_size_log.png",
           "result_file": "03_memory_size_log_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Raw animation memory size: The memory log motivates PCA compression by showing why full vertex streams are expensive.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "pca-components",
@@ -1049,7 +1532,12 @@
           "result_meaning": "The component count shows how a large vertex stream becomes a compact coefficient space.",
           "card_file": "04_pca_components_shape.png",
           "result_file": "04_pca_components_shape_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Seven PCA component layout: The component count shows how a large vertex stream becomes a compact coefficient space.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "pca-component-viewer",
@@ -1081,7 +1569,12 @@
           ],
           "preview_gif": "05_pca_component_viewer_preview.gif",
           "video_mp4": "05_pca_component_viewer_preview.mp4",
-          "video_webm": "05_pca_component_viewer_preview.webm"
+          "video_webm": "05_pca_component_viewer_preview.webm",
+          "capture_kind": "widget_controls",
+          "visual_subject": "PCA component deformation viewer: The widget makes a basis component visible as a facial deformation direction.",
+          "capture_selector": "output widget controls",
+          "publish_media_required": true,
+          "media_provenance": "live_widget_controls"
         },
         {
           "id": "cpu-reconstruction",
@@ -1104,7 +1597,13 @@
           ],
           "preview_gif": "06_cpu_reconstruction_compare_preview.gif",
           "video_mp4": "06_cpu_reconstruction_compare_preview.mp4",
-          "video_webm": "06_cpu_reconstruction_compare_preview.webm"
+          "video_webm": "06_cpu_reconstruction_compare_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "CPU PCA reconstruction playback: The viewer checks whether the compressed representation preserves the visible expression motion.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "gpu-reconstruction",
@@ -1127,7 +1626,13 @@
           ],
           "preview_gif": "07_gpu_shader_reconstruction_preview.gif",
           "video_mp4": "07_gpu_shader_reconstruction_preview.mp4",
-          "video_webm": "07_gpu_shader_reconstruction_preview.webm"
+          "video_webm": "07_gpu_shader_reconstruction_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "GPU shader PCA reconstruction: The final viewer shows the runtime-friendly form of the PCA facial animation pipeline.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         }
       ],
       "video_step": {
@@ -1163,7 +1668,12 @@
           "result_meaning": "The count defines how many temporal windows can contribute foot-contact examples.",
           "card_file": "01_clip_window_count.png",
           "result_file": "01_clip_window_count_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Animation windows and frame count: The count defines how many temporal windows can contribute foot-contact examples.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "feature-vector-code",
@@ -1174,7 +1684,12 @@
           "result_meaning": "The source card identifies what the classifier sees when deciding whether a foot should be planted.",
           "card_file": "02_feature_vector_construction.png",
           "result_file": "02_feature_vector_construction_result.png",
-          "media_role": "code_evidence"
+          "media_role": "code_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Foot-contact feature vector construction: The source card identifies what the classifier sees when deciding whether a foot should be planted.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "annotation-skip",
@@ -1185,7 +1700,12 @@
           "result_meaning": "This documents that the browser-safe study copy validates the pipeline without replaying the fragile annotation widget.",
           "card_file": "03_annotation_ui_stability_note.png",
           "result_file": "03_annotation_ui_stability_note_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Manual annotation UI stability note: This documents that the browser-safe study copy validates the pipeline without replaying the fragile annotation widget.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "training-accumulation",
@@ -1196,7 +1716,12 @@
           "result_meaning": "The blog can still explain the intended data flow while avoiding a non-repeatable browser labeling step.",
           "card_file": "04_training_set_accumulation.png",
           "result_file": "04_training_set_accumulation_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Training-set accumulation stability note: The blog can still explain the intended data flow while avoiding a non-repeatable browser labeling step.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "classifier-code",
@@ -1207,7 +1732,12 @@
           "result_meaning": "The card marks the transition from hand labels to a reusable prediction model.",
           "card_file": "05_classifier_training_code.png",
           "result_file": "05_classifier_training_code_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Classifier construction: The card marks the transition from hand labels to a reusable prediction model.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "saved-features",
@@ -1218,7 +1748,12 @@
           "result_meaning": "The artifact load is the stable validation path for the case after manual labeling has been done once.",
           "card_file": "06_saved_feature_vectors.png",
           "result_file": "06_saved_feature_vectors_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Saved feature-vector artifact load: The artifact load is the stable validation path for the case after manual labeling has been done once.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         }
       ],
       "video_step": {
@@ -1255,7 +1790,12 @@
           "result_meaning": "The note separates browser-safe validation from the original exploratory UI.",
           "card_file": "01_interactive_ui_skip_note.png",
           "result_file": "01_interactive_ui_skip_note_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Interactive UI stability note: The note separates browser-safe validation from the original exploratory UI.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "state-table",
@@ -1266,7 +1806,12 @@
           "result_meaning": "The table-like log shows the scale and layout of the state database.",
           "card_file": "02_state_table_build.png",
           "result_file": "02_state_table_build_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Motion-field state table allocation: The table-like log shows the scale and layout of the state database.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "umap-field",
@@ -1277,7 +1822,12 @@
           "result_meaning": "The plot makes the motion-field neighborhood structure visible.",
           "card_file": "03_umap_motion_field.png",
           "result_file": "03_umap_motion_field_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "UMAP motion-field embedding: The plot makes the motion-field neighborhood structure visible.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "knn-functions",
@@ -1288,7 +1838,12 @@
           "result_meaning": "The source card explains how a controller state becomes candidate future motions.",
           "card_file": "04_torch_knn_functions.png",
           "result_file": "04_torch_knn_functions_result.png",
-          "media_role": "code_evidence"
+          "media_role": "code_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Torch nearest-neighbor helper: The source card explains how a controller state becomes candidate future motions.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "controller-widget",
@@ -1299,7 +1854,12 @@
           "result_meaning": "The log documents why browser capture uses default input rather than requiring physical hardware.",
           "card_file": "05_controller_widget_note.png",
           "result_file": "05_controller_widget_note_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Controller widget setup: The log documents why browser capture uses default input rather than requiring physical hardware.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "transition-precompute",
@@ -1310,7 +1870,12 @@
           "result_meaning": "Moving the expensive search offline is what makes runtime interaction feasible.",
           "card_file": "06_transition_table_precompute.png",
           "result_file": "06_transition_table_precompute_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Transition table precompute: Moving the expensive search offline is what makes runtime interaction feasible.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "value-learning",
@@ -1321,7 +1886,12 @@
           "result_meaning": "The curve gives a quick read on whether the learned policy is stabilizing.",
           "card_file": "07_value_learning_curve.png",
           "result_file": "07_value_learning_curve_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Value-learning score curve: The curve gives a quick read on whether the learned policy is stabilizing.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         }
       ],
       "video_step": {
@@ -1357,7 +1927,12 @@
           "result_meaning": "The log confirms that distance matrices and local minima can be computed in the available environment.",
           "card_file": "cropped_ranges_padding.png",
           "result_file": "cropped_ranges_padding_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Runtime environment log: The log confirms that distance matrices and local minima can be computed in the available environment.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "raw-walk",
@@ -1377,7 +1952,12 @@
               "role": "timeline",
               "fraction": 0.35
             }
-          ]
+          ],
+          "capture_kind": "canvas",
+          "visual_subject": "Raw walk clip playback: The graph input is a playable sequence of walking frames.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas"
         },
         {
           "id": "point-cloud",
@@ -1397,7 +1977,12 @@
               "role": "timeline",
               "fraction": 0.45
             }
-          ]
+          ],
+          "capture_kind": "canvas",
+          "visual_subject": "Point-cloud pose representation: Point-cloud distance is closer to visible pose similarity than comparing only root or quaternions.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas"
         },
         {
           "id": "alignment",
@@ -1417,7 +2002,12 @@
               "role": "timeline",
               "fraction": 0.55
             }
-          ]
+          ],
+          "capture_kind": "canvas",
+          "visual_subject": "Window alignment between two clips: Similar gait windows can transition even when their world positions differ.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas"
         },
         {
           "id": "distance-matrix",
@@ -1428,7 +2018,12 @@
           "result_meaning": "Low-error regions in the matrix become potential transition edges.",
           "card_file": "distance_matrix_minima.png",
           "result_file": "distance_matrix_minima_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Distance matrix and local minima: Low-error regions in the matrix become potential transition edges.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "scc-pruning",
@@ -1439,7 +2034,12 @@
           "result_meaning": "Pruning keeps the runtime graph from entering dead ends that cannot continue generating motion.",
           "card_file": "scc_pruning.png",
           "result_file": "scc_pruning_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Tarjan SCC pruning log: Pruning keeps the runtime graph from entering dead ends that cannot continue generating motion.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "graph-traversal",
@@ -1459,7 +2059,12 @@
               "role": "timeline",
               "fraction": 0.45
             }
-          ]
+          ],
+          "capture_kind": "canvas",
+          "visual_subject": "Graph traversal playback debug: This validates Node and Edge abstractions as a playable animation sequence.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas"
         },
         {
           "id": "follow-path",
@@ -1482,7 +2087,13 @@
           ],
           "preview_gif": "follow_path_visualization_preview.gif",
           "video_mp4": "follow_path_visualization_preview.mp4",
-          "video_webm": "follow_path_visualization_preview.webm"
+          "video_webm": "follow_path_visualization_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Follow-path result viewer: The final viewer checks whether graph search can serve a path-following goal.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         }
       ],
       "video_step": {
@@ -1527,7 +2138,12 @@
               "role": "timeline",
               "fraction": 0.45
             }
-          ]
+          ],
+          "capture_kind": "canvas",
+          "visual_subject": "Spring-damper future trajectory: This is the source of the future trajectory target used in the motion-matching query.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas"
         },
         {
           "id": "source-animation",
@@ -1547,7 +2163,12 @@
               "role": "timeline",
               "fraction": 0.35
             }
-          ]
+          ],
+          "capture_kind": "canvas",
+          "visual_subject": "Source locomotion clip playback: The database is built from real motion frames, not from generated poses.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas"
         },
         {
           "id": "filtered-motion",
@@ -1567,7 +2188,12 @@
               "role": "timeline",
               "fraction": 0.55
             }
-          ]
+          ],
+          "capture_kind": "canvas",
+          "visual_subject": "Filtered root displacement and orientation: Stable velocity and orientation estimates reduce noise in nearest-neighbor search.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas"
         },
         {
           "id": "feature-vector",
@@ -1587,7 +2213,12 @@
               "role": "timeline",
               "fraction": 0.5
             }
-          ]
+          ],
+          "capture_kind": "canvas",
+          "visual_subject": "33-dimensional feature layout: The abstract feature vector becomes visible as body parts and trajectory targets.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas"
         },
         {
           "id": "normalization-code",
@@ -1598,7 +2229,12 @@
           "result_meaning": "Different physical quantities must be normalized before Euclidean nearest-neighbor search.",
           "card_file": "feature_database_debug.png",
           "result_file": "feature_database_debug_result.png",
-          "media_role": "code_evidence"
+          "media_role": "code_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Feature normalization code: Different physical quantities must be normalized before Euclidean nearest-neighbor search.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "runtime-player",
@@ -1621,7 +2257,13 @@
           ],
           "preview_gif": "inertialization_transition_preview.gif",
           "video_mp4": "inertialization_transition_preview.mp4",
-          "video_webm": "inertialization_transition_preview.webm"
+          "video_webm": "inertialization_transition_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Runtime Player search loop: This is the closed loop that connects input prediction, feature search, and visual playback.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "fast-stop-turn",
@@ -1644,7 +2286,13 @@
           ],
           "preview_gif": "fast_stop_turn_cases_preview.gif",
           "video_mp4": "fast_stop_turn_cases_preview.mp4",
-          "video_webm": "fast_stop_turn_cases_preview.webm"
+          "video_webm": "fast_stop_turn_cases_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Stop and turn debug frame: Stop and sharp-turn cases are useful stress tests for matching quality.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         }
       ],
       "video_step": {
@@ -1693,7 +2341,13 @@
           ],
           "preview_gif": "01_source_animation_playback_preview.gif",
           "video_mp4": "01_source_animation_playback_preview.mp4",
-          "video_webm": "01_source_animation_playback_preview.webm"
+          "video_webm": "01_source_animation_playback_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Source animation playback: This baseline lets later warped outputs be compared against the original motion.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "raw-channel-plot",
@@ -1704,7 +2358,12 @@
           "result_meaning": "The graph shows that animation warping often starts as curve manipulation.",
           "card_file": "02_raw_quaternion_channel.png",
           "result_file": "02_raw_quaternion_channel_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Raw quaternion channel plot: The graph shows that animation warping often starts as curve manipulation.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "timewarp-keypoints",
@@ -1715,7 +2374,12 @@
           "result_meaning": "The plot shows how sparse timing edits become a continuous time-warp curve.",
           "card_file": "03_timewarp_keypoints.png",
           "result_file": "03_timewarp_keypoints_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Time-warp keypoints and tangents: The plot shows how sparse timing edits become a continuous time-warp curve.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "resampled-timewarp",
@@ -1726,7 +2390,12 @@
           "result_meaning": "The output shows the actual per-frame time lookup used for animation sampling.",
           "card_file": "04_resampled_timewarp_curve.png",
           "result_file": "04_resampled_timewarp_curve_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Resampled time-warp curve: The output shows the actual per-frame time lookup used for animation sampling.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "timewarped-animation",
@@ -1749,7 +2418,13 @@
           ],
           "preview_gif": "05_timewarped_animation_compare_preview.gif",
           "video_mp4": "05_timewarped_animation_compare_preview.mp4",
-          "video_webm": "05_timewarped_animation_compare_preview.webm"
+          "video_webm": "05_timewarped_animation_compare_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Time-warped animation comparison: The viewer reveals the timing change without changing the underlying pose content.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "pose-warp-keys",
@@ -1769,7 +2444,12 @@
               "role": "timeline",
               "fraction": 0.45
             }
-          ]
+          ],
+          "capture_kind": "canvas",
+          "visual_subject": "Pose-warp key poses: The key-pose viewer shows what spatial correction will be blended into the clip.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas"
         },
         {
           "id": "offset-curve",
@@ -1780,7 +2460,12 @@
           "result_meaning": "The curve explains how local pose edits are distributed smoothly.",
           "card_file": "07_offset_warp_curve.png",
           "result_file": "07_offset_warp_curve_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Offset warp curve: The curve explains how local pose edits are distributed smoothly.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "combined-warp",
@@ -1803,7 +2488,13 @@
           ],
           "preview_gif": "08_combined_warped_animation_preview.gif",
           "video_mp4": "08_combined_warped_animation_preview.mp4",
-          "video_webm": "08_combined_warped_animation_preview.webm"
+          "video_webm": "08_combined_warped_animation_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Final time and pose warped animation: This final viewer checks whether timing and pose edits combine into a coherent motion.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         }
       ],
       "video_step": {
@@ -1839,7 +2530,12 @@
           "result_meaning": "The helper indices are later used for contacts, costs, and debug drawing.",
           "card_file": "01_load_character_helpers.png",
           "result_file": "01_load_character_helpers_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Character and foot-helper loading: The helper indices are later used for contacts, costs, and debug drawing.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "source-clip",
@@ -1862,7 +2558,13 @@
           ],
           "preview_gif": "02_source_clip_playback_preview.gif",
           "video_mp4": "02_source_clip_playback_preview.mp4",
-          "video_webm": "02_source_clip_playback_preview.webm"
+          "video_webm": "02_source_clip_playback_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Source clip playback: The viewer establishes the motion vocabulary available to the planner.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "clip-count",
@@ -1873,7 +2575,12 @@
           "result_meaning": "The count determines the discrete action set used by the controller.",
           "card_file": "03_clip_count_table.png",
           "result_file": "03_clip_count_table_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Clip slicing count: The count determines the discrete action set used by the controller.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "contact-viewer",
@@ -1905,7 +2612,13 @@
           ],
           "preview_gif": "04_contact_constraint_viewer_preview.gif",
           "video_mp4": "04_contact_constraint_viewer_preview.mp4",
-          "video_webm": "04_contact_constraint_viewer_preview.webm"
+          "video_webm": "04_contact_constraint_viewer_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Clip contact constraints: The viewer shows how physical plausibility is represented before planning.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "random-player",
@@ -1928,7 +2641,13 @@
           ],
           "preview_gif": "05_random_transition_player_preview.gif",
           "video_mp4": "05_random_transition_player_preview.mp4",
-          "video_webm": "05_random_transition_player_preview.webm"
+          "video_webm": "05_random_transition_player_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Random transition player: This validates that clips can be stitched into continuous playback.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "transition-cost",
@@ -1939,7 +2658,12 @@
           "result_meaning": "The log shows the expensive planning data being prepared offline.",
           "card_file": "06_transition_cost_precompute.png",
           "result_file": "06_transition_cost_precompute_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Transition-cost precompute: The log shows the expensive planning data being prepared offline.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "value-surface",
@@ -1950,7 +2674,12 @@
           "result_meaning": "The surface makes the optimal-control objective visible as future cost.",
           "card_file": "07_learned_value_surface.png",
           "result_file": "07_learned_value_surface_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Learned value surface: The surface makes the optimal-control objective visible as future cost.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "optimal-policy",
@@ -1973,7 +2702,13 @@
           ],
           "preview_gif": "08_optimal_policy_player_preview.gif",
           "video_mp4": "08_optimal_policy_player_preview.mp4",
-          "video_webm": "08_optimal_policy_player_preview.webm"
+          "video_webm": "08_optimal_policy_player_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Optimal-policy controller: The viewer checks that the policy callback advances without requiring a physical gamepad.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         }
       ],
       "video_step": {
@@ -2009,7 +2744,12 @@
           "result_meaning": "The log identifies the bones later used for foot locking and rewards.",
           "card_file": "01_character_helper_indices.png",
           "result_file": "01_character_helper_indices_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Character helper bone indices: The log identifies the bones later used for foot locking and rewards.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "source-graph",
@@ -2032,7 +2772,13 @@
           ],
           "preview_gif": "02_source_motion_graph_playback_preview.gif",
           "video_mp4": "02_source_motion_graph_playback_preview.mp4",
-          "video_webm": "02_source_motion_graph_playback_preview.webm"
+          "video_webm": "02_source_motion_graph_playback_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Source motion graph playback: The viewer shows the action fragments from which avatar behavior is assembled.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "state-action-code",
@@ -2043,7 +2789,12 @@
           "result_meaning": "The source card explains the discrete MDP structure behind the behavior system.",
           "card_file": "03_state_action_graph.png",
           "result_file": "03_state_action_graph_result.png",
-          "media_role": "code_evidence"
+          "media_role": "code_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "State and Action graph definitions: The source card explains the discrete MDP structure behind the behavior system.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "random-action",
@@ -2066,7 +2817,13 @@
           ],
           "preview_gif": "04_random_action_playback_preview.gif",
           "video_mp4": "04_random_action_playback_preview.mp4",
-          "video_webm": "04_random_action_playback_preview.webm"
+          "video_webm": "04_random_action_playback_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Random graph action playback: The viewer validates that graph actions can produce continuous animated output.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "action-count",
@@ -2077,7 +2834,12 @@
           "result_meaning": "These numbers define the dimensionality of policy and value tables.",
           "card_file": "05_action_count_table.png",
           "result_file": "05_action_count_table_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Action count and maximum length: These numbers define the dimensionality of policy and value tables.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "target-rings",
@@ -2088,7 +2850,12 @@
           "result_meaning": "The target set converts continuous goals into discrete reward queries.",
           "card_file": "06_target_position_rings.png",
           "result_file": "06_target_position_rings_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Target-position ring construction: The target set converts continuous goals into discrete reward queries.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "reward-policy",
@@ -2111,7 +2878,13 @@
           ],
           "preview_gif": "07_reward_policy_viewer_preview.gif",
           "video_mp4": "07_reward_policy_viewer_preview.mp4",
-          "video_webm": "07_reward_policy_viewer_preview.webm"
+          "video_webm": "07_reward_policy_viewer_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Immediate reward policy viewer: The viewer shows how local target rewards can choose graph actions.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "mdp-policy",
@@ -2134,7 +2907,13 @@
           ],
           "preview_gif": "08_mdp_value_policy_viewer_preview.gif",
           "video_mp4": "08_mdp_value_policy_viewer_preview.mp4",
-          "video_webm": "08_mdp_value_policy_viewer_preview.webm"
+          "video_webm": "08_mdp_value_policy_viewer_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "MDP value-policy viewer: The final viewer checks that the learned value function can drive action selection.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         }
       ],
       "video_step": {
@@ -2169,7 +2948,12 @@
           "result_meaning": "The planning system can reference the foot-contact helper bones later.",
           "card_file": "01_source_animation_viewer.png",
           "result_file": "01_source_animation_viewer_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Character and foot-helper bone loading: The planning system can reference the foot-contact helper bones later.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "clip-count",
@@ -2180,7 +2964,12 @@
           "result_meaning": "The clip count determines the size of transition-cost and value-function tables.",
           "card_file": "02_motion_clip_contact_axes.png",
           "result_file": "02_motion_clip_contact_axes_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "MotionClip count output: The clip count determines the size of transition-cost and value-function tables.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "transition-progress",
@@ -2191,7 +2980,12 @@
           "result_meaning": "The progress output shows that expensive transition work is moved offline.",
           "card_file": "03_player_transition_blend.png",
           "result_file": "03_player_transition_blend_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Transition-cost precompute output: The progress output shows that expensive transition work is moved offline.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "orientation-policy-loss",
@@ -2202,7 +2996,12 @@
           "result_meaning": "A decreasing curve indicates that the policy is stabilizing in the current state space.",
           "card_file": "04_orientation_policy_controller.png",
           "result_file": "04_orientation_policy_controller_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "Orientation policy value-learning curve: A decreasing curve indicates that the policy is stabilizing in the current state space.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "reach-goal-stops",
@@ -2213,7 +3012,12 @@
           "result_meaning": "These endpoints define target states for the reach-goal policy.",
           "card_file": "05_reach_goal_target_tracking.png",
           "result_file": "05_reach_goal_target_tracking_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Reach-goal stopping positions: These endpoints define target states for the reach-goal policy.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "value-surface",
@@ -2224,7 +3028,12 @@
           "result_meaning": "The surface shows the future cost of reaching different target positions from one clip.",
           "card_file": "06_value_surface_clip16.png",
           "result_file": "06_value_surface_clip16_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "clip 16 value surface: The surface shows the future cost of reaching different target positions from one clip.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "motion-group-count",
@@ -2235,7 +3044,12 @@
           "result_meaning": "Motion groups turn multiple clips into a parameterized action space.",
           "card_file": "07_motion_group_weight_blend.png",
           "result_file": "07_motion_group_weight_blend_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "MotionGroup count output: Motion groups turn multiple clips into a parameterized action space.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "group-policy-loss",
@@ -2246,7 +3060,12 @@
           "result_meaning": "The plot verifies that a useful policy can still be learned after moving from clips to motion groups.",
           "card_file": "08_group_reach_goal_result.png",
           "result_file": "08_group_reach_goal_result_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "MotionGroup policy-learning curve: The plot verifies that a useful policy can still be learned after moving from clips to motion groups.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         }
       ],
       "video_step": {
@@ -2295,7 +3114,13 @@
           ],
           "preview_gif": "01_raw_sample_clips_preview.gif",
           "video_mp4": "01_raw_sample_clips_preview.mp4",
-          "video_webm": "01_raw_sample_clips_preview.webm"
+          "video_webm": "01_raw_sample_clips_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Raw sample clip overview: The viewer establishes the motion examples that will be normalized and blended.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "canonical-timing",
@@ -2327,7 +3152,13 @@
           ],
           "preview_gif": "02_canonical_timing_contacts_preview.gif",
           "video_mp4": "02_canonical_timing_contacts_preview.mp4",
-          "video_webm": "02_canonical_timing_contacts_preview.webm"
+          "video_webm": "02_canonical_timing_contacts_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Canonical timing and contact inspection: Canonical timing aligns examples before interpolation.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "looping-clips",
@@ -2359,7 +3190,13 @@
           ],
           "preview_gif": "03_looping_animation_compare_preview.gif",
           "video_mp4": "03_looping_animation_compare_preview.mp4",
-          "video_webm": "03_looping_animation_compare_preview.webm"
+          "video_webm": "03_looping_animation_compare_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Looping animation comparison: Looping makes repeated motion comparable across clips.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "resampled-clips",
@@ -2391,7 +3228,13 @@
           ],
           "preview_gif": "04_resampled_canonical_clips_preview.gif",
           "video_mp4": "04_resampled_canonical_clips_preview.mp4",
-          "video_webm": "04_resampled_canonical_clips_preview.webm"
+          "video_webm": "04_resampled_canonical_clips_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Resampled canonical clips: The viewer checks that examples share a common timing domain.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "bspline-fit",
@@ -2402,7 +3245,12 @@
           "result_meaning": "The plot shows how sparse motion samples become smooth parameterized curves.",
           "card_file": "05_bspline_fit_plot.png",
           "result_file": "05_bspline_fit_plot_result.png",
-          "media_role": "key_visual"
+          "media_role": "key_visual",
+          "capture_kind": "plot",
+          "visual_subject": "B-spline curve fit: The plot shows how sparse motion samples become smooth parameterized curves.",
+          "capture_selector": "executed output image/png",
+          "publish_media_required": true,
+          "media_provenance": "executed_plot_output"
         },
         {
           "id": "bspline-viewer",
@@ -2434,7 +3282,13 @@
           ],
           "preview_gif": "06_bspline_reconstruction_viewer_preview.gif",
           "video_mp4": "06_bspline_reconstruction_viewer_preview.mp4",
-          "video_webm": "06_bspline_reconstruction_viewer_preview.webm"
+          "video_webm": "06_bspline_reconstruction_viewer_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "B-spline reconstruction viewer: The viewer validates the curve representation as playable motion.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         },
         {
           "id": "adverb-table",
@@ -2445,7 +3299,12 @@
           "result_meaning": "The table connects semantic labels to numeric interpolation coordinates.",
           "card_file": "07_adverb_coordinate_table.png",
           "result_file": "07_adverb_coordinate_table_result.png",
-          "media_role": "supporting_evidence"
+          "media_role": "supporting_evidence",
+          "capture_kind": "table",
+          "visual_subject": "Adverb coordinate table: The table connects semantic labels to numeric interpolation coordinates.",
+          "capture_selector": "executed output text/html|text/plain table",
+          "publish_media_required": false,
+          "media_provenance": "executed_structured_output"
         },
         {
           "id": "final-controls",
@@ -2484,7 +3343,13 @@
           ],
           "preview_gif": "08_final_interpolated_adverb_controls_preview.gif",
           "video_mp4": "08_final_interpolated_adverb_controls_preview.mp4",
-          "video_webm": "08_final_interpolated_adverb_controls_preview.webm"
+          "video_webm": "08_final_interpolated_adverb_controls_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Final interpolated adverb controls: The final viewer shows how verb and adverb coordinates produce a new animation.",
+          "capture_selector": "output canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "live_control_scan"
         }
       ],
       "video_step": {
@@ -2523,7 +3388,12 @@
           ],
           "card_file": "01_module_imports.png",
           "result_file": "01_module_imports_result.png",
-          "media_role": "code_evidence"
+          "media_role": "code_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Module dependencies: The module is a small worker dependency for value-function fitting, not a standalone viewer case.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "function-contract",
@@ -2536,7 +3406,12 @@
           "source_context_lines": 12,
           "card_file": "02_function_contract.png",
           "result_file": "02_function_contract_result.png",
-          "media_role": "code_evidence"
+          "media_role": "code_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "reach_train_value_function contract: The function maps training samples and precompute query indices to a reshaped value table.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "empty-guard",
@@ -2551,7 +3426,12 @@
           ],
           "card_file": "03_empty_training_guard.png",
           "result_file": "03_empty_training_guard_result.png",
-          "media_role": "code_evidence"
+          "media_role": "code_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Empty training-set guard: The guard keeps multiprocessing workers deterministic when a motion group has no samples.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "extra-trees",
@@ -2566,7 +3446,12 @@
           ],
           "card_file": "04_extra_trees_regressor.png",
           "result_file": "04_extra_trees_regressor_result.png",
-          "media_role": "code_evidence"
+          "media_role": "code_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "ExtraTrees value fitting: This is the offline regression step used to fill a value-function table.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "import-check",
@@ -2582,7 +3467,12 @@
           "log_path": ".reports/logs/real_time_planning_multiprocess_func.log",
           "card_file": "05_import_validation_log.png",
           "result_file": "05_import_validation_log_result.png",
-          "media_role": "code_evidence"
+          "media_role": "code_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Import validation log: A quiet log means the module imports successfully in the managed environment.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         }
       ],
       "video_step": {
@@ -2621,7 +3511,12 @@
           ],
           "card_file": "01_maya_fallback_imports.png",
           "result_file": "01_maya_fallback_imports_result.png",
-          "media_role": "code_evidence"
+          "media_role": "code_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Maya API fallback and synthetic writer: The script can run inside Maya or fall back to generating a compatible synthetic face asset.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "maya-export",
@@ -2634,7 +3529,12 @@
           "source_context_lines": 28,
           "card_file": "02_maya_export_function.png",
           "result_file": "02_maya_export_function_result.png",
-          "media_role": "code_evidence"
+          "media_role": "code_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Maya mesh export function: The exporter records topology once and vertex positions over time for facial animation playback.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "cli-path",
@@ -2649,7 +3549,12 @@
           ],
           "card_file": "03_cli_entrypoint.png",
           "result_file": "03_cli_entrypoint_result.png",
-          "media_role": "code_evidence"
+          "media_role": "code_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "CLI output path and fallback switch: The command-line path makes the case reproducible without an interactive Maya session.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "export-log",
@@ -2665,7 +3570,12 @@
           "log_path": ".reports/logs/halo_4_exporter_from_maya.log",
           "card_file": "04_export_command_log.png",
           "result_file": "04_export_command_log_result.png",
-          "media_role": "code_evidence"
+          "media_role": "code_evidence",
+          "capture_kind": "code_evidence",
+          "visual_subject": "Exporter validation log: The log records the generated artifact path used by the notebook case.",
+          "capture_selector": "generated code/log evidence",
+          "publish_media_required": false,
+          "media_provenance": "generated_code_evidence"
         },
         {
           "id": "artifact-summary",
@@ -2681,7 +3591,12 @@
           "artifact_path": "labs/AnimationPapers/animated_face.dat",
           "card_file": "05_animated_face_artifact_summary.png",
           "result_file": "05_animated_face_artifact_summary_result.png",
-          "media_role": "code_evidence"
+          "media_role": "code_evidence",
+          "capture_kind": "artifact_summary",
+          "visual_subject": "animated_face.dat artifact summary: The summary verifies that the artifact contains topology, normals, and per-frame vertices.",
+          "capture_selector": "generated artifact summary",
+          "publish_media_required": false,
+          "media_provenance": "generated_artifact_summary"
         },
         {
           "id": "dataflow",
@@ -2703,7 +3618,12 @@
           ],
           "card_file": "06_exporter_dataflow.png",
           "result_file": "06_exporter_dataflow_result.png",
-          "media_role": "code_evidence"
+          "media_role": "code_evidence",
+          "capture_kind": "artifact_summary",
+          "visual_subject": "Exporter data flow: The diagram links the supporting script to the Halo 4 Facial Animation notebook.",
+          "capture_selector": "generated artifact summary",
+          "publish_media_required": false,
+          "media_provenance": "generated_artifact_summary"
         }
       ],
       "video_step": {
@@ -2732,5 +3652,26 @@
     "fps": 6,
     "max_seconds": 6,
     "max_bytes": 10485760
+  },
+  "media_quality_policy": {
+    "key_media_must_be_algorithm_output": true,
+    "forbidden_key_media_provenance": [
+      "derived_card_crop",
+      "learning_card",
+      "scroll_capture",
+      "whole_cell",
+      "browser_page",
+      "static_pan_zoom"
+    ],
+    "allowed_capture_kind": [
+      "artifact_summary",
+      "canvas",
+      "code_evidence",
+      "formula",
+      "plot",
+      "table",
+      "widget_controls"
+    ],
+    "card_file_usage": "appendix_evidence_only"
   }
 }

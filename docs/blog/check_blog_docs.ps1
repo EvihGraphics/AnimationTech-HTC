@@ -56,6 +56,39 @@ forbidden_tokens = [
     "TO" + "DO",
     "?" * 3,
 ]
+allowed_capture_kinds = {
+    "canvas",
+    "plot",
+    "table",
+    "formula",
+    "widget_controls",
+    "artifact_summary",
+    "code_evidence",
+}
+key_media_roles = {"key_visual", "key_animation"}
+forbidden_key_provenance = {
+    "curated_algorithm_visual",
+    "derived_card_crop",
+    "learning_card",
+    "scroll_capture",
+    "whole_cell",
+    "browser_page",
+    "static_pan_zoom",
+}
+footskate_slug = "footskate_cleanup_for_motion_capture_editing"
+footskate_key_provenance_allowlist = {"live_canvas", "executed_plot_image"}
+forbidden_key_provenance_prefixes = ("curated", "derived", "static")
+pollution_text_markers = [
+    "Code cell",
+    "Source excerpt",
+    "Mode: Command",
+    "Busy",
+    "Markdown",
+    "JupyterLab",
+    "Jupyter Notebook",
+    "Cell In",
+    "Run",
+]
 label_artifact_patterns = [
     ("code-purpose label", re.compile(r"\u4ee3\u7801\u505a\u4ec0\u4e48\?")),
     ("output label", re.compile(r"\u8fd0\u884c\u540e\u770b\u5230\u4ec0\u4e48\?")),
@@ -113,6 +146,71 @@ def png_size(path):
         return None
     width, height = struct.unpack(">II", header[16:24])
     return width, height
+
+def step_label(slug, step):
+    return f"{slug}:{step.get('id', '<missing-id>')}"
+
+def has_real_controls(step, expected_roles=None):
+    controls = step.get("controls", [])
+    if not isinstance(controls, list) or not controls:
+        return False
+    expected_roles = set(expected_roles or [])
+    for control in controls:
+        if not isinstance(control, dict):
+            continue
+        kind = control.get("kind")
+        role = control.get("role")
+        if kind not in {"slider", "range", "scrubber", "checkbox", "toggle", "select"}:
+            continue
+        if expected_roles and role not in expected_roles:
+            continue
+        if kind in {"slider", "range", "scrubber"}:
+            if any(key in control for key in ("fraction", "value", "frame", "time")):
+                return True
+        elif any(key in control for key in ("checked", "value", "index")):
+            return True
+    return False
+
+def is_forbidden_key_provenance(provenance):
+    if provenance in (None, ""):
+        return False
+    value = str(provenance)
+    return value in forbidden_key_provenance or value.startswith(forbidden_key_provenance_prefixes)
+
+def png_has_embedded_pollution_text(path):
+    try:
+        raw = Path(path).read_bytes()
+    except OSError:
+        return []
+    text = raw.decode("latin-1", errors="ignore")
+    return [marker for marker in pollution_text_markers if marker in text]
+
+def check_result_png_visual_pollution(slug, step, media_path, width, height):
+    label = step_label(slug, step)
+    found_markers = png_has_embedded_pollution_text(media_path)
+    if found_markers:
+        add_error(f"Result PNG for {label} contains notebook/chrome text marker(s): {', '.join(found_markers)}")
+
+    role = step.get("media_role")
+    provenance = step.get("media_provenance")
+    if role in key_media_roles:
+        if width <= 0 or height <= 0:
+            add_error(f"Key result PNG has invalid dimensions for {label}: {media_path}")
+            return
+        ratio = width / height
+        if height > width * 1.4:
+            add_error(f"Key result PNG looks like a tall scroll capture for {label}: {media_path} ({width}x{height})")
+        if ratio > 10:
+            add_error(f"Key result PNG has an extreme wide ratio for {label}: {media_path} ({width}x{height})")
+        if is_forbidden_key_provenance(provenance):
+            add_error(f"Key result PNG uses forbidden provenance for {label}: {provenance}")
+
+def section_between(text, heading, next_prefix="\n## "):
+    start = text.find(heading)
+    if start < 0:
+        return ""
+    end = text.find(next_prefix, start + 1)
+    return text[start:] if end < 0 else text[start:end]
 
 def ffprobe_duration(path):
     ffprobe = shutil.which("ffprobe")
@@ -303,6 +401,7 @@ if media_manifest is not None:
 
         readme_text = read_text(readme)
         asset_text = read_text(asset_readme)
+        key_media_section = section_between(readme_text, "## \u91cd\u70b9\u53ef\u89c6\u5316 / \u52a8\u753b")
         manifest_case = target_by_slug.get(slug, {})
         case_kind = case.get("kind") or manifest_case.get("kind", "notebook")
         if case_kind == "python_module":
@@ -343,6 +442,7 @@ if media_manifest is not None:
                     if media_entry.get("key") == "result_file":
                         if width < 320 or height < 160:
                             add_error(f"Result PNG media is too small for {slug}: {media_path} ({width}x{height})")
+                        check_result_png_visual_pollution(slug, media_entry.get("step", {}), media_path, width, height)
                     elif width < 800 or height < 450:
                         add_error(f"Card PNG media is too small for {slug}: {media_path} ({width}x{height})")
                 min_png_bytes = 4000 if media_entry.get("key") == "result_file" else 10000
@@ -378,21 +478,64 @@ if media_manifest is not None:
                 required_step_fields.append("source_path")
             else:
                 required_step_fields.append("cell_index")
+            required_step_fields.extend([
+                "visual_subject",
+                "capture_kind",
+                "capture_selector",
+                "publish_media_required",
+            ])
             for field in required_step_fields:
                 if field not in step:
                     add_error(f"Media step for {slug} is missing {field}.")
             for field in ("media_role", "result_file", "card_file"):
                 if field not in step:
                     add_error(f"Media step for {slug} is missing {field}.")
+            capture_kind = step.get("capture_kind")
+            if capture_kind is not None and capture_kind not in allowed_capture_kinds:
+                add_error(f"Media step for {slug} has unsupported capture_kind: {capture_kind}")
+            if step.get("capture_selector") in (None, ""):
+                add_error(f"Media step for {slug} needs a non-empty capture_selector: {step.get('id')}")
+            if step.get("visual_subject") in (None, ""):
+                add_error(f"Media step for {slug} needs a non-empty visual_subject: {step.get('id')}")
+            if "publish_media_required" in step and not isinstance(step.get("publish_media_required"), bool):
+                add_error(f"Media step for {slug} publish_media_required must be boolean: {step.get('id')}")
             if step.get("media_role") in {"key_visual", "key_animation"}:
                 result_ref = f"assets/{step.get('result_file', '')}"
                 if result_ref not in readme_text:
                     add_error(f"README for {slug} does not reference key result media {result_ref}.")
+                if key_media_section and f"assets/{step.get('card_file', '')}" in key_media_section:
+                    add_error(f"Key media section for {slug} must not reference learning card {step.get('card_file')}.")
+                if capture_kind == "code_evidence":
+                    add_error(f"Key media for {slug} cannot use capture_kind=code_evidence: {step.get('id')}")
+                if step.get("publish_media_required") is not True:
+                    add_error(f"Key media for {slug} must set publish_media_required=true: {step.get('id')}")
+                provenance = step.get("media_provenance")
+                if provenance in (None, ""):
+                    add_error(f"Key media for {slug} is missing media_provenance: {step.get('id')}")
+                elif is_forbidden_key_provenance(provenance):
+                    add_error(f"Key media for {slug} uses forbidden media_provenance={provenance}: {step.get('id')}")
+                if slug == footskate_slug and provenance not in footskate_key_provenance_allowlist:
+                    add_error(f"Footskate key media must use live_canvas or executed_plot_image provenance: {step.get('id')} has {provenance}")
+                if provenance == "live_canvas" and capture_kind != "canvas":
+                    add_error(f"live_canvas media for {slug} must use capture_kind=canvas: {step.get('id')}")
+                if provenance in {"executed_plot_image", "executed_plot_output"} and capture_kind != "plot":
+                    add_error(f"executed plot media for {slug} must use capture_kind=plot: {step.get('id')}")
+            if step.get("media_role") == "key_animation":
+                if not step.get("preview_gif"):
+                    add_error(f"Key animation for {slug} missing preview_gif: {step.get('id')}")
+                if not (step.get("video_mp4") and step.get("video_webm")):
+                    add_error(f"Key animation for {slug} requires both video_mp4 and video_webm: {step.get('id')}")
+                if step.get("media_provenance") == "static_pan_zoom":
+                    add_error(f"Key animation for {slug} cannot use static_pan_zoom provenance: {step.get('id')}")
+                if not has_real_controls(step, {"timeline", "parameter"}):
+                    add_error(f"Key animation for {slug} needs real timeline/parameter controls: {step.get('id')}")
             if step.get("output_type") == "timeline_viewer" or any(control.get("role") == "parameter" for control in step.get("controls", [])):
                 if not step.get("preview_gif"):
                     add_error(f"Timeline/parameter step for {slug} missing preview_gif: {step.get('id')}")
                 if not (step.get("video_mp4") or step.get("video_webm")):
                     add_error(f"Timeline/parameter step for {slug} missing video_mp4/video_webm: {step.get('id')}")
+                if not has_real_controls(step, {"timeline", "parameter"}):
+                    add_error(f"Timeline/parameter step for {slug} needs real controls: {step.get('id')}")
             if step.get("media_role") not in {"key_visual", "key_animation", "supporting_evidence", "code_evidence"}:
                 add_error(f"Media step for {slug} has unsupported media_role: {step.get('media_role')}")
             if step.get("output_type") not in {
@@ -422,7 +565,7 @@ if errors:
 
 print(f"docs/blog check passed for {len(target_cases)} managed AnimationPapers/Theory cases.")
 if strict:
-    print("Strict mode currently uses the same checks as default mode.")
+    print("Strict mode includes real-media provenance, capture-kind, and key visual/animation quality gates.")
 '@
 
 $pythonScript | python - "$PSScriptRoot" "$($Strict.IsPresent)"

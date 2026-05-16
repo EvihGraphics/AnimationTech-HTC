@@ -12,6 +12,7 @@
 | kernel | `<kernel_name>` |
 | validation | `passed` |
 | publish tier | `深写完成 + 媒体完整` / `媒体完整 + 发布基底` |
+| media quality | `key_visual/key_animation 必须是算法输出本身，禁止滚动截图、整页 cell、代码卡裁剪和静态假动画` |
 
 ## 问题背景
 
@@ -75,6 +76,8 @@ flowchart LR
 - 代码做什么：`<code_purpose>`
 - 运行后看到什么：`<output_type>`
 - 结果说明什么：`<result_meaning>`
+- 可视化主体：`<visual_subject>`
+- 捕获方式：`<capture_kind>` / `<capture_selector>`
 
 ![重点结果](assets/<result_file>.png)
 
@@ -98,19 +101,21 @@ flowchart LR
 
 ## 重点可视化 / 动画
 
-正文优先引用结果图、GIF 预览和视频链接；代码学习卡只作为证据或附录，不作为主要视觉素材。
+正文只引用有意义的算法输出媒体：plot、table、formula、canvas、viewer 或控件状态。禁止把浏览器滚动截图、整页 cell 截图、代码学习卡裁剪图、Jupyter chrome 截图或静态图平移缩放生成的假动画放在本节。
 
-| Cell | 重点媒体 | 代码做什么 | 结果说明什么 |
-| --- | --- | --- | --- |
-| `<cell_index>` | [结果图](assets/<result_file>.png) / [GIF](assets/<preview>.gif) | `<code_purpose>` | `<result_meaning>` |
+GIF 用作 GitHub README 的动态预览；MP4/H.264 与 WebM/VP9 只作为可点击播放/下载链接，不使用 `<video>`。
+
+| Cell | 重点媒体 | 可视化主体 | 捕获方式 | 结果说明什么 |
+| --- | --- | --- | --- | --- |
+| `<cell_index>` | [结果图](assets/<result_file>.png) / [GIF](assets/<preview>.gif) | `<visual_subject>` | `<capture_kind>` | `<result_meaning>` |
 
 ## 代码 Cell 与可视化证据
 
-notebook 案例使用本节记录可复现证据。每个条目绑定 cell、输出类型、媒体角色、结果媒体和代码学习卡。
+notebook 案例使用本节记录可复现证据。每个条目绑定 cell、输出类型、媒体角色、结果媒体和代码学习卡；`card_file` 只作为附录证据，不能替代正文中的重点结果媒体。
 
-| Cell | 输出类型 | 媒体角色 | 结果媒体 | 代码学习卡 |
-| --- | --- | --- | --- | --- |
-| `<cell_index>` | `<output_type>` | `<media_role>` | [PNG](assets/<result_file>.png) | [PNG](assets/<card_file>.png) |
+| Cell | 输出类型 | 媒体角色 | 捕获方式 | 发布必需 | 结果媒体 | 代码学习卡 |
+| --- | --- | --- | --- | --- | --- | --- |
+| `<cell_index>` | `<output_type>` | `<media_role>` | `<capture_kind>` | `<publish_media_required>` | [PNG](assets/<result_file>.png) | [PNG](assets/<card_file>.png) |
 
 python module 案例把本节标题替换为 `## 源码模块与执行证据`，并使用 source path、symbol、command log 或 artifact summary 来说明可复现证据。
 
@@ -130,4 +135,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 <slug>
 
 ## 素材清单
 
-每个案例在 `assets/README.md` 中维护素材清单。正文只引用已经存在的结果 PNG、GIF、MP4 或 WebM 文件，并说明它们来自哪个 cell、源码片段或命令输出。
+每个案例在 `assets/README.md` 中维护素材清单。正文只引用已经存在的结果 PNG、GIF、MP4 或 WebM 文件，并说明它们来自哪个 cell、源码片段或命令输出；重点媒体还必须说明 `visual_subject`、`capture_kind` 和 `media_provenance`。

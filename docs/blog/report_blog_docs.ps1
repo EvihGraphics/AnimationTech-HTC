@@ -39,6 +39,25 @@ deep_slugs = {
     "near_optimal_character_animation_with_continuous_control",
     "motion_fields_for_interactive_character_animation",
 }
+key_media_roles = {"key_visual", "key_animation"}
+forbidden_key_provenance = {
+    "curated_algorithm_visual",
+    "derived_card_crop",
+    "learning_card",
+    "scroll_capture",
+    "whole_cell",
+    "browser_page",
+    "static_pan_zoom",
+}
+footskate_slug = "footskate_cleanup_for_motion_capture_editing"
+footskate_key_provenance_allowlist = {"live_canvas", "executed_plot_image"}
+forbidden_key_provenance_prefixes = ("curated", "derived", "static")
+
+def is_forbidden_key_provenance(provenance):
+    if provenance in (None, ""):
+        return False
+    value = str(provenance)
+    return value in forbidden_key_provenance or value.startswith(forbidden_key_provenance_prefixes)
 
 def read_text(path):
     return Path(path).read_text(encoding="utf-8-sig")
@@ -108,6 +127,15 @@ gif_bytes = 0
 mp4_bytes = 0
 output_types = Counter()
 media_roles = Counter()
+capture_kinds = Counter()
+media_provenance = Counter()
+key_media_provenance = Counter()
+footskate_key_media_provenance = Counter()
+key_forbidden_fallback_count = 0
+footskate_forbidden_fallback_count = 0
+footskate_non_allowlisted_count = 0
+key_missing_provenance_count = 0
+key_missing_required_metadata_count = 0
 mermaid_counts = {}
 cell_mermaid_counts = {}
 unreferenced_assets = []
@@ -131,6 +159,26 @@ for case in media_cases:
     step_count += len(case.get("steps", []))
     output_types.update(step.get("output_type", "<missing>") for step in case.get("steps", []))
     media_roles.update(step.get("media_role", "<missing>") for step in case.get("steps", []))
+    capture_kinds.update(step.get("capture_kind", "<missing>") for step in case.get("steps", []))
+    media_provenance.update(step.get("media_provenance", "<missing>") for step in case.get("steps", []))
+    for step in case.get("steps", []):
+        role = step.get("media_role")
+        provenance = step.get("media_provenance", "<missing>")
+        if role in key_media_roles:
+            key_media_provenance[provenance] += 1
+            if provenance == "<missing>":
+                key_missing_provenance_count += 1
+            if is_forbidden_key_provenance(provenance):
+                key_forbidden_fallback_count += 1
+            if slug == footskate_slug:
+                footskate_key_media_provenance[provenance] += 1
+                if is_forbidden_key_provenance(provenance):
+                    footskate_forbidden_fallback_count += 1
+                if provenance not in footskate_key_provenance_allowlist:
+                    footskate_non_allowlisted_count += 1
+            for field in ("visual_subject", "capture_kind", "capture_selector", "publish_media_required"):
+                if field not in step:
+                    key_missing_required_metadata_count += 1
 
     readme_text = read_text(readme) if readme.exists() else ""
     asset_text = read_text(asset_readme) if asset_readme.exists() else ""
@@ -189,6 +237,15 @@ report = {
         "webm_bytes": webm_bytes,
         "output_types": dict(output_types),
         "media_roles": dict(media_roles),
+        "capture_kinds": dict(capture_kinds),
+        "media_provenance": dict(media_provenance),
+        "key_media_provenance": dict(key_media_provenance),
+        "key_forbidden_fallback_count": key_forbidden_fallback_count,
+        "footskate_key_media_provenance": dict(footskate_key_media_provenance),
+        "footskate_forbidden_fallback_count": footskate_forbidden_fallback_count,
+        "footskate_non_allowlisted_count": footskate_non_allowlisted_count,
+        "key_missing_provenance_count": key_missing_provenance_count,
+        "key_missing_required_metadata_count": key_missing_required_metadata_count,
     },
     "mermaid": {
         "case_blocks": mermaid_counts,
@@ -220,6 +277,23 @@ for key, value in sorted(output_types.items()):
 print("Media roles:")
 for key, value in sorted(media_roles.items()):
     print(f" - {key}: {value}")
+print("Capture kinds:")
+for key, value in sorted(capture_kinds.items()):
+    print(f" - {key}: {value}")
+print("Media provenance:")
+for key, value in sorted(media_provenance.items()):
+    print(f" - {key}: {value}")
+print("Key visual/animation provenance:")
+for key, value in sorted(key_media_provenance.items()):
+    print(f" - {key}: {value}")
+print(f"Key visual/animation forbidden fallback count: {key_forbidden_fallback_count} (target 0)")
+print("Footskate key media provenance:")
+for key, value in sorted(footskate_key_media_provenance.items()):
+    print(f" - {key}: {value}")
+print(f"Footskate forbidden fallback count: {footskate_forbidden_fallback_count} (target 0)")
+print(f"Footskate non-allowlisted key media count: {footskate_non_allowlisted_count} (target 0)")
+print(f"Key visual/animation missing provenance count: {key_missing_provenance_count} (target 0)")
+print(f"Key visual/animation missing required metadata fields: {key_missing_required_metadata_count} (target 0)")
 print("Mermaid coverage:")
 print(f" - case-level blocks: {sum(mermaid_counts.values())}")
 print(f" - cell-level blocks: {sum(cell_mermaid_counts.values())}")

@@ -148,18 +148,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 knowing
 
 ## 重点可视化 / 动画
 
-README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 [打开/下载总览 WebM](assets/00-walkthrough.webm)
 
-| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
-| --- | --- | --- | --- | --- |
-| Cell 8 | `table` | `supporting_evidence` | Accumulate source clip ranges and print the available training-frame count. | [结果 PNG](assets/01_clip_window_count_result.png) / [代码卡](assets/01_clip_window_count.png) |
-| Cell 10 | `code_only` | `code_evidence` | Build a local pose and velocity feature vector around leg and foot bones. | [结果 PNG](assets/02_feature_vector_construction_result.png) / [代码卡](assets/02_feature_vector_construction.png) |
-| Cell 11 | `log` | `supporting_evidence` | Record the prepared-notebook skip for the original manual contact-labeling UI. | [结果 PNG](assets/03_annotation_ui_stability_note_result.png) / [代码卡](assets/03_annotation_ui_stability_note.png) |
-| Cell 15 | `log` | `supporting_evidence` | Record the prepared skip for the manual oracle accumulation cell. | [结果 PNG](assets/04_training_set_accumulation_result.png) / [代码卡](assets/04_training_set_accumulation.png) |
-| Cell 18 | `table` | `supporting_evidence` | Create and fit the contact classifier from accumulated mirrored labels. | [结果 PNG](assets/05_classifier_training_code_result.png) / [代码卡](assets/05_classifier_training_code.png) |
-| Cell 25 | `table` | `supporting_evidence` | Load saved feature vectors and labels from disk. | [结果 PNG](assets/06_saved_feature_vectors_result.png) / [代码卡](assets/06_saved_feature_vectors.png) |
+| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+
 
 ## 代码 Cell 与可视化结果
 

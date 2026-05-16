@@ -29,6 +29,7 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+from jupyter_client import BlockingKernelClient
 import nbformat
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
@@ -44,6 +45,26 @@ BAD_TEXT = (
     "model not found",
 )
 LIVE_OUTPUT_TYPES = {"viewer", "timeline_viewer", "widget_controls", "animation_viewer"}
+ALLOWED_CAPTURE_KINDS = {
+    "canvas",
+    "plot",
+    "table",
+    "formula",
+    "widget_controls",
+    "artifact_summary",
+    "code_evidence",
+}
+REAL_MEDIA_PROVENANCE = {
+    "live_canvas",
+    "executed_plot_image",
+    "executed_text_card",
+    "executed_table_card",
+    "executed_formula_card",
+    "live_widget_controls",
+    "artifact_summary",
+    "code_evidence",
+}
+DERIVED_CARD_PROVENANCE = "derived_card_crop"
 TEXT_OUTPUT_TYPES = {
     "log",
     "table",
@@ -179,7 +200,72 @@ def card_file(step: dict) -> str:
 
 
 def result_file(step: dict) -> str:
-    return step.get("result_file") or card_file(step)
+    value = step.get("result_file")
+    if not value:
+        raise RuntimeError(f"{step_label(step)}: result_file is required for result media.")
+    if value == card_file(step):
+        raise RuntimeError(f"{step_label(step)}: result_file must not point at the learning card.")
+    return value
+
+
+def capture_kind(step: dict) -> str:
+    kind = step.get("capture_kind")
+    if kind is None:
+        output_type = step.get("output_type")
+        if output_type in {"viewer", "timeline_viewer", "animation_viewer"}:
+            kind = "canvas"
+        elif output_type == "widget_controls":
+            kind = "widget_controls"
+        elif output_type == "plot":
+            kind = "plot"
+        elif output_type in {"table", "matrix"}:
+            kind = "table"
+        elif output_type in {"latex", "formula"}:
+            kind = "formula"
+        elif output_type == "artifact_summary":
+            kind = "artifact_summary"
+        elif output_type in {"source_excerpt", "command_log", "code_log", "diagram"}:
+            kind = "code_evidence"
+        else:
+            kind = "code_evidence"
+    if kind not in ALLOWED_CAPTURE_KINDS:
+        raise RuntimeError(f"{step_label(step)}: unsupported capture_kind {kind!r}.")
+    return kind
+
+
+def visual_subject(step: dict) -> str:
+    return step.get("visual_subject") or step.get("title") or step_label(step)
+
+
+def media_provenance(step: dict, default: str) -> str:
+    return step.get("media_provenance") or default
+
+
+def concrete_provenance(step: dict, default: str) -> str:
+    manifest_value = step.get("media_provenance")
+    aliases = {
+        "executed_plot_output": "executed_plot_image",
+        "executed_structured_output": "executed_table_card",
+        "executed_formula_output": "executed_formula_card",
+        "generated_artifact_summary": "artifact_summary",
+        "generated_code_evidence": "code_evidence",
+    }
+    return aliases.get(manifest_value, manifest_value or default)
+
+
+def publish_media_required(step: dict) -> set[str]:
+    required = step.get("publish_media_required", [])
+    if isinstance(required, str):
+        return {required}
+    if isinstance(required, list):
+        return {str(value) for value in required}
+    if isinstance(required, bool):
+        return {"key_visual"} if required else set()
+    return set()
+
+
+def is_key_publish_media(step: dict) -> bool:
+    return bool(publish_media_required(step).intersection({"key_visual", "key_animation"}))
 
 
 def step_needs_motion_media(step: dict) -> bool:
@@ -198,14 +284,15 @@ def save_result_media(result_images: list[Image.Image], target_path: Path, width
         fitted = [render_text_card("Output", ["No visual output was captured."], width, FONT_TEXT)]
     gap = 16
     margin = 18
+    canvas_width = max(image.width for image in fitted) + margin * 2
     total_height = margin * 2 + sum(image.height for image in fitted) + gap * (len(fitted) - 1)
-    canvas = Image.new("RGB", (width + margin * 2, total_height), (255, 255, 255))
+    canvas = Image.new("RGB", (canvas_width, total_height), (255, 255, 255))
     y = margin
     for image in fitted:
         canvas.paste(image, (margin, y))
         y += image.height + gap
     canvas.save(target_path)
-    validate_png(target_path, min_width=320, min_height=180, min_bytes=4000)
+    validate_png(target_path, min_width=320, min_height=150, min_bytes=4000)
 
 
 def build_learning_card(step: dict, source: str, result_images: list[Image.Image], card_conf: dict) -> Image.Image:
@@ -350,14 +437,23 @@ def summarize_artifact(path: Path) -> list[str]:
 
 def module_result_images(root: Path, step: dict, width: int) -> list[Image.Image]:
     output_type = step.get("output_type")
+    kind = capture_kind(step)
     if output_type == "command_log":
+        if kind != "code_evidence":
+            raise RuntimeError(f"{step_label(step)}: command_log requires capture_kind=code_evidence.")
         log_path = root / step.get("log_path", "")
         return [render_text_card("Command log", text_lines_from_file(log_path), width, FONT_CODE)]
     if output_type == "artifact_summary":
+        if kind != "artifact_summary":
+            raise RuntimeError(f"{step_label(step)}: artifact_summary requires capture_kind=artifact_summary.")
         artifact_path = root / step.get("artifact_path", "")
         return [render_text_card("Artifact summary", summarize_artifact(artifact_path), width, FONT_CODE)]
     if output_type == "diagram":
+        if kind != "code_evidence":
+            raise RuntimeError(f"{step_label(step)}: diagram requires capture_kind=code_evidence.")
         return [render_text_card("Module flow", step.get("diagram_lines", []), width, FONT_TEXT)]
+    if kind != "code_evidence":
+        raise RuntimeError(f"{step_label(step)}: module evidence requires capture_kind=code_evidence.")
     return [render_text_card("Source evidence", [step.get("result_meaning", "Source excerpt explains this module behavior.")], width, FONT_TEXT)]
 
 
@@ -420,7 +516,62 @@ def api_kernel_state(server: dict, notebook_path: str) -> str | None:
     return None
 
 
+def api_kernel_id(server: dict, notebook_path: str) -> str | None:
+    url = server["url"].rstrip("/") + "/api/sessions?token=" + urllib.parse.quote(server["token"])
+    try:
+        with urllib.request.urlopen(url, timeout=5) as response:
+            sessions = json.load(response)
+    except Exception:
+        return None
+    normalized = notebook_path.replace("\\", "/")
+    for session in sessions:
+        if session.get("path", "").replace("\\", "/") == normalized:
+            kernel = session.get("kernel") or {}
+            return kernel.get("id")
+    return None
+
+
+def kernel_connection_file(server: dict, notebook_path: str) -> Path:
+    kernel_id = api_kernel_id(server, notebook_path)
+    if not kernel_id:
+        raise RuntimeError(f"Cannot find live kernel for {notebook_path}.")
+    path = repo_root() / ".jupyter-runtime" / f"kernel-{kernel_id}.json"
+    if not path.exists():
+        raise RuntimeError(f"Cannot find kernel connection file: {path}")
+    return path
+
+
+def execute_kernel_code(connection_file: Path, code: str, timeout_seconds: int = 60) -> None:
+    client = BlockingKernelClient()
+    client.load_connection_file(str(connection_file))
+    client.start_channels()
+    try:
+        message_id = client.execute(code, store_history=False)
+        deadline = time.time() + timeout_seconds
+        errors: list[str] = []
+        while time.time() < deadline:
+            try:
+                message = client.get_iopub_msg(timeout=1)
+            except Exception:
+                continue
+            if message.get("parent_header", {}).get("msg_id") != message_id:
+                continue
+            msg_type = message.get("msg_type")
+            content = message.get("content", {})
+            if msg_type == "error":
+                errors.append("\n".join(content.get("traceback") or [content.get("ename", "error")]))
+            if msg_type == "status" and content.get("execution_state") == "idle":
+                if errors:
+                    raise RuntimeError("Kernel render command failed:\n" + "\n".join(errors))
+                return
+        raise TimeoutError("Kernel render command timed out.")
+    finally:
+        client.stop_channels()
+
+
 def run_all_cells(page, server: dict, case: dict, timeout_seconds: int) -> None:
+    page.locator(".jp-Notebook-cell").nth(1).click(timeout=10_000)
+    page.wait_for_timeout(300)
     page.get_by_text("Run", exact=True).click(timeout=10_000)
     page.wait_for_timeout(300)
     page.get_by_text("Run All Cells", exact=True).click(timeout=10_000)
@@ -495,12 +646,34 @@ def set_slider_by_index(output, index: int, fraction: float) -> bool:
     return True
 
 
+def set_checkbox_by_index(output, index: int, checked: bool) -> bool:
+    boxes = output.locator("input[type='checkbox']")
+    if index >= boxes.count():
+        return False
+    boxes.nth(index).evaluate(
+        """(node, checked) => {
+            node.checked = Boolean(checked);
+            node.dispatchEvent(new Event('input', {bubbles: true}));
+            node.dispatchEvent(new Event('change', {bubbles: true}));
+        }""",
+        bool(checked),
+    )
+    return True
+
+
+def control_fraction(step: dict, control: dict) -> float:
+    if control.get("role") == "timeline" and "slider_fraction" in step:
+        return float(step["slider_fraction"])
+    return float(control.get("fraction", step.get("slider_fraction", 0.5)))
+
+
 def set_sliders(output, step: dict) -> None:
     controls = step.get("controls")
     if isinstance(controls, list):
         for control in controls:
             if control.get("kind") == "slider":
-                set_slider_by_index(output, int(control.get("index", 0)), float(control.get("fraction", 0.5)))
+                if not set_slider_by_index(output, int(control.get("index", 0)), control_fraction(step, control)):
+                    raise RuntimeError(f"{step_label(step)}: slider control index {control.get('index', 0)} was not found.")
         return
     slider_fractions = step.get("slider_fractions")
     if isinstance(slider_fractions, list):
@@ -525,16 +698,9 @@ def set_sliders(output, step: dict) -> None:
 def set_checkboxes(output, indices: list[int]) -> None:
     if not indices:
         return
-    boxes = output.locator("input[type='checkbox']")
     for index in indices:
-        if index < boxes.count():
-            boxes.nth(index).evaluate(
-                """(node) => {
-                    node.checked = true;
-                    node.dispatchEvent(new Event('input', {bubbles: true}));
-                    node.dispatchEvent(new Event('change', {bubbles: true}));
-                }"""
-            )
+        if not set_checkbox_by_index(output, index, True):
+            raise RuntimeError(f"Checkbox control index {index} was not found.")
 
 
 def set_controls(output, step: dict) -> None:
@@ -542,13 +708,13 @@ def set_controls(output, step: dict) -> None:
         return
     controls = step.get("controls")
     if isinstance(controls, list):
-        checkbox_indices: list[int] = []
         for control in controls:
             if control.get("kind") == "slider":
-                set_slider_by_index(output, int(control.get("index", 0)), float(control.get("fraction", 0.5)))
-            elif control.get("kind") == "checkbox" and bool(control.get("checked", True)):
-                checkbox_indices.append(int(control.get("index", 0)))
-        set_checkboxes(output, checkbox_indices)
+                if not set_slider_by_index(output, int(control.get("index", 0)), control_fraction(step, control)):
+                    raise RuntimeError(f"{step_label(step)}: slider control index {control.get('index', 0)} was not found.")
+            elif control.get("kind") == "checkbox":
+                if not set_checkbox_by_index(output, int(control.get("index", 0)), bool(control.get("checked", True))):
+                    raise RuntimeError(f"{step_label(step)}: checkbox control index {control.get('index', 0)} was not found.")
         return
     set_checkboxes(output, step.get("checkbox_indices", []))
     set_sliders(output, step)
@@ -573,6 +739,23 @@ def element_to_image(locator, label: str) -> Image.Image | None:
         path.unlink(missing_ok=True)
 
 
+def raw_element_image(locator) -> Image.Image | None:
+    if locator.count() == 0:
+        return None
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as handle:
+        path = Path(handle.name)
+    try:
+        locator.screenshot(path=str(path), timeout=12_000)
+        image = Image.open(path).convert("RGB")
+        if image.width < 20 or image.height < 20:
+            return None
+        return image
+    except PlaywrightTimeoutError:
+        return None
+    finally:
+        path.unlink(missing_ok=True)
+
+
 def add_image_label(image: Image.Image, label: str) -> Image.Image:
     label_height = 36
     output = Image.new("RGB", (image.width, image.height + label_height), (245, 247, 250))
@@ -582,34 +765,236 @@ def add_image_label(image: Image.Image, label: str) -> Image.Image:
     return output
 
 
-def capture_live_result(page, step: dict) -> list[Image.Image]:
+def compose_labeled_montage(items: list[tuple[str, Image.Image]], width: int = 1280) -> Image.Image:
+    if not items:
+        raise RuntimeError("Cannot compose an empty live-canvas montage.")
+    margin = 18
+    gap = 16
+    label_height = 34
+    column_width = max(180, int((width - margin * 2 - gap * (len(items) - 1)) / len(items)))
+    fitted: list[tuple[str, Image.Image]] = []
+    for label, image in items:
+        fitted.append((label, ImageOps.contain(image.convert("RGB"), (column_width, 720), Image.Resampling.LANCZOS)))
+    content_height = max(image.height for _, image in fitted)
+    height = margin * 2 + label_height + content_height
+    output = Image.new("RGB", (width, height), (255, 255, 255))
+    draw = ImageDraw.Draw(output)
+    x = margin
+    for label, image in fitted:
+        draw.text((x, margin), label, font=FONT_SMALL, fill=(30, 41, 59))
+        output.paste(image, (x, margin + label_height))
+        x += column_width + gap
+    return output
+
+
+def column_sidebar_fraction(image: Image.Image, x: int) -> float:
+    pixels = image.convert("RGB").load()
+    sidebar = 0
+    for y in range(image.height):
+        r, g, b = pixels[x, y]
+        gray = abs(r - g) <= 4 and abs(g - b) <= 4 and 25 <= r <= 170
+        dark_edge = r <= 18 and g <= 22 and b <= 30
+        if gray or dark_edge:
+            sidebar += 1
+    return sidebar / max(1, image.height)
+
+
+def crop_canvas_render_area(image: Image.Image) -> Image.Image:
+    source = image.convert("RGB")
+    right = source.width
+    while right > int(source.width * 0.5) and column_sidebar_fraction(source, right - 1) > 0.96:
+        right -= 1
+    while right > int(source.width * 0.5) and column_sidebar_fraction(source, right - 1) > 0.90:
+        right -= 1
+    if right < source.width - 20:
+        return source.crop((0, 0, right, source.height))
+    return source
+
+
+def locator_text(locator) -> str:
+    try:
+        return locator.inner_text(timeout=1500)
+    except Exception:
+        return ""
+
+
+def image_stats(image: Image.Image) -> dict:
+    sample = ImageOps.contain(image.convert("RGB"), (160, 160), Image.Resampling.BILINEAR)
+    pixels = list(sample.getdata())
+    count = max(1, len(pixels))
+    channel_means = [sum(pixel[index] for pixel in pixels) / count for index in range(3)]
+    grayish = sum(1 for r, g, b in pixels if abs(r - g) < 4 and abs(g - b) < 4 and 80 <= r <= 245) / count
+    near_white = sum(1 for r, g, b in pixels if r > 248 and g > 248 and b > 248) / count
+    near_uniform = len({(r // 8, g // 8, b // 8) for r, g, b in pixels}) <= 6
+    variance = sum(sum((pixel[index] - channel_means[index]) ** 2 for index in range(3)) for pixel in pixels) / count
+    return {
+        "grayish": grayish,
+        "near_white": near_white,
+        "near_uniform": near_uniform,
+        "variance": variance,
+    }
+
+
+def validate_captured_subject(image: Image.Image, kind: str, subject: str, text: str = "") -> None:
+    if image.width < 80 or image.height < 60:
+        raise RuntimeError(f"{subject}: captured {kind} is too small: {image.width}x{image.height}.")
+    bad_text = [token for token in BAD_TEXT if token in text]
+    chrome_text = ["Run All Cells", "Code", "Markdown", "Python 3", "Trusted", "No Kernel"]
+    bad_text.extend(token for token in chrome_text if token in text)
+    if bad_text:
+        raise RuntimeError(f"{subject}: captured {kind} includes notebook chrome/error text: {', '.join(sorted(set(bad_text)))}.")
+    if kind == "canvas":
+        stats = image_stats(image)
+        if stats["near_white"] > 0.985:
+            raise RuntimeError(f"{subject}: live canvas capture is blank/white.")
+        if stats["near_uniform"] or stats["variance"] < 18:
+            raise RuntimeError(f"{subject}: live canvas capture is nearly uniform.")
+        if stats["grayish"] > 0.94 and stats["variance"] < 140:
+            raise RuntimeError(f"{subject}: live canvas capture looks like a gray placeholder.")
+
+
+def screenshot_concrete(locator, kind: str, subject: str, label: str | None = None) -> Image.Image:
+    image = raw_element_image(locator)
+    if image is None:
+        raise RuntimeError(f"{subject}: failed to screenshot {kind}.")
+    validate_captured_subject(image, kind, subject, locator_text(locator))
+    return add_image_label(image, label) if label else image
+
+
+def selector_locator(page, output, selector: str):
+    selector = selector.strip()
+    if selector in {"page canvas:last", "page canvas"}:
+        return page.locator("canvas").last if selector.endswith(":last") else page.locator("canvas").first
+    if selector in {"output canvas:last", "output canvas"}:
+        return output.locator("canvas").last if selector.endswith(":last") else output.locator("canvas").first
+    if selector == "output widget controls":
+        return widget_controls_locator(output)
+    if selector.startswith("output "):
+        selector = selector[len("output "):].strip()
+    scoped = output.locator(selector) if output.count() > 0 else page.locator(selector)
+    if scoped.count() > 0:
+        return scoped.first
+    return page.locator(selector).first
+
+
+def widget_controls_locator(output):
+    explicit = output.locator(".widget-box, .jupyter-widgets, .widget-subarea, .lm-Widget").first
+    if explicit.count() > 0:
+        return explicit
+    controls = output.locator("input[type='range'], input[type='checkbox'], select, button")
+    if controls.count() == 0:
+        return controls
+    controls.first.evaluate(
+        """(node) => {
+            const target = node.closest('.widget-box, .jupyter-widgets, .widget-subarea, form, div') || node;
+            target.setAttribute('data-blog-media-widget-controls', 'true');
+        }"""
+    )
+    return output.locator("[data-blog-media-widget-controls='true']").first
+
+
+def merge_variant_step(step: dict, variant: dict) -> dict:
+    merged = dict(step)
+    merged.pop("capture_variants", None)
+    if "controls" in variant:
+        merged["controls"] = variant["controls"]
+    if "slider_fraction" in step:
+        merged["slider_fraction"] = step["slider_fraction"]
+    for key in ("cell_index", "capture_selector", "capture_kind", "visual_subject"):
+        if key in variant:
+            merged[key] = variant[key]
+    for key in ("camera", "live_prepare_cell", "live_render"):
+        if key in variant:
+            merged[key] = variant[key]
+    return merged
+
+
+def timeline_fraction(step: dict) -> float:
+    for control in step.get("controls", []):
+        if control.get("kind") == "slider" and control.get("role") == "timeline":
+            return float(step.get("slider_fraction", control.get("fraction", 0.5)))
+    return float(step.get("slider_fraction", 0.5))
+
+
+def execute_live_render(context: dict | None, step: dict) -> None:
+    render_template = step.get("live_render")
+    if not render_template:
+        return
+    if context is None:
+        raise RuntimeError(f"{step_label(step)}: live_render requires a live kernel context.")
+    prepare_cell = step.get("live_prepare_cell")
+    if prepare_cell is not None and context.get("prepared_cell") != int(prepare_cell):
+        source_nb = context["source_nb"]
+        source = source_nb.cells[int(prepare_cell)].source
+        execute_kernel_code(context["connection_file"], source, int(context.get("kernel_timeout", 90)))
+        context["prepared_cell"] = int(prepare_cell)
+    fraction = timeline_fraction(step)
+    frame_expr = f"int(round((frame_count - 1) * {fraction:.8f}))"
+    camera = step.get("camera")
+    camera_lines: list[str] = []
+    if isinstance(camera, dict):
+        if camera.get("target") == "animation_root":
+            offset = camera.get("offset", [0.0, 0.0, 0.0])
+            camera_lines.append(f"_blog_frame = {frame_expr}")
+            camera_lines.append(
+                "viewer.camera_pos = (animation.pos[_blog_frame, 0] + "
+                f"np.array({offset}, dtype=np.float32)).tolist()"
+            )
+            frame_expr = "_blog_frame"
+        elif isinstance(camera.get("pos"), list):
+            camera_lines.append(f"viewer.camera_pos = {camera['pos']}")
+        if "pitch" in camera:
+            camera_lines.append(f"viewer.camera_pitch = {float(camera['pitch'])}")
+        if "yaw" in camera:
+            camera_lines.append(f"viewer.camera_yaw = {float(camera['yaw'])}")
+    code = "\n".join(camera_lines + [render_template.format(frame=frame_expr, fraction=f"{fraction:.8f}")])
+    execute_kernel_code(context["connection_file"], code, int(context.get("kernel_timeout", 90)))
+
+
+def capture_live_canvas_image(page, step: dict, context: dict | None = None) -> Image.Image:
+    if page is None:
+        raise RuntimeError(f"{step_label(step)}: live capture requires a browser page.")
+    execute_live_render(context, step)
     cell, output = cell_output_locator(page, int(step["cell_index"]))
     cell.scroll_into_view_if_needed(timeout=10_000)
     page.wait_for_timeout(500)
-    if output.count() > 0:
+    if output.count() > 0 and not step.get("live_render"):
         set_controls(output, step)
     page.wait_for_timeout(1200)
 
-    images: list[Image.Image] = []
-    if step.get("output_type") == "widget_controls":
-        controls = element_to_image(output, "Cell output controls / widget state") if output.count() > 0 else None
-        if controls is not None and controls.height >= 50:
-            images.append(controls)
-
-    target_canvas = output.locator("canvas").last if output.count() > 0 and output.locator("canvas").count() > 0 else None
-    canvas = target_canvas or page.locator("canvas").last
-    if canvas.count() > 0:
-        canvas.scroll_into_view_if_needed(timeout=10_000)
+    kind = capture_kind(step)
+    subject = visual_subject(step)
+    selector = step.get("capture_selector")
+    if kind == "canvas":
+        target = selector_locator(page, output, selector) if selector else output.locator("canvas").last
+        if target.count() == 0:
+            raise RuntimeError(f"{subject}: no concrete canvas found; live capture will not fall back to cell/output screenshots.")
+        target.scroll_into_view_if_needed(timeout=10_000)
         page.wait_for_timeout(500)
-        canvas_image = element_to_image(canvas, "Live animation viewer / canvas")
-        if canvas_image is not None:
-            images.append(canvas_image)
+        image = screenshot_concrete(target, "canvas", subject)
+        return crop_canvas_render_area(image) if step.get("crop_canvas_render_area") else image
+    if kind == "widget_controls":
+        if output.count() == 0:
+            raise RuntimeError(f"{subject}: no output area available for widget controls.")
+        target = selector_locator(page, output, selector) if selector else widget_controls_locator(output)
+        if target.count() == 0:
+            raise RuntimeError(f"{subject}: no concrete widget controls found; live capture will not fall back to output screenshots.")
+        target.scroll_into_view_if_needed(timeout=10_000)
+        page.wait_for_timeout(300)
+        return screenshot_concrete(target, "widget_controls", subject)
+    raise RuntimeError(f"{subject}: live capture_kind={kind!r} is not supported.")
 
-    if not images:
-        fallback = element_to_image(output if output.count() > 0 else cell, "Cell output")
-        if fallback is not None:
-            images.append(fallback)
-    return images
+
+def capture_live_result(page, step: dict, context: dict | None = None) -> list[Image.Image]:
+    variants = step.get("capture_variants")
+    if isinstance(variants, list) and variants:
+        captured: list[tuple[str, Image.Image]] = []
+        for index, variant in enumerate(variants):
+            variant_step = merge_variant_step(step, variant)
+            label = variant.get("label") or f"Variant {index + 1}"
+            captured.append((label, capture_live_canvas_image(page, variant_step, context)))
+        return [compose_labeled_montage(captured)]
+    return [capture_live_canvas_image(page, step, context)]
 
 
 def png_size(path: Path) -> tuple[int, int] | None:
@@ -850,6 +1235,33 @@ def write_frames(images: list[Image.Image], prefix: str) -> list[Path]:
     return frames
 
 
+def frame_difference(left: Image.Image, right: Image.Image) -> float:
+    a = ImageOps.contain(left.convert("RGB"), (160, 90), Image.Resampling.BILINEAR)
+    b = ImageOps.contain(right.convert("RGB"), (160, 90), Image.Resampling.BILINEAR)
+    if a.size != b.size:
+        b = b.resize(a.size, Image.Resampling.BILINEAR)
+    left_pixels = list(a.getdata())
+    right_pixels = list(b.getdata())
+    total = 0
+    for first, second in zip(left_pixels, right_pixels):
+        total += sum(abs(first[index] - second[index]) for index in range(3))
+    return total / max(1, len(left_pixels) * 3)
+
+
+def validate_real_motion_frames(step: dict, frames: list[Image.Image], provenance: str) -> None:
+    if provenance == DERIVED_CARD_PROVENANCE:
+        if is_key_publish_media(step):
+            raise RuntimeError(f"{step_label(step)}: derived card crops cannot satisfy publish-required key media.")
+        return
+    if provenance not in REAL_MEDIA_PROVENANCE:
+        raise RuntimeError(f"{step_label(step)}: motion media provenance {provenance!r} is not an approved real source.")
+    if len(frames) < 3:
+        raise RuntimeError(f"{step_label(step)}: motion media requires a real frame sequence, got {len(frames)} frame(s).")
+    max_delta = max(frame_difference(frames[index - 1], frames[index]) for index in range(1, len(frames)))
+    if max_delta < 1.5:
+        raise RuntimeError(f"{step_label(step)}: motion frame sequence appears static.")
+
+
 def animated_frames_from_still(image: Image.Image, frame_count: int = 18) -> list[Image.Image]:
     source = fit_video_frame(image)
     frames: list[Image.Image] = []
@@ -867,9 +1279,16 @@ def animated_frames_from_still(image: Image.Image, frame_count: int = 18) -> lis
     return frames
 
 
-def encode_step_motion(step: dict, frames: list[Image.Image], assets_dir: Path, animation_conf: dict) -> None:
+def encode_step_motion(
+    step: dict,
+    frames: list[Image.Image],
+    assets_dir: Path,
+    animation_conf: dict,
+    provenance: str = "live_canvas",
+) -> None:
     if not step_needs_motion_media(step):
         return
+    validate_real_motion_frames(step, frames, provenance)
     fps = int(animation_conf.get("fps", 6))
     max_seconds = int(animation_conf.get("max_seconds", 6))
     max_bytes = int(animation_conf.get("max_bytes", 10 * 1024 * 1024))
@@ -898,16 +1317,14 @@ def choose_live_video_step(case: dict) -> dict | None:
     return None
 
 
-def make_video_from_live(page, case: dict, source_nb, video_conf: dict, assets_dir: Path, card_conf: dict) -> None:
+def make_video_from_live(page, case: dict, source_nb, video_conf: dict, assets_dir: Path, card_conf: dict, context: dict | None = None) -> None:
     base_step = choose_live_video_step(case)
     if base_step is None:
-        make_video_from_cards(case, video_conf, assets_dir)
-        return
+        raise RuntimeError(f"{case['slug']}: live_timeline video requires a concrete live video step.")
 
     frames_dir = Path(tempfile.mkdtemp(prefix=f"blog_media_{case['slug']}_live_frames_"))
     target_count = max(12, min(48, int(video_conf["max_seconds"]) * int(video_conf.get("fps", 4))))
     sample_count = min(12, target_count)
-    source = source_nb.cells[int(base_step["cell_index"])].source
     sample_frames: list[Image.Image] = []
 
     for sample_index in range(sample_count):
@@ -915,8 +1332,12 @@ def make_video_from_live(page, case: dict, source_nb, video_conf: dict, assets_d
         step = dict(base_step)
         step["slider_fraction"] = fraction
         step["title"] = f"{base_step['title']} - timeline sample {sample_index + 1}"
-        result_images = capture_live_result(page, step)
-        sample_frames.append(fit_video_frame(build_learning_card(step, source, result_images, card_conf)))
+        result_images = capture_live_result(page, step, context)
+        if not result_images:
+            raise RuntimeError(f"{case['slug']}: live video sample {sample_index + 1} produced no concrete media.")
+        sample_frames.append(fit_video_frame(result_images[0]))
+
+    validate_real_motion_frames(base_step, sample_frames, concrete_provenance(base_step, "live_canvas"))
 
     frames: list[Path] = []
     for index in range(target_count):
@@ -928,6 +1349,38 @@ def make_video_from_live(page, case: dict, source_nb, video_conf: dict, assets_d
     output_path = assets_dir / video_conf["file"]
     encode_webm(frames, output_path, int(video_conf.get("fps", 4)))
     validate_video(output_path, int(video_conf["max_seconds"]), int(video_conf["max_bytes"]))
+
+
+def capture_live_motion_frames(page, step: dict, animation_conf: dict, context: dict | None = None) -> list[Image.Image]:
+    frame_count = max(3, min(24, int(animation_conf.get("max_seconds", 6)) * int(animation_conf.get("fps", 6))))
+    sample_count = min(12, frame_count)
+    frames: list[Image.Image] = []
+    for index in range(sample_count):
+        sample = dict(step)
+        sample["slider_fraction"] = index / max(1, sample_count - 1)
+        images = capture_live_result(page, sample, context)
+        if not images:
+            raise RuntimeError(f"{step_label(step)}: live motion sample {index + 1} produced no concrete media.")
+        frames.append(images[0])
+    return frames
+
+
+def executed_result_images(executed_nb, step: dict, width: int) -> tuple[list[Image.Image], str]:
+    kind = capture_kind(step)
+    if kind == "plot":
+        image = image_from_executed_output(executed_nb, step)
+        if image is None:
+            raise RuntimeError(f"{step_label(step)}: capture_kind=plot requires an executed image/png output.")
+        return [add_image_label(image, f"{visual_subject(step)} / executed plot image")], "executed_plot_image"
+    if kind == "table":
+        return [text_image_from_executed_output(executed_nb, step, width)], "executed_table_card"
+    if kind == "formula":
+        return [text_image_from_executed_output(executed_nb, step, width)], "executed_formula_card"
+    if kind == "artifact_summary":
+        return [text_image_from_executed_output(executed_nb, step, width)], "artifact_summary"
+    if kind == "code_evidence":
+        return [text_image_from_executed_output(executed_nb, step, width)], "code_evidence"
+    raise RuntimeError(f"{step_label(step)}: capture_kind={kind!r} requires live capture.")
 
 
 def capture_module_case(case: dict, manifest: dict) -> None:
@@ -943,6 +1396,9 @@ def capture_module_case(case: dict, manifest: dict) -> None:
         step_source_path = root / step.get("source_path", case["source_path"])
         source = extract_source_excerpt(step_source_path, step)
         images = module_result_images(root, step, int(manifest["card"]["width"]))
+        provenance = concrete_provenance(step, "artifact_summary" if capture_kind(step) == "artifact_summary" else "code_evidence")
+        if provenance not in {"artifact_summary", "code_evidence"}:
+            raise RuntimeError(f"{step_label(step)}: module media provenance {provenance!r} is not valid for concrete evidence.")
         save_result_media(images, assets_dir / result_file(step), int(manifest["card"]["width"]))
         compose_learning_card(step, source, images, assets_dir / card_file(step), manifest["card"])
 
@@ -1014,6 +1470,8 @@ def derive_case_from_cards(case: dict, manifest: dict) -> None:
     assets_dir = root / case["assets_dir"]
     animation_conf = manifest.get("animation", manifest.get("video", {}))
     for step in case["steps"]:
+        if is_key_publish_media(step):
+            raise RuntimeError(f"{case['slug']} {step_label(step)}: derive-from-cards is fallback/provenance={DERIVED_CARD_PROVENANCE} and cannot satisfy publish-required key media.")
         card_path = assets_dir / card_file(step)
         if not card_path.exists():
             raise FileNotFoundError(f"{case['slug']}: missing legacy card for derive mode: {card_path}")
@@ -1025,7 +1483,7 @@ def derive_case_from_cards(case: dict, manifest: dict) -> None:
             result.save(result_path)
             validate_png(result_path, min_width=320, min_height=180, min_bytes=4000)
             if step_needs_motion_media(step):
-                encode_step_motion(step, animated_frames_from_still(result), assets_dir, animation_conf)
+                encode_step_motion(step, animated_frames_from_still(result), assets_dir, animation_conf, DERIVED_CARD_PROVENANCE)
     make_video_from_cards(case, manifest["video"], assets_dir)
     print(f"derived {case['slug']}: result media from legacy cards")
 
@@ -1053,9 +1511,10 @@ def capture_case(case: dict, manifest: dict, server: dict | None, browser, run_t
 
     source_nb = nbformat.read(notebook_path, as_version=4)
     executed_nb = nbformat.read(executed_path, as_version=4)
-    needs_live = any(step.get("output_type") in LIVE_OUTPUT_TYPES for step in case["steps"])
+    needs_live = any(capture_kind(step) in {"canvas", "widget_controls"} for step in case["steps"])
 
     page = None
+    live_context = None
     if needs_live:
         if server is None:
             raise RuntimeError(f"{slug}: live JupyterLab server is required for viewer captures.")
@@ -1070,31 +1529,36 @@ def capture_case(case: dict, manifest: dict, server: dict | None, browser, run_t
         if not skip_run:
             run_all_cells(page, server, case, run_timeout)
         scan_page_for_errors(page, slug)
+        live_context = {
+            "connection_file": kernel_connection_file(server, case["notebook"]),
+            "source_nb": source_nb,
+            "prepared_cell": None,
+            "kernel_timeout": 120,
+        }
 
     for step in case["steps"]:
         cell_index = int(step["cell_index"])
         source = source_nb.cells[cell_index].source
-        output_type = step.get("output_type")
-        result_images: list[Image.Image] = []
-        if output_type in LIVE_OUTPUT_TYPES:
-            result_images = capture_live_result(page, step) if page is not None else []
-        elif output_type in PLOT_OUTPUT_TYPES:
-            image = image_from_executed_output(executed_nb, step)
-            if image is None:
-                image = text_image_from_executed_output(executed_nb, step, int(manifest["card"]["width"]))
-            result_images = [add_image_label(image, "Executed cell plot/output")]
-        elif output_type in TEXT_OUTPUT_TYPES:
-            result_images = [text_image_from_executed_output(executed_nb, step, int(manifest["card"]["width"]))]
+        kind = capture_kind(step)
+        width = int(manifest["card"]["width"])
+        if kind in {"canvas", "widget_controls"}:
+            result_images = capture_live_result(page, step, live_context)
+            provenance = concrete_provenance(step, "live_canvas" if kind == "canvas" else "live_widget_controls")
         else:
-            result_images = [render_text_card("Cell output", ["This cell prepares data for downstream visualization."], int(manifest["card"]["width"]), FONT_TEXT)]
+            result_images, provenance = executed_result_images(executed_nb, step, width)
+        if provenance not in REAL_MEDIA_PROVENANCE:
+            raise RuntimeError(f"{step_label(step)}: result media provenance {provenance!r} is not an approved real source.")
 
-        save_result_media(result_images, assets_dir / result_file(step), int(manifest["card"]["width"]))
+        save_result_media(result_images, assets_dir / result_file(step), width)
         compose_learning_card(step, source, result_images, assets_dir / card_file(step), manifest["card"])
         if step_needs_motion_media(step):
-            encode_step_motion(step, [fit_video_frame(image) for image in result_images], assets_dir, manifest.get("animation", manifest["video"]))
+            if kind != "canvas":
+                raise RuntimeError(f"{step_label(step)}: motion media requires capture_kind=canvas and a real frame sequence.")
+            motion_frames = capture_live_motion_frames(page, step, manifest.get("animation", manifest["video"]), live_context)
+            encode_step_motion(step, motion_frames, assets_dir, manifest.get("animation", manifest["video"]), provenance)
 
     if page is not None and case.get("video_step", {}).get("mode") == "live_timeline":
-        make_video_from_live(page, case, source_nb, manifest["video"], assets_dir, manifest["card"])
+        make_video_from_live(page, case, source_nb, manifest["video"], assets_dir, manifest["card"], live_context)
         page.close()
     else:
         if page is not None:
@@ -1127,7 +1591,7 @@ def main() -> int:
             derive_case_from_cards(case, manifest)
         return 0
 
-    needs_live = any(any(step.get("output_type") in LIVE_OUTPUT_TYPES for step in case["steps"]) for case in cases)
+    needs_live = any(any(capture_kind(step) in {"canvas", "widget_controls"} for step in case["steps"]) for case in cases if case.get("kind") != "python_module")
     server = find_live_jupyter_server() if needs_live else None
 
     with sync_playwright() as playwright:

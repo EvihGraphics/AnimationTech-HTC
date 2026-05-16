@@ -134,24 +134,24 @@ canonical clips 验证相位对齐；B-spline viewer 验证曲线压缩可播放
 
 ## 重点可视化 / 动画
 
-README 中优先引用结果 PNG、GIF 预览和视频链接；代码学习卡保留为复现证据。
+本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 [打开/下载总览 WebM](assets/00-walkthrough.webm)
 
-![Final interpolated adverb controls](assets/08_final_interpolated_adverb_controls_preview.gif)
+![Raw sample clip overview](assets/01_raw_sample_clips_preview.gif)
 
-[打开 MP4](assets/08_final_interpolated_adverb_controls_preview.mp4) / [打开 WebM](assets/08_final_interpolated_adverb_controls_preview.webm)
+[打开 MP4](assets/01_raw_sample_clips_preview.mp4) / [打开 WebM](assets/01_raw_sample_clips_preview.webm)
 
-| Cell | 输出类型 | 媒体角色 | 代码目的 | 结果媒体 |
-| --- | --- | --- | --- | --- |
-| Cell 7 | `timeline_viewer` | `key_animation` | Render the original sample actions for different verbs/adverbs. | [结果 PNG](assets/01_raw_sample_clips_result.png) / [GIF](assets/01_raw_sample_clips_preview.gif) / [MP4](assets/01_raw_sample_clips_preview.mp4) / [WebM](assets/01_raw_sample_clips_preview.webm) / [代码卡](assets/01_raw_sample_clips.png) |
-| Cell 10 | `timeline_viewer` | `key_animation` | Inspect clip timing with optional on-spot playback. | [结果 PNG](assets/02_canonical_timing_contacts_result.png) / [GIF](assets/02_canonical_timing_contacts_preview.gif) / [MP4](assets/02_canonical_timing_contacts_preview.mp4) / [WebM](assets/02_canonical_timing_contacts_preview.webm) / [代码卡](assets/02_canonical_timing_contacts.png) |
-| Cell 14 | `timeline_viewer` | `key_animation` | Render looped versions of the sample clips. | [结果 PNG](assets/03_looping_animation_compare_result.png) / [GIF](assets/03_looping_animation_compare_preview.gif) / [MP4](assets/03_looping_animation_compare_preview.mp4) / [WebM](assets/03_looping_animation_compare_preview.webm) / [代码卡](assets/03_looping_animation_compare.png) |
-| Cell 18 | `timeline_viewer` | `key_animation` | Render resampled clips after time normalization. | [结果 PNG](assets/04_resampled_canonical_clips_result.png) / [GIF](assets/04_resampled_canonical_clips_preview.gif) / [MP4](assets/04_resampled_canonical_clips_preview.mp4) / [WebM](assets/04_resampled_canonical_clips_preview.webm) / [代码卡](assets/04_resampled_canonical_clips.png) |
-| Cell 22 | `plot` | `key_visual` | Plot fitted B-spline curves over normalized samples. | [结果 PNG](assets/05_bspline_fit_plot_result.png) / [代码卡](assets/05_bspline_fit_plot.png) |
-| Cell 23 | `timeline_viewer` | `key_animation` | Render the reconstructed animation from fitted curves. | [结果 PNG](assets/06_bspline_reconstruction_viewer_result.png) / [GIF](assets/06_bspline_reconstruction_viewer_preview.gif) / [MP4](assets/06_bspline_reconstruction_viewer_preview.mp4) / [WebM](assets/06_bspline_reconstruction_viewer_preview.webm) / [代码卡](assets/06_bspline_reconstruction_viewer.png) |
-| Cell 28 | `table` | `supporting_evidence` | Print the adverb-space coordinates used by the RBF interpolator. | [结果 PNG](assets/07_adverb_coordinate_table_result.png) / [代码卡](assets/07_adverb_coordinate_table.png) |
-| Cell 33 | `timeline_viewer` | `key_animation` | Move final controls for angle/style and render the blended result. | [结果 PNG](assets/08_final_interpolated_adverb_controls_result.png) / [GIF](assets/08_final_interpolated_adverb_controls_preview.gif) / [MP4](assets/08_final_interpolated_adverb_controls_preview.mp4) / [WebM](assets/08_final_interpolated_adverb_controls_preview.webm) / [代码卡](assets/08_final_interpolated_adverb_controls.png) |
+| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+| Cell 7 | `timeline_viewer` | `key_animation` | Raw sample clip overview: The viewer establishes the motion examples that will be normalized and blended. | `canvas` | [结果 PNG](assets/01_raw_sample_clips_result.png) / [GIF](assets/01_raw_sample_clips_preview.gif) / [MP4](assets/01_raw_sample_clips_preview.mp4) / [WebM](assets/01_raw_sample_clips_preview.webm) |
+| Cell 10 | `timeline_viewer` | `key_animation` | Canonical timing and contact inspection: Canonical timing aligns examples before interpolation. | `canvas` | [结果 PNG](assets/02_canonical_timing_contacts_result.png) / [GIF](assets/02_canonical_timing_contacts_preview.gif) / [MP4](assets/02_canonical_timing_contacts_preview.mp4) / [WebM](assets/02_canonical_timing_contacts_preview.webm) |
+| Cell 14 | `timeline_viewer` | `key_animation` | Looping animation comparison: Looping makes repeated motion comparable across clips. | `canvas` | [结果 PNG](assets/03_looping_animation_compare_result.png) / [GIF](assets/03_looping_animation_compare_preview.gif) / [MP4](assets/03_looping_animation_compare_preview.mp4) / [WebM](assets/03_looping_animation_compare_preview.webm) |
+| Cell 18 | `timeline_viewer` | `key_animation` | Resampled canonical clips: The viewer checks that examples share a common timing domain. | `canvas` | [结果 PNG](assets/04_resampled_canonical_clips_result.png) / [GIF](assets/04_resampled_canonical_clips_preview.gif) / [MP4](assets/04_resampled_canonical_clips_preview.mp4) / [WebM](assets/04_resampled_canonical_clips_preview.webm) |
+| Cell 22 | `plot` | `key_visual` | B-spline curve fit: The plot shows how sparse motion samples become smooth parameterized curves. | `plot` | [结果 PNG](assets/05_bspline_fit_plot_result.png) |
+| Cell 23 | `timeline_viewer` | `key_animation` | B-spline reconstruction viewer: The viewer validates the curve representation as playable motion. | `canvas` | [结果 PNG](assets/06_bspline_reconstruction_viewer_result.png) / [GIF](assets/06_bspline_reconstruction_viewer_preview.gif) / [MP4](assets/06_bspline_reconstruction_viewer_preview.mp4) / [WebM](assets/06_bspline_reconstruction_viewer_preview.webm) |
+| Cell 33 | `timeline_viewer` | `key_animation` | Final interpolated adverb controls: The final viewer shows how verb and adverb coordinates produce a new animation. | `canvas` | [结果 PNG](assets/08_final_interpolated_adverb_controls_result.png) / [GIF](assets/08_final_interpolated_adverb_controls_preview.gif) / [MP4](assets/08_final_interpolated_adverb_controls_preview.mp4) / [WebM](assets/08_final_interpolated_adverb_controls_preview.webm) |
+
 
 ## 代码 Cell 与可视化结果
 
