@@ -305,3 +305,18 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 halo_4_
 | Cell 19 | The widget makes a basis component visible as a facial deformation direction. | [结果 PNG](assets/05_pca_component_viewer_result.png) / [GIF](assets/05_pca_component_viewer_preview.gif) / [MP4](assets/05_pca_component_viewer_preview.mp4) / [WebM](assets/05_pca_component_viewer_preview.webm) / [代码卡](assets/05_pca_component_viewer.png) |
 | Cell 23 | The viewer checks whether the compressed representation preserves the visible expression motion. | [结果 PNG](assets/06_cpu_reconstruction_compare_result.png) / [GIF](assets/06_cpu_reconstruction_compare_preview.gif) / [MP4](assets/06_cpu_reconstruction_compare_preview.mp4) / [WebM](assets/06_cpu_reconstruction_compare_preview.webm) / [代码卡](assets/06_cpu_reconstruction_compare.png) |
 | Cell 26 | The final viewer shows the runtime-friendly form of the PCA facial animation pipeline. | [结果 PNG](assets/07_gpu_shader_reconstruction_result.png) / [GIF](assets/07_gpu_shader_reconstruction_preview.gif) / [MP4](assets/07_gpu_shader_reconstruction_preview.mp4) / [WebM](assets/07_gpu_shader_reconstruction_preview.webm) / [代码卡](assets/07_gpu_shader_reconstruction.png) |
+
+### Debug Video Tests
+
+Test 1: GitHub Raw absolute inside video tag
+<video src="https://github.com/EvihGraphics/AnimationTech-HTC/raw/main/docs/blog/AnimationPapers/halo_4_facial_animation/assets/02_raw_vertex_stream_viewer_preview.mp4" controls></video>
+
+Test 2: githubusercontent absolute inside video tag
+<video src="https://raw.githubusercontent.com/EvihGraphics/AnimationTech-HTC/main/docs/blog/AnimationPapers/halo_4_facial_animation/assets/02_raw_vertex_stream_viewer_preview.mp4" controls></video>
+
+Test 3: Bare GitHub raw URL
+https://github.com/EvihGraphics/AnimationTech-HTC/raw/main/docs/blog/AnimationPapers/halo_4_facial_animation/assets/02_raw_vertex_stream_viewer_preview.mp4
+
+Test 4: Bare githubusercontent URL
+https://raw.githubusercontent.com/EvihGraphics/AnimationTech-HTC/main/docs/blog/AnimationPapers/halo_4_facial_animation/assets/02_raw_vertex_stream_viewer_preview.mp4
+
