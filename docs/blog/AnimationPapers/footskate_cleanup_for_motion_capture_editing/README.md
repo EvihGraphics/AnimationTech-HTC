@@ -284,6 +284,9 @@ notebook 先用普通版本生成 `solved_animation`，后面又用 `L4 = 1000` 
 
 ![Final Processing boundary smoothing preview](assets/06_final_processing_compare_preview.gif)
 
+
+https://github.com/user-attachments/assets/2abd9291-3fe6-4c1d-a21c-51ed691da380
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_final_processing_compare_result.png" src="assets/06_final_processing_compare_preview.mp4"></video>
 
 ## 运行方式
@@ -303,6 +306,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 footska
 
 ![Final Processing boundary smoothing preview](assets/06_final_processing_compare_preview.gif)
 
+
+https://github.com/user-attachments/assets/2abd9291-3fe6-4c1d-a21c-51ed691da380
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_final_processing_compare_result.png" src="assets/06_final_processing_compare_preview.mp4"></video>
 
 | Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
@@ -314,7 +320,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 footska
 | Cell 28 | `plot` | `key_visual` | IK knee damping curve: The curve explains how correction error is smoothly distributed through the leg chain. | `plot/executed_plot_image` | [结果 PNG](assets/04_constraint_buffer_debug_result.png) |
 | Cell 29 | `viewer` | `key_visual` | Original versus IK-solved animation: foot drift is reduced toward the planted-foot band. | `canvas/live_canvas` | [结果 PNG](assets/01_raw_vs_solved_overview_result.png) |
 | Cell 34 | `timeline_viewer` | `key_animation` | Final Processing smoothstep blend: correction weight fades in/out across contact boundaries. | `canvas/live_canvas` | [结果 PNG](assets/06_final_processing_compare_result.png) / [GIF](assets/06_final_processing_compare_preview.gif) / [MP4](assets/06_final_processing_compare_preview.mp4) / [WebM](assets/06_final_processing_compare_preview.webm) |
-
 
 ## 代码 Cell 与可视化结果
 

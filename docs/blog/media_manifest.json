@@ -1417,7 +1417,7 @@
           "preview_gif": "06_final_processing_compare_preview.gif",
           "video_mp4": "06_final_processing_compare_preview.mp4",
           "video_webm": "06_final_processing_compare_preview.webm",
-          "github_video_url": null,
+          "github_video_url": "https://github.com/user-attachments/assets/2abd9291-3fe6-4c1d-a21c-51ed691da380",
           "capture_kind": "canvas",
           "visual_subject": "Final Processing smoothstep blend: correction weight fades in/out across contact boundaries.",
           "capture_selector": "page canvas:last",

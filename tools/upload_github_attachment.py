@@ -110,8 +110,6 @@ def update_manifest(path: Path, manifest: dict, case_slug: str, step_id: str, ur
 
 def insert_url_after_preview(readme_path: Path, preview_gif: str, url: str) -> None:
     text = readme_path.read_text(encoding="utf-8-sig")
-    if url in text:
-        return
     preview_ref = f"assets/{preview_gif}"
     if preview_ref not in text:
         raise SystemExit(f"README does not reference preview GIF {preview_ref}: {readme_path}")
@@ -123,7 +121,7 @@ def insert_url_after_preview(readme_path: Path, preview_gif: str, url: str) -> N
     while index < len(lines):
         line = lines[index]
         output.append(line)
-        if preview_ref in line:
+        if line.strip().startswith("![") and preview_ref in line:
             cursor = index + 1
             while cursor < len(lines) and lines[cursor].strip() == "":
                 output.append(lines[cursor])
@@ -164,32 +162,103 @@ def backfill_docs(manifest_path: Path, case_slug: str, step_id: str | None, file
     return readme_path, resolved_step_id
 
 
-def open_issue_markdown_editor(page, repo: str) -> None:
-    """Open a GitHub Markdown editor without creating any issue."""
+def has_visible_textarea(page) -> bool:
+    return page.locator("textarea:visible").count() > 0
 
-    page.goto(f"https://github.com/{repo}/issues/new", wait_until="domcontentloaded", timeout=60_000)
-    if page.locator("textarea").count() > 0:
+
+def needs_login(page) -> bool:
+    if "github.com/login" in page.url:
+        return True
+    if has_visible_textarea(page):
+        return False
+    return page.locator("a[href*='/login']").count() > 0
+
+
+def wait_for_login_if_needed(page, repo: str, headless: bool, timeout_seconds: int) -> None:
+    if not needs_login(page):
         return
+    if headless:
+        raise SystemExit("GitHub login is required; rerun without --headless.")
 
-    blank_issue_links = [
-        page.get_by_role("link", name=re.compile(r"open a blank issue", re.I)),
-        page.get_by_role("link", name=re.compile(r"blank issue", re.I)),
-        page.get_by_role("link", name=re.compile(r"get started", re.I)).first,
-    ]
-    for link in blank_issue_links:
-        try:
-            if link.count() > 0:
-                link.click(timeout=5_000)
-                page.wait_for_load_state("domcontentloaded", timeout=30_000)
-                if page.locator("textarea").count() > 0:
-                    return
-        except Exception:
-            continue
-
-    page.goto(f"https://github.com/{repo}/issues/new?body=", wait_until="domcontentloaded", timeout=60_000)
+    print("GitHub login is required. Complete login in the opened browser window.")
+    page.goto(
+        f"https://github.com/login?return_to=https%3A%2F%2Fgithub.com%2F{repo}%2Fissues%2Fnew",
+        wait_until="domcontentloaded",
+        timeout=60_000,
+    )
+    page.wait_for_function(
+        "() => !location.href.includes('/login') && !document.querySelector(\"a[href*='/login']\")",
+        timeout=timeout_seconds * 1000,
+    )
 
 
-def upload_with_playwright(repo: str, file_path: Path, profile_dir: Path, headless: bool, timeout_seconds: int) -> str:
+def current_git_branch(root: Path) -> str | None:
+    try:
+        result = __import__("subprocess").run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except Exception:
+        return None
+    branch = result.stdout.strip()
+    if not branch or branch == "HEAD":
+        return None
+    return branch
+
+
+def markdown_editor_urls(repo: str, branch: str | None, base_branch: str, editor_url: str | None) -> list[str]:
+    urls = []
+    if editor_url:
+        urls.append(editor_url)
+    urls.append(f"https://github.com/{repo}/issues/new")
+    if branch and branch != base_branch:
+        urls.append(f"https://github.com/{repo}/compare/{base_branch}...{branch}?expand=1")
+    return urls
+
+
+def open_markdown_editor(
+    page,
+    repo: str,
+    branch: str | None,
+    base_branch: str,
+    editor_url: str | None,
+) -> None:
+    """Open a GitHub Markdown editor without submitting anything."""
+
+    for url in markdown_editor_urls(repo, branch, base_branch, editor_url):
+        page.goto(url, wait_until="domcontentloaded", timeout=60_000)
+        if has_visible_textarea(page) or needs_login(page):
+            return
+
+        blank_issue_links = [
+            page.get_by_role("link", name=re.compile(r"open a blank issue", re.I)),
+            page.get_by_role("link", name=re.compile(r"blank issue", re.I)),
+            page.get_by_role("link", name=re.compile(r"get started", re.I)).first,
+        ]
+        for link in blank_issue_links:
+            try:
+                if link.count() > 0:
+                    link.click(timeout=5_000)
+                    page.wait_for_load_state("domcontentloaded", timeout=30_000)
+                    if has_visible_textarea(page) or needs_login(page):
+                        return
+            except Exception:
+                continue
+
+
+def upload_with_playwright(
+    repo: str,
+    file_path: Path,
+    profile_dir: Path,
+    headless: bool,
+    timeout_seconds: int,
+    branch: str | None,
+    base_branch: str,
+    editor_url: str | None,
+) -> str:
     try:
         from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
         from playwright.sync_api import sync_playwright
@@ -209,16 +278,13 @@ def upload_with_playwright(repo: str, file_path: Path, profile_dir: Path, headle
         context = playwright.chromium.launch_persistent_context(**launch_kwargs)
         page = context.pages[0] if context.pages else context.new_page()
         try:
-            open_issue_markdown_editor(page, repo)
-            if "login" in page.url:
-                if headless:
-                    raise SystemExit("GitHub login is required; rerun without --headless.")
-                print("GitHub login is required. Complete login in the opened browser window.")
-                page.wait_for_url(lambda url: "login" not in url, timeout=timeout_seconds * 1000)
-                open_issue_markdown_editor(page, repo)
+            open_markdown_editor(page, repo, branch, base_branch, editor_url)
+            if needs_login(page):
+                wait_for_login_if_needed(page, repo, headless, timeout_seconds)
+                open_markdown_editor(page, repo, branch, base_branch, editor_url)
 
-            textarea = page.locator("textarea").first
-            textarea.wait_for(state="attached", timeout=30_000)
+            textarea = page.locator("textarea:visible").first
+            textarea.wait_for(state="visible", timeout=30_000)
             textarea.click()
 
             file_inputs = page.locator("input[type='file']")
@@ -254,6 +320,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--step-id", default="final-processing", help="media_manifest step id.")
     parser.add_argument("--manifest", default="docs/blog/media_manifest.json")
     parser.add_argument("--github-video-url", help="Skip upload and backfill this existing attachment URL.")
+    parser.add_argument(
+        "--editor-url",
+        help="Optional GitHub page with a Markdown attachment editor; useful when Issues are disabled.",
+    )
+    parser.add_argument("--base-branch", default="main", help="Base branch for compare-page upload fallback.")
     parser.add_argument("--no-backfill", action="store_true", help="Only print the generated URL.")
     parser.add_argument("--dry-run", action="store_true", help="Validate targets without writing files.")
     parser.add_argument("--headless", action="store_true", help="Run browser headlessly. Only works if already logged in.")
@@ -277,12 +348,16 @@ def main() -> int:
     elif args.dry_run:
         url = "https://github.com/user-attachments/assets/dry-run"
     else:
+        branch = current_git_branch(root)
         url = upload_with_playwright(
             args.repo,
             file_path,
             Path(args.profile_dir).expanduser().resolve(),
             args.headless,
             args.timeout_seconds,
+            branch,
+            args.base_branch,
+            args.editor_url,
         )
         url = validate_attachment_url(url)
 
