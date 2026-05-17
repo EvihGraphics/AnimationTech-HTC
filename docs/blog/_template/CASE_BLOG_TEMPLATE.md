@@ -160,6 +160,18 @@ rg -n "打开 MP4|打开 WebM|打开/下载" docs/blog --glob README.md
 
 <https://github.com/EvihGraphics/AnimationTech-HTC/tree/main/docs/blog/AnimationPapers/footskate_cleanup_for_motion_capture_editing>
 
+GitHub attachment 视频 URL 优先用本仓库脚本生成并回填，避免手工拖拽遗漏 README 或 manifest：
+
+```powershell
+python .\tools\upload_github_attachment.py `
+  --repo EvihGraphics/AnimationTech-HTC `
+  --file .\docs\blog\AnimationPapers\footskate_cleanup_for_motion_capture_editing\assets\06_final_processing_compare_preview.mp4 `
+  --case-slug footskate_cleanup_for_motion_capture_editing `
+  --step-id final-processing
+```
+
+首次运行会打开一个专用 Playwright 浏览器 profile；若未登录 GitHub，登录一次后脚本会复用该 profile。脚本只读取 GitHub 编辑器返回的 `github.com/user-attachments/assets/...` URL，并自动写入 README 与 `media_manifest.json`，不会把 cookie 或 token 写入仓库。
+
 线上检查项：
 
 - 正文动画至少必须显示 GIF 可动预览，不允许退回“打开 MP4 / 打开 WebM / 打开下载”链接。
