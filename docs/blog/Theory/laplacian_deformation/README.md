@@ -202,6 +202,9 @@ flowchart LR
 
 ![Animation graph reconstruction preview](assets/07_animation_graph_deformation_preview.gif)
 
+
+https://github.com/user-attachments/assets/41fa9cc6-4f7c-40eb-b540-8c1ecf02cc3b
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_animation_graph_deformation_result.png" src="assets/07_animation_graph_deformation_preview.mp4"></video>
 
 ### Cell 46 - Curved locomotion result
@@ -225,6 +228,9 @@ flowchart LR
 ![Curved locomotion result](assets/08_curved_locomotion_result_result.png)
 
 ![Curved locomotion result preview](assets/08_curved_locomotion_result_preview.gif)
+
+
+https://github.com/user-attachments/assets/1b2467a9-be91-422f-81d6-d45ba9749100
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_curved_locomotion_result_result.png" src="assets/08_curved_locomotion_result_preview.mp4"></video>
 

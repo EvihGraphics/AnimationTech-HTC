@@ -117,6 +117,9 @@ flowchart LR
 
 ![Raw vertex-stream face playback preview](assets/02_raw_vertex_stream_viewer_preview.gif)
 
+
+https://github.com/user-attachments/assets/617bb853-265d-4eed-b095-38b474535255
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_raw_vertex_stream_viewer_result.png" src="assets/02_raw_vertex_stream_viewer_preview.mp4"></video>
 
 ### Cell 13 - Raw animation memory size
@@ -204,6 +207,9 @@ flowchart LR
 
 ![CPU PCA reconstruction playback preview](assets/06_cpu_reconstruction_compare_preview.gif)
 
+
+https://github.com/user-attachments/assets/b979b113-c290-4b17-b2e1-4cf25ffd4994
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_cpu_reconstruction_compare_result.png" src="assets/06_cpu_reconstruction_compare_preview.mp4"></video>
 
 ### Cell 26 - GPU shader PCA reconstruction
@@ -229,6 +235,9 @@ flowchart LR
 ![GPU shader PCA reconstruction](assets/07_gpu_shader_reconstruction_result.png)
 
 ![GPU shader PCA reconstruction preview](assets/07_gpu_shader_reconstruction_preview.gif)
+
+
+https://github.com/user-attachments/assets/5b77cb10-de83-48b2-b19e-a83a7662832a
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_gpu_shader_reconstruction_result.png" src="assets/07_gpu_shader_reconstruction_preview.mp4"></video>
 
@@ -263,6 +272,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 halo_4_
 
 
 ![Raw vertex-stream face playback](assets/02_raw_vertex_stream_viewer_preview.gif)
+
+
+https://github.com/user-attachments/assets/617bb853-265d-4eed-b095-38b474535255
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_raw_vertex_stream_viewer_result.png">
   <source src="assets/02_raw_vertex_stream_viewer_preview.mp4" type="video/mp4">

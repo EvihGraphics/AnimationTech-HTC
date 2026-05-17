@@ -267,6 +267,9 @@ flowchart LR
 
 ![Runtime Player search loop preview](assets/inertialization_transition_preview.gif)
 
+
+https://github.com/user-attachments/assets/fcfce01e-939c-442b-809d-4c2a5629d522
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/inertialization_transition_result.png" src="assets/inertialization_transition_preview.mp4"></video>
 
 ### Cell 26 - Stop and turn debug frame
@@ -290,6 +293,9 @@ flowchart LR
 
 ![Stop and turn debug frame preview](assets/fast_stop_turn_cases_preview.gif)
 
+
+https://github.com/user-attachments/assets/f9f561b3-3da0-4288-aece-06abcbd03c6a
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/fast_stop_turn_cases_result.png" src="assets/fast_stop_turn_cases_preview.mp4"></video>
 
 ## 运行方式
@@ -312,6 +318,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 motion_
 
 
 ![Runtime Player search loop](assets/inertialization_transition_preview.gif)
+
+
+https://github.com/user-attachments/assets/fcfce01e-939c-442b-809d-4c2a5629d522
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/inertialization_transition_result.png">
   <source src="assets/inertialization_transition_preview.mp4" type="video/mp4">

@@ -311,6 +311,9 @@ flowchart LR
 
 ![Follow-path result viewer preview](assets/follow_path_visualization_preview.gif)
 
+
+https://github.com/user-attachments/assets/10405ac3-2546-4376-ac64-fcd62bcaa3a7
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/follow_path_visualization_result.png" src="assets/follow_path_visualization_preview.mp4"></video>
 
 ## 运行方式
@@ -333,6 +336,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 motion_
 
 
 ![Follow-path result viewer](assets/follow_path_visualization_preview.gif)
+
+
+https://github.com/user-attachments/assets/10405ac3-2546-4376-ac64-fcd62bcaa3a7
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/follow_path_visualization_result.png">
   <source src="assets/follow_path_visualization_preview.mp4" type="video/mp4">

@@ -173,6 +173,8 @@ direct_src_video_count = 0
 github_attachment_video_count = 0
 manifest_github_video_count = 0
 manifest_github_video_missing_readme_count = 0
+key_animation_count = 0
+key_animation_missing_github_video_url_count = 0
 legacy_link_only_video_count = 0
 embedded_webm_without_mp4_companion_count = 0
 
@@ -221,6 +223,10 @@ for case in media_cases:
         github_video_url = step.get("github_video_url")
         if github_video_url:
             manifest_github_video_count += 1
+        if step.get("media_role") == "key_animation":
+            key_animation_count += 1
+            if not github_video_url:
+                key_animation_missing_github_video_url_count += 1
 
     readme_text = read_text(readme) if readme.exists() else ""
     asset_text = read_text(asset_readme) if asset_readme.exists() else ""
@@ -306,6 +312,8 @@ report = {
         "github_attachment_video_count": github_attachment_video_count,
         "manifest_github_video_count": manifest_github_video_count,
         "manifest_github_video_missing_readme_count": manifest_github_video_missing_readme_count,
+        "key_animation_count": key_animation_count,
+        "key_animation_missing_github_video_url_count": key_animation_missing_github_video_url_count,
         "legacy_link_only_video_count": legacy_link_only_video_count,
         "embedded_webm_without_mp4_companion_count": embedded_webm_without_mp4_companion_count,
     },
@@ -338,6 +346,7 @@ print(f"Direct-src local video tags: {direct_src_video_count}")
 print(f"GitHub attachment video URLs: {github_attachment_video_count}")
 print(f"Manifest GitHub video URLs: {manifest_github_video_count}")
 print(f"Manifest GitHub video URLs missing from README: {manifest_github_video_missing_readme_count}")
+print(f"Key animations missing GitHub video URL: {key_animation_missing_github_video_url_count} / {key_animation_count}")
 print(f"Legacy link-only video opens: {legacy_link_only_video_count}")
 print(f"Embedded WebM without MP4 companion: {embedded_webm_without_mp4_companion_count}")
 print("Output types:")

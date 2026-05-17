@@ -83,6 +83,9 @@ flowchart LR
 
 ![Raw sample clip overview preview](assets/01_raw_sample_clips_preview.gif)
 
+
+https://github.com/user-attachments/assets/7c36901a-6782-465a-8c6b-281c0e36c487
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/01_raw_sample_clips_result.png" src="assets/01_raw_sample_clips_preview.mp4"></video>
 
 ### Cell 10 - Canonical timing and contact inspection
@@ -105,6 +108,9 @@ flowchart LR
 ![Canonical timing and contact inspection](assets/02_canonical_timing_contacts_result.png)
 
 ![Canonical timing and contact inspection preview](assets/02_canonical_timing_contacts_preview.gif)
+
+
+https://github.com/user-attachments/assets/e89b1fd9-6321-4029-b220-d00f449605c8
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_canonical_timing_contacts_result.png" src="assets/02_canonical_timing_contacts_preview.mp4"></video>
 
@@ -129,6 +135,9 @@ flowchart LR
 
 ![Looping animation comparison preview](assets/03_looping_animation_compare_preview.gif)
 
+
+https://github.com/user-attachments/assets/47626e48-6d1c-4cdb-af74-13ca3bdbf819
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/03_looping_animation_compare_result.png" src="assets/03_looping_animation_compare_preview.mp4"></video>
 
 ### Cell 18 - Resampled canonical clips
@@ -151,6 +160,9 @@ flowchart LR
 ![Resampled canonical clips](assets/04_resampled_canonical_clips_result.png)
 
 ![Resampled canonical clips preview](assets/04_resampled_canonical_clips_preview.gif)
+
+
+https://github.com/user-attachments/assets/10c0e665-0a87-4a2a-b9e4-10a10fc1034f
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_resampled_canonical_clips_result.png" src="assets/04_resampled_canonical_clips_preview.mp4"></video>
 
@@ -194,6 +206,9 @@ flowchart LR
 
 ![B-spline reconstruction viewer preview](assets/06_bspline_reconstruction_viewer_preview.gif)
 
+
+https://github.com/user-attachments/assets/5f02c79f-1ecd-45e2-bd8a-5ec193f24aff
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_bspline_reconstruction_viewer_result.png" src="assets/06_bspline_reconstruction_viewer_preview.mp4"></video>
 
 ### Cell 33 - Final interpolated adverb controls
@@ -217,6 +232,9 @@ flowchart LR
 
 ![Final interpolated adverb controls preview](assets/08_final_interpolated_adverb_controls_preview.gif)
 
+
+https://github.com/user-attachments/assets/4a2661f9-0b7e-4c71-be52-a3b22f3b66a8
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_final_interpolated_adverb_controls_result.png" src="assets/08_final_interpolated_adverb_controls_preview.mp4"></video>
 
 ## 关键数据结构
@@ -237,6 +255,9 @@ canonical clips 验证相位对齐；B-spline viewer 验证曲线压缩可播放
 
 
 ![Raw sample clip overview](assets/01_raw_sample_clips_preview.gif)
+
+
+https://github.com/user-attachments/assets/7c36901a-6782-465a-8c6b-281c0e36c487
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/01_raw_sample_clips_result.png">
   <source src="assets/01_raw_sample_clips_preview.mp4" type="video/mp4">

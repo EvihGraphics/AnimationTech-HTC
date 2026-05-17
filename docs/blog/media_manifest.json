@@ -429,7 +429,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/41fa9cc6-4f7c-40eb-b540-8c1ecf02cc3b"
         },
         {
           "id": "curved-locomotion",
@@ -458,7 +459,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/1b2467a9-be91-422f-81d6-d45ba9749100"
         }
       ],
       "video_step": {
@@ -1029,7 +1031,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/f1a58680-65d5-444c-bae3-d5b51c46e0f0"
         },
         {
           "id": "static-root-toggles",
@@ -1066,7 +1069,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/93d326a8-60dd-439d-bc97-452968275553"
         }
       ],
       "video_step": {
@@ -1507,7 +1511,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/617bb853-265d-4eed-b095-38b474535255"
         },
         {
           "id": "memory-size",
@@ -1605,7 +1610,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/b979b113-c290-4b17-b2e1-4cf25ffd4994"
         },
         {
           "id": "gpu-reconstruction",
@@ -1634,7 +1640,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/5b77cb10-de83-48b2-b19e-a83a7662832a"
         }
       ],
       "video_step": {
@@ -2095,7 +2102,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/10405ac3-2546-4376-ac64-fcd62bcaa3a7"
         }
       ],
       "video_step": {
@@ -2265,7 +2273,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/fcfce01e-939c-442b-809d-4c2a5629d522"
         },
         {
           "id": "fast-stop-turn",
@@ -2294,7 +2303,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/f9f561b3-3da0-4288-aece-06abcbd03c6a"
         }
       ],
       "video_step": {
@@ -2349,7 +2359,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/2a3e910d-fd40-4620-b0e0-28ac59b0f917"
         },
         {
           "id": "raw-channel-plot",
@@ -2426,7 +2437,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/cab0161e-4390-49df-87ab-de3b9aa1515a"
         },
         {
           "id": "pose-warp-keys",
@@ -2496,7 +2508,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/d871efca-08a5-4cee-9139-2380a4cc6d2b"
         }
       ],
       "video_step": {
@@ -2566,7 +2579,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/bfff5417-4489-4a83-819b-d4d05318fe99"
         },
         {
           "id": "clip-count",
@@ -2620,7 +2634,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/6f827c0f-ea4c-4ed3-b7d2-36571202bd12"
         },
         {
           "id": "random-player",
@@ -2649,7 +2664,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/85a27653-0c55-408c-b5be-5e945b46adc9"
         },
         {
           "id": "transition-cost",
@@ -2710,7 +2726,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/f847ace0-489b-4d2b-a12e-14bee505aa4b"
         }
       ],
       "video_step": {
@@ -2780,7 +2797,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/70eab46f-ba9f-43a6-b26d-d48d46bb6e6c"
         },
         {
           "id": "state-action-code",
@@ -2825,7 +2843,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/9667efe3-2b9e-4979-ad38-5d753d34f6c8"
         },
         {
           "id": "action-count",
@@ -2886,7 +2905,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/9ac14a7b-01b3-4cef-8521-4097d2b2e54b"
         },
         {
           "id": "mdp-policy",
@@ -2915,7 +2935,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/aee60aa4-29d7-40b3-8714-8782e2ba912b"
         }
       ],
       "video_step": {
@@ -3122,7 +3143,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/7c36901a-6782-465a-8c6b-281c0e36c487"
         },
         {
           "id": "canonical-timing",
@@ -3160,7 +3182,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/e89b1fd9-6321-4029-b220-d00f449605c8"
         },
         {
           "id": "looping-clips",
@@ -3198,7 +3221,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/47626e48-6d1c-4cdb-af74-13ca3bdbf819"
         },
         {
           "id": "resampled-clips",
@@ -3236,7 +3260,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/10c0e665-0a87-4a2a-b9e4-10a10fc1034f"
         },
         {
           "id": "bspline-fit",
@@ -3290,7 +3315,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/5f02c79f-1ecd-45e2-bd8a-5ec193f24aff"
         },
         {
           "id": "adverb-table",
@@ -3351,7 +3377,8 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
-          "motion_provenance": "live_control_scan"
+          "motion_provenance": "live_control_scan",
+          "github_video_url": "https://github.com/user-attachments/assets/4a2661f9-0b7e-4c71-be52-a3b22f3b66a8"
         }
       ],
       "video_step": {

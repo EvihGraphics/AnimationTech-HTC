@@ -85,6 +85,9 @@ flowchart LR
 
 ![Source motion graph playback preview](assets/02_source_motion_graph_playback_preview.gif)
 
+
+https://github.com/user-attachments/assets/70eab46f-ba9f-43a6-b26d-d48d46bb6e6c
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_source_motion_graph_playback_result.png" src="assets/02_source_motion_graph_playback_preview.mp4"></video>
 
 ### Cell 16 - Random graph action playback
@@ -109,6 +112,9 @@ flowchart LR
 
 ![Random graph action playback preview](assets/04_random_action_playback_preview.gif)
 
+
+https://github.com/user-attachments/assets/9667efe3-2b9e-4979-ad38-5d753d34f6c8
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_random_action_playback_result.png" src="assets/04_random_action_playback_preview.mp4"></video>
 
 ### Cell 22 - Immediate reward policy viewer
@@ -131,6 +137,9 @@ flowchart LR
 ![Immediate reward policy viewer](assets/07_reward_policy_viewer_result.png)
 
 ![Immediate reward policy viewer preview](assets/07_reward_policy_viewer_preview.gif)
+
+
+https://github.com/user-attachments/assets/9ac14a7b-01b3-4cef-8521-4097d2b2e54b
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_reward_policy_viewer_result.png" src="assets/07_reward_policy_viewer_preview.mp4"></video>
 
@@ -156,6 +165,9 @@ flowchart LR
 
 ![MDP value-policy viewer preview](assets/08_mdp_value_policy_viewer_preview.gif)
 
+
+https://github.com/user-attachments/assets/aee60aa4-29d7-40b3-8714-8782e2ba912b
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_mdp_value_policy_viewer_result.png" src="assets/08_mdp_value_policy_viewer_preview.mp4"></video>
 
 ## 关键数据结构
@@ -176,6 +188,9 @@ source graph viewer 说明动作来源；random action viewer 验证播放连续
 
 
 ![Source motion graph playback](assets/02_source_motion_graph_playback_preview.gif)
+
+
+https://github.com/user-attachments/assets/70eab46f-ba9f-43a6-b26d-d48d46bb6e6c
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_source_motion_graph_playback_result.png">
   <source src="assets/02_source_motion_graph_playback_preview.mp4" type="video/mp4">

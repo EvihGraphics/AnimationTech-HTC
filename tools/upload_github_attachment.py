@@ -25,7 +25,7 @@ from pathlib import Path
 
 
 ATTACHMENT_RE = re.compile(
-    r"https://(?:github\.com/user-attachments/assets/[A-Za-z0-9_-]+"
+    r"https://(?:github\.com/user-attachments/assets/[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}"
     r"|user-images\.githubusercontent\.com/[^\s<>)\"']+\.(?:mp4|webm|mov))",
     re.I,
 )
@@ -368,9 +368,31 @@ def publish_attachment_urls_in_pr(
     if not branch or branch == base_branch:
         raise SystemExit("--publish-pr requires running from a pushed feature branch.")
 
+    body_lines = [
+        "Attachment host for docs/blog key animation video verification.",
+        "",
+        "This PR body/comment intentionally publishes the GitHub attachment URLs used by README key animations, so GitHub can render them as inline video players.",
+        "",
+    ]
+    body_lines.extend(urls)
+    body = "\n".join(body_lines) + "\n"
+
+    if "/pull/" in page.url:
+        comment_input = page.locator("textarea[name='comment[body]']:visible").first
+        comment_input.wait_for(state="visible", timeout=30_000)
+        comment_input.fill(body)
+        page.get_by_role("button", name=re.compile(r"^Comment$", re.I)).first.click(timeout=30_000)
+        page.wait_for_load_state("domcontentloaded", timeout=30_000)
+        return page.url
+
     page.goto(compare_url(repo, branch, base_branch), wait_until="domcontentloaded", timeout=60_000)
     page.wait_for_timeout(1000)
     if "/pull/" in page.url:
+        comment_input = page.locator("textarea[name='comment[body]']:visible").first
+        comment_input.wait_for(state="visible", timeout=30_000)
+        comment_input.fill(body)
+        page.get_by_role("button", name=re.compile(r"^Comment$", re.I)).first.click(timeout=30_000)
+        page.wait_for_load_state("domcontentloaded", timeout=30_000)
         return page.url
 
     title_input = page.locator("input[name='pull_request[title]']:visible").first
@@ -378,14 +400,7 @@ def publish_attachment_urls_in_pr(
     title_input.wait_for(state="visible", timeout=30_000)
     body_input.wait_for(state="visible", timeout=30_000)
     title_input.fill(title)
-    body_lines = [
-        "Attachment host for docs/blog key animation video verification.",
-        "",
-        "This PR body intentionally publishes the GitHub attachment URLs used by README key animations, so GitHub can render them as inline video players.",
-        "",
-    ]
-    body_lines.extend(urls)
-    body_input.fill("\n".join(body_lines) + "\n")
+    body_input.fill(body)
     page.get_by_role("button", name="Create pull request").first.click(timeout=30_000)
     page.wait_for_url("**/pull/**", timeout=60_000)
     return page.url

@@ -86,6 +86,9 @@ flowchart LR
 
 ![Source clip playback preview](assets/02_source_clip_playback_preview.gif)
 
+
+https://github.com/user-attachments/assets/bfff5417-4489-4a83-819b-d4d05318fe99
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_source_clip_playback_result.png" src="assets/02_source_clip_playback_preview.mp4"></video>
 
 ### Cell 16 - Clip contact constraints
@@ -109,6 +112,9 @@ flowchart LR
 
 ![Clip contact constraints preview](assets/04_contact_constraint_viewer_preview.gif)
 
+
+https://github.com/user-attachments/assets/6f827c0f-ea4c-4ed3-b7d2-36571202bd12
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_contact_constraint_viewer_result.png" src="assets/04_contact_constraint_viewer_preview.mp4"></video>
 
 ### Cell 19 - Random transition player
@@ -131,6 +137,9 @@ flowchart LR
 ![Random transition player](assets/05_random_transition_player_result.png)
 
 ![Random transition player preview](assets/05_random_transition_player_preview.gif)
+
+
+https://github.com/user-attachments/assets/85a27653-0c55-408c-b5be-5e945b46adc9
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/05_random_transition_player_result.png" src="assets/05_random_transition_player_preview.mp4"></video>
 
@@ -174,6 +183,9 @@ flowchart LR
 
 ![Optimal-policy controller preview](assets/08_optimal_policy_player_preview.gif)
 
+
+https://github.com/user-attachments/assets/f847ace0-489b-4d2b-a12e-14bee505aa4b
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_optimal_policy_player_result.png" src="assets/08_optimal_policy_player_preview.mp4"></video>
 
 ## 关键数据结构
@@ -194,6 +206,9 @@ contact viewer 验证物理约束；transition cost 说明离线控制模型；v
 
 
 ![Source clip playback](assets/02_source_clip_playback_preview.gif)
+
+
+https://github.com/user-attachments/assets/bfff5417-4489-4a83-819b-d4d05318fe99
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_source_clip_playback_result.png">
   <source src="assets/02_source_clip_playback_preview.mp4" type="video/mp4">

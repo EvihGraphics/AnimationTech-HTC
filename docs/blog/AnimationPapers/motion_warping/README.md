@@ -85,6 +85,9 @@ flowchart LR
 
 ![Source animation playback preview](assets/01_source_animation_playback_preview.gif)
 
+
+https://github.com/user-attachments/assets/2a3e910d-fd40-4620-b0e0-28ac59b0f917
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/01_source_animation_playback_result.png" src="assets/01_source_animation_playback_preview.mp4"></video>
 
 ### Cell 6 - Raw quaternion channel plot
@@ -163,6 +166,9 @@ flowchart LR
 
 ![Time-warped animation comparison preview](assets/05_timewarped_animation_compare_preview.gif)
 
+
+https://github.com/user-attachments/assets/cab0161e-4390-49df-87ab-de3b9aa1515a
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/05_timewarped_animation_compare_result.png" src="assets/05_timewarped_animation_compare_preview.mp4"></video>
 
 ### Cell 23 - Pose-warp key poses
@@ -224,6 +230,9 @@ flowchart LR
 
 ![Final time and pose warped animation preview](assets/08_combined_warped_animation_preview.gif)
 
+
+https://github.com/user-attachments/assets/d871efca-08a5-4cee-9139-2380a4cc6d2b
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_combined_warped_animation_result.png" src="assets/08_combined_warped_animation_preview.mp4"></video>
 
 ## 关键数据结构
@@ -244,6 +253,9 @@ Time warp 图验证事件是否发生在新时间；pose warp viewer 验证关�
 
 
 ![Source animation playback](assets/01_source_animation_playback_preview.gif)
+
+
+https://github.com/user-attachments/assets/2a3e910d-fd40-4620-b0e0-28ac59b0f917
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/01_source_animation_playback_result.png">
   <source src="assets/01_source_animation_playback_preview.mp4" type="video/mp4">

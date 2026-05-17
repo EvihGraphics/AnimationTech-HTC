@@ -574,7 +574,9 @@ if media_manifest is not None:
                     if not has_video_preview(readme_text, mp4_ref, webm_ref):
                         add_error(f"Key animation for {slug} must provide a local video preview for {mp4_ref}: {step.get('id')}")
                     github_video_url = step.get("github_video_url")
-                    if github_video_url:
+                    if not github_video_url:
+                        add_error(f"Key animation for {slug} missing github_video_url: {step.get('id')}")
+                    else:
                         if not is_github_video_url(github_video_url):
                             add_error(f"Key animation for {slug} has invalid github_video_url: {step.get('id')}")
                         elif github_video_url not in readme_text:
