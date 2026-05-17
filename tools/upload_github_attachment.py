@@ -16,8 +16,11 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import sys
 import time
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 
@@ -194,7 +197,7 @@ def wait_for_login_if_needed(page, repo: str, headless: bool, timeout_seconds: i
 
 def current_git_branch(root: Path) -> str | None:
     try:
-        result = __import__("subprocess").run(
+        result = subprocess.run(
             ["git", "rev-parse", "--abbrev-ref", "HEAD"],
             cwd=root,
             check=True,
@@ -217,6 +220,10 @@ def markdown_editor_urls(repo: str, branch: str | None, base_branch: str, editor
     if branch and branch != base_branch:
         urls.append(f"https://github.com/{repo}/compare/{base_branch}...{branch}?expand=1")
     return urls
+
+
+def compare_url(repo: str, branch: str, base_branch: str) -> str:
+    return f"https://github.com/{repo}/compare/{base_branch}...{branch}?expand=1"
 
 
 def open_markdown_editor(
@@ -249,6 +256,48 @@ def open_markdown_editor(
                 continue
 
 
+def public_attachment_available(url: str) -> bool:
+    request = urllib.request.Request(url, headers={"User-Agent": "AnimationTech-HTC-docs-bot"})
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            content_type = response.headers.get("content-type", "")
+            return response.status == 200 and content_type.lower().startswith("video/")
+    except (urllib.error.URLError, TimeoutError):
+        return False
+
+
+def publish_attachment_in_pr(
+    page,
+    repo: str,
+    branch: str | None,
+    base_branch: str,
+    url: str,
+    title: str,
+) -> str:
+    if not branch or branch == base_branch:
+        raise SystemExit("--publish-pr requires running from a pushed feature branch.")
+
+    page.goto(compare_url(repo, branch, base_branch), wait_until="domcontentloaded", timeout=60_000)
+    page.wait_for_timeout(1000)
+    if "/pull/" in page.url:
+        return page.url
+
+    title_input = page.locator("input[name='pull_request[title]']:visible").first
+    body_input = page.locator("textarea[name='pull_request[body]']:visible").first
+    title_input.wait_for(state="visible", timeout=30_000)
+    body_input.wait_for(state="visible", timeout=30_000)
+    title_input.fill(title)
+    body_input.fill(
+        "Attachment host for docs/blog video verification.\n\n"
+        "This PR body intentionally publishes the GitHub attachment URL used by the README, "
+        "so GitHub can render it as an inline video player.\n\n"
+        f"{url}\n"
+    )
+    page.get_by_role("button", name="Create pull request").first.click(timeout=30_000)
+    page.wait_for_url("**/pull/**", timeout=60_000)
+    return page.url
+
+
 def upload_with_playwright(
     repo: str,
     file_path: Path,
@@ -258,6 +307,8 @@ def upload_with_playwright(
     branch: str | None,
     base_branch: str,
     editor_url: str | None,
+    publish_pr: bool,
+    pr_title: str,
 ) -> str:
     try:
         from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
@@ -301,7 +352,17 @@ def upload_with_playwright(
                 values = page.locator("textarea").evaluate_all("(nodes) => nodes.map((node) => node.value).join('\\n')")
                 match = ATTACHMENT_RE.search(values)
                 if match:
-                    return match.group(0)
+                    url = match.group(0)
+                    if publish_pr and not public_attachment_available(url):
+                        pr_url = publish_attachment_in_pr(page, repo, branch, base_branch, url, pr_title)
+                        print(f"Published attachment through PR: {pr_url}")
+                        for _ in range(12):
+                            if public_attachment_available(url):
+                                break
+                            page.wait_for_timeout(1000)
+                        if not public_attachment_available(url):
+                            raise SystemExit(f"Attachment URL is still not public after PR publish: {url}")
+                    return url
                 page.wait_for_timeout(1000)
             raise SystemExit("Timed out waiting for GitHub to insert the attachment URL.")
         finally:
@@ -325,6 +386,16 @@ def parse_args() -> argparse.Namespace:
         help="Optional GitHub page with a Markdown attachment editor; useful when Issues are disabled.",
     )
     parser.add_argument("--base-branch", default="main", help="Base branch for compare-page upload fallback.")
+    parser.add_argument(
+        "--publish-pr",
+        action="store_true",
+        help="Create a PR body to publish draft-only attachment URLs when needed.",
+    )
+    parser.add_argument(
+        "--pr-title",
+        default="Footskate GitHub attachment video validation",
+        help="Title to use when --publish-pr creates the attachment-host PR.",
+    )
     parser.add_argument("--no-backfill", action="store_true", help="Only print the generated URL.")
     parser.add_argument("--dry-run", action="store_true", help="Validate targets without writing files.")
     parser.add_argument("--headless", action="store_true", help="Run browser headlessly. Only works if already logged in.")
@@ -358,6 +429,8 @@ def main() -> int:
             branch,
             args.base_branch,
             args.editor_url,
+            args.publish_pr,
+            args.pr_title,
         )
         url = validate_attachment_url(url)
 

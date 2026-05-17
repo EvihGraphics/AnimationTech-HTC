@@ -167,10 +167,11 @@ python .\tools\upload_github_attachment.py `
   --repo EvihGraphics/AnimationTech-HTC `
   --file .\docs\blog\AnimationPapers\footskate_cleanup_for_motion_capture_editing\assets\06_final_processing_compare_preview.mp4 `
   --case-slug footskate_cleanup_for_motion_capture_editing `
-  --step-id final-processing
+  --step-id final-processing `
+  --publish-pr
 ```
 
-首次运行会打开一个专用 Playwright 浏览器 profile；若未登录 GitHub，登录一次后脚本会复用该 profile。脚本只读取 GitHub 编辑器返回的 `github.com/user-attachments/assets/...` URL，并自动写入 README 与 `media_manifest.json`，不会把 cookie 或 token 写入仓库。
+首次运行会打开一个专用 Playwright 浏览器 profile；若未登录 GitHub，登录一次后脚本会复用该 profile。脚本读取 GitHub 编辑器返回的 `github.com/user-attachments/assets/...` URL，并自动写入 README 与 `media_manifest.json`，不会把 cookie 或 token 写入仓库。若 GitHub 返回的附件仍是草稿私有状态，`--publish-pr` 会在当前验证分支创建一个 PR body 容器来发布该 URL；确认 URL 匿名可访问后才完成回填。
 
 线上检查项：
 
