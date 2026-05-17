@@ -173,6 +173,12 @@ python .\tools\upload_github_attachment.py `
 
 首次运行会打开一个专用 Playwright 浏览器 profile；若未登录 GitHub，登录一次后脚本会复用该 profile。脚本读取 GitHub 编辑器返回的 `github.com/user-attachments/assets/...` URL，并自动写入 README 与 `media_manifest.json`，不会把 cookie 或 token 写入仓库。若 GitHub 返回的附件仍是草稿私有状态，`--publish-pr` 会在当前验证分支创建一个 PR body 容器来发布该 URL；确认 URL 匿名可访问后才完成回填。
 
+全案例推广时只处理正文 `key_animation`，使用批量模式：
+
+```powershell
+python .\tools\upload_github_attachment.py --all-missing-key-animations --publish-pr
+```
+
 线上检查项：
 
 - 正文动画至少必须显示 GIF 可动预览，不允许退回“打开 MP4 / 打开 WebM / 打开下载”链接。

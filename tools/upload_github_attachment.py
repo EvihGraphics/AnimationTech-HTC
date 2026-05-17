@@ -111,6 +111,10 @@ def update_manifest(path: Path, manifest: dict, case_slug: str, step_id: str, ur
     path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def write_manifest(path: Path, manifest: dict) -> None:
+    path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
 def insert_url_after_preview(readme_path: Path, preview_gif: str, url: str) -> None:
     text = readme_path.read_text(encoding="utf-8-sig")
     preview_ref = f"assets/{preview_gif}"
@@ -163,6 +167,61 @@ def backfill_docs(manifest_path: Path, case_slug: str, step_id: str | None, file
     insert_url_after_preview(readme_path, preview_gif, url)
     update_manifest(manifest_path, manifest, case_slug, resolved_step_id, url)
     return readme_path, resolved_step_id
+
+
+def missing_key_animation_targets(manifest: dict, root: Path) -> list[dict]:
+    targets: list[dict] = []
+    for case in manifest.get("cases", []):
+        readme_path = root / case["blog_readme"]
+        assets_dir = readme_path.parent / "assets"
+        for step in case.get("steps", []):
+            if step.get("media_role") != "key_animation" or step.get("github_video_url"):
+                continue
+            missing = [field for field in ("preview_gif", "video_mp4", "video_webm") if not step.get(field)]
+            if missing:
+                raise SystemExit(f"Key animation {case.get('slug')}:{step.get('id')} missing fields: {', '.join(missing)}")
+            mp4_path = assets_dir / step["video_mp4"]
+            gif_path = assets_dir / step["preview_gif"]
+            webm_path = assets_dir / step["video_webm"]
+            for path in (mp4_path, gif_path, webm_path):
+                if not path.exists():
+                    raise SystemExit(f"Expected media file does not exist: {path}")
+            targets.append(
+                {
+                    "case_slug": case["slug"],
+                    "step_id": step["id"],
+                    "readme_path": readme_path,
+                    "preview_gif": step["preview_gif"],
+                    "video_mp4": step["video_mp4"],
+                    "file_path": mp4_path,
+                }
+            )
+    return targets
+
+
+def backfill_many_docs(manifest_path: Path, targets: list[dict], urls: list[str], dry_run: bool) -> None:
+    if len(targets) != len(urls):
+        raise SystemExit(f"Target/URL count mismatch: {len(targets)} targets, {len(urls)} URLs")
+    manifest = load_manifest(manifest_path)
+    url_by_key = {(target["case_slug"], target["step_id"]): url for target, url in zip(targets, urls)}
+
+    if dry_run:
+        for target in targets:
+            print(
+                f"Would set github_video_url for {target['case_slug']}:{target['step_id']} "
+                f"and insert after assets/{target['preview_gif']}"
+            )
+        return
+
+    for target, url in zip(targets, urls):
+        insert_url_after_preview(target["readme_path"], target["preview_gif"], url)
+
+    for case in manifest.get("cases", []):
+        for step in case.get("steps", []):
+            key = (case.get("slug"), step.get("id"))
+            if key in url_by_key:
+                step["github_video_url"] = url_by_key[key]
+    write_manifest(manifest_path, manifest)
 
 
 def has_visible_textarea(page) -> bool:
@@ -298,6 +357,40 @@ def publish_attachment_in_pr(
     return page.url
 
 
+def publish_attachment_urls_in_pr(
+    page,
+    repo: str,
+    branch: str | None,
+    base_branch: str,
+    urls: list[str],
+    title: str,
+) -> str:
+    if not branch or branch == base_branch:
+        raise SystemExit("--publish-pr requires running from a pushed feature branch.")
+
+    page.goto(compare_url(repo, branch, base_branch), wait_until="domcontentloaded", timeout=60_000)
+    page.wait_for_timeout(1000)
+    if "/pull/" in page.url:
+        return page.url
+
+    title_input = page.locator("input[name='pull_request[title]']:visible").first
+    body_input = page.locator("textarea[name='pull_request[body]']:visible").first
+    title_input.wait_for(state="visible", timeout=30_000)
+    body_input.wait_for(state="visible", timeout=30_000)
+    title_input.fill(title)
+    body_lines = [
+        "Attachment host for docs/blog key animation video verification.",
+        "",
+        "This PR body intentionally publishes the GitHub attachment URLs used by README key animations, so GitHub can render them as inline video players.",
+        "",
+    ]
+    body_lines.extend(urls)
+    body_input.fill("\n".join(body_lines) + "\n")
+    page.get_by_role("button", name="Create pull request").first.click(timeout=30_000)
+    page.wait_for_url("**/pull/**", timeout=60_000)
+    return page.url
+
+
 def upload_with_playwright(
     repo: str,
     file_path: Path,
@@ -369,6 +462,94 @@ def upload_with_playwright(
             context.close()
 
 
+def attachment_urls_in_text(page) -> list[str]:
+    values = page.locator("textarea").evaluate_all("(nodes) => nodes.map((node) => node.value).join('\\n')")
+    return ATTACHMENT_RE.findall(values)
+
+
+def wait_for_new_attachment_url(page, known_urls: set[str], timeout_seconds: int) -> str:
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        urls = attachment_urls_in_text(page)
+        for url in urls:
+            if url not in known_urls:
+                return url
+        page.wait_for_timeout(1000)
+    raise SystemExit("Timed out waiting for GitHub to insert the attachment URL.")
+
+
+def upload_many_with_playwright(
+    repo: str,
+    targets: list[dict],
+    profile_dir: Path,
+    headless: bool,
+    timeout_seconds: int,
+    branch: str | None,
+    base_branch: str,
+    editor_url: str | None,
+    publish_pr: bool,
+    pr_title: str,
+) -> list[str]:
+    try:
+        from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
+        from playwright.sync_api import sync_playwright
+    except Exception as exc:  # pragma: no cover - depends on local env
+        raise SystemExit("Python Playwright is required. Install with: pip install playwright") from exc
+
+    browser_executable = find_browser_executable()
+    with sync_playwright() as playwright:
+        launch_kwargs = {
+            "user_data_dir": str(profile_dir),
+            "headless": headless,
+            "accept_downloads": False,
+        }
+        if browser_executable:
+            launch_kwargs["executable_path"] = browser_executable
+        context = playwright.chromium.launch_persistent_context(**launch_kwargs)
+        page = context.pages[0] if context.pages else context.new_page()
+        try:
+            open_markdown_editor(page, repo, branch, base_branch, editor_url)
+            if needs_login(page):
+                wait_for_login_if_needed(page, repo, headless, timeout_seconds)
+                open_markdown_editor(page, repo, branch, base_branch, editor_url)
+
+            textarea = page.locator("textarea:visible").first
+            textarea.wait_for(state="visible", timeout=30_000)
+            file_inputs = page.locator("input[type='file']")
+            try:
+                file_inputs.first.wait_for(state="attached", timeout=15_000)
+            except PlaywrightTimeoutError as exc:
+                raise SystemExit(
+                    "Could not find GitHub Markdown attachment file input. "
+                    "Make sure the Markdown editor loaded."
+                ) from exc
+
+            known_urls = set(attachment_urls_in_text(page))
+            uploaded_urls: list[str] = []
+            for index, target in enumerate(targets, start=1):
+                print(f"[{index}/{len(targets)}] Uploading {target['case_slug']}:{target['step_id']} -> {target['file_path'].name}")
+                textarea.click()
+                file_inputs.first.set_input_files(str(target["file_path"]))
+                url = wait_for_new_attachment_url(page, known_urls, timeout_seconds)
+                known_urls.add(url)
+                uploaded_urls.append(url)
+                print(url)
+
+            if publish_pr and any(not public_attachment_available(url) for url in uploaded_urls):
+                pr_url = publish_attachment_urls_in_pr(page, repo, branch, base_branch, uploaded_urls, pr_title)
+                print(f"Published attachments through PR: {pr_url}")
+                for url in uploaded_urls:
+                    for _ in range(12):
+                        if public_attachment_available(url):
+                            break
+                        page.wait_for_timeout(1000)
+                    if not public_attachment_available(url):
+                        raise SystemExit(f"Attachment URL is still not public after PR publish: {url}")
+            return uploaded_urls
+        finally:
+            context.close()
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo", default="EvihGraphics/AnimationTech-HTC", help="GitHub repo in owner/name form.")
@@ -381,6 +562,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--step-id", default="final-processing", help="media_manifest step id.")
     parser.add_argument("--manifest", default="docs/blog/media_manifest.json")
     parser.add_argument("--github-video-url", help="Skip upload and backfill this existing attachment URL.")
+    parser.add_argument(
+        "--all-missing-key-animations",
+        action="store_true",
+        help="Upload and backfill every key_animation step missing github_video_url.",
+    )
     parser.add_argument(
         "--editor-url",
         help="Optional GitHub page with a Markdown attachment editor; useful when Issues are disabled.",
@@ -407,12 +593,43 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     root = repo_root()
-    file_path = (root / args.file).resolve()
     manifest_path = (root / args.manifest).resolve()
-    if not file_path.exists():
-        raise SystemExit(f"Video file does not exist: {file_path}")
     if not manifest_path.exists():
         raise SystemExit(f"Manifest does not exist: {manifest_path}")
+
+    if args.all_missing_key_animations:
+        manifest = load_manifest(manifest_path)
+        targets = missing_key_animation_targets(manifest, root)
+        if not targets:
+            print("No missing key_animation github_video_url entries.")
+            return 0
+        print(f"Missing key_animation github_video_url entries: {len(targets)}")
+        for target in targets:
+            print(f"- {target['case_slug']}:{target['step_id']} {target['file_path'].relative_to(root)}")
+        if args.dry_run:
+            backfill_many_docs(manifest_path, targets, ["https://github.com/user-attachments/assets/dry-run"] * len(targets), True)
+            return 0
+        branch = current_git_branch(root)
+        urls = upload_many_with_playwright(
+            args.repo,
+            targets,
+            Path(args.profile_dir).expanduser().resolve(),
+            args.headless,
+            args.timeout_seconds,
+            branch,
+            args.base_branch,
+            args.editor_url,
+            args.publish_pr,
+            args.pr_title,
+        )
+        urls = [validate_attachment_url(url) for url in urls]
+        backfill_many_docs(manifest_path, targets, urls, False)
+        print(f"Backfilled {len(urls)} key_animation GitHub attachment URLs.")
+        return 0
+
+    file_path = (root / args.file).resolve()
+    if not file_path.exists():
+        raise SystemExit(f"Video file does not exist: {file_path}")
 
     if args.github_video_url:
         url = validate_attachment_url(args.github_video_url)
