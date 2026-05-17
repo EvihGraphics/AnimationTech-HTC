@@ -5,236 +5,276 @@
 | 字段 | 内容 |
 | --- | --- |
 | slug | `motion_fields_for_interactive_character_animation` |
-| source path | [`labs/AnimationPapers/Motion Fields For Interactive Character Animation.ipynb`](../../../../labs/AnimationPapers/Motion Fields For Interactive Character Animation.ipynb) |
-| transcript sources | [`docs/transcripts/ukobLRLKZDM_Reinforcement Learning 04 _ Motion Fields For Interactive Character Animation_.txt`](../../../../docs/transcripts/ukobLRLKZDM_Reinforcement Learning 04 _ Motion Fields For Interactive Character Animation_.txt) |
+| source path | [`labs/AnimationPapers/Motion Fields For Interactive Character Animation.ipynb`](<../../../../labs/AnimationPapers/Motion Fields For Interactive Character Animation.ipynb>) |
+| transcript sources | [`docs/transcripts/ukobLRLKZDM_Reinforcement Learning 04 _ Motion Fields For Interactive Character Animation_.txt`](<../../../../docs/transcripts/ukobLRLKZDM_Reinforcement Learning 04 _ Motion Fields For Interactive Character Animation_.txt>) |
 | env prefix | `.envs/motion_fields` |
 | kernel | `animationtech-motion_fields_for_interactive_character_animation` |
 | validation status | `passed` (`manual_smoke`) |
 
 ## 问题背景
 
-Motion Fields 不把动作表示成 clip graph，而是把每一帧编码为 pose 和 velocity 的样本状态。语音稿强调四个核心概念：pose、velocity、motion state 和 similarity metric。运行时根据当前状态和目标速度在样本场中找邻居，插值得到下一状态，再用 value function 改善长期行为。
+Motion Fields 把交互角色动画从“选择某段 clip 播放”改写成“在姿态速度样本场里积分”。讲解中反复强调四个对象：`pose`、`velocity`、`motion state` 和 `similarity metric`。一个 motion state 是当前姿态 `x` 加上从当前帧走向下一帧的有限差分速度 `v`；把多段 walk/jog 动画逐帧拆成这样的 `(x, v)` 后，就得到一个高维样本数据库。
+
+运行时控制器并不直接拼接原始片段，而是把当前角色状态投到同一个 metric 空间，找出最相似的 `K_NEIGHBORS = 15` 个样本。最基础的 passive action 会按反距离权重混合这些邻居的速度；可控版本则把其中某个邻居权重拉高，形成离散动作集合。value function 再估计“现在选择这个动作，对未来朝向目标方向是否更好”，从而让角色能在 motion field 中长期稳定地转向、行走或慢跑。
 
 ## 阅读前置知识
 
-- pose/velocity state：姿态与下一帧 delta 一起构成 motion field。
-- quaternion 姿态代数：pose pack/unpack/add/subtract/lerp。
-- k-NN 与 metric matrix：距离定义决定动作相似性。
-- fitted value iteration：用预计算邻居和权重做 Bellman backup。
+- 姿态代数：`pose_add` 表示 `x ⊕ v`，`pose_subtract` 表示 `x' ⊖ x`，四元数部分需要归一化并处理符号翻转。
+- 角色局部空间：数据库中的 root 会被归零，root 朝向会设为单位四元数，让相似度比较关注局部姿态和相对运动。
+- k-NN 插值：近邻索引给出候选样本，`1 / distance^2` 归一化后成为 velocity blending 权重。
+- Bellman backup：value iteration 用 `reward + gamma * expected_next_value` 反复更新状态价值，这里的状态还包含目标朝向 `theta`。
+- Foot contact 与 IK：数据库保留左右脚接触 `states_c`，runtime 末尾会用接触权重约束脚尖位置，减少控制时的脚滑。
 
 ## 总模块图
 
 ```mermaid
 flowchart TD
-    A[Walk/Run BVH clips] --> B[PoseData pack/unpack]
-    B --> C[states_x / states_v / states_y / states_c]
-    C --> D[metric_matrix and UMAP]
-    D --> E[Torch k-NN]
-    E --> F[compute_new_state]
-    F --> G[action/value precompute]
-    G --> H[value_function walk/jog]
+    A[Walk/Jog BVH clips] --> B[PoseData pose algebra]
+    B --> C[(Motion state database<br/>states_x + states_v + states_y + states_c)]
+    C --> D[Distance metric<br/>pose position + next-frame displacement]
+    D --> E[Torch brute-force k-NN]
+    E --> F[Velocity blending<br/>compute_new_state]
+    F --> G[Discrete actions<br/>raise one neighbor weight]
+    G --> H[Precomputed transition/value tables]
+    H --> I[Value function walk/jog]
+    I --> J[Runtime controller + foot locking]
+    C --> K[UMAP projection for reading the field]
 ```
 
 ## 代码执行路径
 
 ```mermaid
 flowchart LR
-    C7[Cell 7: interaction note] --> C11[Cell 11: state tables]
-    C11 --> C17[Cell 17: UMAP field]
-    C17 --> C20[Cell 20: Torch kNN]
-    C20 --> C25[Cell 25: controller widget]
-    C25 --> C32[Cell 32: transition precompute]
-    C32 --> C35[Cell 35: value learning]
+    C8[Cell 8<br/>pose_pack / pose_add / pose_subtract] --> C11[Cell 11<br/>state table allocation]
+    C11 --> C17[Cell 17<br/>UMAP field projection]
+    C17 --> C20[Cell 20<br/>Torch nearest-neighbor helper]
+    C20 --> C25[Cell 25<br/>controller setup]
+    C25 --> C32[Cell 32<br/>transition precompute]
+    C32 --> C35[Cell 35<br/>value-learning curve]
+    C35 --> C36[Runtime render<br/>choose action and lock feet]
 ```
+
+这条路径有两层含义。前半段把原始动画变成可查询的 motion field，后半段把查询结果变成控制策略。manifest 中的 cell 编号对应已经生成的博客结果媒体；实验 notebook 的原始单元里，部分实现代码和说明 markdown 相邻出现，因此正文会同时标出关键函数名。
 
 ## 模块拆解
 
-### 1. Motion State Database
+### 1. Pose+Velocity 状态表达
 
-`PoseData` 把 root、hips 和 bone quaternions 打包进统一 buffer。`states_x` 是 pose，`states_v` 是 velocity，二者合起来描述当前状态和自然通向的下一帧。
+`PoseData` 只是轻量容器，真正重要的是统一的 buffer 形状：`POSESHAPE = (bone_count + 2, 4)`。前两行分别存 root 平移和 hips 平移，后面存每根骨骼的四元数。`pose_pack` 和 `pose_unpack` 让 numpy 数组与结构化字段互转；`pose_add`、`pose_subtract`、`pose_lerp`、`pose_blend` 则给 motion field 提供最小的姿态代数。
 
-### 2. Similarity Metric 与 k-NN
+这个设计把“姿态”和“速度”放进同一种存储形状，速度并不是欧式向量的单独类型，而是“能被加回 pose 的差分 pose”。因此 `states_v[i] = states_x[i+1] ⊖ states_x[i]`，积分时再做 `states_x[i] ⊕ blended_v`。
 
-`metric_matrix` 给不同 pose 维度分配权重。UMAP 只是可视化投影，真正运行时依赖 Torch k-NN 在高维空间中找邻居。
+### 2. Motion Field 数据库
 
-### 3. Value Function
+`add_states_ex` 从 walk 和 jog 片段逐帧取三帧：`a` 是当前姿态，`b` 是下一帧，`c` 是下下帧。它存下 `states_x = a`、`states_v = b ⊖ a`、`states_y = c ⊖ b`，并把左右脚接触存进 `states_c`。讲解里提到数据库规模约 6400 个 pose states，对应几千帧可交互样本。
 
-greedy action 只看即时目标；transition table 和 value function 让系统估计不同 theta/action 的未来收益。
+`states_x` 的 root 被归零、root 朝向被重置，这一步很关键：相似度比较不应因为角色站在世界坐标的不同位置而失效。数据库更像是“局部运动趋势表”，而不是一条固定世界路径。
+
+### 3. Similarity Metric 与 k-NN 候选
+
+论文原始方法更偏向使用旋转信息；这个 notebook 用骨骼位置和下一帧位移构造 `build_distance_metric(x, v)`。它先 forward kinematics 得到当前骨骼位置 `p_a`，再把 `v` 加到 pose 得到下一帧位置 `p_b`，最后拼接加权的 `p_a` 与 `p_b - p_a`。脚、腿和 root 附近的权重更高，所以近邻更容易保持步态和落脚节奏。
+
+`toch_knn_features` 把整个 metric matrix 放进 GPU 张量。`get_nns_by_vector` 通过 broadcast 计算 query 与所有样本的逐点距离，再 `topk(largest=False)` 取最近邻。这不是近似搜索，但数据库规模小，暴力法足够清楚，也方便教学。
+
+### 4. Action、Transition 与 Value/Policy 学习
+
+passive action 使用 k-NN 的相似度权重原样混合。为了产生控制动作，代码复制一份权重，把第 `n_idx` 个邻居的权重设为 1，再重新归一化。于是 15 个邻居就变成 15 个候选动作。`compute_new_state` 会混合 `states_v` 与 `states_y`，同时用 `tug_ratio` 把结果拉回最强邻居对应的数据库区域，避免在高维场外漂移。
+
+value function 训练前，Cell 32 会把“每个状态、每个动作、动作后的下一批 value 查询邻居”预计算到 `all_states_actions_*`。Cell 35 的 `_train(is_walking, factor)` 再在 GPU 上做 fitted value iteration：每个方向格 `theta` 都有一列价值，walk 与 jog 分别得到 `value_function_walk` 和 `value_function_jog`。
+
+### 5. Runtime Controller
+
+runtime 渲染函数读取 gamepad 轴向生成 desired direction。每帧先找当前 `(current_x, current_v)` 的 15 个邻居，再枚举 15 个动作，查询 value function 估计未来奖励，选择 `argmax(future_rewards)`。这个选择不是“当前哪一帧最像目标方向”这么短视，而是“沿这个邻居推进后，未来更可能对齐目标方向”。
+
+最后，`states_c` 的接触权重会驱动脚尖锁定逻辑：接触概率高时保留脚位置，释放时逐渐跟随当前脚尖，再用 `limb_ik` 把脚部约束传回骨架。这也是 Motion Fields 和 foot contact 数据天然相连的地方。
 
 ## 关键 cell / 函数深讲
 
-## 关键 cell / 函数深讲
+### Cell 8 - PoseData 与姿态代数
 
-### Cell 7 - Interactive UI skip note
-
-考虑到浏览器自动化验证和渲染的稳定性，该笔记记录了原案例中部分易崩溃的探索性 UI 控件的跳过情况。
+`PoseData` 系列函数是后面所有 motion state 操作的语法层。它把 root、hips 和关节四元数塞进同一块数组，让 pose、velocity 和 blended velocity 都能走同一套接口。
 
 ```mermaid
 flowchart LR
-    A[Jupyter Notebook] --> B[交互式 Widget Canvas]
-    B --> C[在自动化脚本环境中阻塞运行]
-    C --> D[由脚本自动检测并跳过]
+    A[root + hips + quats] --> B[pose_pack]
+    B --> C[(pose buffer)]
+    C --> D[pose_unpack]
+    D --> E[pose_add x plus v]
+    D --> F[pose_subtract next minus current]
+    D --> G[pose_blend weighted velocities]
 ```
 
-- 代码做什么：The note separates browser-safe validation from the original exploratory UI.
-- 运行后看到什么：`log`
-- 结果说明什么：The note separates browser-safe validation from the original exploratory UI.
-- 可视化主体：Interactive UI skip note
-- 捕获方式：`log`
+读这段时要注意，`pose_subtract` 对四元数做的是 `inv(b) * a`，不是简单相减；`pose_add` 则用 `qp_mul` 把 root delta 叠到当前 root 上。这样 velocity 才能随着角色当前朝向一起旋转。
 
-![Interactive UI skip note](assets/01_interactive_ui_skip_note_result.png)
+### Cell 11 - Motion-field state table allocation
 
-### Cell 11 - State table build
-
-基于包含 Pose 及其对应的下一帧 Velocity 信息的样本库，搭建供系统运行时高速匹配查询的状态数据库。
+这一步把多段 BVH 片段变成数据库。`states_x` 保存规范化后的当前 pose，`states_v` 保存当前到下一帧的速度，`states_y` 保存下一帧到下下帧的速度，`states_c` 保存左右脚接触。
 
 ```mermaid
 flowchart LR
-    A[Raw BVH clips] --> B[打包成 states_x 和 states_v]
-    B --> C[结合 contact 信息]
-    C --> D[生成状态矩阵]
+    A[animation quats/pos] --> B[frame i, i+1, i+2]
+    B --> C[v = pose_subtract b a]
+    B --> D[y = pose_subtract c b]
+    C --> E[states_v]
+    D --> F[states_y]
+    B --> G[states_x with root normalized]
+    A --> H[contacts]
+    H --> I[states_c]
 ```
 
-- 代码做什么：The table-like log shows the scale and layout of the state database.
-- 运行后看到什么：`log`
-- 结果说明什么：The table-like log shows the scale and layout of the state database.
-- 可视化主体：State table build
-- 捕获方式：`log`
+![Motion-field state table allocation](assets/02_state_table_build_result.png)
 
-![State table build](assets/02_state_table_build_result.png)
+结果图的意义不在美观，而在确认数据库确实被分配并裁剪到实际 `states_count`。如果这个表的规模、shape 或 contact 列不对，后续 k-NN 和 value precompute 都会在错误的状态空间里工作。
 
 ### Cell 17 - UMAP motion-field embedding
 
-使用 UMAP 对高维状态空间特征进行降维投影，从可视化的二维散点图中确认近邻样本的合理性和聚类情况。
+UMAP 只是阅读工具，不参与 runtime 控制。它把 `metric_matrix.reshape(-1, FEATURE_SHAPE[0] * 3)` 投影到 3D，让读者看到相近姿态在低维图上形成连续团块。
 
 ```mermaid
 flowchart LR
-    A[states_x 高维数据] --> B[metric_matrix 加权处理]
-    B --> C[输入 UMAP 模型]
-    C --> D[生成二维散点簇并绘制]
+    A[states_x + states_v] --> B[build_distance_metric]
+    B --> C[metric_matrix]
+    C --> D[UMAP n_neighbors=80]
+    D --> E[3D scatter plot]
 ```
-
-- 代码做什么：UMAP motion-field embedding: The plot makes the motion-field neighborhood structure visible.
-- 运行后看到什么：`plot`
-- 结果说明什么：The plot makes the motion-field neighborhood structure visible.
-- 可视化主体：UMAP motion-field embedding
-- 捕获方式：`plot`
 
 ![UMAP motion-field embedding](assets/03_umap_motion_field_result.png)
 
-### Cell 20 - Torch k-NN functions
+这张图不能证明 metric 完美，但能快速暴露两个问题：样本是否被严重撕裂，walk 与 jog 是否混到无法区分。讲解中也强调它只是帮助理解高维 motion field 的投影。
 
-利用 GPU 加速的 PyTorch 实现运行时 K 近邻搜索（k-NN），根据角色当前姿态与摇杆意图从库里召回最佳下一步候选。
+### Cell 20 - Torch nearest-neighbor helper 与相似度权重
 
-```mermaid
-flowchart LR
-    A[当前控制意图与实时 Pose] --> B[Torch k-NN 搜索最邻近样本]
-    B --> C[计算样本间混合权重]
-    C --> D[生成插值后的下一帧状态]
-```
-
-- 代码做什么：The source card explains how a controller state becomes candidate future motions.
-- 运行后看到什么：`code_only`
-- 结果说明什么：The source card explains how a controller state becomes candidate future motions.
-- 可视化主体：Torch k-NN functions
-- 捕获方式：`source_excerpt`
-
-![Torch k-NN functions](assets/04_torch_knn_functions_result.png)
-
-### Cell 25 - Controller widget note
-
-该部分对外部控制器的默认映射进行说明，强调验证模式下使用模拟输入而非强制物理外设。
+近邻查询由 `get_nns_by_vector` 和 `get_k_neighbors` 分成两层。前者只返回最近索引与距离，后者把距离转成归一化反距离权重，供 motion blending 使用。
 
 ```mermaid
 flowchart LR
-    A[控制器 Widget 模块] --> B[检查是否有真实 Gamepad]
-    B --> C[无则提供模拟默认摇杆参数]
-    C --> D[进行下一步贪婪代价测试]
+    A[current_x/current_v] --> B[build_distance_metric]
+    B --> C[get_nns_by_vector]
+    C --> D[topk indices + distances]
+    D --> E[1 / distance squared]
+    E --> F[normalized similarity weights]
 ```
 
-- 代码做什么：The log documents why browser capture uses default input rather than requiring physical hardware.
-- 运行后看到什么：`log`
-- 结果说明什么：The log documents why browser capture uses default input rather than requiring physical hardware.
-- 可视化主体：Controller widget note
-- 捕获方式：`log`
+![Torch nearest-neighbor helper](assets/04_torch_knn_functions_result.png)
 
-![Controller widget note](assets/05_controller_widget_note_result.png)
+这段代码解释了 controller state 如何变成候选未来动作。注意 `torch.topk` 找的是 metric 空间距离最小的样本，而不是动画时间上相邻的帧。
+
+### Cell 21 - compute_new_state 的积分与 drift correction
+
+`compute_new_state` 用当前权重混合邻居 velocity，再加入一个朝向最大权重邻居的 tug。这个 tug 是 motion field 的稳定器：角色可以在场里移动，但不会被混合速度推到数据库完全没有样本的区域。
+
+```mermaid
+flowchart TD
+    A[indices + action weights] --> B[blend states_v]
+    A --> C[argmax weight neighbor]
+    C --> D[compute_v_to_reach_state]
+    B --> E[pose_lerp with tug_ratio]
+    D --> E
+    E --> F[pose_add current_x final_v]
+    A --> G[blend states_y as next velocity]
+```
+
+如果只做平均速度，短时间看起来能走，长时间会逐渐离开训练数据流形；加入 tug 后，系统每一步都被轻微拉回“真实动画曾经出现过”的区域。
 
 ### Cell 32 - Transition table precompute
 
-预先计算任意起始状态和可能输入操作（Action）下的下一状态及其评估收益，以空间换取交互时间。
+value iteration 需要反复问：“从状态 `i` 采取动作 `a` 后，会落到哪些 value states 以及对应权重是多少？”在线做这件事太慢，所以 Cell 32 把这些查询提前存进大表。
 
 ```mermaid
 flowchart LR
-    A[所有 state_id] --> B[组合各种 Action 输入]
-    B --> C[计算 k-NN 下一状态转移概率]
-    C --> D[构建 offline 转移概率大表]
+    A[all states] --> B[future_indices/future_weights]
+    B --> C[for each neighbor action]
+    C --> D[compute_new_state]
+    D --> E[build metric for next state]
+    E --> F[get_batched_k_neighbors]
+    F --> G[indices/weights for value lookup]
 ```
-
-- 代码做什么：Moving the expensive search offline is what makes runtime interaction feasible.
-- 运行后看到什么：`log`
-- 结果说明什么：Moving the expensive search offline is what makes runtime interaction feasible.
-- 可视化主体：Transition table precompute
-- 捕获方式：`log`
 
 ![Transition table precompute](assets/06_transition_table_precompute_result.png)
 
-### Cell 35 - Value learning curve
+这就是用存储换交互速度。预计算完成后，训练和 runtime 都可以用数组索引加权求和，而不用在每次 Bellman backup 中重新扫完整数据库。
 
-训练基于 Bellman 方程的值函数策略，对当前策略执行效果进行自我强化迭代并绘制损失历史。
+### Cell 35 - Value-learning score curve
+
+`_train` 维护形状为 `[states_count, theta_count]` 的 value table。`theta_count = 17` 把目标朝向离散成 17 个格点；动作造成的朝向变化会落在两个 theta 格之间，因此代码还做了线性插值。
+
+```mermaid
+flowchart TD
+    A[V initialized to zero] --> B[precomputed next indices]
+    B --> C[gather neighbor V]
+    C --> D[interpolate by theta]
+    D --> E[weighted expected next value]
+    E --> F[Q = reward + gamma * next value]
+    F --> G[max over actions]
+    G --> H[updated V and Bellman residual]
+```
+
+![Value-learning score curve](assets/07_value_learning_curve_result.png)
+
+曲线关注的是 Bellman residual 的收敛趋势。它不是角色动画质量的最终评测，但能说明 value table 不再大幅震荡，策略学习进入稳定区间。
+
+### Cell 36 - Runtime policy 选择与脚部约束
+
+runtime 的核心是把 learned value 用回控制器。对 15 个候选动作分别预测下一状态、查 value、按 theta 插值，然后取未来奖励最高的一项。
 
 ```mermaid
 flowchart LR
-    A[获取预计算的离线 Transition 表] --> B[评估 immediate_reward]
-    B --> C[Torch 加速 Bellman Backup]
-    C --> D[多轮迭代直至价值收敛]
+    A[gamepad direction] --> B[get current k neighbors]
+    B --> C[enumerate 15 actions]
+    C --> D[query value_function_walk/jog]
+    D --> E[pick best action]
+    E --> F[compute_new_state]
+    F --> G[blend states_c contact]
+    G --> H[toe lock + limb_ik]
 ```
 
-- 代码做什么：Value-learning score curve: The curve gives a quick read on whether the learned policy is stabilizing.
-- 运行后看到什么：`plot`
-- 结果说明什么：The curve gives a quick read on whether the learned policy is stabilizing.
-- 可视化主体：Value learning curve
-- 捕获方式：`plot`
-
-![Value learning curve](assets/07_value_learning_curve_result.png)
+`gamepad.buttons[1]` 在 walk/jog value function 之间切换；接触锁脚则来自数据库里的 `states_c`。这说明本案例虽然主题是 motion field 控制，但完整 runtime 仍然依赖脚接触信息来保持视觉可信度。
 
 ## 关键数据结构
 
-- `PoseData`：pose buffer 的 pack/unpack/add/subtract/lerp 接口。
-- `states_x`、`states_v`、`states_y`、`states_c`：motion field 样本、速度、标签和 contact。
-- `metric_matrix`、`toch_knn_features`：近邻查询的距离空间。
-- `all_states_actions_states_x/v`、`all_states_actions_value_function_indices/weights`：预计算转移表。
-- `thetas`、`value_function_walk`、`value_function_jog`：策略学习结果。
+| 名称 | 形状 / 类型 | 作用 |
+| --- | --- | --- |
+| `PoseData` | `root`、`hips`、`quats` | 将统一 pose buffer 解释成可读字段 |
+| `states_x` | `[states_count, bone_count + 2, 4]` | 规范化后的当前 pose |
+| `states_v` | 同 `states_x` | 从当前帧到下一帧的 velocity |
+| `states_y` | 同 `states_x` | 下一帧到下下帧的 velocity，用于更新未来速度 |
+| `states_c` | `[states_count, 2]` | 左右脚接触标记，用于 runtime lock |
+| `metric_matrix` | `[states_count, bone_count * 2, 3]` | k-NN 查询空间，包含姿态位置和下一帧位移 |
+| `toch_knn_features` | Torch tensor on CUDA | GPU 暴力近邻查询的数据库张量 |
+| `all_states_actions_states_x/v` | `[S, K, bone_count + 2, 4]` | 每个状态和动作对应的下一 motion state |
+| `all_states_actions_value_function_indices/weights` | `[S, K, K]` | 下一状态查询 value table 时的近邻索引与权重 |
+| `thetas` | `17` 个方向格 | value function 的目标方向离散化 |
+| `value_function_walk/jog` | `[states_count, theta_count]` | walk 和 jog 两套 learned policy value |
 
 ## 执行结果的意义
 
-当前 prepared notebook 跳过了部分原始交互 cell，因此正文把重点放在可复现的 state table、UMAP、k-NN 和 value learning 证据上。
+这个 prepared notebook 跳过了若干依赖真实浏览器交互的 viewer/gamepad 单元，但保留了可复现的核心证据：状态表、UMAP、k-NN 代码、transition precompute 和 value-learning 曲线。
+
+从结果读法上看，Cell 11 证明 motion state database 已经成型；Cell 17 帮读者理解 metric 空间的邻域结构；Cell 20 与 Cell 21 说明 runtime 如何从当前状态找候选并积分；Cell 32 解释为什么 value iteration 能在合理时间内跑；Cell 35 说明 learned value 的更新正在趋于稳定。把这些连起来，才是 Motion Fields 相比简单 clip selection 的关键：角色每一帧都在数据场中重新选择方向，而不是沿固定片段被动播放。
 
 ## 重点可视化 / 动画
 
-本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
+本节只使用 manifest 声明的结果媒体和 walkthrough，学习卡只放在后续证据表，不作为正文主视觉。
 
-
-| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
-| --- | --- | --- | --- | --- | --- |
-| Cell 17 | `plot` | `key_visual` | UMAP motion-field embedding: The plot makes the motion-field neighborhood structure visible. | `plot` | [结果 PNG](assets/03_umap_motion_field_result.png) |
-| Cell 35 | `plot` | `key_visual` | Value-learning score curve: The curve gives a quick read on whether the learned policy is stabilizing. | `plot` | [结果 PNG](assets/07_value_learning_curve_result.png) |
-
+| 媒体 | manifest 角色 | 阅读重点 |
+| --- | --- | --- |
+| [UMAP motion-field embedding](assets/03_umap_motion_field_result.png) | `key_visual` | 高维 motion field 在低维投影中的邻域连续性 |
+| [Value-learning score curve](assets/07_value_learning_curve_result.png) | `key_visual` | Bellman residual 随 epoch 下降并进入稳定区间 |
+| [Motion Fields walkthrough](assets/00-walkthrough.webm) | `supporting_evidence` | 按 cell 顺序回放学习卡与结果证据 |
 
 ## 代码 Cell 与可视化结果
 
-本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+下面的表用于复现证据。`结果 PNG` 是正文可读结果媒体；`代码卡` 只作为源码摘要和输出来源记录。
 
 | Cell / 片段 | 结果说明 | 证据 |
 | --- | --- | --- |
-| Cell 7 | The note separates browser-safe validation from the original exploratory UI. | [结果 PNG](assets/01_interactive_ui_skip_note_result.png) / [代码卡](assets/01_interactive_ui_skip_note.png) |
-| Cell 11 | The table-like log shows the scale and layout of the state database. | [结果 PNG](assets/02_state_table_build_result.png) / [代码卡](assets/02_state_table_build.png) |
-| Cell 17 | The plot makes the motion-field neighborhood structure visible. | [结果 PNG](assets/03_umap_motion_field_result.png) / [代码卡](assets/03_umap_motion_field.png) |
-| Cell 20 | The source card explains how a controller state becomes candidate future motions. | [结果 PNG](assets/04_torch_knn_functions_result.png) / [代码卡](assets/04_torch_knn_functions.png) |
-| Cell 25 | The log documents why browser capture uses default input rather than requiring physical hardware. | [结果 PNG](assets/05_controller_widget_note_result.png) / [代码卡](assets/05_controller_widget_note.png) |
-| Cell 32 | Moving the expensive search offline is what makes runtime interaction feasible. | [结果 PNG](assets/06_transition_table_precompute_result.png) / [代码卡](assets/06_transition_table_precompute.png) |
-| Cell 35 | The curve gives a quick read on whether the learned policy is stabilizing. | [结果 PNG](assets/07_value_learning_curve_result.png) / [代码卡](assets/07_value_learning_curve.png) |
-
+| Cell 7 | prepared notebook 记录并跳过原始交互 viewer，保证浏览器安全验证可以继续。 | [结果 PNG](assets/01_interactive_ui_skip_note_result.png) / [代码卡](assets/01_interactive_ui_skip_note.png) |
+| Cell 11 | state table 的日志展示了 pose、velocity、trajectory 和 contact 数据库的规模。 | [结果 PNG](assets/02_state_table_build_result.png) / [代码卡](assets/02_state_table_build.png) |
+| Cell 17 | UMAP 图让 motion-field 的高维邻域结构变成可检查的低维散点。 | [结果 PNG](assets/03_umap_motion_field_result.png) / [代码卡](assets/03_umap_motion_field.png) |
+| Cell 20 | Torch k-NN helper 说明当前控制状态如何转成候选未来动作。 | [结果 PNG](assets/04_torch_knn_functions_result.png) / [代码卡](assets/04_torch_knn_functions.png) |
+| Cell 25 | controller widget 日志说明验证环境使用安全默认输入，不依赖物理手柄。 | [结果 PNG](assets/05_controller_widget_note_result.png) / [代码卡](assets/05_controller_widget_note.png) |
+| Cell 32 | transition table 预计算把昂贵搜索从 runtime 移到离线阶段。 | [结果 PNG](assets/06_transition_table_precompute_result.png) / [代码卡](assets/06_transition_table_precompute.png) |
+| Cell 35 | value-learning 曲线展示策略价值更新是否趋于稳定。 | [结果 PNG](assets/07_value_learning_curve_result.png) / [代码卡](assets/07_value_learning_curve.png) |
 
 ## 运行方式
 

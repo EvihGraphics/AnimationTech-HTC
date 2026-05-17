@@ -6,198 +6,254 @@
 | --- | --- |
 | slug | `knowing_when_to_put_your_foot_down` |
 | source path | [`labs/AnimationPapers/Knowing When To Put Your Foot Down.ipynb`](<../../../../labs/AnimationPapers/Knowing When To Put Your Foot Down.ipynb>) |
+| transcript sources | [`docs/transcripts/2k3xZQgXc9s_Knowing When To Put Your Foot Down.txt`](<../../../../docs/transcripts/2k3xZQgXc9s_Knowing When To Put Your Foot Down.txt>) |
 | env prefix | `.envs/foot_down` |
 | kernel | `animationtech-knowing_when_to_put_your_foot_down` |
 | validation status | `passed`（`manual_smoke`，最后记录：`2026-04-29T19:57:03.2494879Z`；仍需 JupyterLab 手动 smoke test） |
 
 ## 问题背景
 
-脚接触判断决定角色的脚是否应该锁在地面上，是减少 foot skating 的关键输入。这个 notebook 用人工少量标注加近邻传播的方式构建 foot down oracle：先从多种 Lafan1 动作中提取脚部时间窗口特征，再用交互 canvas 标注左右脚掌和脚尖是否接触地面，最后用 k-NN 把标注推广到未标注片段。
+Footskate cleanup 想解决的是脚在应该贴地时继续滑动的问题，但 cleanup 之前必须先知道“哪一帧哪只脚应当贴地”。这篇案例对应 2006 年的 Knowing When To Put Your Foot Down，目标不是直接修脚滑，而是训练一个 foot contact oracle：给定一帧附近的脚腿运动窗口，判断左脚、左脚尖、右脚、右脚尖是否处于接触。
 
-案例重点不在训练复杂模型，而在展示“少量高质量标注 + 对称增强 + 最近邻分类”如何快速得到可迭代的脚接触数据。
+讲解中的训练策略很务实。先从 Lafan1 中取 walk、run、dance、aiming 等多类动作，构造约 22600 帧的 feature vector；再手工标注少量 clip 的四通道 contact；然后用镜像增强和 k-nearest neighbor classifier 把标签传播到未标注帧。模型简单，重点在数据定义和迭代挑样：当 oracle 对某段动作最不熟悉，就把这段拿出来继续人工修正。
+
+## 阅读前置知识
+
+- Foot contact：本文的标签不是“脚在世界空间速度为零”，而是动画师认可的接触状态，包含脚掌和脚尖四条轨道。
+- Root-local feature：脚部轨迹会被转换到当前 root 局部坐标，避免世界位置和朝向污染分类。
+- Sliding window：每个样本看当前帧前后各 `window_size = 5` 帧，因此特征既包含当前高度，也包含入地和离地趋势。
+- k-NN classifier：`NearestNeighbors` 只负责找邻居，最终标签由邻居 label 的平均概率和阈值逻辑决定。
+- Footskate cleanup 关系：cleanup 使用 contact 标签决定何时锁脚和何时释放脚，本案例提供的是这个锁定决策的输入。
 
 ## 总模块图
 
 ```mermaid
 flowchart TD
-    A[加载多段 Lafan1 动作] --> B[提取脚腿局部窗口特征]
-    B --> C[交互式 canvas 标注四路接触]
-    C --> D[合并人工标注样本]
-    D --> E[左右镜像数据增强]
-    E --> F[NearestNeighbors 训练 oracle]
-    F --> G[预测新片段接触标签]
-    G --> H[挑选最差样本继续迭代]
-    H --> I[读取或保存 foot_feature_vector.dat]
+    A[Lafan1 ranges<br/>walk/run/dance/aiming] --> B[clip slicing + root alignment]
+    B --> C[feature_vector<br/>6 bones x xyz x 11 frames]
+    C --> D[manual annotation canvas<br/>4 contact channels]
+    D --> E[trained_feature_vector + trained_label]
+    E --> F[left/right mirror augmentation]
+    F --> G[NearestNeighbors oracle]
+    G --> H[predict contact labels]
+    H --> I[find worst-distance clip]
+    I --> D
+    E --> J[foot_feature_vector.dat]
+    G --> K[downstream footskate cleanup]
 ```
+
+## 代码执行路径
+
+```mermaid
+flowchart LR
+    C5[Load ranges<br/>slice BVH clips] --> C8[Cell 8<br/>frame/window count]
+    C8 --> C10[Cell 10<br/>feature vector construction]
+    C10 --> C11[Cell 11<br/>manual annotation UI]
+    C11 --> C15[Cell 15<br/>accumulate labels]
+    C15 --> C18[Cell 18<br/>classifier + predict]
+    C18 --> C21[Iterate<br/>worst-distance sample]
+    C21 --> C25[Cell 25<br/>load saved artifact]
+```
+
+manifest 中的 Cell 8、10、11、15、18、25 已经生成了稳定结果媒体。原始 notebook 里还有交互 canvas 和保存单元，这些单元在 prepared 版本中会谨慎跳过或改为读取已有 artifact，以避免误写训练数据。
 
 ## 模块拆解
 
-### 1. 动作加载与切片
+### 1. 动作加载、切片与 root 对齐
 
-`Load a few animations` 设置 `window_size = 5`、`clip_length = 200` 和 `n_neighbors = 10`，并从 walk、run、dance、aiming 等 BVH 中取出多个范围。每个片段都额外保留前后窗口帧，并把 root 对齐到片段起点，便于比较局部脚部运动。
+`ranges` 指定参与训练的 BVH 片段，包括 walking、running、dancing 和 aiming。每段会额外取前后 `window_size` 帧，随后构造新的 `lab.Anim`。root 会通过第一帧的逆变换重新对齐，这样不同 clip 起点不再携带任意世界位置。
 
-### 2. 特征向量计算
+这一步的输出不是训练标签，而是一组可统一遍历的 animation slices。`clip_length = 200` 决定一次人工标注界面默认处理的片段长度，`total_frames / clip_length` 则告诉标注者整个数据池大概能切成多少个训练窗口。
 
-`Compute the feature vector` 选取 LeftLeg、LeftFoot、LeftToe、RightLeg、RightFoot、RightToe 六个骨骼，在当前帧前后各 5 帧的窗口里采样三维位置。位置先转换到当前 root 局部空间，再 flatten 成 `6 * 3 * (1 + 2 * window_size)` 维特征。`feature_vector_indices` 记录每条特征对应的动画和帧号。
+### 2. Feature Vector：脚腿局部时间窗
 
-### 3. 交互标注界面
+特征选取六根骨骼：`LeftLeg`、`LeftFoot`、`LeftToe`、`RightLeg`、`RightFoot`、`RightToe`。每个样本取当前帧前后各 5 帧，共 11 帧，每帧存 6 个骨骼的 3D 位置，因此维度是 `6 * 3 * 11 = 198`。
 
-`Train the oracle` 用 `ipycanvas.Canvas` 显示四条接触轨道：左脚、左脚尖、右脚、右脚尖。`current_label` 是长度为 `clip_length` 的四通道标签，viewer 会同时显示骨架、特征点和当前标签对应的地面接触标记，方便人工修正。
+位置先由 forward kinematics 得到全局坐标，再乘当前 root 的逆旋转和平移，转到 root-local 空间。这样 oracle 看到的是“脚相对于身体如何运动”，而不是“角色在场景哪里”。
 
-### 4. Oracle 训练
+### 3. Foot Contact 标注界面
 
-`Compute the Oracle` 把当前标注追加到 `trained_feature_vector` 和 `trained_label`。训练前会镜像 x 坐标，并交换左右脚标签，从而把一条标注同时变成左右对称的样本。`NearestNeighbors` 使用 `n_neighbors = 10`，`predict` 对邻居标签求平均，并用 0.4 和 0.6 阈值做滞回式二值化。
+标注界面由 `ipycanvas.Canvas`、timeline 和 viewer 组成。canvas 高度分成四条轨道：左脚、左脚尖、右脚、右脚尖；`current_label` 的形状是 `[clip_length, 4]`。鼠标移动会同步更新当前帧，鼠标按下和拖动会切换某一轨道的 contact 值。
 
-### 5. 迭代挑样与读写
+界面里还有 `generate using speed` 按钮，它调用 `lab.utils.extract_feet_contacts` 生成初始猜测。标注者不是从空白开始，而是在速度阈值结果上修正，尤其关注起跳、落地、转身和脚尖轻触地面的不确定帧。
 
-`Iterate....` 先在当前范围上查看预测结果，再用最近邻距离最大的片段作为“最不熟悉”的样本继续标注。`Load and Save` 中保存代码被注释以避免误写，默认读取 `foot_feature_vector.dat` 中已有的训练特征和标签。
+### 4. Oracle / Classifier
 
-## 关键数据结构
+一次 clip 标完后，`trained_feature_vector` 与 `trained_label` 累加当前特征和标签。训练 classifier 前，代码把所有特征 reshape 成 xyz 坐标，令 x 坐标取反做左右镜像，并把 label 从 `[left foot, left toe, right foot, right toe]` 交换成 `[right foot, right toe, left foot, left toe]`。这样一段人工标注同时贡献原始样本和镜像样本。
 
-- `ranges`：参与训练的 BVH 名称与帧范围。
-- `feature_vector`：每帧脚腿窗口特征，维度为 `6 * 3 * 11`。
-- `feature_vector_indices`：从全局特征行映射回动画 id 和局部帧号。
-- `current_feature_vector`：当前正在标注或验证的片段特征。
-- `current_label`：四通道脚接触标签，顺序为左脚、左脚尖、右脚、右脚尖。
-- `trained_feature_vector`、`trained_label`：累计人工确认的训练集。
-- `classifier_feature_vector`、`classifier_label`：加入左右镜像增强后的 k-NN 训练数据。
-- `classifier`：`sklearn.neighbors.NearestNeighbors` 实例。
+`classifier = NearestNeighbors(n_neighbors=10)` 拟合增强后的特征。`predict(features)` 对每个 query 找 10 个近邻，把四通道标签平均成概率：小于等于 0.4 视为未接触，大于等于 0.6 视为接触，介于两者之间则沿用上一帧状态，减少 0/1 抖动。
 
-## 执行结果的意义
+### 5. 迭代挑样
 
-成功运行后，标注者可以在 viewer 和 canvas 中检查脚接触预测是否符合动作画面。结果文件 `foot_feature_vector.dat` 代表一个可复用的脚接触 oracle 训练集，后续案例可以用它判断何时锁脚、何时释放脚。质量评估时应重点看起跳、落地、转身和脚尖轻触地面的帧，因为这些是二值标签最容易摇摆的区域。
+训练完第一版 oracle 后，代码会把当前片段或更长片段送进 `predict` 看效果。下一轮标注不随机选样，而是用 `classifier.kneighbors(feature_vector, n_neighbors=1, return_distance=True)` 找全数据集中最近邻距离最大的帧，再对齐到 `clip_length` 边界。
 
-## 代码 Cell 与可视化结果
+这个策略的含义很直接：优先标注 oracle 最不熟悉的动作区域。每次人工修正后重新 fit classifier，直到不熟悉样本减少，或者预测已经满足后续 cleanup 的质量要求。
 
-本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和 PNG 学习卡片。PNG 由指定 cell 的代码摘要、输出区、viewer/canvas 或图表/日志合成，不使用整页滚动截图替代。
+### 6. 与 Footskate Cleanup 的关系
 
-> Note: Prepared notebook skips the original manual annotation UI; media uses code/log/artifact evidence for those cells.
+Footskate cleanup 通常需要两个信息：脚应该固定在哪个世界位置，以及这段固定应持续多久。本案例不直接做 IK cleanup，但它提供第二个信息的判定来源。后续系统可以把 `predict` 得到的 contact 标签作为锁脚区间，在接触段保持脚掌或脚尖锚点，在非接触段释放约束。
 
-
-| Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
-| --- | --- | --- | --- | --- |
-| 8 | `table` | Accumulate source clip ranges and print the available training-frame count. | The count defines how many temporal windows can contribute foot-contact examples. | [PNG](assets/01_clip_window_count.png) |
-| 10 | `code_only` | Build a local pose and velocity feature vector around leg and foot bones. | The source card identifies what the classifier sees when deciding whether a foot should be planted. | [PNG](assets/02_feature_vector_construction.png) |
-| 11 | `log` | Record the prepared-notebook skip for the original manual contact-labeling UI. | This documents that the browser-safe study copy validates the pipeline without replaying the fragile annotation widget. | [PNG](assets/03_annotation_ui_stability_note.png) |
-| 15 | `log` | Record the prepared skip for the manual oracle accumulation cell. | The blog can still explain the intended data flow while avoiding a non-repeatable browser labeling step. | [PNG](assets/04_training_set_accumulation.png) |
-| 18 | `table` | Create and fit the contact classifier from accumulated mirrored labels. | The card marks the transition from hand labels to a reusable prediction model. | [PNG](assets/05_classifier_training_code.png) |
-| 25 | `table` | Load saved feature vectors and labels from disk. | The artifact load is the stable validation path for the case after manual labeling has been done once. | [PNG](assets/06_saved_feature_vectors.png) |
+因此这篇的质量评估不能只看 classifier accuracy。更重要的是错误类型：把空中脚误判成接触会让 cleanup 把脚吸到地面；把落地脚误判成非接触会留下滑步。0.4/0.6 的滞回阈值正是为了减少这些边界帧的闪烁。
 
 ## 关键 cell / 函数深讲
 
 ### Cell 8 - Animation windows and frame count
 
-统计加载的动画片段，并确认总共可用的帧数，为后续的时间窗口特征提取设定基准。
+这一步统计所有切片在扣掉前后窗口后还能贡献多少训练帧。讲解中提到总规模约 22600 帧，这决定了 feature matrix 的第一维，也决定了人工标注迭代面对的数据池大小。
 
 ```mermaid
 flowchart LR
-    A[加载原始 BVH 文件] --> B[截取有效 ranges]
-    B --> C[附加前后 window padding]
-    C --> D[统计合并后的有效训练帧数]
+    A[ranges dictionary] --> B[load BVH clips]
+    B --> C[add window padding]
+    C --> D[root align each slice]
+    D --> E[sum anim.pos frames minus 2 * window_size]
+    E --> F[total_frames and total_frames / clip_length]
 ```
-
-- 代码做什么：Accumulate source clip ranges and print the available training-frame count.
-- 运行后看到什么：`table`
-- 结果说明什么：The count defines how many temporal windows can contribute foot-contact examples.
-- 可视化主体：Animation windows and frame count
-- 捕获方式：`table/output`
 
 ![Animation windows and frame count](assets/01_clip_window_count_result.png)
 
+如果 `total_frames` 偏小，oracle 见不到足够多的步态变化；如果 `total_frames / clip_length` 与预期不符，说明 ranges 或 padding 可能有错。
+
 ### Cell 10 - Foot-contact feature vector construction
 
-提取包含双腿和双脚骨骼的局部窗口特征（时间上前 5 帧和后 5 帧），这些特征将作为 k-NN 判定接触的关键证据。
+feature vector 是 oracle 的“眼睛”。它只看脚腿六根骨骼在 11 帧窗口中的 root-local 轨迹，不直接看角色全身，也不使用渲染图像。
 
 ```mermaid
-flowchart LR
-    A[选定 Left/Right 的 Leg/Foot/Toe] --> B[在时间窗内采样坐标]
-    B --> C[转换到 Root 局部坐标系]
-    C --> D[展平得到 11 帧特征向量]
+flowchart TD
+    A[global quats/pos] --> B[quat_fk to global bone positions]
+    B --> C[pick six leg/foot/toe bones]
+    C --> D[slice frame-5 to frame+5]
+    D --> E[transform by inverse root qp]
+    E --> F[flatten to 198D feature]
+    F --> G[feature_vector_indices map back to anim/frame]
 ```
-
-- 代码做什么：Build a local pose and velocity feature vector around leg and foot bones.
-- 运行后看到什么：`code_only`
-- 结果说明什么：The source card identifies what the classifier sees when deciding whether a foot should be planted.
-- 可视化主体：Foot-contact feature vector construction
-- 捕获方式：`source_excerpt`
 
 ![Foot-contact feature vector construction](assets/02_feature_vector_construction_result.png)
 
+`feature_vector_indices` 很容易被忽略，但它决定了 classifier 找到“最差样本”后能否回到正确动画和帧号继续标注。
+
 ### Cell 11 - Manual annotation UI stability note
 
-因为原始的脚部接触标记过程高度依赖交互式 Canvas 和人工修正，自动化流水线在这里会跳过界面以保证运行稳定。
+原始交互单元负责人工标注四条 contact 轨道。prepared notebook 会记录跳过原因，因为自动化环境不能可靠复现鼠标拖动、canvas 绘制和 viewer 同步。
 
 ```mermaid
 flowchart LR
-    A[Jupyter Widget Canvas] --> B[人工修正接触标签]
-    B --> C[容易导致环境崩溃或阻塞]
-    C --> D[笔记记录并跳过]
+    A[current_feature_vector] --> B[viewer render skeleton + feature points]
+    A --> C[canvas four contact lanes]
+    C --> D[mouse down/drag toggles current_label]
+    D --> E[update_canvas]
+    E --> F[human-checked labels]
 ```
-
-- 代码做什么：Record the prepared-notebook skip for the original manual contact-labeling UI.
-- 运行后看到什么：`log`
-- 结果说明什么：This documents that the browser-safe study copy validates the pipeline without replaying the fragile annotation widget.
-- 可视化主体：Manual annotation UI stability note
-- 捕获方式：`log`
 
 ![Manual annotation UI stability note](assets/03_annotation_ui_stability_note_result.png)
 
-### Cell 15 - Training-set accumulation stability note
+正文仍然要讲这个 UI，因为它定义了标签语义：四条轨道不是算法自动生成的真值，而是人工对“脚是否应该锁地”的判断。
 
-这里负责把上述的人工标注特征追加进特征库，同样为了自动化验证而被跳过。
+### Cell 15 - Training-set accumulation
+
+标完一个 clip 后，当前样本才被纳入训练集。prepared 版本跳过这里的交互累加，但数据流本身很简单：把 `current_feature_vector` 追加到 `trained_feature_vector`，把 `current_label` 追加到 `trained_label`。
 
 ```mermaid
 flowchart LR
-    A[单次标注的结果] --> B[判断是否纳入训练集]
-    B --> C[追加到 trained_feature_vector]
+    A[current_feature_vector] --> B[manual review finished]
+    C[current_label] --> B
+    B --> D[np.concatenate]
+    D --> E[trained_feature_vector]
+    D --> F[trained_label]
 ```
-
-- 代码做什么：Record the prepared skip for the manual oracle accumulation cell.
-- 运行后看到什么：`log`
-- 结果说明什么：The blog can still explain the intended data flow while avoiding a non-repeatable browser labeling step.
-- 可视化主体：Training-set accumulation stability note
-- 捕获方式：`log`
 
 ![Training-set accumulation stability note](assets/04_training_set_accumulation_result.png)
 
-### Cell 18 - Classifier construction
+这个累加步骤是“少量高质量标注”的核心。后续 classifier 没有复杂监督训练过程，它完全依赖这里进入训练集的标签是否可靠。
 
-用左右脚对称镜像的方式进行数据增强，之后构建 k-NN 最近邻分类器。
+### Cell 18 - Classifier construction 与 predict
+
+classifier 的构建和预测由两部分组成：镜像增强让左右脚共享经验，概率阈值让 contact label 更稳定。
 
 ```mermaid
-flowchart LR
-    A[累积的 trained_feature_vector] --> B[镜像左脚到右脚特征]
-    B --> C[合并形成成倍的数据]
-    C --> D[训练 NearestNeighbors]
-    D --> E[输出可复用的模型]
+flowchart TD
+    A[trained_feature_vector] --> B[reshape xyz and mirror x]
+    A --> C[original features]
+    B --> D[classifier_feature_vector]
+    C --> D
+    E[trained_label] --> F[swap left/right channels]
+    E --> G[original labels]
+    F --> H[classifier_label]
+    G --> H
+    D --> I[NearestNeighbors fit]
+    I --> J[predict: average 10 neighbor labels]
+    J --> K[0.4/0.6 hysteresis]
 ```
-
-- 代码做什么：Create and fit the contact classifier from accumulated mirrored labels.
-- 运行后看到什么：`table`
-- 结果说明什么：The card marks the transition from hand labels to a reusable prediction model.
-- 可视化主体：Classifier construction
-- 捕获方式：`table/output`
 
 ![Classifier construction](assets/05_classifier_training_code_result.png)
 
-### Cell 25 - Saved feature-vector artifact load
+这里的 oracle 本质上是数据检索器。它不会学习一组神经网络权重，而是把“和这个脚部轨迹最像的 10 个已标注轨迹”取出来投票。
 
-展示如何加载之前成功标注并持久化存储好的特征库和标签，供其它用例或复现使用。
+### Iterate and Cell 25 - 挑选最不熟悉样本与 artifact load
+
+迭代阶段先用当前 oracle 预测一段片段，再寻找最近邻距离最大的训练帧作为下一段人工标注目标。最终已经标好的训练数据会写入或读取 `foot_feature_vector.dat`。
 
 ```mermaid
 flowchart LR
-    A[foot_feature_vector.dat] --> B[读取 Numpy 数据]
-    B --> C[直接跳过人工标注阶段]
-    C --> D[供系统验证和下游任务使用]
+    A[classifier] --> B[kneighbors all feature_vector]
+    B --> C[argmax nearest distance]
+    C --> D[align to clip_length boundary]
+    D --> E[load clip for review]
+    E --> F[predict current_label]
+    F --> G[manual correction]
+    G --> H[save/load foot_feature_vector.dat]
 ```
 
-- 代码做什么：Load saved feature vectors and labels from disk.
-- 运行后看到什么：`table`
-- 结果说明什么：The artifact load is the stable validation path for the case after manual labeling has been done once.
-- 可视化主体：Saved feature-vector artifact load
-- 捕获方式：`table/output`
-
 ![Saved feature-vector artifact load](assets/06_saved_feature_vectors_result.png)
+
+prepared notebook 默认读取 artifact，而不是自动保存，原因是保存会覆盖人工标注成果。稳定复现时，`foot_feature_vector.dat` 代表“已经完成若干轮人工迭代后的 oracle 训练集”。
+
+## 关键数据结构
+
+| 名称 | 形状 / 类型 | 作用 |
+| --- | --- | --- |
+| `ranges` | dict of BVH ranges | 规定参与训练的动作类型和帧区间 |
+| `animations` | list of `lab.Anim` | root 对齐后的可遍历 clip slices |
+| `feature_vector` | `[total_frames, 198]` | 每帧脚腿 11 帧窗口特征 |
+| `feature_vector_indices` | `[total_frames, 2]` | 从特征行映射回 animation id 和 frame |
+| `current_feature_vector` | `[clip_length, 198]` 或更长 | 当前正在标注或检查的片段特征 |
+| `current_label` | `[clip_length, 4]` | 左脚、左脚尖、右脚、右脚尖四路 contact |
+| `trained_feature_vector` | `[N, 198]` | 累计人工确认的训练特征 |
+| `trained_label` | `[N, 4]` | 与训练特征对应的四通道标签 |
+| `classifier_feature_vector` | `[2N, 198]` | 原始样本加镜像样本 |
+| `classifier_label` | `[2N, 4]` | 原始标签加左右交换标签 |
+| `classifier` | `sklearn.neighbors.NearestNeighbors` | 近邻检索器，也就是 oracle 的核心 |
+| `foot_feature_vector.dat` | pickle artifact | 持久化的训练特征和标签 |
+
+## 执行结果的意义
+
+这篇的结果不是一个最终动画片段，而是一条可复用的 contact-labeling workflow。Cell 8 确认训练数据池规模；Cell 10 定义 oracle 能看到的证据；Cell 11 和 Cell 15 说明人工标签如何进入训练集；Cell 18 把人工标签变成可预测的新片段标签；Cell 25 则让已有标注能被下游案例复用。
+
+与 Footskate cleanup 放在一起看，oracle 的价值在于把“什么时候锁脚”从手工规则变成可迭代数据。cleanup 可以继续负责修正脚的位置和 IK，oracle 负责告诉 cleanup 哪些帧应该约束脚掌、哪些帧应该释放脚。
+
+## 重点可视化 / 动画
+
+manifest 没有把本案例的结果声明为 `key_visual` 或 `key_animation`，所以正文只把真实 `result_file` 和 walkthrough 作为重点证据；学习卡只放在后续证据表，不作为主视觉。
+
+| 媒体 | manifest 角色 | 阅读重点 |
+| --- | --- | --- |
+| [Animation windows and frame count](assets/01_clip_window_count_result.png) | `supporting_evidence` | 数据池规模与可切片数量 |
+| [Classifier construction](assets/05_classifier_training_code_result.png) | `supporting_evidence` | 从人工标签到 k-NN oracle 的转换 |
+| [Saved feature-vector artifact load](assets/06_saved_feature_vectors_result.png) | `supporting_evidence` | 已标注训练集的稳定复现入口 |
+| [Knowing When To Put Your Foot Down walkthrough](assets/00-walkthrough.webm) | `supporting_evidence` | 按 cell 顺序回放学习卡与结果证据 |
+
+## 代码 Cell 与可视化结果
+
+下面的表保留所有 manifest 学习步骤的证据。结果 PNG 用于阅读，代码卡只用于追溯 cell 摘要和输出来源。
+
+| Cell / 片段 | 结果说明 | 证据 |
+| --- | --- | --- |
+| Cell 8 | 统计可用训练帧和可切分的 200 帧窗口数量。 | [结果 PNG](assets/01_clip_window_count_result.png) / [代码卡](assets/01_clip_window_count.png) |
+| Cell 10 | 构造 root-local 的脚腿 11 帧窗口特征。 | [结果 PNG](assets/02_feature_vector_construction_result.png) / [代码卡](assets/02_feature_vector_construction.png) |
+| Cell 11 | prepared notebook 记录并跳过原始 manual contact-labeling UI。 | [结果 PNG](assets/03_annotation_ui_stability_note_result.png) / [代码卡](assets/03_annotation_ui_stability_note.png) |
+| Cell 15 | 记录人工标注样本进入训练集的累加阶段。 | [结果 PNG](assets/04_training_set_accumulation_result.png) / [代码卡](assets/04_training_set_accumulation.png) |
+| Cell 18 | 构建镜像增强后的 NearestNeighbors classifier。 | [结果 PNG](assets/05_classifier_training_code_result.png) / [代码卡](assets/05_classifier_training_code.png) |
+| Cell 25 | 读取已保存的 `foot_feature_vector.dat`，作为稳定复现路径。 | [结果 PNG](assets/06_saved_feature_vectors_result.png) / [代码卡](assets/06_saved_feature_vectors.png) |
 
 ## 运行方式
 
@@ -212,25 +268,3 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpaper
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 knowing_when_to_put_your_foot_down
 ```
-
-## 重点可视化 / 动画
-
-本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
-
-
-| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
-| --- | --- | --- | --- | --- | --- |
-
-
-## 代码 Cell 与可视化结果
-
-本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
-
-| Cell / 片段 | 结果说明 | 证据 |
-| --- | --- | --- |
-| Cell 8 | The count defines how many temporal windows can contribute foot-contact examples. | [结果 PNG](assets/01_clip_window_count_result.png) / [代码卡](assets/01_clip_window_count.png) |
-| Cell 10 | The source card identifies what the classifier sees when deciding whether a foot should be planted. | [结果 PNG](assets/02_feature_vector_construction_result.png) / [代码卡](assets/02_feature_vector_construction.png) |
-| Cell 11 | This documents that the browser-safe study copy validates the pipeline without replaying the fragile annotation widget. | [结果 PNG](assets/03_annotation_ui_stability_note_result.png) / [代码卡](assets/03_annotation_ui_stability_note.png) |
-| Cell 15 | The blog can still explain the intended data flow while avoiding a non-repeatable browser labeling step. | [结果 PNG](assets/04_training_set_accumulation_result.png) / [代码卡](assets/04_training_set_accumulation.png) |
-| Cell 18 | The card marks the transition from hand labels to a reusable prediction model. | [结果 PNG](assets/05_classifier_training_code_result.png) / [代码卡](assets/05_classifier_training_code.png) |
-| Cell 25 | The artifact load is the stable validation path for the case after manual labeling has been done once. | [结果 PNG](assets/06_saved_feature_vectors_result.png) / [代码卡](assets/06_saved_feature_vectors.png) |

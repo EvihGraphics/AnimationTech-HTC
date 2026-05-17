@@ -1,243 +1,330 @@
-# 径向基函数插值
+# 径向基函数插值：从稀疏样本到连续函数场
 
-## 元数据
+## 元信息
 
-| 字段 | 内容 |
+| 字段 | 值 |
 | --- | --- |
 | slug | `radial_basis_function` |
 | source path | [`labs/Theory/radial_basis_function.ipynb`](../../../../labs/Theory/radial_basis_function.ipynb) |
+| transcript sources | [`docs/transcripts/luX11STn1Uk_Radial Basis Function.txt`](../../../../docs/transcripts/luX11STn1Uk_Radial%20Basis%20Function.txt) |
+| kind | `notebook` |
 | env prefix | `.envs/radial_basis_function` |
 | kernel | `animationtech-radial_basis_function` |
 | validation status | `passed` (`automated`) |
+| publish tier | `深写完成 + 媒体完整` |
 
 ## 问题背景
 
-径向基函数（RBF）常用于从稀疏样本构造连续函数。它把每个样本点当作一个中心，用只依赖距离的 kernel 描述影响范围，再求一组权重，使插值函数穿过所有样本值。
+RBF（Radial Basis Function）解决的是一个很常见的问题：我们只知道少量样本点的值，却希望在样本之间得到一条平滑、连续、并且穿过样本的函数。语音稿里反复强调的直觉是，RBF 不先假设一条全局曲线，而是把每个已知样本当成一个影响源；查询点离哪些样本近，就更强地感受到哪些样本的影响。
 
-这个 notebook 以 Gaussian kernel 为例，先展示一维 RBF 的基础插值流程，再讨论 `epsilon` 对形状的影响。最后加入 polynomial augmentation，让 RBF 在样本分布不均或需要全局趋势时更稳定。
+这个 notebook 用一维函数做最小可视化版本。输入是稀疏采样位置 `xs` 和函数值 `ys`，核心是 Gaussian kernel：
 
-和曲线/样条章节相比，RBF 也在做“从离散控制信息生成连续值”，但它的控制量不是 Bezier 或 B-Spline 那样的控制点序列，而是样本中心、距离 kernel 和求解出的权重。用于动作插值时，可以把姿态样本、控制器状态或特征空间位置看作 RBF 中心；查询姿态到各中心的距离决定每个样本对最终结果的影响。
+```text
+Phi(r) = exp(-(epsilon * r)^2)
+```
+
+它只依赖距离 `r`，所以叫“径向”。`epsilon` 控制距离被放大的速度：值越大，Gaussian 越窄，样本影响越局部；值越小，影响越宽，样本之间耦合越强。如果只是把每个样本中心的 Gaussian 曲线直接相加，结果会过冲或下陷；真正的 RBF 插值会先组成 kernel matrix `Phi_ki = Phi(|x_k - x_i|)`，再求解一组权重 `w`，让 `sum_i w_i Phi(|x_k - x_i|) = y_k` 在所有样本点同时成立。后半段引入 polynomial augmentation，把全局二次趋势交给多项式项，把局部偏差交给 RBF 项，解释为什么纯 Gaussian RBF 擅长插值但不擅长外推。
+
+## 阅读前置知识
+
+读这篇前，最好先确认五件事：
+
+1. 线性系统 `A x = b`：RBF 的权重不是手调出来的，而是从 kernel matrix 直接求解。
+2. NumPy broadcasting：`xs[:, None] - xs[None, :]` 会一次性得到样本两两距离矩阵。
+3. kernel / basis 的区别：kernel 是“距离到影响值”的函数，basis 是最终组合中的一列或一个影响源。
+4. 插值与外推的差异：穿过样本之间的区域叫插值；跑到样本覆盖范围之外叫外推，RBF 在这里需要额外趋势项帮助。
+5. 块矩阵约束：polynomial augmentation 会把 `Phi`、`P`、`P^T` 放进同一个线性系统，读懂它比只看最终曲线更重要。
+
+这篇是后续 `radial_basis_function_verbs_and_adverbs` 的数学前置：后者把这里的一维样本点换成高维 adverb 坐标，把标量函数值换成动作参数或颜色自由度。
 
 ## 总模块图
 
 ```mermaid
 flowchart TD
-    A[样本点 xs 与函数值 ys] --> B[Gaussian kernel phi(r)]
-    B --> C[距离矩阵 distances]
-    C --> D[Kernel 矩阵 Phi]
-    D --> E[求解权重 w]
-    E --> F[查询点插值]
-    F --> G[观察 epsilon 影响]
-    G --> H[Polynomial augmentation]
-    H --> I[扩展线性系统求解]
+    A[稀疏样本函数 xs, ys] --> B[Gaussian basis phi(r)]
+    B --> C[样本两两距离矩阵 distances]
+    C --> D[Kernel matrix Phi]
+    D --> E[求解 Phi * w = ys]
+    E --> F[查询点距离到所有样本中心]
+    F --> G[矩阵乘法得到插值曲线]
+    G --> H[观察插值好、外推弱]
+    H --> I[构造 polynomial basis P]
+    I --> J[扩展块矩阵求解 w 与 c]
+    J --> K[局部 RBF + 全局 affine/quadratic 趋势]
 ```
+
+## 代码执行路径
+
+notebook 的执行顺序可以读成一条“从样本到可查询函数”的管线。
+
+```mermaid
+sequenceDiagram
+    participant Data as xs / ys
+    participant Kernel as gauss(radius, eps)
+    participant Matrix as Phi matrix
+    participant Solver as np.linalg.solve
+    participant Query as plot_x / x=0.5
+    participant Aug as polynomial augmentation
+    participant Plot as matplotlib
+
+    Data->>Kernel: 定义样本中心和 Gaussian 形状
+    Data->>Matrix: 计算两两距离 distances
+    Kernel->>Matrix: Phi = gauss(distances, eps)
+    Matrix->>Solver: 解 Phi * w = ys
+    Query->>Kernel: 计算查询点到各中心的 kernel 值
+    Solver->>Query: dot(phi, w) 得到插值结果
+    Data->>Aug: 构造 P = [1, x, x^2]
+    Aug->>Solver: 解扩展块矩阵 [Phi P; P^T 0]
+    Solver->>Plot: 绘制基础 RBF 与增强 RBF
+```
+
+工程上要注意，Cell 13 只计算单个查询点 `0.5`，Cell 15 把同一件事批量化到 `plot_x`。RBF 的数学公式看起来像求和，但实际代码尽量写成矩阵乘法，这样可以一次性处理许多查询点。本文只使用元信息中列出的 notebook 和 transcript 作为解释来源，所有图片都引用已有 `assets` 输出。
 
 ## 模块拆解
 
-1. **Gaussian kernel 定义**
-   `gauss(radius, epsilon)` 实现 `exp(-(epsilon * radius)^2)`。kernel 只依赖查询点到样本中心的距离，因此是径向函数。
+### 1. 样本函数与中心点
 
-2. **构造示例函数和样本**
-   `example_function` 提供一维目标函数，`xs` 是少量样本位置，`ys` 是对应函数值。`plot_x` 和 `plot_y` 用于对比真实函数与插值曲线。
+前半段的 `example_function(x) = -2*x^3 + 3*x^2` 只是一个可观察的真值函数。`xs = [0, .3, .8, 1.0, 1.3]` 是我们假装“真实测到”的稀疏点，`ys = example_function(xs)` 是这些点上的函数值。
 
-3. **观察单个 kernel 的形状**
-   `gauss_example` 画出每个样本中心对应的 Gaussian 曲线。交互参数 `eps` 展示 kernel 宽度对局部性和平滑性的影响：`epsilon` 越大，影响范围越窄。
+```mermaid
+flowchart LR
+    A[连续真值函数] --> B[选择少量 xs]
+    B --> C[计算 ys]
+    C --> D[只把 xs, ys 交给 RBF]
+    A --> E[plot_y 仅用于对照]
+```
 
-4. **求解基础 RBF 权重**
-   notebook 先计算样本之间的 `distances`，再得到 `phi = gauss(distances, eps)`。线性系统 `phi @ w = ys` 的解 `w` 会缩放每个 kernel，使组合函数穿过样本点。
+**执行结果怎么看：** Cell 6 的红色虚线是真值，叉号是稀疏样本。RBF 后续不能“偷看”红线，它只能用叉号重建中间形状。
 
-5. **查询点与连续插值**
-   对单个点 `0.5`，计算它到所有样本点的距离并用 `np.dot(phi, w)` 得到插值值。对 `plot_x` 重复同样流程，就得到连续插值曲线。
+![Sample function and sparse points](assets/01_sample_function_points_result.png)
 
-6. **Polynomial augmentation**
-   在样本分布更分散的例子里，纯 RBF 可能缺少合理的全局趋势。notebook 构造多项式基 `P = [1, x, x^2]`，并求解块矩阵系统：
+### 2. Gaussian basis 与 epsilon
 
-   ```text
-   [ Phi  P ] [ w ] = [ f ]
-   [ P^T  0 ] [ c ]   [ 0 ]
-   ```
+`gauss(radius, epsilon)` 把距离转换成影响强度。距离越近，值越接近 1；距离越远，值越接近 0。这里的 `radius` 可以是单个数，也可以是距离矩阵；NumPy 会把 `exp(-(epsilon * radius)^2)` 逐元素应用到每个距离上。`epsilon` 决定钟形曲线宽窄：越大越窄、越局部，越小越宽、越平滑但也越容易让远样本互相干扰。
 
-   其中 `w` 是径向权重，`c` 是多项式系数。
+```mermaid
+flowchart LR
+    A[查询点 x] --> B[计算 radius = x - x_i]
+    B --> C[Phi = exp(-(eps * radius)^2)]
+    C --> D[得到样本 i 对 x 的影响]
+```
 
-## 与曲线和动作插值的术语关系
+**执行结果怎么看：** Cell 7 显示每个样本中心各自形成一个局部影响场。语音稿里提到，如果直接把这些曲线相加，要么整体过冲，要么在样本间下陷，所以需要下一步求权重。
 
-- **样本中心 vs 控制点**：曲线章节里的控制点按序定义形状；RBF 的中心点定义影响源，通常存在于一维时间、二维平面或更高维特征空间中。
-- **kernel 权重 vs basis 权重**：Bezier/B-Spline 使用多项式 basis 随 `t` 分配控制点影响；RBF 使用距离 kernel 随查询位置分配样本影响。
-- **插值 vs 拟合**：基础 RBF 解线性系统后会穿过样本值，语义上接近插值曲线；加入正则化或改为最小二乘时，也可以转向拟合。
-- **epsilon vs tension / tangent**：`epsilon` 控制 RBF 影响范围，类似在调局部性和平滑性；它不等同于 Cardinal 的 `tension` 或 Hermite 的 tangent，但都在影响过渡形状。
-- **动作插值**：在动作系统中，RBF 常用于 pose blending、控制器空间插值和高维参数到动作值的映射；曲线样条更常用于时间轴上的单通道动画值或空间路径。
+![Gaussian kernel influence](assets/02_gaussian_kernel_influence_result.png)
 
-## 关键数据结构
+### 3. Kernel matrix 与权重求解
 
-- `xs`、`ys`：样本中心和目标函数值。
-- `plot_x`、`plot_y`：用于绘图的密集采样点和真实函数值。
-- `eps`：Gaussian kernel 的形状参数。
-- `distances`：样本点或查询点到样本中心的距离矩阵。
-- `phi`：RBF kernel 矩阵。
-- `w`：求解出的径向权重。
-- `interpolated`：在 `plot_x` 上计算出的插值结果。
-- `P`：polynomial augmentation 中的多项式基矩阵。
-- `extended_phi`、`extended_ys`：拼接多项式约束后的扩展线性系统。
-- `gauss`、`example_function`、`gauss_example`：主要函数。
+RBF 插值的关键是让组合函数穿过所有样本。对第 `k` 个样本点来说：
 
-## 执行结果的意义
+```text
+f(x_k) = sum_i w_i * Phi(|x_k - x_i|)
+```
 
-基础插值图说明 RBF 通过“每个样本一个 kernel，再求权重”的方式精确穿过样本点。`epsilon` 的交互图让人直观看到局部性和平滑性之间的取舍：kernel 太宽会过度平滑，太窄会在样本之间产生不稳定形状。
+把所有样本点一起写成矩阵形式，就是：
 
-Polynomial augmentation 的结果说明，RBF 不一定只负责完整函数本身。让多项式项表达全局趋势、径向项表达局部残差，通常能得到更可靠的外推和更自然的曲线形状。
+```text
+Phi * w = ys
+```
 
-把它和曲线章节连起来看，可以把 RBF 理解为另一种连续插值工具：样条通常沿时间或点序构造连续曲线，RBF 则根据“离哪些样本更近”来混合结果。后续学习动作插值、pose space deformation 或 controller-driven deformation 时，这个距离驱动的视角会非常有用。
+```mermaid
+flowchart LR
+    A[xs 列向量] --> B[两两相减取绝对值]
+    B --> C[distances 矩阵]
+    C --> D[gauss(distances, eps)]
+    D --> E[Phi]
+    F[ys] --> G[solve(Phi, ys)]
+    E --> G
+    G --> H[w]
+```
 
-## 代码 Cell 与可视化结果
+**执行结果怎么看：** Cell 9 的距离矩阵对角线为 0，因为每个样本到自己距离为 0；经过 Gaussian 后，`Phi` 对角线变成 1。非对角元素描述样本之间的相互影响，越接近 1 表示两个中心越难被区分。Cell 10 的 `w` 不是样本值本身，而是每个 basis 需要放大或反向抵消多少，才能让总和穿过所有点。
 
-本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和 PNG 学习卡片。PNG 由指定 cell 的代码摘要、输出区、viewer/canvas 或图表/日志合成，不使用整页滚动截图替代。
+![Distance and kernel matrices](assets/03_distance_kernel_matrix_result.png)
 
+![Solved RBF weights](assets/04_rbf_weights_result.png)
 
-| Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
-| --- | --- | --- | --- | --- |
-| 6 | `plot` | Plot the target function and sparse interpolation samples. | The plot establishes what the RBF interpolator must reconstruct. | [PNG](assets/01_sample_function_points.png) |
-| 7 | `plot` | Plot per-sample Gaussian radial basis functions. | The graph shows each sample as a local influence field. | [PNG](assets/02_gaussian_kernel_influence.png) |
-| 9 | `matrix` | Print the pairwise distances and Phi kernel matrix. | The matrix is the linear system that determines interpolation weights. | [PNG](assets/03_distance_kernel_matrix.png) |
-| 10 | `table` | Solve Phi w = y and print the weights. | The weights tell how much each radial basis contributes to the reconstruction. | [PNG](assets/04_rbf_weights.png) |
-| 16 | `plot` | Evaluate the RBF curve and mark a query point. | The plot checks that local kernels reconstruct the target curve between samples. | [PNG](assets/05_interpolated_query_result.png) |
-| 21 | `matrix` | Build and print the polynomial basis matrix P. | The augmentation adds a global trend term alongside local kernels. | [PNG](assets/06_polynomial_basis_matrix.png) |
-| 27 | `plot` | Plot the final polynomial-augmented RBF interpolation. | The final curve preserves both sparse samples and stable large-scale behavior. | [PNG](assets/07_augmented_rbf_fit.png) |
+### 4. 查询点与连续插值曲线
+
+求出 `w` 后，新查询点不再参与解线性系统。它只需要计算自己到所有样本中心的距离，走同一个 Gaussian kernel，再与 `w` 点乘。样本阶段的 `Phi` 是 `[n,n]`，查询阶段的 `query Phi` 是 `[m,n]`；两者使用同一个 kernel，但承担的角色不同。
+
+```mermaid
+flowchart LR
+    A[query x 或 plot_x] --> B[到每个 xs 的距离]
+    B --> C[phi_query]
+    C --> D[dot(phi_query, w)]
+    D --> E[单点 y_05 或整条 interpolated 曲线]
+```
+
+**执行结果怎么看：** Cell 16 中绿色曲线是 RBF 插值，红色虚线是真值，叉号是样本。绿色线应穿过样本点；样本之间越接近红线，说明当前 kernel 宽度和样本分布越适合这个函数。样本范围之外的趋势不可靠，这就是后面要加多项式项的原因。
+
+![Interpolated curve and query sample](assets/05_interpolated_query_result_result.png)
+
+### 5. Polynomial augmentation
+
+纯 RBF 只看局部距离，遇到两个样本簇分布很远、整体趋势又很明显的情况，外推会往 0 或奇怪方向塌。notebook 后半段改用近似二次函数的数据，并构造：
+
+```text
+P = [1, x, x^2]
+
+[ Phi  P ] [ w ] = [ ys ]
+[ P^T  0 ] [ c ]   [ 0  ]
+```
+
+这里 `w` 是径向项权重，`c` 是多项式系数。最终函数可以读作 `f(x)=phi(x)w + P(x)c`：多项式项负责常数、斜率和二次弯曲这类低频趋势，RBF 项负责样本附近的剩余形状。`P^T w = 0` 这一组约束避免径向项和多项式项互相抢同一个全局趋势，否则同一段变化可能被两套参数重复解释，外推会更不稳定。
+
+```mermaid
+flowchart TD
+    A[样本 xs] --> B[构造 P: 常数, x, x^2]
+    C[Phi] --> D[扩展块矩阵]
+    B --> D
+    D --> E[扩展右端 extended_ys]
+    E --> F[求解 w 与 c]
+    F --> G[查询时同时计算 phi 与 P]
+    G --> H[局部残差 + 全局二次趋势]
+```
+
+**执行结果怎么看：** Cell 21 的 `P` 告诉读者多项式基如何由样本坐标生成。Cell 27 的曲线显示增强后的 RBF 不再只靠 Gaussian 钟形曲线硬撑，而是能用二次项解释大趋势，用径向项补局部差异。这个拆分正对应后续动作语义插值里的 “linear term + residual radial coefficients”。
+
+![Polynomial augmentation matrix](assets/06_polynomial_basis_matrix_result.png)
+
+![Augmented RBF fit](assets/07_augmented_rbf_fit_result.png)
 
 ## 关键 cell / 函数深讲
 
 ### Cell 6 - Sample function and sparse points
 
-建立一条用于测试插值的连续目标函数，并抽取部分稀疏样本作为 RBF 的中心点。
-
 ```mermaid
 flowchart LR
-    A[定义真实的一维目标函数 f] --> B[在稀疏位置 xs 采样]
-    B --> C[获取样本值 ys]
-    C --> D[绘制出必须被重建的目标图]
+    A[example_function] --> B[plot_x / plot_y 真值对照]
+    A --> C[xs / ys 稀疏样本]
+    B --> D[红色虚线]
+    C --> E[叉号样本]
 ```
 
-- 代码做什么：Plot the target function and sparse interpolation samples.
-- 运行后看到什么：`plot`
-- 结果说明什么：The plot establishes what the RBF interpolator must reconstruct.
-- 可视化主体：Sample function and sparse points
-- 捕获方式：`plot`
-
-![Sample function and sparse points](assets/01_sample_function_points_result.png)
+- 代码做什么：画出目标函数和稀疏插值样本。
+- 运行后看到什么：一条真值曲线和 5 个已知样本点。
+- 结果说明什么：后续 RBF 的输入只有 `xs, ys`，红线只是用于验证重建效果。
+- 可视化主体：Sample function and sparse points。
+- 捕获方式：`plot`，来自 executed plot output。
 
 ### Cell 7 - Gaussian kernel influence
 
-观察每一个稀疏样本如果作为 Gaussian kernel 的中心，它对周围空间的影响分布情况。
+```mermaid
+flowchart LR
+    A[xs 中每个中心] --> B[plot_x - xs_i]
+    B --> C[gauss(..., eps)]
+    C --> D[乘以 ys_i 只为展示高度]
+    D --> E[每个样本的局部影响曲线]
+```
+
+- 代码做什么：把每个样本中心对应的 Gaussian radial basis 画出来。
+- 运行后看到什么：多个以样本为中心的钟形影响曲线。
+- 结果说明什么：RBF 的局部性来自距离 kernel，但直接相加不是最终插值。
+- 可视化主体：Gaussian kernel influence。
+- 捕获方式：`plot`。
+
+### Cell 9 / 10 - Kernel matrix and weights
 
 ```mermaid
 flowchart LR
-    A[选择样本中心 x_i] --> B[设定参数 eps]
-    B --> C[计算 Gaussian kernel]
-    C --> D[绘制单个核函数在定义域的形状]
+    A[xs] --> B[distances: n by n]
+    B --> C[Phi: n by n]
+    D[ys: n] --> E[solve]
+    C --> E
+    E --> F[w: n]
 ```
 
-- 代码做什么：Plot per-sample Gaussian radial basis functions.
-- 运行后看到什么：`plot`
-- 结果说明什么：The graph shows each sample as a local influence field.
-- 可视化主体：Gaussian kernel influence
-- 捕获方式：`plot`
-
-![Gaussian kernel influence](assets/02_gaussian_kernel_influence_result.png)
-
-### Cell 9 - Distance and kernel matrices
-
-计算样本两两之间的距离矩阵，并将其转换为 Gaussian Kernel 矩阵 Phi。
-
-```mermaid
-flowchart LR
-    A[样本中心坐标序列 xs] --> B[计算全成对距离矩阵 distances]
-    B --> C[应用 Gaussian 函数]
-    C --> D[生成核矩阵 Phi]
-```
-
-- 代码做什么：Print the pairwise distances and Phi kernel matrix.
-- 运行后看到什么：`matrix`
-- 结果说明什么：The matrix is the linear system that determines interpolation weights.
-- 可视化主体：Distance and kernel matrices
-- 捕获方式：`matrix`
-
-![Distance and kernel matrices](assets/03_distance_kernel_matrix_result.png)
-
-### Cell 10 - Solved RBF weights
-
-基于样本的实际输出值，求解一组线性方程以获取每个径向基函数的权重。
-
-```mermaid
-flowchart LR
-    A[核矩阵 Phi] --> B[求解线性方程组 Phi * w = ys]
-    C[样本值 ys] --> B
-    B --> D[得到每个基的权重 w]
-```
-
-- 代码做什么：Solve Phi w = y and print the weights.
-- 运行后看到什么：`table`
-- 结果说明什么：The weights tell how much each radial basis contributes to the reconstruction.
-- 可视化主体：Solved RBF weights
-- 捕获方式：`table/output`
-
-![Solved RBF weights](assets/04_rbf_weights_result.png)
+- 代码做什么：打印样本两两距离、kernel matrix，并求解 `Phi w = ys`。
+- 运行后看到什么：一个对称距离矩阵、一个对称 `Phi` 矩阵，以及权重向量。
+- 结果说明什么：RBF 的权重是为“穿过样本值”服务的，不等于样本值本身。
+- 可视化主体：Distance and kernel matrices / Solved RBF weights。
+- 捕获方式：`table`。
 
 ### Cell 16 - Interpolated curve and query sample
 
-利用解得的权重和 Gaussian Kernel 组合计算整个定义域上的 RBF 拟合结果，并测试某个特定查询点。
+```mermaid
+flowchart LR
+    A[plot_x 查询网格] --> B[query-to-center distances]
+    B --> C[query Phi]
+    C --> D[query Phi * w]
+    D --> E[绿色插值曲线]
+    F[x = 0.5] --> G[y_05 单点结果]
+```
+
+- 代码做什么：对整条查询网格批量计算 RBF 插值，并标出 `x=0.5` 的单点结果。
+- 运行后看到什么：真值、RBF 插值、样本点和一个查询点。
+- 结果说明什么：矩阵乘法版本和数学求和等价，但更适合批量绘图和工程实现。
+- 可视化主体：Interpolated curve and query sample。
+- 捕获方式：`plot`。
+
+### Cell 21 / 27 - Polynomial augmented RBF
 
 ```mermaid
 flowchart LR
-    A[查询点集 plot_x] --> B[计算到每个样本中心 xs 的距离]
-    B --> C[计算核值]
-    C --> D[乘以对应权重 w 并求和]
-    D --> E[绘制最终的 RBF 连续插值曲线]
+    A[新样本 xs, ys] --> B[Phi]
+    A --> C[P = 1, x, x^2]
+    B --> D[extended_phi]
+    C --> D
+    D --> E[solve extended system]
+    E --> F[插值时同时评估径向项和多项式项]
+    F --> G[增强 RBF 曲线]
 ```
 
-- 代码做什么：Evaluate the RBF curve and mark a query point.
-- 运行后看到什么：`plot`
-- 结果说明什么：The plot checks that local kernels reconstruct the target curve between samples.
-- 可视化主体：Interpolated curve and query sample
-- 捕获方式：`plot`
+- 代码做什么：构造多项式基矩阵，求解扩展线性系统，并绘制增强后的插值。
+- 运行后看到什么：`P` 矩阵和一条带全局二次趋势的最终曲线。
+- 结果说明什么：augmented affine / polynomial terms 给 RBF 提供外推趋势，径向项只负责局部修正。
+- 可视化主体：Polynomial augmentation matrix / Augmented RBF fit。
+- 捕获方式：`table` 与 `plot`。
 
-![Interpolated curve and query sample](assets/05_interpolated_query_result_result.png)
+## 关键数据结构
 
-### Cell 21 - Polynomial augmentation matrix
+| 名称 | 形状或类型 | 作用 |
+| --- | --- | --- |
+| `xs` | `[n]` | 样本中心的位置，也就是每个 radial basis 的中心。 |
+| `ys` | `[n]` | 每个中心处必须被插值函数命中的目标值。 |
+| `plot_x` / `plot_y` | `[m]` | 绘图用查询网格和真值对照；`plot_y` 不参与求解。 |
+| `eps` | scalar | Gaussian kernel 宽度参数，控制局部性和平滑性。 |
+| `distances` | `[n, n]` 或 `[m, n]` | 样本到样本、查询点到样本的距离矩阵。 |
+| `phi` / `Phi` | `[n, n]` 或 `[m, n]` | 距离经过 kernel 后形成的 basis matrix。 |
+| `w` | `[n]` | 径向基权重；控制每个样本中心的局部 basis 如何被放大、压低或反向抵消。 |
+| `c` | `[3]` | polynomial augmentation 中的多项式系数，对应常数、一次、二次趋势。 |
+| `interpolated` | `[m]` | 对查询网格求得的连续插值结果。 |
+| `P` | `[n, 3]` 或 `[1, 3]` | 多项式基矩阵，这里对应常数项、一次项和二次项。 |
+| `extended_phi` | `[n+3, n+3]` | 把 kernel matrix 与 polynomial constraints 合并后的块矩阵。 |
+| `extended_ys` | `[n+3]` | 样本值加上约束右端 0。 |
 
-引入多项式增强，解决分布不均时可能出现的边界失控问题，首先需要构造多项式的基矩阵。
+## 执行结果的意义
 
-```mermaid
-flowchart LR
-    A[样本中心坐标 xs] --> B[构造 1, x, x^2 的列向量]
-    B --> C[合并为多项式基矩阵 P]
-```
+基础 RBF 图说明：只要 kernel matrix 可解，RBF 可以精确穿过给定样本，并在样本之间产生平滑曲线。读图时不要只看曲线是否“像红线”，还要看它是否命中叉号；命中样本是插值系统求解正确的第一指标。
 
-- 代码做什么：Build and print the polynomial basis matrix P.
-- 运行后看到什么：`matrix`
-- 结果说明什么：The augmentation adds a global trend term alongside local kernels.
-- 可视化主体：Polynomial augmentation matrix
-- 捕获方式：`matrix`
+Gaussian kernel 图说明：`epsilon` 不是简单的“越大越好”。kernel 太宽时，远处样本相互干扰强，组合容易过度平滑；kernel 太窄时，样本之间缺少支撑，曲线可能下陷或不稳定。
 
-![Polynomial augmentation matrix](assets/06_polynomial_basis_matrix_result.png)
+增强 RBF 图说明：当样本分布不能覆盖外推区域时，RBF 自己不知道“应该继续沿二次趋势走”。加入 `P=[1,x,x^2]` 后，全局趋势由多项式项承接，径向项只处理样本附近的残差。换句话说，纯 RBF 解的是“所有形状都由局部中心解释”，增强 RBF 解的是“全局趋势先解释，局部误差再修正”。这就是后续动作语义空间里“linear terms + radial residuals”的数学原型。
 
-### Cell 27 - Augmented RBF fit
+## 重点可视化 / 动画
 
-计算包含线性或多项式全局项的增强 RBF 系统，并查看更稳定的组合插值效果。
+正文重点媒体只引用 `key_visual` 的真实算法输出。学习卡仅作为后面的复现证据，不作为主视觉；`00-walkthrough.webm` 是学习卡串联视频，也不替代本文核心结果图。
 
-```mermaid
-flowchart LR
-    A[核矩阵 Phi] --> B[结合多项式矩阵 P 构造大矩阵系统]
-    C[加入多项式正交约束方程] --> B
-    B --> D[联合求解径向权重与多项式系数]
-    D --> E[绘制带有全局趋势支持的 RBF 曲线]
-```
+| Cell | 重点媒体 | 可视化主体 | 捕获方式 | 结果说明什么 |
+| --- | --- | --- | --- | --- |
+| 6 | [结果 PNG](assets/01_sample_function_points_result.png) | Sample function and sparse points | `plot` | 建立 RBF 必须从稀疏点重建的目标。 |
+| 7 | [结果 PNG](assets/02_gaussian_kernel_influence_result.png) | Gaussian kernel influence | `plot` | 展示每个样本作为局部影响源的形状。 |
+| 16 | [结果 PNG](assets/05_interpolated_query_result_result.png) | Interpolated curve and query sample | `plot` | 验证求解权重后，查询点可由 kernel 值与权重组合得到。 |
+| 21 | [结果 PNG](assets/06_polynomial_basis_matrix_result.png) | Polynomial basis matrix | `table` | 展示多项式增强项如何把样本坐标变成全局趋势基。 |
+| 27 | [结果 PNG](assets/07_augmented_rbf_fit_result.png) | Augmented RBF fit | `plot` | 展示多项式增强如何改善稀疏样本下的全局趋势。 |
 
-- 代码做什么：Plot the final polynomial-augmented RBF interpolation.
-- 运行后看到什么：`plot`
-- 结果说明什么：The final curve preserves both sparse samples and stable large-scale behavior.
-- 可视化主体：Augmented RBF fit
-- 捕获方式：`plot`
+## 代码 Cell 与可视化结果
 
-![Augmented RBF fit](assets/07_augmented_rbf_fit_result.png)
+| Cell | 输出类型 | 媒体角色 | 捕获方式 | 发布必需 | 结果媒体 | 代码学习卡 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 6 | `plot` | `key_visual` | `plot` | `true` | [PNG](assets/01_sample_function_points_result.png) | [PNG](assets/01_sample_function_points.png) |
+| 7 | `plot` | `key_visual` | `plot` | `true` | [PNG](assets/02_gaussian_kernel_influence_result.png) | [PNG](assets/02_gaussian_kernel_influence.png) |
+| 9 | `matrix` | `supporting_evidence` | `table` | `false` | [PNG](assets/03_distance_kernel_matrix_result.png) | [PNG](assets/03_distance_kernel_matrix.png) |
+| 10 | `table` | `supporting_evidence` | `table` | `false` | [PNG](assets/04_rbf_weights_result.png) | [PNG](assets/04_rbf_weights.png) |
+| 16 | `plot` | `key_visual` | `plot` | `true` | [PNG](assets/05_interpolated_query_result_result.png) | [PNG](assets/05_interpolated_query_result.png) |
+| 21 | `matrix` | `supporting_evidence` | `table` | `false` | [PNG](assets/06_polynomial_basis_matrix_result.png) | [PNG](assets/06_polynomial_basis_matrix.png) |
+| 27 | `plot` | `key_visual` | `plot` | `true` | [PNG](assets/07_augmented_rbf_fit_result.png) | [PNG](assets/07_augmented_rbf_fit.png) |
 
 ## 运行方式
 
@@ -248,31 +335,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 radial_
 .\.envs\radial_basis_function\python.exe -m jupyter lab --notebook-dir .
 ```
 
-打开 `labs/Theory/radial_basis_function.ipynb`，选择 kernel `animationtech-radial_basis_function`。本说明只根据 notebook 源内容整理，没有重新执行 notebook。
-
-## 重点可视化 / 动画
-
-本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
-
-
-| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
-| --- | --- | --- | --- | --- | --- |
-| Cell 6 | `plot` | `key_visual` | Sample function and sparse points: The plot establishes what the RBF interpolator must reconstruct. | `plot` | [结果 PNG](assets/01_sample_function_points_result.png) |
-| Cell 7 | `plot` | `key_visual` | Gaussian kernel influence: The graph shows each sample as a local influence field. | `plot` | [结果 PNG](assets/02_gaussian_kernel_influence_result.png) |
-| Cell 16 | `plot` | `key_visual` | Interpolated curve and query sample: The plot checks that local kernels reconstruct the target curve between samples. | `plot` | [结果 PNG](assets/05_interpolated_query_result_result.png) |
-| Cell 27 | `plot` | `key_visual` | Augmented RBF fit: The final curve preserves both sparse samples and stable large-scale behavior. | `plot` | [结果 PNG](assets/07_augmented_rbf_fit_result.png) |
-
-
-## 代码 Cell 与可视化结果
-
-本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
-
-| Cell / 片段 | 结果说明 | 证据 |
-| --- | --- | --- |
-| Cell 6 | The plot establishes what the RBF interpolator must reconstruct. | [结果 PNG](assets/01_sample_function_points_result.png) / [代码卡](assets/01_sample_function_points.png) |
-| Cell 7 | The graph shows each sample as a local influence field. | [结果 PNG](assets/02_gaussian_kernel_influence_result.png) / [代码卡](assets/02_gaussian_kernel_influence.png) |
-| Cell 9 | The matrix is the linear system that determines interpolation weights. | [结果 PNG](assets/03_distance_kernel_matrix_result.png) / [代码卡](assets/03_distance_kernel_matrix.png) |
-| Cell 10 | The weights tell how much each radial basis contributes to the reconstruction. | [结果 PNG](assets/04_rbf_weights_result.png) / [代码卡](assets/04_rbf_weights.png) |
-| Cell 16 | The plot checks that local kernels reconstruct the target curve between samples. | [结果 PNG](assets/05_interpolated_query_result_result.png) / [代码卡](assets/05_interpolated_query_result.png) |
-| Cell 21 | The augmentation adds a global trend term alongside local kernels. | [结果 PNG](assets/06_polynomial_basis_matrix_result.png) / [代码卡](assets/06_polynomial_basis_matrix.png) |
-| Cell 27 | The final curve preserves both sparse samples and stable large-scale behavior. | [结果 PNG](assets/07_augmented_rbf_fit_result.png) / [代码卡](assets/07_augmented_rbf_fit.png) |
+打开 `labs/Theory/radial_basis_function.ipynb`，选择 kernel `animationtech-radial_basis_function`，按 cell 顺序运行。本文根据 notebook、manifest 与对应 transcript 整理；正文媒体均来自现有 `assets` 中的真实 notebook 输出。
