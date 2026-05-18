@@ -285,14 +285,14 @@ def save_result_media(result_images: list[Image.Image], target_path: Path, width
     gap = 16
     margin = 18
     canvas_width = max(image.width for image in fitted) + margin * 2
-    total_height = margin * 2 + sum(image.height for image in fitted) + gap * (len(fitted) - 1)
+    total_height = max(160, margin * 2 + sum(image.height for image in fitted) + gap * (len(fitted) - 1))
     canvas = Image.new("RGB", (canvas_width, total_height), (255, 255, 255))
     y = margin
     for image in fitted:
         canvas.paste(image, (margin, y))
         y += image.height + gap
     canvas.save(target_path)
-    validate_png(target_path, min_width=320, min_height=150, min_bytes=4000)
+    validate_png(target_path, min_width=320, min_height=160, min_bytes=4000)
 
 
 def build_learning_card(step: dict, source: str, result_images: list[Image.Image], card_conf: dict) -> Image.Image:
@@ -792,9 +792,10 @@ def column_sidebar_fraction(image: Image.Image, x: int) -> float:
     sidebar = 0
     for y in range(image.height):
         r, g, b = pixels[x, y]
-        gray = abs(r - g) <= 4 and abs(g - b) <= 4 and 25 <= r <= 170
+        gray = abs(r - g) <= 4 and abs(g - b) <= 4 and 25 <= r <= 235
+        near_white = r >= 238 and g >= 238 and b >= 238
         dark_edge = r <= 18 and g <= 22 and b <= 30
-        if gray or dark_edge:
+        if gray or near_white or dark_edge:
             sidebar += 1
     return sidebar / max(1, image.height)
 
@@ -861,10 +862,14 @@ def screenshot_concrete(locator, kind: str, subject: str, label: str | None = No
     return add_image_label(image, label) if label else image
 
 
-def selector_locator(page, output, selector: str):
+def selector_locator(page, output, selector: str, cell=None):
     selector = selector.strip()
     if selector in {"page canvas:last", "page canvas"}:
         return page.locator("canvas").last if selector.endswith(":last") else page.locator("canvas").first
+    if selector in {"cell canvas:last", "cell canvas"}:
+        if cell is None:
+            raise RuntimeError("cell-scoped selector requires a notebook cell locator.")
+        return cell.locator("canvas").last if selector.endswith(":last") else cell.locator("canvas").first
     if selector in {"output canvas:last", "output canvas"}:
         return output.locator("canvas").last if selector.endswith(":last") else output.locator("canvas").first
     if selector == "output widget controls":
@@ -900,10 +905,10 @@ def merge_variant_step(step: dict, variant: dict) -> dict:
         merged["controls"] = variant["controls"]
     if "slider_fraction" in step:
         merged["slider_fraction"] = step["slider_fraction"]
-    for key in ("cell_index", "capture_selector", "capture_kind", "visual_subject"):
+    for key in ("cell_index", "capture_cell_index", "capture_selector", "capture_kind", "visual_subject"):
         if key in variant:
             merged[key] = variant[key]
-    for key in ("camera", "live_prepare_cell", "live_render"):
+    for key in ("camera", "live_prepare_cell", "live_prepare_code", "live_render", "motion_capture", "motion_quality"):
         if key in variant:
             merged[key] = variant[key]
     return merged
@@ -916,18 +921,27 @@ def timeline_fraction(step: dict) -> float:
     return float(step.get("slider_fraction", 0.5))
 
 
-def execute_live_render(context: dict | None, step: dict) -> None:
-    render_template = step.get("live_render")
-    if not render_template:
-        return
+def execute_live_prepare(context: dict | None, step: dict, force: bool = False) -> None:
     if context is None:
-        raise RuntimeError(f"{step_label(step)}: live_render requires a live kernel context.")
+        raise RuntimeError(f"{step_label(step)}: live capture requires a live kernel context.")
     prepare_cell = step.get("live_prepare_cell")
-    if prepare_cell is not None and context.get("prepared_cell") != int(prepare_cell):
+    if prepare_cell is not None and (force or context.get("prepared_cell") != int(prepare_cell)):
         source_nb = context["source_nb"]
         source = source_nb.cells[int(prepare_cell)].source
         execute_kernel_code(context["connection_file"], source, int(context.get("kernel_timeout", 90)))
         context["prepared_cell"] = int(prepare_cell)
+    prepare_code = step.get("live_prepare_code")
+    prepare_key = f"{step.get('id', step_label(step))}:{hash(prepare_code)}"
+    if prepare_code and (force or context.get("prepared_code") != prepare_key):
+        execute_kernel_code(context["connection_file"], prepare_code, int(context.get("kernel_timeout", 90)))
+        context["prepared_code"] = prepare_key
+
+
+def execute_live_render(context: dict | None, step: dict) -> None:
+    render_template = step.get("live_render")
+    if not render_template:
+        return
+    execute_live_prepare(context, step)
     fraction = timeline_fraction(step)
     frame_expr = f"int(round((frame_count - 1) * {fraction:.8f}))"
     camera = step.get("camera")
@@ -941,6 +955,12 @@ def execute_live_render(context: dict | None, step: dict) -> None:
                 f"np.array({offset}, dtype=np.float32)).tolist()"
             )
             frame_expr = "_blog_frame"
+        elif camera.get("target") == "player_root":
+            offset = camera.get("offset", [0.0, 0.0, 0.0])
+            camera_lines.append(
+                "if 'player' in globals() and hasattr(player, 'positions'):\n"
+                f"    viewer.camera_pos = (player.positions[0] + np.array({offset}, dtype=np.float32)).tolist()"
+            )
         elif isinstance(camera.get("pos"), list):
             camera_lines.append(f"viewer.camera_pos = {camera['pos']}")
         if "pitch" in camera:
@@ -955,7 +975,7 @@ def capture_live_canvas_image(page, step: dict, context: dict | None = None) -> 
     if page is None:
         raise RuntimeError(f"{step_label(step)}: live capture requires a browser page.")
     execute_live_render(context, step)
-    cell, output = cell_output_locator(page, int(step["cell_index"]))
+    cell, output = cell_output_locator(page, int(step.get("capture_cell_index", step["cell_index"])))
     cell.scroll_into_view_if_needed(timeout=10_000)
     page.wait_for_timeout(500)
     if output.count() > 0 and not step.get("live_render"):
@@ -966,7 +986,17 @@ def capture_live_canvas_image(page, step: dict, context: dict | None = None) -> 
     subject = visual_subject(step)
     selector = step.get("capture_selector")
     if kind == "canvas":
-        target = selector_locator(page, output, selector) if selector else output.locator("canvas").last
+        target = selector_locator(page, output, selector, cell) if selector else output.locator("canvas").last
+        try:
+            target.wait_for(state="visible", timeout=45_000)
+        except Exception:
+            pass
+        if target.count() == 0:
+            page_canvases = page.locator("canvas")
+            if selector and "canvas" in selector and page_canvases.count() == 1:
+                target = page_canvases.first
+            else:
+                raise RuntimeError(f"{subject}: no concrete canvas found; live capture will not fall back to cell/output screenshots.")
         if target.count() == 0:
             raise RuntimeError(f"{subject}: no concrete canvas found; live capture will not fall back to cell/output screenshots.")
         target.scroll_into_view_if_needed(timeout=10_000)
@@ -976,7 +1006,7 @@ def capture_live_canvas_image(page, step: dict, context: dict | None = None) -> 
     if kind == "widget_controls":
         if output.count() == 0:
             raise RuntimeError(f"{subject}: no output area available for widget controls.")
-        target = selector_locator(page, output, selector) if selector else widget_controls_locator(output)
+        target = selector_locator(page, output, selector, cell) if selector else widget_controls_locator(output)
         if target.count() == 0:
             raise RuntimeError(f"{subject}: no concrete widget controls found; live capture will not fall back to output screenshots.")
         target.scroll_into_view_if_needed(timeout=10_000)
@@ -1253,6 +1283,20 @@ def frame_difference(left: Image.Image, right: Image.Image) -> float:
     return total / max(1, len(left_pixels) * 3)
 
 
+def frame_changed_fraction(left: Image.Image, right: Image.Image, threshold: int = 15) -> float:
+    a = ImageOps.contain(left.convert("RGB"), (160, 90), Image.Resampling.BILINEAR)
+    b = ImageOps.contain(right.convert("RGB"), (160, 90), Image.Resampling.BILINEAR)
+    if a.size != b.size:
+        b = b.resize(a.size, Image.Resampling.BILINEAR)
+    left_pixels = list(a.getdata())
+    right_pixels = list(b.getdata())
+    changed = 0
+    for first, second in zip(left_pixels, right_pixels):
+        if max(abs(first[index] - second[index]) for index in range(3)) >= threshold:
+            changed += 1
+    return changed / max(1, len(left_pixels))
+
+
 def validate_real_motion_frames(step: dict, frames: list[Image.Image], provenance: str) -> None:
     if provenance == DERIVED_CARD_PROVENANCE:
         if is_key_publish_media(step):
@@ -1262,9 +1306,19 @@ def validate_real_motion_frames(step: dict, frames: list[Image.Image], provenanc
         raise RuntimeError(f"{step_label(step)}: motion media provenance {provenance!r} is not an approved real source.")
     if len(frames) < 3:
         raise RuntimeError(f"{step_label(step)}: motion media requires a real frame sequence, got {len(frames)} frame(s).")
+    quality = step.get("motion_quality", {})
+    min_max_delta = float(quality.get("min_max_delta", 1.5))
     max_delta = max(frame_difference(frames[index - 1], frames[index]) for index in range(1, len(frames)))
-    if max_delta < 1.5:
-        raise RuntimeError(f"{step_label(step)}: motion frame sequence appears static.")
+    if max_delta < min_max_delta:
+        raise RuntimeError(f"{step_label(step)}: motion frame sequence appears static: max frame delta {max_delta:.2f} < {min_max_delta:.2f}.")
+    min_changed_fraction = quality.get("min_changed_fraction")
+    if min_changed_fraction is not None:
+        max_changed = max(frame_changed_fraction(frames[index - 1], frames[index]) for index in range(1, len(frames)))
+        if max_changed < float(min_changed_fraction):
+            raise RuntimeError(
+                f"{step_label(step)}: motion frame sequence has too little visible change: "
+                f"max changed fraction {max_changed:.3f} < {float(min_changed_fraction):.3f}."
+            )
 
 
 def animated_frames_from_still(image: Image.Image, frame_count: int = 18) -> list[Image.Image]:
@@ -1312,6 +1366,16 @@ def encode_step_motion(
         encode_webm(frame_paths, webm_path, fps)
         validate_video(webm_path, max_seconds, max_bytes)
         validate_codec(webm_path, "vp9")
+
+
+def step_animation_conf(step: dict, animation_conf: dict) -> dict:
+    merged = dict(animation_conf)
+    override = step.get("motion_capture")
+    if isinstance(override, dict):
+        for key in ("fps", "max_seconds", "max_bytes"):
+            if key in override:
+                merged[key] = override[key]
+    return merged
 
 
 def choose_live_video_step(case: dict) -> dict | None:
@@ -1362,12 +1426,21 @@ def make_video_from_live(page, case: dict, source_nb, video_conf: dict, assets_d
 
 
 def capture_live_motion_frames(page, step: dict, animation_conf: dict, context: dict | None = None) -> list[Image.Image]:
-    frame_count = max(3, min(24, int(animation_conf.get("max_seconds", 6)) * int(animation_conf.get("fps", 6))))
-    sample_count = min(12, frame_count)
+    motion_conf = step.get("motion_capture", {}) if isinstance(step.get("motion_capture"), dict) else {}
+    max_frame_count = int(motion_conf.get("max_frame_count", 72))
+    frame_count = max(3, min(max_frame_count, int(animation_conf.get("max_seconds", 6)) * int(animation_conf.get("fps", 6))))
+    sample_count = max(3, min(frame_count, int(motion_conf.get("sample_count", min(18, frame_count)))))
+    start_fraction = float(motion_conf.get("start_fraction", 0.0))
+    end_fraction = float(motion_conf.get("end_fraction", 1.0))
+    if end_fraction < start_fraction:
+        raise RuntimeError(f"{step_label(step)}: motion_capture end_fraction must be >= start_fraction.")
     frames: list[Image.Image] = []
+    if context is not None and (step.get("live_prepare_cell") is not None or step.get("live_prepare_code")):
+        execute_live_prepare(context, step, force=True)
     for index in range(sample_count):
         sample = dict(step)
-        sample["slider_fraction"] = index / max(1, sample_count - 1)
+        t = index / max(1, sample_count - 1)
+        sample["slider_fraction"] = start_fraction + (end_fraction - start_fraction) * t
         images = capture_live_result(page, sample, context)
         if not images:
             raise RuntimeError(f"{step_label(step)}: live motion sample {index + 1} produced no concrete media.")
@@ -1493,12 +1566,15 @@ def derive_case_from_cards(case: dict, manifest: dict) -> None:
             result.save(result_path)
             validate_png(result_path, min_width=320, min_height=180, min_bytes=4000)
             if step_needs_motion_media(step):
-                encode_step_motion(step, animated_frames_from_still(result), assets_dir, animation_conf, DERIVED_CARD_PROVENANCE)
+                raise RuntimeError(
+                    f"{case['slug']} {step_label(step)}: motion previews must come from a real viewer/control sequence; "
+                    "still-image pan/zoom animation is not allowed."
+                )
     make_video_from_cards(case, manifest["video"], assets_dir)
     print(f"derived {case['slug']}: result media from legacy cards")
 
 
-def capture_case(case: dict, manifest: dict, server: dict | None, browser, run_timeout: int, skip_run: bool) -> None:
+def capture_case(case: dict, manifest: dict, server: dict | None, browser, run_timeout: int, skip_run: bool, step_ids: set[str] | None = None) -> None:
     root = repo_root()
     slug = case["slug"]
     if case.get("kind") == "python_module":
@@ -1521,7 +1597,12 @@ def capture_case(case: dict, manifest: dict, server: dict | None, browser, run_t
 
     source_nb = nbformat.read(notebook_path, as_version=4)
     executed_nb = nbformat.read(executed_path, as_version=4)
-    needs_live = any(capture_kind(step) in {"canvas", "widget_controls"} for step in case["steps"])
+    selected_steps = [step for step in case["steps"] if not step_ids or step.get("id") in step_ids]
+    if step_ids:
+        missing = sorted(step_ids - {step.get("id") for step in selected_steps})
+        if missing:
+            raise RuntimeError(f"{slug}: unknown step id(s): {', '.join(missing)}")
+    needs_live = any(capture_kind(step) in {"canvas", "widget_controls"} for step in selected_steps)
 
     page = None
     live_context = None
@@ -1539,6 +1620,7 @@ def capture_case(case: dict, manifest: dict, server: dict | None, browser, run_t
         if not skip_run:
             run_all_cells(page, server, case, run_timeout)
         scan_page_for_errors(page, slug)
+        page.wait_for_timeout(10_000)
         live_context = {
             "connection_file": kernel_connection_file(server, case["notebook"]),
             "source_nb": source_nb,
@@ -1546,7 +1628,7 @@ def capture_case(case: dict, manifest: dict, server: dict | None, browser, run_t
             "kernel_timeout": 120,
         }
 
-    for step in case["steps"]:
+    for step in selected_steps:
         cell_index = int(step["cell_index"])
         source = source_nb.cells[cell_index].source
         kind = capture_kind(step)
@@ -1564,23 +1646,28 @@ def capture_case(case: dict, manifest: dict, server: dict | None, browser, run_t
         if step_needs_motion_media(step):
             if kind != "canvas":
                 raise RuntimeError(f"{step_label(step)}: motion media requires capture_kind=canvas and a real frame sequence.")
-            motion_frames = capture_live_motion_frames(page, step, manifest.get("animation", manifest["video"]), live_context)
-            encode_step_motion(step, motion_frames, assets_dir, manifest.get("animation", manifest["video"]), provenance)
+            motion_conf = step_animation_conf(step, manifest.get("animation", manifest["video"]))
+            motion_frames = capture_live_motion_frames(page, step, motion_conf, live_context)
+            encode_step_motion(step, motion_frames, assets_dir, motion_conf, provenance)
 
-    if page is not None and case.get("video_step", {}).get("mode") == "live_timeline":
+    if step_ids:
+        if page is not None:
+            page.close()
+    elif page is not None and case.get("video_step", {}).get("mode") == "live_timeline":
         make_video_from_live(page, case, source_nb, manifest["video"], assets_dir, manifest["card"], live_context)
         page.close()
     else:
         if page is not None:
             page.close()
         make_video_from_cards(case, manifest["video"], assets_dir)
-    print(f"captured {slug}: {len(case['steps'])} learning cards + {manifest['video']['file']}")
+    print(f"captured {slug}: {len(selected_steps)} learning cards + {manifest['video']['file']}")
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest", default="docs/blog/media_manifest.json")
     parser.add_argument("--slug", action="append", default=[])
+    parser.add_argument("--step-id", action="append", default=[], help="Capture only the named manifest step id. May be repeated.")
     parser.add_argument("--all", action="store_true")
     parser.add_argument("--run-timeout", type=int, default=900)
     parser.add_argument("--skip-run", action="store_true")
@@ -1608,7 +1695,7 @@ def main() -> int:
         browser = playwright.chromium.launch(headless=True, args=["--use-gl=swiftshader", "--enable-webgl"])
         try:
             for case in cases:
-                capture_case(case, manifest, server, browser, args.run_timeout, args.skip_run)
+                capture_case(case, manifest, server, browser, args.run_timeout, args.skip_run, set(args.step_id) if args.step_id else None)
         finally:
             browser.close()
     return 0
