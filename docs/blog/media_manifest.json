@@ -457,9 +457,24 @@
           "capture_kind": "canvas",
           "visual_subject": "Curved locomotion result: The final viewer checks whether graph deformation can redirect locomotion smoothly.",
           "capture_selector": "output canvas:last",
+          "crop_canvas_render_area": true,
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
+          "live_prepare_code": "_blog_angle = np.pi * 1.35\n_blog_vertices = vertices.copy()\nfor _blog_i in range(_blog_vertices.shape[0]):\n    _blog_vertices[_blog_i, 0], _blog_vertices[_blog_i, 2] = curve(300, _blog_angle, vertices[_blog_i, 0], vertices[_blog_i, 2], vertices[_blog_i, 1] * .05 * -_blog_angle)\nnew_vertices = deform(L.copy(), Adjacency, vertices, anchors, _blog_vertices, edges, edges_Lengths, feet_height, use_rotation_invariance=False, hard_constraints=False, max_iteration=35, anchor_weight=5)\nquats, pos = compute_animation(walk_straight.quats, walk_straight.pos, new_vertices, bcount, bone_names)\n_blog_frame_count = pos.shape[0]",
+          "live_render": "_blog_frame = int(round((_blog_frame_count - 1) * {fraction}))\nviewer.camera_pos = [-250, 190, 240]\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nrender(_blog_frame)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 6,
+            "sample_count": 36,
+            "max_frame_count": 48,
+            "start_fraction": 0.05,
+            "end_fraction": 0.95
+          },
+          "motion_quality": {
+            "min_max_delta": 1.8,
+            "min_changed_fraction": 0.04
+          },
           "github_video_url": "https://github.com/user-attachments/assets/1b2467a9-be91-422f-81d6-d45ba9749100"
         }
       ],
@@ -1638,9 +1653,24 @@
           "capture_kind": "canvas",
           "visual_subject": "GPU shader PCA reconstruction: The final viewer shows the runtime-friendly form of the PCA facial animation pipeline.",
           "capture_selector": "output canvas:last",
+          "crop_canvas_render_area": true,
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
+          "live_prepare_code": "def animationtech_blog_gpu_render(frame):\n    anim = anim_pca[frame] * 12.0\n    viewer.begin_shadow()\n    viewer.end_shadow()\n    viewer.begin_display()\n    viewer.draw_ground()\n    viewer.use_program(prog_pca)\n    viewer.bind_vertex_array(vao_pca)\n    viewer.uniform('u_color', material.albedo)\n    viewer.uniform('u_material', material.material_uniform)\n    viewer.uniform('u_pca_0', np.array([anim[0]], dtype=np.float32))\n    viewer.uniform('u_pca_1', np.array([anim[1]], dtype=np.float32))\n    viewer.uniform('u_pca_2', np.array([anim[2]], dtype=np.float32))\n    viewer.uniform('u_pca_3', np.array([anim[3]], dtype=np.float32))\n    viewer.uniform('u_pca_4', np.array([anim[4]], dtype=np.float32))\n    viewer.uniform('u_pca_5', np.array([anim[5]], dtype=np.float32))\n    viewer.uniform('u_pca_6', np.array([anim[6]], dtype=np.float32))\n    viewer.draw_elements('TRIANGLES', indices.shape[0] * 3, 'UNSIGNED_SHORT', 0)\n    viewer.end_display()\n    viewer.execute_commands()",
+          "live_render": "_blog_frame = int(round((anim_pca.shape[0] - 1) * {fraction}))\nviewer.camera_pos = [-220, 170, 210]\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nanimationtech_blog_gpu_render(_blog_frame)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 6,
+            "sample_count": 36,
+            "max_frame_count": 48,
+            "start_fraction": 0.05,
+            "end_fraction": 0.95
+          },
+          "motion_quality": {
+            "min_max_delta": 1.8,
+            "min_changed_fraction": 0.04
+          },
           "github_video_url": "https://github.com/user-attachments/assets/5b77cb10-de83-48b2-b19e-a83a7662832a"
         }
       ],
@@ -2103,6 +2133,19 @@
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
+          "live_render": "_blog_frame = int(round((total_frame_count - 1) * {fraction}))\nviewer.camera_pos = (traj_p[_blog_frame, 0] + np.array([0, 105, 210], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = 180\nrender(_blog_frame)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 6,
+            "sample_count": 36,
+            "max_frame_count": 48,
+            "start_fraction": 0.05,
+            "end_fraction": 0.95
+          },
+          "motion_quality": {
+            "min_max_delta": 1.8,
+            "min_changed_fraction": 0.04
+          },
           "github_video_url": "https://github.com/user-attachments/assets/10405ac3-2546-4376-ac64-fcd62bcaa3a7"
         }
       ],
@@ -2274,6 +2317,20 @@
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
+          "live_prepare_code": "_blog_motion_matching_axes = [0.0, -0.9, 0.25, -0.35]\ndef animationtech_gamepad_axis(gamepad, index, default=0.0):\n    try:\n        return float(_blog_motion_matching_axes[index])\n    except Exception:\n        return default\nx = np.zeros(3, dtype=np.float32)\nv = np.zeros(3, dtype=np.float32)\na = np.zeros(3, dtype=np.float32)\nplayer = Player(0)\nx_rot = np.array([1,0,0,0], dtype=np.float32)\nv_rot = np.zeros(3, dtype=np.float32)\ndesired_orientation = np.array([1,0,0,0], dtype=np.float32)",
+          "live_render": "_blog_t = float({fraction})\n_blog_motion_matching_axes[:] = [0.75 + 0.20 * np.sin(_blog_t * np.pi * 2.0), -1.0, 0.35 * np.sin(_blog_t * np.pi), -0.65]\nviewer.camera_pos = (player.p[0] + np.array([0, 115, 230], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = 180\n_blog_frame = int(round(100 * _blog_t))\nfor _blog_substep in range(4):\n    render(_blog_frame + _blog_substep, max_speed=5.5, halflife=.30, halflife_rot=.22, code_vs_anim=0.0, fast_stop=False, inertialize=True)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 6,
+            "sample_count": 36,
+            "max_frame_count": 48,
+            "start_fraction": 0.0,
+            "end_fraction": 1.0
+          },
+          "motion_quality": {
+            "min_max_delta": 1.8,
+            "min_changed_fraction": 0.04
+          },
           "github_video_url": "https://github.com/user-attachments/assets/fcfce01e-939c-442b-809d-4c2a5629d522"
         },
         {
@@ -2304,6 +2361,20 @@
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
+          "live_prepare_code": "_blog_motion_matching_axes = [0.0, -1.0, 0.0, 0.0]\ndef animationtech_gamepad_axis(gamepad, index, default=0.0):\n    try:\n        return float(_blog_motion_matching_axes[index])\n    except Exception:\n        return default\nx = np.zeros(3, dtype=np.float32)\nv = np.zeros(3, dtype=np.float32)\na = np.zeros(3, dtype=np.float32)\nplayer = Player(0)\nx_rot = np.array([1,0,0,0], dtype=np.float32)\nv_rot = np.zeros(3, dtype=np.float32)\ndesired_orientation = np.array([1,0,0,0], dtype=np.float32)",
+          "live_render": "_blog_t = float({fraction})\nif _blog_t < 0.45:\n    _blog_motion_matching_axes[:] = [0.15, -1.0, 0.0, 0.0]\nelif _blog_t < 0.72:\n    _blog_motion_matching_axes[:] = [1.0, -0.15, 1.0, -0.15]\nelse:\n    _blog_motion_matching_axes[:] = [0.0, 0.0, 1.0, 0.0]\nviewer.camera_pos = (player.p[0] + np.array([0, 115, 230], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = 180\n_blog_frame = int(round(100 * _blog_t))\nfor _blog_substep in range(4):\n    render(_blog_frame + _blog_substep, max_speed=5.8, halflife=.18, halflife_rot=.15, code_vs_anim=0.0, fast_stop=(_blog_t > 0.70), inertialize=True)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 6,
+            "sample_count": 36,
+            "max_frame_count": 48,
+            "start_fraction": 0.0,
+            "end_fraction": 1.0
+          },
+          "motion_quality": {
+            "min_max_delta": 1.8,
+            "min_changed_fraction": 0.04
+          },
           "github_video_url": "https://github.com/user-attachments/assets/f9f561b3-3da0-4288-aece-06abcbd03c6a"
         }
       ],
@@ -2724,9 +2795,24 @@
           "capture_kind": "canvas",
           "visual_subject": "Optimal-policy controller: The viewer checks that the policy callback advances without requiring a physical gamepad.",
           "capture_selector": "output canvas:last",
+          "crop_canvas_render_area": true,
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
+          "live_prepare_code": "_blog_near_optimal_axes = [0.65, -0.8, 0.0, 0.0]\ndef animationtech_gamepad_axis(gamepad, index, default=0.0):\n    try:\n        return float(_blog_near_optimal_axes[index])\n    except Exception:\n        return default\nanimationtech_reset_near_optimal_player()",
+          "live_render": "_blog_t = float({fraction})\n_blog_near_optimal_axes[:] = [0.35 + 0.35 * np.sin(_blog_t * np.pi), -0.9, 0.0, 0.0]\nviewer.camera_pos = (player.positions[0] + np.array([-250, 190, 240], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\n_blog_frame = int(round((MAX_STEP_LEN - 1) * _blog_t))\nrender(_blog_frame, draw_debug=True)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 6,
+            "sample_count": 36,
+            "max_frame_count": 48,
+            "start_fraction": 0.0,
+            "end_fraction": 1.0
+          },
+          "motion_quality": {
+            "min_max_delta": 1.8,
+            "min_changed_fraction": 0.04
+          },
           "github_video_url": "https://github.com/user-attachments/assets/f847ace0-489b-4d2b-a12e-14bee505aa4b"
         }
       ],
@@ -3477,9 +3563,24 @@
           "capture_kind": "canvas",
           "visual_subject": "Final interpolated adverb controls: The final viewer shows how verb and adverb coordinates produce a new animation.",
           "capture_selector": "output canvas:last",
+          "crop_canvas_render_area": true,
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
+          "live_prepare_code": "buffer = Buffer()",
+          "live_render": "_blog_t = float({fraction})\n_blog_frame = int(round(220 * _blog_t))\n_blog_angle = -2.2 + 4.4 * _blog_t\n_blog_mood = 0.15 + 0.70 * (0.5 - 0.5 * np.cos(_blog_t * np.pi * 2.0))\nviewer.camera_pos = (buffer.current_pos + np.array([-250, 190, 240], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nrender(_blog_frame, _blog_angle, _blog_mood, lock_feet=True)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 6,
+            "sample_count": 36,
+            "max_frame_count": 48,
+            "start_fraction": 0.0,
+            "end_fraction": 1.0
+          },
+          "motion_quality": {
+            "min_max_delta": 1.8,
+            "min_changed_fraction": 0.04
+          },
           "github_video_url": "https://github.com/user-attachments/assets/4a2661f9-0b7e-4c71-be52-a3b22f3b66a8"
         }
       ],

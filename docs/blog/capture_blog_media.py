@@ -14,6 +14,7 @@ schema migrations do not require a full live recapture.
 from __future__ import annotations
 
 import argparse
+import asyncio
 import base64
 import io
 import json
@@ -1693,6 +1694,8 @@ def main() -> int:
 
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True, args=["--use-gl=swiftshader", "--enable-webgl"])
+        if sys.platform == "win32":
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         try:
             for case in cases:
                 capture_case(case, manifest, server, browser, args.run_timeout, args.skip_run, set(args.step_id) if args.step_id else None)
