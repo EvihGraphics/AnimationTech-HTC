@@ -228,12 +228,14 @@ flowchart LR
 - 可视化主体：Final interpolated adverb controls
 - 捕获方式：`canvas`
 
+这段动画同时扫过 `angle` 和 `mood`，重点看角色步态和方向如何连续变化。它验证的是 RBF 对 timing 与 B-spline 控制点的插值结果能直接驱动新动作，而不是只在参数表里得到一个数值。
+
 ![Final interpolated adverb controls](assets/08_final_interpolated_adverb_controls_result.png)
 
 ![Final interpolated adverb controls preview](assets/08_final_interpolated_adverb_controls_preview.gif)
 
 
-https://github.com/user-attachments/assets/4a2661f9-0b7e-4c71-be52-a3b22f3b66a8
+https://github.com/user-attachments/assets/647b8b0c-9885-4c53-984a-6a5ffefb886d
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_final_interpolated_adverb_controls_result.png" src="assets/08_final_interpolated_adverb_controls_preview.mp4"></video>
 

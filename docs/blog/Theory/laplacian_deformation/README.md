@@ -225,12 +225,14 @@ flowchart LR
 - 可视化主体：Curved locomotion result
 - 捕获方式：`canvas`
 
+这段动画要看红色/黄色时空骨架如何跟随角色一起弯曲。角色不是在播放原始直线 clip，而是先把跨帧骨架图按弯曲路径重求解，再把变形后的图还原成可播放的 `quats/pos`。
+
 ![Curved locomotion result](assets/08_curved_locomotion_result_result.png)
 
 ![Curved locomotion result preview](assets/08_curved_locomotion_result_preview.gif)
 
 
-https://github.com/user-attachments/assets/1b2467a9-be91-422f-81d6-d45ba9749100
+https://github.com/user-attachments/assets/4acb38c5-3cae-449f-b243-aa2bbac81614
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_curved_locomotion_result_result.png" src="assets/08_curved_locomotion_result_preview.mp4"></video>
 

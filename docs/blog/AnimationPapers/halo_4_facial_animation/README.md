@@ -232,12 +232,14 @@ flowchart LR
 - 可视化主体：GPU shader PCA reconstruction
 - 捕获方式：`canvas`
 
+这段动画要看头部几何的表情形变，而不是相机移动。每一帧只更新 7 个 PCA 权重，GPU shader 用平均脸和 7 个 component 在顶点阶段重建完整面部网格。
+
 ![GPU shader PCA reconstruction](assets/07_gpu_shader_reconstruction_result.png)
 
 ![GPU shader PCA reconstruction preview](assets/07_gpu_shader_reconstruction_preview.gif)
 
 
-https://github.com/user-attachments/assets/5b77cb10-de83-48b2-b19e-a83a7662832a
+https://github.com/user-attachments/assets/48111d08-e64c-4f9d-8d94-5263667b5d6e
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_gpu_shader_reconstruction_result.png" src="assets/07_gpu_shader_reconstruction_preview.mp4"></video>
 

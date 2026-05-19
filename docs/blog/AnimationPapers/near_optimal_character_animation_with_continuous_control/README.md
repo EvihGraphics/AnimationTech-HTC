@@ -179,12 +179,14 @@ flowchart LR
 - 可视化主体：Optimal-policy controller
 - 捕获方式：`canvas`
 
+这段动画要看黄色方向箭头、白色角色和调试骨架一起移动。策略不是随机换片段，而是在当前 clip、连续位移和朝向误差上查询 value policy，选择包含未来代价的下一段动作。
+
 ![Optimal-policy controller](assets/08_optimal_policy_player_result.png)
 
 ![Optimal-policy controller preview](assets/08_optimal_policy_player_preview.gif)
 
 
-https://github.com/user-attachments/assets/f847ace0-489b-4d2b-a12e-14bee505aa4b
+https://github.com/user-attachments/assets/4a71849b-72a9-47d3-b778-40811c83b5b9
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_optimal_policy_player_result.png" src="assets/08_optimal_policy_player_preview.mp4"></video>
 

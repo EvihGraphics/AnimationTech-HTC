@@ -263,12 +263,14 @@ flowchart LR
 - 可视化主体：Runtime Player search loop
 - 捕获方式：`canvas`
 
+这段动画要看角色脚下的未来轨迹标记和身体姿态如何同步变化：输入先被平滑成未来 10/20/30 帧目标，再由最近邻检索决定下一帧播放位置。角色连续移动说明 query、检索和 inertialization 已经形成闭环。
+
 ![Runtime Player search loop](assets/inertialization_transition_result.png)
 
 ![Runtime Player search loop preview](assets/inertialization_transition_preview.gif)
 
 
-https://github.com/user-attachments/assets/fcfce01e-939c-442b-809d-4c2a5629d522
+https://github.com/user-attachments/assets/1793e880-6609-4d41-8944-b536f9ae6604
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/inertialization_transition_result.png" src="assets/inertialization_transition_preview.mp4"></video>
 
@@ -289,12 +291,14 @@ flowchart LR
 - 可视化主体：Stop and turn debug frame
 - 捕获方式：`canvas`
 
+这段动画故意扫过前进、急转和停止输入。重点看角色朝向是否快速改变但身体没有瞬间抽跳，以及黄色未来方向标记如何引导检索到更合适的减速/转身素材。
+
 ![Stop and turn debug frame](assets/fast_stop_turn_cases_result.png)
 
 ![Stop and turn debug frame preview](assets/fast_stop_turn_cases_preview.gif)
 
 
-https://github.com/user-attachments/assets/f9f561b3-3da0-4288-aece-06abcbd03c6a
+https://github.com/user-attachments/assets/aacf204b-f999-4988-9a4e-ab3d33f6a699
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/fast_stop_turn_cases_result.png" src="assets/fast_stop_turn_cases_preview.mp4"></video>
 
@@ -320,7 +324,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 motion_
 ![Runtime Player search loop](assets/inertialization_transition_preview.gif)
 
 
-https://github.com/user-attachments/assets/fcfce01e-939c-442b-809d-4c2a5629d522
+https://github.com/user-attachments/assets/1793e880-6609-4d41-8944-b536f9ae6604
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/inertialization_transition_result.png">
   <source src="assets/inertialization_transition_preview.mp4" type="video/mp4">

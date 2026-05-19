@@ -307,12 +307,14 @@ flowchart LR
 - 可视化主体：Follow-path result viewer
 - 捕获方式：`canvas`
 
+这段动画要看两件事：白色角色是否沿着地面上的贝塞尔目标线前进，以及红色误差线是否随着播放持续把当前 root 拉回目标路径。它展示的是图搜索结果真正被拼成一段可播放轨迹，而不是只给出一张距离矩阵。
+
 ![Follow-path result viewer](assets/follow_path_visualization_result.png)
 
 ![Follow-path result viewer preview](assets/follow_path_visualization_preview.gif)
 
 
-https://github.com/user-attachments/assets/10405ac3-2546-4376-ac64-fcd62bcaa3a7
+https://github.com/user-attachments/assets/72d4ec2d-0922-495a-b456-45c66535e27e
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/follow_path_visualization_result.png" src="assets/follow_path_visualization_preview.mp4"></video>
 
@@ -338,7 +340,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 motion_
 ![Follow-path result viewer](assets/follow_path_visualization_preview.gif)
 
 
-https://github.com/user-attachments/assets/10405ac3-2546-4376-ac64-fcd62bcaa3a7
+https://github.com/user-attachments/assets/72d4ec2d-0922-495a-b456-45c66535e27e
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/follow_path_visualization_result.png">
   <source src="assets/follow_path_visualization_preview.mp4" type="video/mp4">
