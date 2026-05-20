@@ -1,75 +1,88 @@
-# Precomputing Avatar Behavior: 把 Motion Graph 预计算成运行时策略
+# Precomputing Avatar Behavior：把 Motion Graph 预计算成运行时策略
 
 ## 元数据
 
 | 字段 | 内容 |
 | --- | --- |
 | slug | `precomputing_avatar_behavior` |
-| source path | [`labs/AnimationPapers/Precomputing Avatar Behavior.ipynb`](../../../../labs/AnimationPapers/Precomputing%20Avatar%20Behavior.ipynb) |
-| transcript sources | [`docs/transcripts/tv3ZwY1mvIw_Reinforcement Learning 01 _ Precomputing Avatar Behavior From Human Motion Data.txt`](../../../../docs/transcripts/tv3ZwY1mvIw_Reinforcement%20Learning%2001%20_%20Precomputing%20Avatar%20Behavior%20From%20Human%20Motion%20Data.txt) |
+| source path | [`labs/AnimationPapers/Precomputing Avatar Behavior.ipynb`](../../../../labs/AnimationPapers/Precomputing Avatar Behavior.ipynb) |
+| transcript sources | [`docs/transcripts/tv3ZwY1mvIw_Reinforcement Learning 01 _ Precomputing Avatar Behavior From Human Motion Data.txt`](../../../../docs/transcripts/tv3ZwY1mvIw_Reinforcement Learning 01 _ Precomputing Avatar Behavior From Human Motion Data.txt) |
 | env prefix | `.envs/avatar_behavior` |
 | kernel | `animationtech-precomputing_avatar_behavior` |
-| validation status | `passed` |
+| validation status | 自动执行已通过；交互部分仍建议在 JupyterLab 中人工检查 |
 
 ## 问题背景
 
-这篇 notebook 对应 Lee 与 Lee 的 *Precomputing Avatar Behavior From Human Motion Data*。语音稿里最重要的动机是：运行时不要在庞大的 Motion Graph 上临时搜索，而是把“面对某个局部目标时该选哪段动作”提前算成表。运行时的 avatar 只需要知道当前 graph state 和目标方向，就可以查表选择 action。
-
-它和普通 Motion Graph 的区别在于，Motion Graph 只回答“哪些片段可以接到一起”；这里进一步把 state、action、reward、next state 和 value function 都离线算好，让角色在游戏循环里用很便宜的查询做决策。
+语音稿中的关键思想是：运行时不要在庞大的动作图上做昂贵搜索，而是把行为决策预计算成状态、动作、reward 和 value table。这个 notebook 从 motion graph 片段出发，构造离散 MDP，让 avatar 面对局部目标时可以通过查表选择动作。
 
 ## 阅读前置知识
 
-- Motion Graph: 动作片段、转移边、局部拼接和循环播放。
-- MDP: `state`、`action`、`reward`、`next_state` 与 Bellman backup。
-- Root motion 局部化: 动作位移要放到角色局部坐标里比较，才能和目标方向对齐。
-- Foot lock: 随机或策略驱动播放时，用脚部约束减少脚滑。
+- Motion Graph：动作片段、转移边和 loopable playback。
+- MDP：state、action、reward、next state 和 Bellman backup。
+- root motion 局部化：动作效果要在角色局部坐标中比较。
+- FootLock：随机或策略动作播放时用于减少脚滑。
 
 ## 总模块图
 
 ```mermaid
 flowchart TD
-    A[Motion Graph raw data] --> B[State / Action graph]
-    B --> C[Action local trajectory]
-    C --> D[Discrete target rings]
-    D --> E[Immediate reward and next state]
+    A[Motion graph data] --> B[State / Action graph]
+    B --> C[Action local trajectories]
+    C --> D[Target position rings]
+    D --> E[Immediate rewards / next states]
     E --> F[Bellman value iteration]
-    F --> G[Value policy table]
-    G --> H[Runtime avatar viewer]
+    F --> G[Static value policy]
+    G --> H[Runtime viewer]
 ```
-
-## 模块拆解
-
-这篇案例可以读成三层：底层是 Motion Graph 片段和转移边，中层是把片段包装成 MDP 的 state/action/reward/next-state 表，顶层是运行时 viewer 按 value policy 查表播放。后面的四段动画正好对应这条链路里的四个检查点。
 
 ## 代码执行路径
 
 ```mermaid
 flowchart LR
-    C5[Cell 5: load graph data] --> C9[Cell 9: source playback]
-    C9 --> C11[Cell 11: State / Action classes]
-    C11 --> C16[Cell 16: random action playback]
-    C16 --> C18[Cell 18: reward tensors]
-    C18 --> C22[Cell 22: immediate reward policy]
-    C22 --> C24[Cell 24: value iteration]
-    C24 --> C27[Cell 27: value policy viewer]
+    C5[Cell 5: helpers] --> C9[Cell 9: source graph]
+    C9 --> C11[Cell 11: State/Action]
+    C11 --> C16[Cell 16: random playback]
+    C16 --> C19[Cell 19: target rings]
+    C19 --> C22[Cell 22: immediate reward]
+    C22 --> C27[Cell 27: MDP policy]
 ```
+
+## 模块拆解
+
+### 1. 从 Motion Graph 到决策状态
+
+`State` 和 `Action` dataclass 把可播放片段整理成决策点和可执行动作。单出口链会被折叠，减少运行时策略需要考虑的节点数量。
+
+### 2. Reward 查询空间
+
+`target_positions` 把连续目标离散成角色周围的采样环。每个 state-action 都预计算 immediate reward 和 next state。
+
+### 3. Value Function
+
+immediate reward 只看当前动作，容易短视。Bellman 更新把未来 reward 叠回当前动作，形成更稳定的查表策略。
 
 ## 关键 cell / 函数深讲
 
 ### Cell 9 - Source motion graph playback
 
-这一步先确认输入动作不是抽象矩阵，而是一组真实的人体运动片段。新版录制只截取 viewer canvas，并把镜头拉近到角色，使读者能看到脚步、骨架辅助线和原始片段的步态变化。
+播放和预览由 Motion Graph 算法生成的离散动作片段，作为后续构建决策状态的基础数据源。
 
 ```mermaid
 flowchart LR
-    A[Load motion_graph_walking_rawdata.dat] --> B[Map clip to character skeleton]
-    B --> C[Render source frame]
-    C --> D[Use clip frames as graph material]
+    A[读取 Motion Graph 产出数据] --> B[重构动作片段]
+    B --> C[在 Timeline Viewer 中循环播放]
 ```
 
-看这段时，重点是“动作素材从哪里来”：后面的 state/action 都会从这些片段里切出来。
+- 代码做什么：源 Motion Graph 播放：展示 avatar behavior 所使用的动作片段来源。
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：viewer 展示 avatar behavior 所使用的动作片段来源。
+- 可视化主体：Source motion graph playback
+- 捕获方式：`canvas`
+
+![Source motion graph playback](assets/02_source_motion_graph_playback_result.png)
 
 ![Source motion graph playback preview](assets/02_source_motion_graph_playback_preview.gif)
+
 
 https://github.com/user-attachments/assets/85426882-4855-4eec-b894-42f8d0445259
 
@@ -77,62 +90,79 @@ https://github.com/user-attachments/assets/85426882-4855-4eec-b894-42f8d0445259
 
 ### Cell 16 - Random graph action playback
 
-`State` 保存当前可选的 `Action`，`Action` 保存一段动作的起止帧、是否需要 blend，以及结束后跳到哪个 state。随机播放不是最终策略，但它是一个很好的连通性测试：如果随机 action 都能连续播，说明 graph 拓扑和 foot lock 至少能支持运行时拼接。
+使用提取出的 State 和 Action 拓扑图，通过随机选择下一步动作，验证图的连通性和片段间播放的连续性。
 
 ```mermaid
 flowchart LR
-    A[Current state] --> B[Random outgoing action]
-    B --> C[Play action trajectory]
-    C --> D[FootLock stabilizes feet]
-    D --> E[Move to next_state]
-    E --> A
+    A[从起始 State 节点开始] --> B[随机抽取一条出路 Action]
+    B --> C[播放该 Action 对应的动作片段]
+    C --> D[转移到下一个 State 节点]
+    D --> B
 ```
 
-新版录制固定随机种子，并连续推进多个 action。看这段时，重点是动作片段之间是否能连续接上，而不是单帧姿态。
+- 代码做什么：随机图动作播放：验证图动作能否生成连续动画输出。
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：viewer 验证图动作能否生成连续动画输出。
+- 可视化主体：Random graph action playback
+- 捕获方式：`canvas`
+
+![Random graph action playback](assets/04_random_action_playback_result.png)
 
 ![Random graph action playback preview](assets/04_random_action_playback_preview.gif)
+
 
 https://github.com/user-attachments/assets/cb9b9a98-336d-4890-8450-360a1391e6ae
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_random_action_playback_result.png" src="assets/04_random_action_playback_preview.mp4"></video>
 
-### Cell 18 / 22 - Immediate reward policy
+### Cell 22 - Immediate reward policy viewer
 
-`target_positions` 把连续目标离散成角色周围的采样环。对每个 `(state, target, action)`，代码预计算两个量：当前 action 能带来多高的 immediate reward，以及 action 播完后目标会落到哪个离散 target state。
+不考虑长远未来，仅根据当前离目标采样点的距离立即给出最大奖励，生成短视（Myopic）的最优动作策略。
 
 ```mermaid
-flowchart TD
-    A[State i] --> B[Outgoing action a]
-    C[Target sample j] --> D[Compare action trajectory to target]
-    B --> D
-    D --> E[immediate_rewards[i,j,a]]
-    D --> F[next_states[i,j,a]]
+flowchart LR
+    A[角色当前所处的 State 节点] --> B[遍历所有出路 Action]
+    B --> C[计算每个 Action 执行后的物理距离收益 immediate_reward]
+    C --> D[直接选择收益最大的 Action 播放]
 ```
 
-Immediate reward 只看眼前哪段动作最接近目标，因此它很直观，也很短视。新版录制给 viewer 一个非零目标输入，画面里可以看到目标点、采样环和当前被选中的局部轨迹。
+- 代码做什么：即时奖励策略 viewer：展示局部目标奖励如何选择图动作。
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：viewer 展示局部目标奖励如何选择图动作。
+- 可视化主体：Immediate reward policy viewer
+- 捕获方式：`canvas`
+
+![Immediate reward policy viewer](assets/07_reward_policy_viewer_result.png)
 
 ![Immediate reward policy viewer preview](assets/07_reward_policy_viewer_preview.gif)
+
 
 https://github.com/user-attachments/assets/9e34bd3e-5368-4303-a4d6-7df9792c3603
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_reward_policy_viewer_result.png" src="assets/07_reward_policy_viewer_preview.mp4"></video>
 
-### Cell 24 / 27 - MDP value-policy viewer
+### Cell 27 - MDP value-policy viewer
 
-Value iteration 把未来收益折回当前 state。这样运行时选择 action 时，不只是问“这一步离目标近不近”，而是问“这一步之后，后续动作是否还能继续把角色带向目标”。
+通过 Bellman 方程预计算的价值函数（Value Function），在运行时只需查表即可做出具有长远预见性的动作决策。
 
 ```mermaid
 flowchart LR
-    A[Immediate reward] --> B[Next state]
-    B --> C[max future value]
-    C --> D[Bellman update]
-    D --> E[value_function table]
-    E --> F[Runtime action choice]
+    A[预先离线进行 Bellman Value Iteration] --> B[生成 State x Target 的价值表]
+    B --> C[运行时获取当前 State 和 Target]
+    C --> D[查表选择 Value 最大的 Action]
+    D --> E[驱动角色走向目标]
 ```
 
-看这段时，重点是角色每次到达 action 边界后，会用预计算的 value table 重新选下一段动作。青色目标点和采样环说明目标查询仍然存在，但决策依据已经从短视 reward 升级为长期 value。
+- 代码做什么：MDP 价值策略 viewer：最终检查学到的价值函数能否驱动动作选择。
+- 运行后看到什么：`timeline_viewer`
+- 结果说明什么：最终 viewer 检查学到的价值函数能否驱动动作选择。
+- 可视化主体：MDP value-policy viewer
+- 捕获方式：`canvas`
+
+![MDP value-policy viewer](assets/08_mdp_value_policy_viewer_result.png)
 
 ![MDP value-policy viewer preview](assets/08_mdp_value_policy_viewer_preview.gif)
+
 
 https://github.com/user-attachments/assets/475172d6-5ade-4363-a68c-79936b2630a3
 
@@ -140,36 +170,76 @@ https://github.com/user-attachments/assets/475172d6-5ade-4363-a68c-79936b2630a3
 
 ## 关键数据结构
 
-| 名称 | 作用 |
-| --- | --- |
-| `State` | 保存 graph 节点对应的帧和可执行 action 列表。 |
-| `Action` | 保存动作起止帧、blend 标记、局部轨迹和 `next_state_id`。 |
-| `target_positions` | 角色局部坐标下的离散目标采样点。 |
-| `immediate_rewards` | 每个 state-target-action 的短期奖励表。 |
-| `next_states` | 每个 action 执行后落到的下一个离散状态。 |
-| `value_function` | Bellman 迭代后的长期价值表。 |
-| `AnimPlayer` / `FootLock` | 把离散 action 播放回连续角色动画，并稳定脚部接触。 |
+- `State`、`Action`、`states`：MDP 图结构。
+- `foot_tags`、`AnimPlayer`、`FootLock`：播放和脚部稳定。
+- `target_positions`：局部目标采样。
+- `immediate_rewards`、`next_states`：预计算 Bellman 输入。
+- `value_function`、`value_function_static`：最终查表策略。
 
 ## 执行结果的意义
 
-这篇案例的结果不是“角色能走路”这么简单。它展示的是一条完整的离线到在线链路：Motion Graph 给出可拼接素材，MDP 把目标追踪问题离散成查表问题，value function 把未来收益编码进当前 action 选择。运行时 viewer 只是最终读表结果的可视化。
+source graph viewer 说明动作来源；random action viewer 验证播放连续；value-policy viewer 验证预计算策略能把当前目标和未来收益连接起来。
 
-新版媒体的验收标准也更严格：正文动画必须来自真实 viewer canvas；不能用滚动代码录屏、整页截图、cell 截图、代码卡裁剪图，不能把静态图平移缩放成假动画。
+## 重点可视化 / 动画
+
+本节只保留最能说明算法结果的图像和动画。代码学习卡移到文末证据表，供需要复现或追溯 cell 上下文时查看。
+
+
+![Source motion graph playback](assets/02_source_motion_graph_playback_preview.gif)
+
+
+https://github.com/user-attachments/assets/85426882-4855-4eec-b894-42f8d0445259
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_source_motion_graph_playback_result.png">
+  <source src="assets/02_source_motion_graph_playback_preview.mp4" type="video/mp4">
+  <source src="assets/02_source_motion_graph_playback_preview.webm" type="video/webm">
+</video>
+
+
+**Cell 16 - Random graph action playback**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_random_action_playback_result.png">
+  <source src="assets/04_random_action_playback_preview.mp4" type="video/mp4">
+  <source src="assets/04_random_action_playback_preview.webm" type="video/webm">
+</video>
+
+**Cell 22 - Immediate reward policy viewer**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_reward_policy_viewer_result.png">
+  <source src="assets/07_reward_policy_viewer_preview.mp4" type="video/mp4">
+  <source src="assets/07_reward_policy_viewer_preview.webm" type="video/webm">
+</video>
+
+**Cell 27 - MDP value-policy viewer**
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_mdp_value_policy_viewer_result.png">
+  <source src="assets/08_mdp_value_policy_viewer_preview.mp4" type="video/mp4">
+  <source src="assets/08_mdp_value_policy_viewer_preview.webm" type="video/webm">
+</video>
+
+| Cell | 输出类型 | 阅读位置 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+| Cell 9 | `timeline_viewer` | 核心动画 | 源 Motion Graph 播放：展示 avatar behavior 所使用的动作片段来源。 | `canvas` | [结果 PNG](assets/02_source_motion_graph_playback_result.png) / [GIF](assets/02_source_motion_graph_playback_preview.gif) / [MP4](assets/02_source_motion_graph_playback_preview.mp4) / [WebM](assets/02_source_motion_graph_playback_preview.webm) |
+| Cell 16 | `timeline_viewer` | 核心动画 | 随机图动作播放：验证图动作能否生成连续动画输出。 | `canvas` | [结果 PNG](assets/04_random_action_playback_result.png) / [GIF](assets/04_random_action_playback_preview.gif) / [MP4](assets/04_random_action_playback_preview.mp4) / [WebM](assets/04_random_action_playback_preview.webm) |
+| Cell 22 | `timeline_viewer` | 核心动画 | 即时奖励策略 viewer：展示局部目标奖励如何选择图动作。 | `canvas` | [结果 PNG](assets/07_reward_policy_viewer_result.png) / [GIF](assets/07_reward_policy_viewer_preview.gif) / [MP4](assets/07_reward_policy_viewer_preview.mp4) / [WebM](assets/07_reward_policy_viewer_preview.webm) |
+| Cell 27 | `timeline_viewer` | 核心动画 | MDP 价值策略 viewer：最终检查学到的价值函数能否驱动动作选择。 | `canvas` | [结果 PNG](assets/08_mdp_value_policy_viewer_result.png) / [GIF](assets/08_mdp_value_policy_viewer_preview.gif) / [MP4](assets/08_mdp_value_policy_viewer_preview.mp4) / [WebM](assets/08_mdp_value_policy_viewer_preview.webm) |
+
 
 ## 代码 Cell 与可视化结果
 
-本节只作为复现索引。正文主视觉已经在上面按算法步骤展开；这里保留每个 cell 的结果图、视频文件和代码卡，方便回到 notebook 对照。
+下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 
-| Cell / 片段 | 结果说明 | 复现证据 |
+| Cell / 片段 | 结果说明 | 证据 |
 | --- | --- | --- |
-| Cell 5 | 骨骼和 foot-lock 相关索引加载完成。 | [结果 PNG](assets/01_character_helper_indices_result.png) / [代码卡](assets/01_character_helper_indices.png) |
-| Cell 9 | 原始 Motion Graph 片段可以被角色 viewer 播放。 | [结果 PNG](assets/02_source_motion_graph_playback_result.png) / [GIF](assets/02_source_motion_graph_playback_preview.gif) / [MP4](assets/02_source_motion_graph_playback_preview.mp4) / [WebM](assets/02_source_motion_graph_playback_preview.webm) / [代码卡](assets/02_source_motion_graph_playback.png) |
-| Cell 11 | `State` / `Action` 结构定义了离散决策图。 | [结果 PNG](assets/03_state_action_graph_result.png) / [代码卡](assets/03_state_action_graph.png) |
-| Cell 16 | 随机 action 播放验证了 graph action 的连续性。 | [结果 PNG](assets/04_random_action_playback_result.png) / [GIF](assets/04_random_action_playback_preview.gif) / [MP4](assets/04_random_action_playback_preview.mp4) / [WebM](assets/04_random_action_playback_preview.webm) / [代码卡](assets/04_random_action_playback.png) |
-| Cell 18 | action 数量和最大长度决定 reward/value 表维度。 | [结果 PNG](assets/05_action_count_table_result.png) / [代码卡](assets/05_action_count_table.png) |
-| Cell 19 | 离散目标环把连续目标变成表查询。 | [结果 PNG](assets/06_target_position_rings_result.png) / [代码卡](assets/06_target_position_rings.png) |
-| Cell 22 | immediate reward 策略展示短视 action 选择。 | [结果 PNG](assets/07_reward_policy_viewer_result.png) / [GIF](assets/07_reward_policy_viewer_preview.gif) / [MP4](assets/07_reward_policy_viewer_preview.mp4) / [WebM](assets/07_reward_policy_viewer_preview.webm) / [代码卡](assets/07_reward_policy_viewer.png) |
-| Cell 27 | value policy 展示长期收益驱动的运行时 action 选择。 | [结果 PNG](assets/08_mdp_value_policy_viewer_result.png) / [GIF](assets/08_mdp_value_policy_viewer_preview.gif) / [MP4](assets/08_mdp_value_policy_viewer_preview.mp4) / [WebM](assets/08_mdp_value_policy_viewer_preview.webm) / [代码卡](assets/08_mdp_value_policy_viewer.png) |
+| Cell 5 | 日志标出后续用于锁脚和奖励计算的骨骼。 | [结果 PNG](assets/01_character_helper_indices_result.png) / [代码卡](assets/01_character_helper_indices.png) |
+| Cell 9 | viewer 展示 avatar behavior 所使用的动作片段来源。 | [结果 PNG](assets/02_source_motion_graph_playback_result.png) / [GIF](assets/02_source_motion_graph_playback_preview.gif) / [MP4](assets/02_source_motion_graph_playback_preview.mp4) / [WebM](assets/02_source_motion_graph_playback_preview.webm) / [代码卡](assets/02_source_motion_graph_playback.png) |
+| Cell 11 | 源码卡说明行为系统背后的离散 MDP 结构。 | [结果 PNG](assets/03_state_action_graph_result.png) / [代码卡](assets/03_state_action_graph.png) |
+| Cell 16 | viewer 验证图动作能否生成连续动画输出。 | [结果 PNG](assets/04_random_action_playback_result.png) / [GIF](assets/04_random_action_playback_preview.gif) / [MP4](assets/04_random_action_playback_preview.mp4) / [WebM](assets/04_random_action_playback_preview.webm) / [代码卡](assets/04_random_action_playback.png) |
+| Cell 18 | These numbers define the dimensionality of policy and value tables. | [结果 PNG](assets/05_action_count_table_result.png) / [代码卡](assets/05_action_count_table.png) |
+| Cell 19 | 目标集合把连续目标转换成离散奖励查询。 | [结果 PNG](assets/06_target_position_rings_result.png) / [代码卡](assets/06_target_position_rings.png) |
+| Cell 22 | viewer 展示局部目标奖励如何选择图动作。 | [结果 PNG](assets/07_reward_policy_viewer_result.png) / [GIF](assets/07_reward_policy_viewer_preview.gif) / [MP4](assets/07_reward_policy_viewer_preview.mp4) / [WebM](assets/07_reward_policy_viewer_preview.webm) / [代码卡](assets/07_reward_policy_viewer.png) |
+| Cell 27 | 最终 viewer 检查学到的价值函数能否驱动动作选择。 | [结果 PNG](assets/08_mdp_value_policy_viewer_result.png) / [GIF](assets/08_mdp_value_policy_viewer_preview.gif) / [MP4](assets/08_mdp_value_policy_viewer_preview.mp4) / [WebM](assets/08_mdp_value_policy_viewer_preview.webm) / [代码卡](assets/08_mdp_value_policy_viewer.png) |
+
 
 ## 运行方式
 

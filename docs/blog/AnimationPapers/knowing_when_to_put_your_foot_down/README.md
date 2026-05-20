@@ -9,7 +9,7 @@
 | transcript sources | [`docs/transcripts/2k3xZQgXc9s_Knowing When To Put Your Foot Down.txt`](<../../../../docs/transcripts/2k3xZQgXc9s_Knowing When To Put Your Foot Down.txt>) |
 | env prefix | `.envs/foot_down` |
 | kernel | `animationtech-knowing_when_to_put_your_foot_down` |
-| validation status | `passed`（`manual_smoke`，最后记录：`2026-04-29T19:57:03.2494879Z`；仍需 JupyterLab 手动 smoke test） |
+| validation status | 自动执行已通过（最后记录：`2026-04-29T19:57:03.2494879Z`）；交互部分仍建议在 JupyterLab 中人工检查 |
 
 ## 问题背景
 
@@ -55,7 +55,7 @@ flowchart LR
     C21 --> C25[Cell 25<br/>load saved artifact]
 ```
 
-manifest 中的 Cell 8、10、11、15、18、25 已经生成了稳定结果媒体。原始 notebook 里还有交互 canvas 和保存单元，这些单元在 prepared 版本中会谨慎跳过或改为读取已有 artifact，以避免误写训练数据。
+已生成证据中的 Cell 8、10、11、15、18、25 已经生成了稳定结果媒体。原始 notebook 里还有交互 canvas 和保存单元，这些单元在 prepared 版本中会谨慎跳过或改为读取已有 artifact，以避免误写训练数据。
 
 ## 模块拆解
 
@@ -233,18 +233,18 @@ prepared notebook 默认读取 artifact，而不是自动保存，原因是保�
 
 ## 重点可视化 / 动画
 
-manifest 没有把本案例的结果声明为 `key_visual` 或 `key_animation`，所以正文只把真实 `result_file` 和 walkthrough 作为重点证据；学习卡只放在后续证据表，不作为主视觉。
+这个案例没有单一的主动画结果，因此正文只挑选最有阅读价值的结果图和 walkthrough；学习卡放在后续证据表里。
 
-| 媒体 | manifest 角色 | 阅读重点 |
+| 媒体 | 证据类型 | 阅读重点 |
 | --- | --- | --- |
-| [Animation windows and frame count](assets/01_clip_window_count_result.png) | `supporting_evidence` | 数据池规模与可切片数量 |
-| [Classifier construction](assets/05_classifier_training_code_result.png) | `supporting_evidence` | 从人工标签到 k-NN oracle 的转换 |
-| [Saved feature-vector artifact load](assets/06_saved_feature_vectors_result.png) | `supporting_evidence` | 已标注训练集的稳定复现入口 |
-| [Knowing When To Put Your Foot Down walkthrough](assets/00-walkthrough.webm) | `supporting_evidence` | 按 cell 顺序回放学习卡与结果证据 |
+| [Animation windows and frame count](assets/01_clip_window_count_result.png) | 补充证据 | 数据池规模与可切片数量 |
+| [Classifier construction](assets/05_classifier_training_code_result.png) | 补充证据 | 从人工标签到 k-NN oracle 的转换 |
+| [Saved feature-vector artifact load](assets/06_saved_feature_vectors_result.png) | 补充证据 | 已标注训练集的稳定复现入口 |
+| [Knowing When To Put Your Foot Down walkthrough](assets/00-walkthrough.webm) | 补充证据 | 按 cell 顺序回放学习卡与结果证据 |
 
 ## 代码 Cell 与可视化结果
 
-下面的表保留所有 manifest 学习步骤的证据。结果 PNG 用于阅读，代码卡只用于追溯 cell 摘要和输出来源。
+下面的表作为证据索引保留各学习步骤。结果 PNG 用于阅读，代码卡只用于追溯 cell 摘要和输出来源。
 
 | Cell / 片段 | 结果说明 | 证据 |
 | --- | --- | --- |

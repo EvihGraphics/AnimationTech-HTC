@@ -12,7 +12,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpaper
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 <slug>
 ```
 
-发布状态：14 个受管案例全部有 README、assets 清单、v5 媒体和运行入口；其中 10 个案例已深写完成，4 个案例保持媒体完整的发布基底。12 个 notebook 使用稳定 study 副本作为学习面，2 个 Python module 使用源码卡、命令日志和产物摘要作为执行证据。
+发布状态：14 个案例全部有 README、assets 清单、结果媒体和运行入口；每篇都已经补齐前置知识、代码执行路径、关键 cell / 函数深讲、结果读法和素材索引。12 个 notebook 使用稳定 study 副本作为学习面，2 个 Python module 使用源码卡、命令日志和产物摘要作为执行证据。
 
 ## 分组模块图
 
@@ -56,6 +56,9 @@ flowchart TD
 | --- | --- |
 | [`animation_format`](animation_format/README.md) | Skeleton、channel、motion buffer 和坐标约定如何成为全部动画系统的输入层。 |
 | [`footskate_cleanup_for_motion_capture_editing`](footskate_cleanup_for_motion_capture_editing/README.md) | 如何检测脚滑、建立足底约束，并把修复结果解释为“接触更可信”。 |
+| [`halo_4_facial_animation`](halo_4_facial_animation/README.md) | 如何用 PCA 把逐顶点面部动画压成可在 GPU 上重建的低维表示。 |
+| [`halo_4_exporter_from_maya`](halo_4_exporter_from_maya/README.md) | Maya 导出脚本如何把制作侧 mesh 动画转成 notebook 可读的资产。 |
+| [`knowing_when_to_put_your_foot_down`](knowing_when_to_put_your_foot_down/README.md) | 如何建立脚接触标注、近邻查询和 footplant oracle。 |
 | [`motion_fields_for_interactive_character_animation`](motion_fields_for_interactive_character_animation/README.md) | 如何把局部 pose、速度和目标查询成 motion field 中的候选动作。 |
 | [`motion_matching`](motion_matching/README.md) | 如何把未来轨迹和姿态特征做成检索向量，并在实时循环中选下一帧。 |
 | [`motion_graph`](motion_graph/README.md) | 如何用距离度量找可转移片段，再把动作库变成可遍历的图。 |
@@ -63,6 +66,7 @@ flowchart TD
 | [`near_optimal_character_animation_with_continuous_control`](near_optimal_character_animation_with_continuous_control/README.md) | 如何在连续控制空间中扩展候选并用代价函数裁剪出近似最优路径。 |
 | [`precomputing_avatar_behavior`](precomputing_avatar_behavior/README.md) | 如何把昂贵的行为搜索提前离线预计算，运行时只做轻量查询。 |
 | [`real_time_planning_for_parameterized_human_motion`](real_time_planning_for_parameterized_human_motion/README.md) | 如何把参数化动作、目标和代价函数组织成实时规划。 |
+| [`real_time_planning_multiprocess_func`](real_time_planning_multiprocess_func/README.md) | 值函数训练 worker 如何把并行任务稳定变成二维查表结果。 |
 | [`verbs_and_adverbs`](verbs_and_adverbs/README.md) | 如何用 RBF 把动作“动词”和风格“副词”合成可调控制空间。 |
 
 ## 全量案例列表
@@ -71,8 +75,8 @@ flowchart TD
 | --- | --- | --- |
 | [`animation_format`](animation_format/README.md) | `notebook` | 深写完成 + 媒体完整 |
 | [`footskate_cleanup_for_motion_capture_editing`](footskate_cleanup_for_motion_capture_editing/README.md) | `notebook` | 深写完成 + 媒体完整 |
-| [`halo_4_facial_animation`](halo_4_facial_animation/README.md) | `notebook` | 媒体完整 + 发布基底 |
-| [`knowing_when_to_put_your_foot_down`](knowing_when_to_put_your_foot_down/README.md) | `notebook` | 媒体完整 + 发布基底 |
+| [`halo_4_facial_animation`](halo_4_facial_animation/README.md) | `notebook` | 深写完成 + 媒体完整 |
+| [`knowing_when_to_put_your_foot_down`](knowing_when_to_put_your_foot_down/README.md) | `notebook` | 深写完成 + 媒体完整 |
 | [`motion_fields_for_interactive_character_animation`](motion_fields_for_interactive_character_animation/README.md) | `notebook` | 深写完成 + 媒体完整 |
 | [`motion_graph`](motion_graph/README.md) | `notebook` | 深写完成 + 媒体完整 |
 | [`motion_matching`](motion_matching/README.md) | `notebook` | 深写完成 + 媒体完整 |
@@ -81,8 +85,8 @@ flowchart TD
 | [`precomputing_avatar_behavior`](precomputing_avatar_behavior/README.md) | `notebook` | 深写完成 + 媒体完整 |
 | [`real_time_planning_for_parameterized_human_motion`](real_time_planning_for_parameterized_human_motion/README.md) | `notebook` | 深写完成 + 媒体完整 |
 | [`verbs_and_adverbs`](verbs_and_adverbs/README.md) | `notebook` | 深写完成 + 媒体完整 |
-| [`real_time_planning_multiprocess_func`](real_time_planning_multiprocess_func/README.md) | `python_module` | 媒体完整 + 源码证据 |
-| [`halo_4_exporter_from_maya`](halo_4_exporter_from_maya/README.md) | `python_module` | 媒体完整 + 源码证据 |
+| [`real_time_planning_multiprocess_func`](real_time_planning_multiprocess_func/README.md) | `python_module` | 深写完成 + 源码证据 |
+| [`halo_4_exporter_from_maya`](halo_4_exporter_from_maya/README.md) | `python_module` | 深写完成 + 源码证据 |
 
 ## 媒体与阅读建议
 

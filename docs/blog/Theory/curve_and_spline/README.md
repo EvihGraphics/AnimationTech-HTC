@@ -115,7 +115,7 @@ flowchart LR
 
    最后一大段把曲线从二维图形切换到一维动画值。`keytimes` 是横轴帧号，`keyvalues` 是关键帧值，`keytangents` 是每个关键帧的斜率。Hermite 示例会把真实帧区间缩放回 `[0, 1]` 再求值；Cardinal 示例对比均匀与非均匀 key time；Bezier 示例用 `find_bezier_root` 根据目标帧号反求内部参数；B-Spline 示例用 `scipy.optimize.minimize` 寻找能最小化误差的控制值。
 
-## 关键 cell / 函数深讲
+## 核心函数速览
 
 ### `castlejau(t, P, ax_draw=None)`
 
@@ -191,7 +191,7 @@ B-Spline 图要看平滑性和局部支撑。曲线通常不穿过所有控制�
 
 最后的一维关键帧图是整篇的工程落点。横轴是帧号，纵轴是属性值；灰色采样点和竖线展示每一帧会读到什么值。如果关键帧时间不均匀，曲线内部 `t` 与真实帧号之间的映射必须显式处理。否则曲线公式本身正确，动画采样仍然可能错位。
 
-## 代码 Cell 与可视化结果
+## 结果阅读导引
 
 本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和 PNG 学习卡片。PNG 由指定 cell 的代码摘要、输出区、viewer/canvas 或图表/日志合成，不使用整页滚动截图替代。
 
@@ -479,23 +479,23 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 curve_a
 
 ## 重点可视化 / 动画
 
-本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
+本节只放真正解释算法结果的图像和动画。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 
 | Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |
-| Cell 13 | `plot` | `key_visual` | Bezier control polygons and curves: The curve is constrained by the control polygon rather than being an isolated function plot. | `plot` | [结果 PNG](assets/01-bezier-de-casteljau_result.png) |
-| Cell 64 | `plot` | `key_visual` | Cox-De Boor basis functions: Local support explains why one B-Spline control point affects only a local curve span. | `plot` | [结果 PNG](assets/02-bernstein-basis_result.png) |
-| Cell 22 | `plot` | `key_visual` | Multi-segment Bezier spline: Long paths are built from local spans, and shared endpoints control continuity. | `plot` | [结果 PNG](assets/03-bezier-control-polygon_result.png) |
-| Cell 24 | `plot` | `key_visual` | Cubic curve shape control: Cubic curves can control both position and derivative, which is why they are common in animation curves. | `plot` | [结果 PNG](assets/05-cubic-bezier-spline_result.png) |
-| Cell 40 | `plot` | `key_visual` | Hermite endpoints and tangents: Velocity and tangent information are as important as position values in animation curves. | `plot` | [结果 PNG](assets/06-hermite-tangents_result.png) |
-| Cell 56 | `plot` | `key_visual` | Cardinal spline tension: Cardinal splines estimate tangents from neighboring points and pass through key points. | `plot` | [结果 PNG](assets/07-cardinal-tension_result.png) |
-| Cell 62 | `plot` | `key_visual` | Continuity construction: The output separates positional continuity, velocity continuity, and higher-order smoothness. | `plot` | [结果 PNG](assets/08-cardinal-continuity_result.png) |
-| Cell 72 | `plot` | `key_visual` | Uniform cubic B-Spline: B-Splines are smooth approximations and usually do not pass through every control point. | `plot` | [结果 PNG](assets/09-bspline-local-support_result.png) |
-| Cell 77 | `plot` | `key_visual` | 1D Hermite keyframe curve: This transfers geometric curve ideas to animation-editor keyframe curves. | `plot` | [结果 PNG](assets/10-keyframe-hermite_result.png) |
-| Cell 83 | `plot` | `key_visual` | Non-uniform Cardinal time: Treating parameter t as real time can place samples incorrectly. | `plot` | [结果 PNG](assets/11-nonuniform-cardinal-time_result.png) |
-| Cell 88 | `plot` | `key_visual` | Bezier time root solving: Animation systems often need to solve internal curve parameters from frame time. | `plot` | [结果 PNG](assets/12-bezier-time-root_result.png) |
-| Cell 92 | `plot` | `key_visual` | B-Spline least-squares fitting: The fitted curve does not need to pass through every sample, but it preserves a stable trend. | `plot` | [结果 PNG](assets/13-bspline-fitting_result.png) |
+| Cell 13 | `plot` | 核心图解 | Bezier control polygons and curves: The curve is constrained by the control polygon rather than being an isolated function plot. | `plot` | [结果 PNG](assets/01-bezier-de-casteljau_result.png) |
+| Cell 64 | `plot` | 核心图解 | Cox-De Boor basis functions: Local support explains why one B-Spline control point affects only a local curve span. | `plot` | [结果 PNG](assets/02-bernstein-basis_result.png) |
+| Cell 22 | `plot` | 核心图解 | Multi-segment Bezier spline: Long paths are built from local spans, and shared endpoints control continuity. | `plot` | [结果 PNG](assets/03-bezier-control-polygon_result.png) |
+| Cell 24 | `plot` | 核心图解 | Cubic curve shape control: Cubic curves can control both position and derivative, which is why they are common in animation curves. | `plot` | [结果 PNG](assets/05-cubic-bezier-spline_result.png) |
+| Cell 40 | `plot` | 核心图解 | Hermite endpoints and tangents: Velocity and tangent information are as important as position values in animation curves. | `plot` | [结果 PNG](assets/06-hermite-tangents_result.png) |
+| Cell 56 | `plot` | 核心图解 | Cardinal spline tension: Cardinal splines estimate tangents from neighboring points and pass through key points. | `plot` | [结果 PNG](assets/07-cardinal-tension_result.png) |
+| Cell 62 | `plot` | 核心图解 | Continuity construction: The output separates positional continuity, velocity continuity, and higher-order smoothness. | `plot` | [结果 PNG](assets/08-cardinal-continuity_result.png) |
+| Cell 72 | `plot` | 核心图解 | Uniform cubic B-Spline: B-Splines are smooth approximations and usually do not pass through every control point. | `plot` | [结果 PNG](assets/09-bspline-local-support_result.png) |
+| Cell 77 | `plot` | 核心图解 | 1D Hermite keyframe curve: This transfers geometric curve ideas to animation-editor keyframe curves. | `plot` | [结果 PNG](assets/10-keyframe-hermite_result.png) |
+| Cell 83 | `plot` | 核心图解 | Non-uniform Cardinal time: Treating parameter t as real time can place samples incorrectly. | `plot` | [结果 PNG](assets/11-nonuniform-cardinal-time_result.png) |
+| Cell 88 | `plot` | 核心图解 | Bezier time root solving: Animation systems often need to solve internal curve parameters from frame time. | `plot` | [结果 PNG](assets/12-bezier-time-root_result.png) |
+| Cell 92 | `plot` | 核心图解 | B-Spline least-squares fitting: The fitted curve does not need to pass through every sample, but it preserves a stable trend. | `plot` | [结果 PNG](assets/13-bspline-fitting_result.png) |
 
 
 ## 代码 Cell 与可视化结果

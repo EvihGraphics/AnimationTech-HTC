@@ -348,7 +348,7 @@ flowchart TD
 
 ## 重点可视化 / 动画
 
-manifest 没有把本案例声明为 `key_visual` 或 `key_animation`，因此正文只引用真实公式结果 PNG 和 walkthrough 证据；学习卡只放在后续证据表，不作为主视觉，也不新增滚动截图或假动画。
+本案例的重点是公式推导，没有需要播放的 viewer 动画；正文只引用真实公式结果 PNG 和 walkthrough 证据。学习卡只放在后续证据表，不作为主视觉，也不新增滚动截图或假动画。
 
 | Cell | 重点媒体 | 可视化主体 | 捕获方式 | 结果说明 |
 | --- | --- | --- | --- | --- |
@@ -381,4 +381,4 @@ manifest 没有把本案例声明为 `key_visual` 或 `key_animation`，因此�
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 motiongraph_pointcloud_derivation
 ```
 
-手动阅读 notebook 时，打开 `labs/Theory/motiongraph_pointcloud_derivation.ipynb`，选择 kernel `animationtech-motiongraph_pointcloud_derivation`。本 README 只引用 manifest 已声明的公式输出与素材。
+手动阅读 notebook 时，打开 `labs/Theory/motiongraph_pointcloud_derivation.ipynb`，选择 kernel `animationtech-motiongraph_pointcloud_derivation`。本文只引用已经生成的公式输出与素材。

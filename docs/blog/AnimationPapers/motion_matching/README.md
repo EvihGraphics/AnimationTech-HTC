@@ -8,7 +8,7 @@
 | source path | [`labs/AnimationPapers/Motion Matching.ipynb`](<../../../../labs/AnimationPapers/Motion Matching.ipynb>) |
 | env prefix | `.envs/motion_matching` |
 | kernel | `animationtech-motion_matching` |
-| validation status | `passed`（`manual_smoke`，最后记录：`2026-04-29T19:59:40.3510337Z`；仍需 JupyterLab 手动 smoke test） |
+| validation status | 自动执行已通过（最后记录：`2026-04-29T19:59:40.3510337Z`）；交互部分仍建议在 JupyterLab 中人工检查 |
 
 ## 问题背景
 
@@ -105,7 +105,7 @@ sequenceDiagram
 
 `inertialize_transition_vec3`、`inertialize_update_vec3`、`inertialize_transition_quat` 和 `inertialize_update_quat` 的作用不是简单 blend 两段动画，而是把跳转瞬间的偏差作为一个会衰减的误差项。这样目标姿态可以立刻切换到检索结果，同时视觉上保留一个短暂、自然的缓冲。对交互动画来说，这比固定时长交叉淡入更适合频繁、不可预测的跳转。
 
-## 关键 cell / 函数深讲
+## 算法读法
 
 - `spring_character_update`：把玩家输入映射成带速度和朝向惯性的模拟 root。它决定 query 的未来轨迹是否平滑，直接影响检索稳定性。
 - `prepare_data`：清洗 root 轨迹、对齐骨架、计算线速度和角速度。它是从原始 BVH 到可检索数据的桥。
@@ -132,21 +132,6 @@ sequenceDiagram
 
 这个 notebook 的可视化意义在于把 motion matching 拆成可调的工程闭环。你可以单独观察输入弹簧、特征点、未来轨迹、最近邻结果和最终播放结果，从而判断问题出在“目标预测”“相似性定义”还是“播放过渡”。
 
-## 代码 Cell 与可视化结果
-
-本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和 PNG 学习卡片。PNG 由指定 cell 的代码摘要、输出区、viewer/canvas 或图表/日志合成，不使用整页滚动截图替代。
-
-
-| Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
-| --- | --- | --- | --- | --- |
-| 9 | `viewer` | Update root position, velocity, and orientation with a spring-damper model. | This is the source of the future trajectory target used in the motion-matching query. | [PNG](assets/spring_damper_prediction.png) |
-| 14 | `viewer` | Render the imported locomotion clips. | The database is built from real motion frames, not from generated poses. | [PNG](assets/motion_matching_overview.png) |
-| 18 | `viewer` | Visualize filtered bone positions, root velocity, and facing direction. | Stable velocity and orientation estimates reduce noise in nearest-neighbor search. | [PNG](assets/trajectory_query_runtime.png) |
-| 21 | `viewer` | Show hips, foot, and future-trajectory debug lines in the viewer. | The abstract feature vector becomes visible as body parts and trajectory targets. | [PNG](assets/feature_vector_layout.png) |
-| 23 | `code_only` | Compute features_mean, features_std, and the normalized database. | Different physical quantities must be normalized before Euclidean nearest-neighbor search. | [PNG](assets/feature_database_debug.png) |
-| 26 | `timeline_viewer` | Build a query, find the best frame, jump playback, and smooth the transition with inertialization. | This is the closed loop that connects input prediction, feature search, and visual playback. | [PNG](assets/inertialization_transition.png) |
-| 26 | `timeline_viewer` | Inspect another runtime frame in the Player cell. | Stop and sharp-turn cases are useful stress tests for matching quality. | [PNG](assets/fast_stop_turn_cases.png) |
-
 ## 关键 cell / 函数深讲
 
 ### Cell 9 - Spring-damper future trajectory
@@ -162,7 +147,7 @@ flowchart LR
 
 - 代码做什么：Update root position, velocity, and orientation with a spring-damper model.
 - 运行后看到什么：`viewer`
-- 结果说明什么：This is the source of the future trajectory target used in the motion-matching query.
+- 结果说明什么：这是 motion matching 查询中未来轨迹目标的来源。
 - 可视化主体：Spring-damper future trajectory
 - 捕获方式：`canvas`
 
@@ -181,7 +166,7 @@ flowchart LR
 
 - 代码做什么：Render the imported locomotion clips.
 - 运行后看到什么：`viewer`
-- 结果说明什么：The database is built from real motion frames, not from generated poses.
+- 结果说明什么：数据库来自真实动作帧，而不是生成姿态。
 - 可视化主体：Source locomotion clip playback
 - 捕获方式：`canvas`
 
@@ -219,7 +204,7 @@ flowchart LR
 
 - 代码做什么：Show hips, foot, and future-trajectory debug lines in the viewer.
 - 运行后看到什么：`viewer`
-- 结果说明什么：The abstract feature vector becomes visible as body parts and trajectory targets.
+- 结果说明什么：把抽象特征向量对应回身体部位和轨迹目标。
 - 可视化主体：33-dimensional feature layout
 - 捕获方式：`canvas`
 
@@ -259,11 +244,9 @@ flowchart LR
 
 - 代码做什么：Build a query, find the best frame, jump playback, and smooth the transition with inertialization.
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：This is the closed loop that connects input prediction, feature search, and visual playback.
+- 结果说明什么：这是连接输入预测、特征搜索和视觉播放的闭环。
 - 可视化主体：Runtime Player search loop
 - 捕获方式：`canvas`
-
-这段动画要看角色脚下的未来轨迹标记和身体姿态如何同步变化：输入先被平滑成未来 10/20/30 帧目标，再由最近邻检索决定下一帧播放位置。角色连续移动说明 query、检索和 inertialization 已经形成闭环。
 
 ![Runtime Player search loop](assets/inertialization_transition_result.png)
 
@@ -291,8 +274,6 @@ flowchart LR
 - 可视化主体：Stop and turn debug frame
 - 捕获方式：`canvas`
 
-这段动画故意扫过前进、急转和停止输入。重点看角色朝向是否快速改变但身体没有瞬间抽跳，以及黄色未来方向标记如何引导检索到更合适的减速/转身素材。
-
 ![Stop and turn debug frame](assets/fast_stop_turn_cases_result.png)
 
 ![Stop and turn debug frame preview](assets/fast_stop_turn_cases_preview.gif)
@@ -318,7 +299,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 motion_
 
 ## 重点可视化 / 动画
 
-本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
+本节只保留最能说明算法结果的图像和动画。代码学习卡移到文末证据表，供需要复现或追溯 cell 上下文时查看。
 
 
 ![Runtime Player search loop](assets/inertialization_transition_preview.gif)
@@ -339,26 +320,26 @@ https://github.com/user-attachments/assets/1793e880-6609-4d41-8944-b536f9ae6604
   <source src="assets/fast_stop_turn_cases_preview.webm" type="video/webm">
 </video>
 
-| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| Cell | 输出类型 | 阅读位置 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |
-| Cell 9 | `viewer` | `key_visual` | Spring-damper future trajectory: This is the source of the future trajectory target used in the motion-matching query. | `canvas` | [结果 PNG](assets/spring_damper_prediction_result.png) |
-| Cell 14 | `viewer` | `key_visual` | Source locomotion clip playback: The database is built from real motion frames, not from generated poses. | `canvas` | [结果 PNG](assets/motion_matching_overview_result.png) |
-| Cell 18 | `viewer` | `key_visual` | Filtered root displacement and orientation: Stable velocity and orientation estimates reduce noise in nearest-neighbor search. | `canvas` | [结果 PNG](assets/trajectory_query_runtime_result.png) |
-| Cell 21 | `viewer` | `key_visual` | 33-dimensional feature layout: The abstract feature vector becomes visible as body parts and trajectory targets. | `canvas` | [结果 PNG](assets/feature_vector_layout_result.png) |
-| Cell 26 | `timeline_viewer` | `key_animation` | Runtime Player search loop: This is the closed loop that connects input prediction, feature search, and visual playback. | `canvas` | [结果 PNG](assets/inertialization_transition_result.png) / [GIF](assets/inertialization_transition_preview.gif) / [MP4](assets/inertialization_transition_preview.mp4) / [WebM](assets/inertialization_transition_preview.webm) |
-| Cell 26 | `timeline_viewer` | `key_animation` | Stop and turn debug frame: Stop and sharp-turn cases are useful stress tests for matching quality. | `canvas` | [结果 PNG](assets/fast_stop_turn_cases_result.png) / [GIF](assets/fast_stop_turn_cases_preview.gif) / [MP4](assets/fast_stop_turn_cases_preview.mp4) / [WebM](assets/fast_stop_turn_cases_preview.webm) |
+| Cell 9 | `viewer` | 核心图解 | 弹簧阻尼未来轨迹：这是 motion matching 查询中未来轨迹目标的来源。 | `canvas` | [结果 PNG](assets/spring_damper_prediction_result.png) |
+| Cell 14 | `viewer` | 核心图解 | 源 locomotion 片段播放：数据库来自真实动作帧，而不是生成姿态。 | `canvas` | [结果 PNG](assets/motion_matching_overview_result.png) |
+| Cell 18 | `viewer` | 核心图解 | 滤波后的 root 位移和朝向：稳定的速度、朝向估计能降低最近邻搜索噪声。 | `canvas` | [结果 PNG](assets/trajectory_query_runtime_result.png) |
+| Cell 21 | `viewer` | 核心图解 | 33 维特征布局：把抽象特征向量对应回身体部位和轨迹目标。 | `canvas` | [结果 PNG](assets/feature_vector_layout_result.png) |
+| Cell 26 | `timeline_viewer` | 核心动画 | 运行时 Player 搜索循环：连接输入预测、特征搜索和视觉播放的闭环。 | `canvas` | [结果 PNG](assets/inertialization_transition_result.png) / [GIF](assets/inertialization_transition_preview.gif) / [MP4](assets/inertialization_transition_preview.mp4) / [WebM](assets/inertialization_transition_preview.webm) |
+| Cell 26 | `timeline_viewer` | 核心动画 | 停止与急转调试帧：停止和急转是检验匹配质量的压力测试。 | `canvas` | [结果 PNG](assets/fast_stop_turn_cases_result.png) / [GIF](assets/fast_stop_turn_cases_preview.gif) / [MP4](assets/fast_stop_turn_cases_preview.mp4) / [WebM](assets/fast_stop_turn_cases_preview.webm) |
 
 
 ## 代码 Cell 与可视化结果
 
-本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 
 | Cell / 片段 | 结果说明 | 证据 |
 | --- | --- | --- |
-| Cell 9 | This is the source of the future trajectory target used in the motion-matching query. | [结果 PNG](assets/spring_damper_prediction_result.png) / [代码卡](assets/spring_damper_prediction.png) |
-| Cell 14 | The database is built from real motion frames, not from generated poses. | [结果 PNG](assets/motion_matching_overview_result.png) / [代码卡](assets/motion_matching_overview.png) |
+| Cell 9 | 这是 motion matching 查询中未来轨迹目标的来源。 | [结果 PNG](assets/spring_damper_prediction_result.png) / [代码卡](assets/spring_damper_prediction.png) |
+| Cell 14 | 数据库来自真实动作帧，而不是生成姿态。 | [结果 PNG](assets/motion_matching_overview_result.png) / [代码卡](assets/motion_matching_overview.png) |
 | Cell 18 | Stable velocity and orientation estimates reduce noise in nearest-neighbor search. | [结果 PNG](assets/trajectory_query_runtime_result.png) / [代码卡](assets/trajectory_query_runtime.png) |
-| Cell 21 | The abstract feature vector becomes visible as body parts and trajectory targets. | [结果 PNG](assets/feature_vector_layout_result.png) / [代码卡](assets/feature_vector_layout.png) |
+| Cell 21 | 把抽象特征向量对应回身体部位和轨迹目标。 | [结果 PNG](assets/feature_vector_layout_result.png) / [代码卡](assets/feature_vector_layout.png) |
 | Cell 23 | Different physical quantities must be normalized before Euclidean nearest-neighbor search. | [结果 PNG](assets/feature_database_debug_result.png) / [代码卡](assets/feature_database_debug.png) |
-| Cell 26 | This is the closed loop that connects input prediction, feature search, and visual playback. | [结果 PNG](assets/inertialization_transition_result.png) / [GIF](assets/inertialization_transition_preview.gif) / [MP4](assets/inertialization_transition_preview.mp4) / [WebM](assets/inertialization_transition_preview.webm) / [代码卡](assets/inertialization_transition.png) |
+| Cell 26 | 这是连接输入预测、特征搜索和视觉播放的闭环。 | [结果 PNG](assets/inertialization_transition_result.png) / [GIF](assets/inertialization_transition_preview.gif) / [MP4](assets/inertialization_transition_preview.mp4) / [WebM](assets/inertialization_transition_preview.webm) / [代码卡](assets/inertialization_transition.png) |
 | Cell 26 | Stop and sharp-turn cases are useful stress tests for matching quality. | [结果 PNG](assets/fast_stop_turn_cases_result.png) / [GIF](assets/fast_stop_turn_cases_preview.gif) / [MP4](assets/fast_stop_turn_cases_preview.mp4) / [WebM](assets/fast_stop_turn_cases_preview.webm) / [代码卡](assets/fast_stop_turn_cases.png) |

@@ -9,7 +9,7 @@
 | transcript sources | [`docs/transcripts/_S4vpMV0-UY_Reinforcement Learning 02 _ Near Optimal Character Animation with Continuous Con.txt`](../../../../docs/transcripts/_S4vpMV0-UY_Reinforcement Learning 02 _ Near Optimal Character Animation with Continuous Con.txt) |
 | env prefix | `.envs/near_opt_ctrl` |
 | kernel | `animationtech-near_optimal_character_animation_with_continuous_control` |
-| validation status | `passed` (`manual_smoke`) |
+| validation status | 自动执行已通过；交互部分仍建议在 JupyterLab 中人工检查 |
 
 ## 问题背景
 
@@ -64,8 +64,6 @@ greedy policy 只看当前 deviation、physics 和 direction；near-optimal poli
 
 ## 关键 cell / 函数深讲
 
-## 关键 cell / 函数深讲
-
 ### Cell 9 - Source clip playback
 
 渲染最初被裁切出的所有离散片段，建立动作规划的可用词汇表。
@@ -76,9 +74,9 @@ flowchart LR
     B --> C[在 Timeline Viewer 中依次播放]
 ```
 
-- 代码做什么：Source clip playback: The viewer establishes the motion vocabulary available to the planner.
+- 代码做什么：源片段播放：建立规划器可使用的动作词汇表。
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：The viewer establishes the motion vocabulary available to the planner.
+- 结果说明什么：viewer 建立规划器可使用的动作词汇表。
 - 可视化主体：Source clip playback
 - 捕获方式：`canvas`
 
@@ -102,9 +100,9 @@ flowchart LR
     C --> D[渲染带有地面接触标记的动作]
 ```
 
-- 代码做什么：Clip contact constraints: The viewer shows how physical plausibility is represented before planning.
+- 代码做什么：片段接触约束：展示规划前如何表达物理合理性。
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：The viewer shows how physical plausibility is represented before planning.
+- 结果说明什么：viewer 展示规划前如何表达物理合理性。
 - 可视化主体：Clip contact constraints
 - 捕获方式：`canvas`
 
@@ -128,9 +126,9 @@ flowchart LR
     C --> D[过渡 Blend 并连续播放]
 ```
 
-- 代码做什么：Random transition player: This validates that clips can be stitched into continuous playback.
+- 代码做什么：随机转移播放器：验证片段能否拼接成连续播放。
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：This validates that clips can be stitched into continuous playback.
+- 结果说明什么：验证片段能否拼接成连续播放。
 - 可视化主体：Random transition player
 - 捕获方式：`canvas`
 
@@ -154,9 +152,9 @@ flowchart LR
     C --> D[将未来收益绘制成等高线/曲面图]
 ```
 
-- 代码做什么：Learned value surface: The surface makes the optimal-control objective visible as future cost.
+- 代码做什么：学到的价值曲面：把最优控制目标显示成未来代价。
 - 运行后看到什么：`plot`
-- 结果说明什么：The surface makes the optimal-control objective visible as future cost.
+- 结果说明什么：曲面把最优控制目标显示成未来代价。
 - 可视化主体：Learned value surface
 - 捕获方式：`plot`
 
@@ -173,13 +171,11 @@ flowchart LR
     C --> D[控制器平滑播放选中的最佳片段]
 ```
 
-- 代码做什么：Optimal-policy controller: The viewer checks that the policy callback advances without requiring a physical gamepad.
+- 代码做什么：最优策略控制器：检查没有实体手柄时策略回调也能推进。
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：The viewer checks that the policy callback advances without requiring a physical gamepad.
+- 结果说明什么：viewer 检查没有实体手柄时策略回调也能推进。
 - 可视化主体：Optimal-policy controller
 - 捕获方式：`canvas`
-
-这段动画要看黄色方向箭头、白色角色和调试骨架一起移动。策略不是随机换片段，而是在当前 clip、连续位移和朝向误差上查询 value policy，选择包含未来代价的下一段动作。
 
 ![Optimal-policy controller](assets/08_optimal_policy_player_result.png)
 
@@ -204,7 +200,7 @@ contact viewer 验证物理约束；transition cost 说明离线控制模型；v
 
 ## 重点可视化 / 动画
 
-本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
+本节只保留最能说明算法结果的图像和动画。代码学习卡移到文末证据表，供需要复现或追溯 cell 上下文时查看。
 
 
 ![Source clip playback](assets/02_source_clip_playback_preview.gif)
@@ -239,29 +235,29 @@ https://github.com/user-attachments/assets/bfff5417-4489-4a83-819b-d4d05318fe99
   <source src="assets/08_optimal_policy_player_preview.webm" type="video/webm">
 </video>
 
-| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| Cell | 输出类型 | 阅读位置 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |
-| Cell 9 | `timeline_viewer` | `key_animation` | Source clip playback: The viewer establishes the motion vocabulary available to the planner. | `canvas` | [结果 PNG](assets/02_source_clip_playback_result.png) / [GIF](assets/02_source_clip_playback_preview.gif) / [MP4](assets/02_source_clip_playback_preview.mp4) / [WebM](assets/02_source_clip_playback_preview.webm) |
-| Cell 16 | `timeline_viewer` | `key_animation` | Clip contact constraints: The viewer shows how physical plausibility is represented before planning. | `canvas` | [结果 PNG](assets/04_contact_constraint_viewer_result.png) / [GIF](assets/04_contact_constraint_viewer_preview.gif) / [MP4](assets/04_contact_constraint_viewer_preview.mp4) / [WebM](assets/04_contact_constraint_viewer_preview.webm) |
-| Cell 19 | `timeline_viewer` | `key_animation` | Random transition player: This validates that clips can be stitched into continuous playback. | `canvas` | [结果 PNG](assets/05_random_transition_player_result.png) / [GIF](assets/05_random_transition_player_preview.gif) / [MP4](assets/05_random_transition_player_preview.mp4) / [WebM](assets/05_random_transition_player_preview.webm) |
-| Cell 36 | `plot` | `key_visual` | Learned value surface: The surface makes the optimal-control objective visible as future cost. | `plot` | [结果 PNG](assets/07_learned_value_surface_result.png) |
-| Cell 38 | `timeline_viewer` | `key_animation` | Optimal-policy controller: The viewer checks that the policy callback advances without requiring a physical gamepad. | `canvas` | [结果 PNG](assets/08_optimal_policy_player_result.png) / [GIF](assets/08_optimal_policy_player_preview.gif) / [MP4](assets/08_optimal_policy_player_preview.mp4) / [WebM](assets/08_optimal_policy_player_preview.webm) |
+| Cell 9 | `timeline_viewer` | 核心动画 | 源片段播放：建立规划器可使用的动作词汇表。 | `canvas` | [结果 PNG](assets/02_source_clip_playback_result.png) / [GIF](assets/02_source_clip_playback_preview.gif) / [MP4](assets/02_source_clip_playback_preview.mp4) / [WebM](assets/02_source_clip_playback_preview.webm) |
+| Cell 16 | `timeline_viewer` | 核心动画 | 片段接触约束：展示规划前如何表达物理合理性。 | `canvas` | [结果 PNG](assets/04_contact_constraint_viewer_result.png) / [GIF](assets/04_contact_constraint_viewer_preview.gif) / [MP4](assets/04_contact_constraint_viewer_preview.mp4) / [WebM](assets/04_contact_constraint_viewer_preview.webm) |
+| Cell 19 | `timeline_viewer` | 核心动画 | 随机转移播放器：验证片段能否拼接成连续播放。 | `canvas` | [结果 PNG](assets/05_random_transition_player_result.png) / [GIF](assets/05_random_transition_player_preview.gif) / [MP4](assets/05_random_transition_player_preview.mp4) / [WebM](assets/05_random_transition_player_preview.webm) |
+| Cell 36 | `plot` | 核心图解 | 学到的价值曲面：把最优控制目标显示成未来代价。 | `plot` | [结果 PNG](assets/07_learned_value_surface_result.png) |
+| Cell 38 | `timeline_viewer` | 核心动画 | 最优策略控制器：检查没有实体手柄时策略回调也能推进。 | `canvas` | [结果 PNG](assets/08_optimal_policy_player_result.png) / [GIF](assets/08_optimal_policy_player_preview.gif) / [MP4](assets/08_optimal_policy_player_preview.mp4) / [WebM](assets/08_optimal_policy_player_preview.webm) |
 
 
 ## 代码 Cell 与可视化结果
 
-本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 
 | Cell / 片段 | 结果说明 | 证据 |
 | --- | --- | --- |
-| Cell 5 | The helper indices are later used for contacts, costs, and debug drawing. | [结果 PNG](assets/01_load_character_helpers_result.png) / [代码卡](assets/01_load_character_helpers.png) |
-| Cell 9 | The viewer establishes the motion vocabulary available to the planner. | [结果 PNG](assets/02_source_clip_playback_result.png) / [GIF](assets/02_source_clip_playback_preview.gif) / [MP4](assets/02_source_clip_playback_preview.mp4) / [WebM](assets/02_source_clip_playback_preview.webm) / [代码卡](assets/02_source_clip_playback.png) |
-| Cell 11 | The count determines the discrete action set used by the controller. | [结果 PNG](assets/03_clip_count_table_result.png) / [代码卡](assets/03_clip_count_table.png) |
-| Cell 16 | The viewer shows how physical plausibility is represented before planning. | [结果 PNG](assets/04_contact_constraint_viewer_result.png) / [GIF](assets/04_contact_constraint_viewer_preview.gif) / [MP4](assets/04_contact_constraint_viewer_preview.mp4) / [WebM](assets/04_contact_constraint_viewer_preview.webm) / [代码卡](assets/04_contact_constraint_viewer.png) |
-| Cell 19 | This validates that clips can be stitched into continuous playback. | [结果 PNG](assets/05_random_transition_player_result.png) / [GIF](assets/05_random_transition_player_preview.gif) / [MP4](assets/05_random_transition_player_preview.mp4) / [WebM](assets/05_random_transition_player_preview.webm) / [代码卡](assets/05_random_transition_player.png) |
-| Cell 21 | The log shows the expensive planning data being prepared offline. | [结果 PNG](assets/06_transition_cost_precompute_result.png) / [代码卡](assets/06_transition_cost_precompute.png) |
-| Cell 36 | The surface makes the optimal-control objective visible as future cost. | [结果 PNG](assets/07_learned_value_surface_result.png) / [代码卡](assets/07_learned_value_surface.png) |
-| Cell 38 | The viewer checks that the policy callback advances without requiring a physical gamepad. | [结果 PNG](assets/08_optimal_policy_player_result.png) / [GIF](assets/08_optimal_policy_player_preview.gif) / [MP4](assets/08_optimal_policy_player_preview.mp4) / [WebM](assets/08_optimal_policy_player_preview.webm) / [代码卡](assets/08_optimal_policy_player.png) |
+| Cell 5 | 这些 helper 索引后续用于接触、代价和调试绘制。 | [结果 PNG](assets/01_load_character_helpers_result.png) / [代码卡](assets/01_load_character_helpers.png) |
+| Cell 9 | viewer 建立规划器可使用的动作词汇表。 | [结果 PNG](assets/02_source_clip_playback_result.png) / [GIF](assets/02_source_clip_playback_preview.gif) / [MP4](assets/02_source_clip_playback_preview.mp4) / [WebM](assets/02_source_clip_playback_preview.webm) / [代码卡](assets/02_source_clip_playback.png) |
+| Cell 11 | 这个数量决定控制器可用的离散动作集合。 | [结果 PNG](assets/03_clip_count_table_result.png) / [代码卡](assets/03_clip_count_table.png) |
+| Cell 16 | viewer 展示规划前如何表达物理合理性。 | [结果 PNG](assets/04_contact_constraint_viewer_result.png) / [GIF](assets/04_contact_constraint_viewer_preview.gif) / [MP4](assets/04_contact_constraint_viewer_preview.mp4) / [WebM](assets/04_contact_constraint_viewer_preview.webm) / [代码卡](assets/04_contact_constraint_viewer.png) |
+| Cell 19 | 验证片段能否拼接成连续播放。 | [结果 PNG](assets/05_random_transition_player_result.png) / [GIF](assets/05_random_transition_player_preview.gif) / [MP4](assets/05_random_transition_player_preview.mp4) / [WebM](assets/05_random_transition_player_preview.webm) / [代码卡](assets/05_random_transition_player.png) |
+| Cell 21 | 日志显示昂贵的规划数据已提前离线准备。 | [结果 PNG](assets/06_transition_cost_precompute_result.png) / [代码卡](assets/06_transition_cost_precompute.png) |
+| Cell 36 | 曲面把最优控制目标显示成未来代价。 | [结果 PNG](assets/07_learned_value_surface_result.png) / [代码卡](assets/07_learned_value_surface.png) |
+| Cell 38 | viewer 检查没有实体手柄时策略回调也能推进。 | [结果 PNG](assets/08_optimal_policy_player_result.png) / [GIF](assets/08_optimal_policy_player_preview.gif) / [MP4](assets/08_optimal_policy_player_preview.mp4) / [WebM](assets/08_optimal_policy_player_preview.webm) / [代码卡](assets/08_optimal_policy_player.png) |
 
 
 ## 运行方式

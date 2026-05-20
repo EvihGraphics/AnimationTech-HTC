@@ -9,7 +9,7 @@
 | transcript sources | [`docs/transcripts/EBosvxpPONY_Verbs and Adverbs_ Multidimensional Motion Interpolation Using Radial Basis Func.txt`](../../../../docs/transcripts/EBosvxpPONY_Verbs and Adverbs_ Multidimensional Motion Interpolation Using Radial Basis Func.txt) |
 | env prefix | `.envs/verbs_and_adverbs` |
 | kernel | `animationtech-verbs_and_adverbs` |
-| validation status | `passed` (`manual_smoke`) |
+| validation status | 自动执行已通过；交互部分仍建议在 JupyterLab 中人工检查 |
 
 ## 问题背景
 
@@ -73,9 +73,9 @@ flowchart LR
     B --> C[观察片段之间存在的相位和时序差异]
 ```
 
-- 代码做什么：Raw sample clip overview: The viewer establishes the motion examples that will be normalized and blended.
+- 代码做什么：原始样本片段概览：viewer 建立后续将被规范化和混合的动作样例。
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：The viewer establishes the motion examples that will be normalized and blended.
+- 结果说明什么：viewer 建立后续将被规范化和混合的动作样例。
 - 可视化主体：Raw sample clip overview
 - 捕获方式：`canvas`
 
@@ -99,7 +99,7 @@ flowchart LR
     C --> D[时间规整后的片段对齐显示]
 ```
 
-- 代码做什么：Canonical timing and contact inspection: Canonical timing aligns examples before interpolation.
+- 代码做什么：规范化时序与接触检查：在插值前先对齐样例时序。
 - 运行后看到什么：`timeline_viewer`
 - 结果说明什么：Canonical timing aligns examples before interpolation.
 - 可视化主体：Canonical timing and contact inspection
@@ -125,7 +125,7 @@ flowchart LR
     C --> D[生成无缝 Looping 动画]
 ```
 
-- 代码做什么：Looping animation comparison: Looping makes repeated motion comparable across clips.
+- 代码做什么：循环动画对比：循环化让重复动作可以跨片段比较。
 - 运行后看到什么：`timeline_viewer`
 - 结果说明什么：Looping makes repeated motion comparable across clips.
 - 可视化主体：Looping animation comparison
@@ -151,9 +151,9 @@ flowchart LR
     C --> D[在 Viewer 中同时同频播放]
 ```
 
-- 代码做什么：Resampled canonical clips: The viewer checks that examples share a common timing domain.
+- 代码做什么：重采样后的规范化片段：检查样例是否共享同一时间域。
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：The viewer checks that examples share a common timing domain.
+- 结果说明什么：viewer 检查样例是否共享同一时间域。
 - 可视化主体：Resampled canonical clips
 - 捕获方式：`canvas`
 
@@ -177,9 +177,9 @@ flowchart LR
     C --> D[绘制包含控制点和拟合曲线的折线图]
 ```
 
-- 代码做什么：B-spline curve fit: The plot shows how sparse motion samples become smooth parameterized curves.
+- 代码做什么：B-spline 曲线拟合：展示稀疏动作样本如何变成平滑参数化曲线。
 - 运行后看到什么：`plot`
-- 结果说明什么：The plot shows how sparse motion samples become smooth parameterized curves.
+- 结果说明什么：图中展示稀疏动作样本如何变成平滑参数化曲线。
 - 可视化主体：B-spline curve fit
 - 捕获方式：`plot`
 
@@ -196,9 +196,9 @@ flowchart LR
     C --> D[在 Viewer 中播放重建动画以验证]
 ```
 
-- 代码做什么：B-spline reconstruction viewer: The viewer validates the curve representation as playable motion.
+- 代码做什么：B-spline 重建 viewer：验证曲线表示能否还原为可播放动作。
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：The viewer validates the curve representation as playable motion.
+- 结果说明什么：viewer 验证曲线表示能否还原为可播放动作。
 - 可视化主体：B-spline reconstruction viewer
 - 捕获方式：`canvas`
 
@@ -222,13 +222,11 @@ flowchart LR
     C --> D[Viewer 实时渲染生成的新动作]
 ```
 
-- 代码做什么：Final interpolated adverb controls: The final viewer shows how verb and adverb coordinates produce a new animation.
+- 代码做什么：最终插值后的 adverb 控制：展示 verb/adverb 坐标如何生成新动画。
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：The final viewer shows how verb and adverb coordinates produce a new animation.
+- 结果说明什么：最终 viewer 展示 verb/adverb 坐标如何生成新动画。
 - 可视化主体：Final interpolated adverb controls
 - 捕获方式：`canvas`
-
-这段动画同时扫过 `angle` 和 `mood`，重点看角色步态和方向如何连续变化。它验证的是 RBF 对 timing 与 B-spline 控制点的插值结果能直接驱动新动作，而不是只在参数表里得到一个数值。
 
 ![Final interpolated adverb controls](assets/08_final_interpolated_adverb_controls_result.png)
 
@@ -253,7 +251,7 @@ canonical clips 验证相位对齐；B-spline viewer 验证曲线压缩可播放
 
 ## 重点可视化 / 动画
 
-本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
+本节只保留最能说明算法结果的图像和动画。代码学习卡移到文末证据表，供需要复现或追溯 cell 上下文时查看。
 
 
 ![Raw sample clip overview](assets/01_raw_sample_clips_preview.gif)
@@ -302,31 +300,31 @@ https://github.com/user-attachments/assets/7c36901a-6782-465a-8c6b-281c0e36c487
   <source src="assets/08_final_interpolated_adverb_controls_preview.webm" type="video/webm">
 </video>
 
-| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| Cell | 输出类型 | 阅读位置 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |
-| Cell 7 | `timeline_viewer` | `key_animation` | Raw sample clip overview: The viewer establishes the motion examples that will be normalized and blended. | `canvas` | [结果 PNG](assets/01_raw_sample_clips_result.png) / [GIF](assets/01_raw_sample_clips_preview.gif) / [MP4](assets/01_raw_sample_clips_preview.mp4) / [WebM](assets/01_raw_sample_clips_preview.webm) |
-| Cell 10 | `timeline_viewer` | `key_animation` | Canonical timing and contact inspection: Canonical timing aligns examples before interpolation. | `canvas` | [结果 PNG](assets/02_canonical_timing_contacts_result.png) / [GIF](assets/02_canonical_timing_contacts_preview.gif) / [MP4](assets/02_canonical_timing_contacts_preview.mp4) / [WebM](assets/02_canonical_timing_contacts_preview.webm) |
-| Cell 14 | `timeline_viewer` | `key_animation` | Looping animation comparison: Looping makes repeated motion comparable across clips. | `canvas` | [结果 PNG](assets/03_looping_animation_compare_result.png) / [GIF](assets/03_looping_animation_compare_preview.gif) / [MP4](assets/03_looping_animation_compare_preview.mp4) / [WebM](assets/03_looping_animation_compare_preview.webm) |
-| Cell 18 | `timeline_viewer` | `key_animation` | Resampled canonical clips: The viewer checks that examples share a common timing domain. | `canvas` | [结果 PNG](assets/04_resampled_canonical_clips_result.png) / [GIF](assets/04_resampled_canonical_clips_preview.gif) / [MP4](assets/04_resampled_canonical_clips_preview.mp4) / [WebM](assets/04_resampled_canonical_clips_preview.webm) |
-| Cell 22 | `plot` | `key_visual` | B-spline curve fit: The plot shows how sparse motion samples become smooth parameterized curves. | `plot` | [结果 PNG](assets/05_bspline_fit_plot_result.png) |
-| Cell 23 | `timeline_viewer` | `key_animation` | B-spline reconstruction viewer: The viewer validates the curve representation as playable motion. | `canvas` | [结果 PNG](assets/06_bspline_reconstruction_viewer_result.png) / [GIF](assets/06_bspline_reconstruction_viewer_preview.gif) / [MP4](assets/06_bspline_reconstruction_viewer_preview.mp4) / [WebM](assets/06_bspline_reconstruction_viewer_preview.webm) |
-| Cell 33 | `timeline_viewer` | `key_animation` | Final interpolated adverb controls: The final viewer shows how verb and adverb coordinates produce a new animation. | `canvas` | [结果 PNG](assets/08_final_interpolated_adverb_controls_result.png) / [GIF](assets/08_final_interpolated_adverb_controls_preview.gif) / [MP4](assets/08_final_interpolated_adverb_controls_preview.mp4) / [WebM](assets/08_final_interpolated_adverb_controls_preview.webm) |
+| Cell 7 | `timeline_viewer` | 核心动画 | 原始样本片段概览：viewer 建立后续将被规范化和混合的动作样例。 | `canvas` | [结果 PNG](assets/01_raw_sample_clips_result.png) / [GIF](assets/01_raw_sample_clips_preview.gif) / [MP4](assets/01_raw_sample_clips_preview.mp4) / [WebM](assets/01_raw_sample_clips_preview.webm) |
+| Cell 10 | `timeline_viewer` | 核心动画 | 规范化时序与接触检查：在插值前先对齐样例时序。 | `canvas` | [结果 PNG](assets/02_canonical_timing_contacts_result.png) / [GIF](assets/02_canonical_timing_contacts_preview.gif) / [MP4](assets/02_canonical_timing_contacts_preview.mp4) / [WebM](assets/02_canonical_timing_contacts_preview.webm) |
+| Cell 14 | `timeline_viewer` | 核心动画 | 循环动画对比：循环化让重复动作可以跨片段比较。 | `canvas` | [结果 PNG](assets/03_looping_animation_compare_result.png) / [GIF](assets/03_looping_animation_compare_preview.gif) / [MP4](assets/03_looping_animation_compare_preview.mp4) / [WebM](assets/03_looping_animation_compare_preview.webm) |
+| Cell 18 | `timeline_viewer` | 核心动画 | 重采样后的规范化片段：检查样例是否共享同一时间域。 | `canvas` | [结果 PNG](assets/04_resampled_canonical_clips_result.png) / [GIF](assets/04_resampled_canonical_clips_preview.gif) / [MP4](assets/04_resampled_canonical_clips_preview.mp4) / [WebM](assets/04_resampled_canonical_clips_preview.webm) |
+| Cell 22 | `plot` | 核心图解 | B-spline 曲线拟合：展示稀疏动作样本如何变成平滑参数化曲线。 | `plot` | [结果 PNG](assets/05_bspline_fit_plot_result.png) |
+| Cell 23 | `timeline_viewer` | 核心动画 | B-spline 重建 viewer：验证曲线表示能否还原为可播放动作。 | `canvas` | [结果 PNG](assets/06_bspline_reconstruction_viewer_result.png) / [GIF](assets/06_bspline_reconstruction_viewer_preview.gif) / [MP4](assets/06_bspline_reconstruction_viewer_preview.mp4) / [WebM](assets/06_bspline_reconstruction_viewer_preview.webm) |
+| Cell 33 | `timeline_viewer` | 核心动画 | 最终插值后的 adverb 控制：展示 verb/adverb 坐标如何生成新动画。 | `canvas` | [结果 PNG](assets/08_final_interpolated_adverb_controls_result.png) / [GIF](assets/08_final_interpolated_adverb_controls_preview.gif) / [MP4](assets/08_final_interpolated_adverb_controls_preview.mp4) / [WebM](assets/08_final_interpolated_adverb_controls_preview.webm) |
 
 
 ## 代码 Cell 与可视化结果
 
-本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 
 | Cell / 片段 | 结果说明 | 证据 |
 | --- | --- | --- |
-| Cell 7 | The viewer establishes the motion examples that will be normalized and blended. | [结果 PNG](assets/01_raw_sample_clips_result.png) / [GIF](assets/01_raw_sample_clips_preview.gif) / [MP4](assets/01_raw_sample_clips_preview.mp4) / [WebM](assets/01_raw_sample_clips_preview.webm) / [代码卡](assets/01_raw_sample_clips.png) |
+| Cell 7 | viewer 建立后续将被规范化和混合的动作样例。 | [结果 PNG](assets/01_raw_sample_clips_result.png) / [GIF](assets/01_raw_sample_clips_preview.gif) / [MP4](assets/01_raw_sample_clips_preview.mp4) / [WebM](assets/01_raw_sample_clips_preview.webm) / [代码卡](assets/01_raw_sample_clips.png) |
 | Cell 10 | Canonical timing aligns examples before interpolation. | [结果 PNG](assets/02_canonical_timing_contacts_result.png) / [GIF](assets/02_canonical_timing_contacts_preview.gif) / [MP4](assets/02_canonical_timing_contacts_preview.mp4) / [WebM](assets/02_canonical_timing_contacts_preview.webm) / [代码卡](assets/02_canonical_timing_contacts.png) |
 | Cell 14 | Looping makes repeated motion comparable across clips. | [结果 PNG](assets/03_looping_animation_compare_result.png) / [GIF](assets/03_looping_animation_compare_preview.gif) / [MP4](assets/03_looping_animation_compare_preview.mp4) / [WebM](assets/03_looping_animation_compare_preview.webm) / [代码卡](assets/03_looping_animation_compare.png) |
-| Cell 18 | The viewer checks that examples share a common timing domain. | [结果 PNG](assets/04_resampled_canonical_clips_result.png) / [GIF](assets/04_resampled_canonical_clips_preview.gif) / [MP4](assets/04_resampled_canonical_clips_preview.mp4) / [WebM](assets/04_resampled_canonical_clips_preview.webm) / [代码卡](assets/04_resampled_canonical_clips.png) |
-| Cell 22 | The plot shows how sparse motion samples become smooth parameterized curves. | [结果 PNG](assets/05_bspline_fit_plot_result.png) / [代码卡](assets/05_bspline_fit_plot.png) |
-| Cell 23 | The viewer validates the curve representation as playable motion. | [结果 PNG](assets/06_bspline_reconstruction_viewer_result.png) / [GIF](assets/06_bspline_reconstruction_viewer_preview.gif) / [MP4](assets/06_bspline_reconstruction_viewer_preview.mp4) / [WebM](assets/06_bspline_reconstruction_viewer_preview.webm) / [代码卡](assets/06_bspline_reconstruction_viewer.png) |
-| Cell 28 | The table connects semantic labels to numeric interpolation coordinates. | [结果 PNG](assets/07_adverb_coordinate_table_result.png) / [代码卡](assets/07_adverb_coordinate_table.png) |
-| Cell 33 | The final viewer shows how verb and adverb coordinates produce a new animation. | [结果 PNG](assets/08_final_interpolated_adverb_controls_result.png) / [GIF](assets/08_final_interpolated_adverb_controls_preview.gif) / [MP4](assets/08_final_interpolated_adverb_controls_preview.mp4) / [WebM](assets/08_final_interpolated_adverb_controls_preview.webm) / [代码卡](assets/08_final_interpolated_adverb_controls.png) |
+| Cell 18 | viewer 检查样例是否共享同一时间域。 | [结果 PNG](assets/04_resampled_canonical_clips_result.png) / [GIF](assets/04_resampled_canonical_clips_preview.gif) / [MP4](assets/04_resampled_canonical_clips_preview.mp4) / [WebM](assets/04_resampled_canonical_clips_preview.webm) / [代码卡](assets/04_resampled_canonical_clips.png) |
+| Cell 22 | 图中展示稀疏动作样本如何变成平滑参数化曲线。 | [结果 PNG](assets/05_bspline_fit_plot_result.png) / [代码卡](assets/05_bspline_fit_plot.png) |
+| Cell 23 | viewer 验证曲线表示能否还原为可播放动作。 | [结果 PNG](assets/06_bspline_reconstruction_viewer_result.png) / [GIF](assets/06_bspline_reconstruction_viewer_preview.gif) / [MP4](assets/06_bspline_reconstruction_viewer_preview.mp4) / [WebM](assets/06_bspline_reconstruction_viewer_preview.webm) / [代码卡](assets/06_bspline_reconstruction_viewer.png) |
+| Cell 28 | 表格把语义标签对应到数值插值坐标。 | [结果 PNG](assets/07_adverb_coordinate_table_result.png) / [代码卡](assets/07_adverb_coordinate_table.png) |
+| Cell 33 | 最终 viewer 展示 verb/adverb 坐标如何生成新动画。 | [结果 PNG](assets/08_final_interpolated_adverb_controls_result.png) / [GIF](assets/08_final_interpolated_adverb_controls_preview.gif) / [MP4](assets/08_final_interpolated_adverb_controls_preview.mp4) / [WebM](assets/08_final_interpolated_adverb_controls_preview.webm) / [代码卡](assets/08_final_interpolated_adverb_controls.png) |
 
 
 ## 运行方式

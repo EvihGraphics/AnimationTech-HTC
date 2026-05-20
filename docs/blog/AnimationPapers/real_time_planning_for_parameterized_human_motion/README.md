@@ -8,13 +8,30 @@
 | source path | [`labs/AnimationPapers/Real-Time Planning for Parameterized Human Motion.ipynb`](../../../../labs/AnimationPapers/Real-Time%20Planning%20for%20Parameterized%20Human%20Motion.ipynb) |
 | env prefix | `.envs/rt_param_human` |
 | kernel | `animationtech-real_time_planning_for_parameterized_human_motion` |
-| validation status | `passed`, `manual_smoke`; 自动执行已通过，交互 viewer 仍建议在 JupyterLab 里人工检查 |
+| validation status | 自动执行已通过；交互 viewer 仍建议在 JupyterLab 中人工检查 |
 
 ## 问题背景
 
 这篇 notebook 讲的是一个经典实时角色规划问题：角色不是简单播放一段固定动画，而是在每个可切换时刻，根据当前动作片段、目标方向或目标位置，快速选择下一段动作。它把昂贵的搜索和价值评估提前离线算好，运行时只做表查询、代价比较和短窗口切换，因此可以在 viewer 中实时响应控制输入。
 
 本案例比 Near-optimal continuous control 更进一步：Near-optimal 主要在固定 motion clip 集合上学习“下一步怎么走”；这里额外引入参数化动作和 MotionGroup，把多个相近动作按权重混合成可插值的运动族。这样规划器不只是在离散片段之间跳转，还可以在“转身、行走、停止”等语义组内选择不同参数版本，让动作空间更连续，目标追踪也更细腻。
+
+## 总模块图
+
+```mermaid
+flowchart TD
+    A[角色与预处理动画数据] --> B[MotionClip 状态集合]
+    B --> C[接触约束与片段对齐]
+    C --> D[clip transition cost 离线表]
+    D --> E[朝向控制 value function]
+    D --> F[reach-goal value function]
+    E --> G[方向控制 Player]
+    F --> H[目标点追踪 Player]
+    B --> I[MotionGroup 参数化动作族]
+    I --> J[group transition cost 离线表]
+    J --> K[group reach-goal value function]
+    K --> L[参数化动作规划 viewer]
+```
 
 ## 阅读前置知识
 
@@ -190,210 +207,39 @@ group 版 `use_optimal_policy` 还会把 group id 映射回 value function 使�
 
 因此，这个案例适合用来理解“实时”二字的工程含义：实时不是每帧从头规划全局最优路径，而是把复杂搜索提前做成可查询结构，再在运行时滚动更新局部决策。
 
+## 重点可视化 / 动画
+
+本节只保留最能说明算法结果的图像和动画。代码学习卡移到文末证据表，供需要复现或追溯 cell 上下文时查看。
+
+
+| Cell | 输出类型 | 阅读位置 | 可视化主体 | 捕获方式 | 结果媒体 |
+| --- | --- | --- | --- | --- | --- |
+| Cell 30 | `plot` | 核心图解 | 朝向策略价值学习曲线：下降曲线说明策略在当前状态空间中趋于稳定。 | `plot` | [结果 PNG](assets/04_orientation_policy_controller_result.png) |
+| Cell 45 | `plot` | 核心图解 | Clip 16 价值曲面：展示从某个片段到达不同目标位置的未来代价。 | `plot` | [结果 PNG](assets/06_value_surface_clip16_result.png) |
+| Cell 72 | `plot` | 核心图解 | MotionGroup 策略学习曲线：验证从 clip 扩展到 motion group 后仍能学到可用策略。 | `plot` | [结果 PNG](assets/08_group_reach_goal_result_result.png) |
+
+
 ## 代码 Cell 与可视化结果
 
-本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和 PNG 学习卡片。PNG 由指定 cell 的代码摘要、输出区、viewer/canvas 或图表/日志合成，不使用整页滚动截图替代。
+下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 
-
-| Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
-| --- | --- | --- | --- | --- |
-| 4 | `log` | Load the character and print added heel/ball bone indices. | The planning system can reference the foot-contact helper bones later. | [PNG](assets/01_source_animation_viewer.png) |
-| 13 | `table` | Build short motion clips and output the number of clips. | The clip count determines the size of transition-cost and value-function tables. | [PNG](assets/02_motion_clip_contact_axes.png) |
-| 25 | `log` | Iterate over clip pairs and compute physical continuity costs and delta states. | The progress output shows that expensive transition work is moved offline. | [PNG](assets/03_player_transition_blend.png) |
-| 30 | `plot` | Plot the mean/min/max value-learning curve. | A decreasing curve indicates that the policy is stabilizing in the current state space. | [PNG](assets/04_orientation_policy_controller.png) |
-| 35 | `table` | Print local end positions for stopping clips. | These endpoints define target states for the reach-goal policy. | [PNG](assets/05_reach_goal_target_tracking.png) |
-| 45 | `plot` | Plot the value function over a two-dimensional target space. | The surface shows the future cost of reaching different target positions from one clip. | [PNG](assets/06_value_surface_clip16.png) |
-| 61 | `table` | Build motion groups and output the group count. | Motion groups turn multiple clips into a parameterized action space. | [PNG](assets/07_motion_group_weight_blend.png) |
-| 72 | `plot` | Plot the parameterized MotionGroup policy-learning curve. | The plot verifies that a useful policy can still be learned after moving from clips to motion groups. | [PNG](assets/08_group_reach_goal_result.png) |
-
-### Cell 4 - Character and foot-helper bone loading
-
-导入 3D 角色模型并注册专门用于脚部接触约束检测的辅助骨骼。
-
-```mermaid
-flowchart LR
-    A[加载 AnimLabSimpleMale 模型] --> B[查找 heel 和 ball 骨骼]
-    B --> C[注册 helper indices]
-```
-
-- 代码做什么：Load the character and print added heel/ball bone indices.
-- 运行后看到什么：`log`
-- 结果说明什么：The planning system can reference the foot-contact helper bones later.
-- 可视化主体：Character and foot-helper bone loading
-- 捕获方式：`log`
-
-![Character and foot-helper bone loading](assets/01_source_animation_viewer_result.png)
-
-### Cell 13 - MotionClip count output
-
-将原始动画拆分为固定长度的 clip，并统计生成的离散状态数量。
-
-```mermaid
-flowchart LR
-    A[遍历源动画帧] --> B[根据步态区间提取片段]
-    B --> C[规范化局部坐标和时长]
-    C --> D[生成 MotionClip 列表]
-```
-
-- 代码做什么：Build short motion clips and output the number of clips.
-- 运行后看到什么：`table`
-- 结果说明什么：The clip count determines the size of transition-cost and value-function tables.
-- 可视化主体：MotionClip count output
-- 捕获方式：`table/output`
-
-![MotionClip count output](assets/02_motion_clip_contact_axes_result.png)
-
-### Cell 25 - Transition-cost precompute output
-
-离线计算所有片段之间两两跳转的物理连续性代价。
-
-```mermaid
-flowchart LR
-    A[片段对 i 和 j] --> B[模拟拼接与过渡 Blend]
-    B --> C[评估速度、姿态跳变与接触匹配]
-    C --> D[记录 physics_costs 与局部增量 delta]
-```
-
-- 代码做什么：Iterate over clip pairs and compute physical continuity costs and delta states.
-- 运行后看到什么：`log`
-- 结果说明什么：The progress output shows that expensive transition work is moved offline.
-- 可视化主体：Transition-cost precompute output
-- 捕获方式：`log`
-
-![Transition-cost precompute output](assets/03_player_transition_blend_result.png)
-
-### Cell 30 - Orientation policy value-learning curve
-
-训练一维朝向（Orientation）的值函数策略，并监控收敛过程。
-
-```mermaid
-flowchart LR
-    A[离散化朝向误差 theta] --> B[执行 Bellman 更新收集样本]
-    B --> C[ExtraTreesRegressor 拟合收益]
-    C --> D[绘制损失收敛曲线]
-```
-
-- 代码做什么：Plot the mean/min/max value-learning curve.
-- 运行后看到什么：`plot`
-- 结果说明什么：A decreasing curve indicates that the policy is stabilizing in the current state space.
-- 可视化主体：Orientation policy value-learning curve
-- 捕获方式：`plot`
-
-![Orientation policy value-learning curve](assets/04_orientation_policy_controller_result.png)
-
-### Cell 35 - Reach-goal stopping positions
-
-记录停止类型动画片段的最终相对位置，作为目标追踪任务的终止状态。
-
-```mermaid
-flowchart LR
-    A[筛选 Stop 语义片段] --> B[提取末端帧的局部位置]
-    B --> C[标记为 Reach-goal 的目标点]
-```
-
-- 代码做什么：Print local end positions for stopping clips.
-- 运行后看到什么：`table`
-- 结果说明什么：These endpoints define target states for the reach-goal policy.
-- 可视化主体：Reach-goal stopping positions
-- 捕获方式：`table/output`
-
-![Reach-goal stopping positions](assets/05_reach_goal_target_tracking_result.png)
-
-### Cell 45 - clip 16 value surface
-
-展示某个片段对二维目标空间 (x, z) 的价值函数曲面，以可视化到达代价。
-
-```mermaid
-flowchart LR
-    A[固定 Clip 16 为当前状态] --> B[遍历二维目标空间采样点]
-    B --> C[查询训练好的 ExtraTreesRegressor]
-    C --> D[绘制未来代价等高线曲面]
-```
-
-- 代码做什么：Plot the value function over a two-dimensional target space.
-- 运行后看到什么：`plot`
-- 结果说明什么：The surface shows the future cost of reaching different target positions from one clip.
-- 可视化主体：clip 16 value surface
-- 捕获方式：`plot`
-
-![clip 16 value surface](assets/06_value_surface_clip16_result.png)
-
-### Cell 61 - MotionGroup count output
-
-通过混合参数，将离散的片段合成连续的参数化 Motion Group，大幅增加规划器选项。
-
-```mermaid
-flowchart LR
-    A[手动按语义聚类片段组] --> B[生成多组插值权重]
-    B --> C[构建新的 MotionGroup 对象集合]
-```
-
-- 代码做什么：Build motion groups and output the group count.
-- 运行后看到什么：`table`
-- 结果说明什么：Motion groups turn multiple clips into a parameterized action space.
-- 可视化主体：MotionGroup count output
-- 捕获方式：`table/output`
-
-![MotionGroup count output](assets/07_motion_group_weight_blend_result.png)
-
-### Cell 72 - MotionGroup policy-learning curve
-
-为参数化组（MotionGroup）训练二维目标值函数，并验证其收敛性。
-
-```mermaid
-flowchart LR
-    A[使用 MotionGroup 作为状态空间] --> B[Rollback 生成高效训练样本]
-    B --> C[Multiprocessing 并行拟合回归树]
-    C --> D[绘制带参数混合支持的策略学习曲线]
-```
-
-- 代码做什么：Plot the parameterized MotionGroup policy-learning curve.
-- 运行后看到什么：`plot`
-- 结果说明什么：The plot verifies that a useful policy can still be learned after moving from clips to motion groups.
-- 可视化主体：MotionGroup policy-learning curve
-- 捕获方式：`plot`
-
-![MotionGroup policy-learning curve](assets/08_group_reach_goal_result_result.png)
+| Cell / 片段 | 结果说明 | 证据 |
+| --- | --- | --- |
+| Cell 4 | 规划系统后续可以引用脚部接触 helper bones。 | [结果 PNG](assets/01_source_animation_viewer_result.png) / [代码卡](assets/01_source_animation_viewer.png) |
+| Cell 13 | clip 数量决定转移代价表和价值函数表的规模。 | [结果 PNG](assets/02_motion_clip_contact_axes_result.png) / [代码卡](assets/02_motion_clip_contact_axes.png) |
+| Cell 25 | 进度输出说明昂贵的转移计算已经移到离线阶段。 | [结果 PNG](assets/03_player_transition_blend_result.png) / [代码卡](assets/03_player_transition_blend.png) |
+| Cell 30 | A decreasing curve indicates that the policy is stabilizing in the current state space. | [结果 PNG](assets/04_orientation_policy_controller_result.png) / [代码卡](assets/04_orientation_policy_controller.png) |
+| Cell 35 | 这些终点定义了 reach-goal 策略的目标状态。 | [结果 PNG](assets/05_reach_goal_target_tracking_result.png) / [代码卡](assets/05_reach_goal_target_tracking.png) |
+| Cell 45 | 曲面展示从某个片段到达不同目标位置的未来代价。 | [结果 PNG](assets/06_value_surface_clip16_result.png) / [代码卡](assets/06_value_surface_clip16.png) |
+| Cell 61 | MotionGroup 把多个 clip 变成可参数化的动作空间。 | [结果 PNG](assets/07_motion_group_weight_blend_result.png) / [代码卡](assets/07_motion_group_weight_blend.png) |
+| Cell 72 | 曲线验证从 clip 扩展到 motion group 后仍能学到可用策略。 | [结果 PNG](assets/08_group_reach_goal_result_result.png) / [代码卡](assets/08_group_reach_goal_result.png) |
 
 ## 运行方式
 
-用于学习和交互查看时，启动 AnimationPapers 的 JupyterLab，再打开对应 notebook：
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpapers_lab.ps1
-```
-
-用于自动化验证或重新生成缓存时，运行对应 case：
+推荐用项目脚本准备环境并运行对应案例：
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 real_time_planning_for_parameterized_human_motion
 ```
 
-注意：该案例的验证策略是 `manual_smoke`。自动执行状态为 `passed`，但 `viewer`、timeline、controller、3D/plot 输出仍需要在 JupyterLab 中人工确认。若本机没有手柄，方向控制 cell 可以作为代码阅读入口；真正交互时需要可被 `ipywidgets.Controller(index=0)` 识别的设备。
-
-## 重点可视化 / 动画
-
-本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
-
-
-| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
-| --- | --- | --- | --- | --- | --- |
-| Cell 30 | `plot` | `key_visual` | Orientation policy value-learning curve: A decreasing curve indicates that the policy is stabilizing in the current state space. | `plot` | [结果 PNG](assets/04_orientation_policy_controller_result.png) |
-| Cell 45 | `plot` | `key_visual` | clip 16 value surface: The surface shows the future cost of reaching different target positions from one clip. | `plot` | [结果 PNG](assets/06_value_surface_clip16_result.png) |
-| Cell 72 | `plot` | `key_visual` | MotionGroup policy-learning curve: The plot verifies that a useful policy can still be learned after moving from clips to motion groups. | `plot` | [结果 PNG](assets/08_group_reach_goal_result_result.png) |
-
-
-## 代码 Cell 与可视化结果
-
-本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
-
-| Cell / 片段 | 结果说明 | 证据 |
-| --- | --- | --- |
-| Cell 4 | The planning system can reference the foot-contact helper bones later. | [结果 PNG](assets/01_source_animation_viewer_result.png) / [代码卡](assets/01_source_animation_viewer.png) |
-| Cell 13 | The clip count determines the size of transition-cost and value-function tables. | [结果 PNG](assets/02_motion_clip_contact_axes_result.png) / [代码卡](assets/02_motion_clip_contact_axes.png) |
-| Cell 25 | The progress output shows that expensive transition work is moved offline. | [结果 PNG](assets/03_player_transition_blend_result.png) / [代码卡](assets/03_player_transition_blend.png) |
-| Cell 30 | A decreasing curve indicates that the policy is stabilizing in the current state space. | [结果 PNG](assets/04_orientation_policy_controller_result.png) / [代码卡](assets/04_orientation_policy_controller.png) |
-| Cell 35 | These endpoints define target states for the reach-goal policy. | [结果 PNG](assets/05_reach_goal_target_tracking_result.png) / [代码卡](assets/05_reach_goal_target_tracking.png) |
-| Cell 45 | The surface shows the future cost of reaching different target positions from one clip. | [结果 PNG](assets/06_value_surface_clip16_result.png) / [代码卡](assets/06_value_surface_clip16.png) |
-| Cell 61 | Motion groups turn multiple clips into a parameterized action space. | [结果 PNG](assets/07_motion_group_weight_blend_result.png) / [代码卡](assets/07_motion_group_weight_blend.png) |
-| Cell 72 | The plot verifies that a useful policy can still be learned after moving from clips to motion groups. | [结果 PNG](assets/08_group_reach_goal_result_result.png) / [代码卡](assets/08_group_reach_goal_result.png) |
+手动阅读时，打开 `labs/AnimationPapers/Real-Time Planning for Parameterized Human Motion.ipynb`，先看离线表格与学习曲线，再回到 viewer 检查在线策略的行为是否与曲线结论一致。

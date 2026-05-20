@@ -8,7 +8,7 @@
 | source path | `labs/AnimationPapers/Footskate Cleanup for Motion Capture Editing.ipynb` |
 | env prefix | `.envs/footskate_cleanup` |
 | kernel | `animationtech-footskate_cleanup_for_motion_capture_editing` |
-| validation status | `passed`（`manual_smoke`；自动执行通过，仍需 JupyterLab 手动冒烟） |
+| validation status | 自动执行已通过；交互部分仍建议在 JupyterLab 中人工检查 |
 
 ## 问题背景
 
@@ -212,97 +212,9 @@ notebook 先用普通版本生成 `solved_animation`，后面又用 `L4 = 1000` 
 
 这套方法的工程定位也很清楚：它适合离线动捕清理、动画编辑后处理、动作库修复和允许少量前瞻的工具链。如果要直接用于强实时角色控制，需要替换接触检测、减少 look-ahead，并把约束求解改造成逐帧在线版本。
 
-## 代码 Cell 与可视化结果
-
-本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和真实结果媒体。重点 PNG/GIF/视频来自 plot 或浏览器中的 viewer canvas；代码学习卡只作为附录证据。
-
-| Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
-| --- | --- | --- | --- | --- |
-| 12 | `viewer` | Display two sphere-joint characters for keep_translation=False and keep_translation=True. | The comparison clarifies the responsibility split between root translation and local joint offsets. | [结果 PNG](assets/07_keep_translation_compare_result.png) |
-| 16 | `plot` | Plot LeftHeel, LeftBall, RightHeel, and RightBall contact booleans. | These signals decide which foot points should stay fixed in world space. | [结果 PNG](assets/03_contact_signal_timeline_result.png) |
-| 19 | `viewer` | Draw the heel and ball targets back into the viewer for contact spans. | Stable targets are the anchors that let IK remove foot sliding. | [结果 PNG](assets/02_contact_targets_result.png) |
-| 25 | `viewer` | Render ankle and root helper axes while the contact constraints are active. | The axes help check whether cleanup preserves foot orientation and body orientation. | [结果 PNG](assets/05_ankle_root_axes_result.png) |
-| 28 | `plot` | Plot the damping polynomial used by the IK correction. | The curve explains how correction error is smoothly distributed through the leg chain. | [结果 PNG](assets/04_constraint_buffer_debug_result.png) |
-| 29 | `viewer` | Toggle between the original animation and the solved animation. | The reader can inspect whether the foot is more stable without damaging the body motion. | [结果 PNG](assets/01_raw_vs_solved_overview_result.png) |
-| 34 | `timeline_viewer` | Compare the solved animation before and after final processing. | Final processing smooths entering and leaving contact spans instead of recomputing the whole IK solve. | [结果 PNG](assets/06_final_processing_compare_result.png) |
-
-### Cell 12 - keep_translation comparison
-
-- 代码做什么：Display two sphere-joint characters for keep_translation=False and keep_translation=True.
-- 运行后看到什么：可视化 viewer 视口。
-- 结果说明什么：The comparison clarifies the responsibility split between root translation and local joint offsets.
-
-![keep_translation comparison](assets/07_keep_translation_compare_result.png)
-
-### Cell 16 - Four foot-contact signals
-
-- 代码做什么：Plot LeftHeel, LeftBall, RightHeel, and RightBall contact booleans.
-- 运行后看到什么：图表输出。
-- 结果说明什么：These signals decide which foot points should stay fixed in world space.
-
-![Four foot-contact signals](assets/03_contact_signal_timeline_result.png)
-
-### Cell 19 - Contact target points
-
-- 代码做什么：Draw the heel and ball targets back into the viewer for contact spans.
-- 运行后看到什么：可视化 viewer 视口。
-- 结果说明什么：Stable targets are the anchors that let IK remove foot sliding.
-
-![Contact target points](assets/02_contact_targets_result.png)
-
-### Cell 25 - Ankle and root debug axes
-
-- 代码做什么：Render ankle and root helper axes while the contact constraints are active.
-- 运行后看到什么：可视化 viewer 视口。
-- 结果说明什么：The axes help check whether cleanup preserves foot orientation and body orientation.
-
-![Ankle and root debug axes](assets/05_ankle_root_axes_result.png)
-
-### Cell 28 - IK knee damping curve
-
-- 代码做什么：Plot the damping polynomial used by the IK correction.
-- 运行后看到什么：图表输出。
-- 结果说明什么：The curve explains how correction error is smoothly distributed through the leg chain.
-
-![IK knee damping curve](assets/04_constraint_buffer_debug_result.png)
-
-### Cell 29 - Original versus IK-solved animation
-
-- 代码做什么：Toggle between the original animation and the solved animation.
-- 运行后看到什么：可视化 viewer 视口。
-- 结果说明什么：The reader can inspect whether the foot is more stable without damaging the body motion.
-
-![Original versus IK-solved animation](assets/01_raw_vs_solved_overview_result.png)
-
-### Cell 34 - Final Processing boundary smoothing
-
-- 代码做什么：Compare the solved animation before and after final processing.
-- 运行后看到什么：带 timeline 的可播放 viewer。
-- 结果说明什么：Final processing smooths entering and leaving contact spans instead of recomputing the whole IK solve.
-
-![Final Processing boundary smoothing](assets/06_final_processing_compare_result.png)
-
-![Final Processing boundary smoothing preview](assets/06_final_processing_compare_preview.gif)
-
-
-https://github.com/user-attachments/assets/2abd9291-3fe6-4c1d-a21c-51ed691da380
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_final_processing_compare_result.png" src="assets/06_final_processing_compare_preview.mp4"></video>
-
-## 运行方式
-
-启动 AnimationPapers 的 JupyterLab 环境后，打开 `labs/AnimationPapers/Footskate Cleanup for Motion Capture Editing.ipynb`，选择 kernel `animationtech-footskate_cleanup_for_motion_capture_editing`，按 cell 顺序运行。
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpapers_lab.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 footskate_cleanup_for_motion_capture_editing
-```
-
-建议先观察 `solved=False` 的原始抬高版本，再切到 `solved=True`；最后使用 Final Processing 对比 cell 查看 `solved_animation_no_fp` 和 `solved_animation_fp` 的边界平滑差异。
-
 ## 重点可视化 / 动画
 
-本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
+本节只保留最能说明算法结果的图像和动画。代码学习卡移到文末证据表，供需要复现或追溯 cell 上下文时查看。
 
 ![Final Processing boundary smoothing preview](assets/06_final_processing_compare_preview.gif)
 
@@ -311,26 +223,36 @@ https://github.com/user-attachments/assets/2abd9291-3fe6-4c1d-a21c-51ed691da380
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_final_processing_compare_result.png" src="assets/06_final_processing_compare_preview.mp4"></video>
 
-| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| Cell | 输出类型 | 阅读位置 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |
-| Cell 12 | `viewer` | `key_visual` | keep_translation comparison: root motion channel versus local joint offset responsibility. | `canvas/live_canvas` | [结果 PNG](assets/07_keep_translation_compare_result.png) |
-| Cell 16 | `plot` | `key_visual` | Four foot-contact signals: These signals decide which foot points should stay fixed in world space. | `plot/executed_plot_image` | [结果 PNG](assets/03_contact_signal_timeline_result.png) |
-| Cell 19 | `viewer` | `key_visual` | Contact target points: heel and ball anchors remain fixed during detected contact spans. | `canvas/live_canvas` | [结果 PNG](assets/02_contact_targets_result.png) |
-| Cell 25 | `viewer` | `key_visual` | Ankle and root debug axes: orientation and root compensation vectors are visible at the constrained joints. | `canvas/live_canvas` | [结果 PNG](assets/05_ankle_root_axes_result.png) |
-| Cell 28 | `plot` | `key_visual` | IK knee damping curve: The curve explains how correction error is smoothly distributed through the leg chain. | `plot/executed_plot_image` | [结果 PNG](assets/04_constraint_buffer_debug_result.png) |
-| Cell 29 | `viewer` | `key_visual` | Original versus IK-solved animation: foot drift is reduced toward the planted-foot band. | `canvas/live_canvas` | [结果 PNG](assets/01_raw_vs_solved_overview_result.png) |
-| Cell 34 | `timeline_viewer` | `key_animation` | Final Processing smoothstep blend: correction weight fades in/out across contact boundaries. | `canvas/live_canvas` | [结果 PNG](assets/06_final_processing_compare_result.png) / [GIF](assets/06_final_processing_compare_preview.gif) / [MP4](assets/06_final_processing_compare_preview.mp4) / [WebM](assets/06_final_processing_compare_preview.webm) |
+| Cell 12 | `viewer` | 核心图解 | keep_translation 对比：区分 root motion 通道和局部关节 offset 各自负责什么。 | `canvas/live_canvas` | [结果 PNG](assets/07_keep_translation_compare_result.png) |
+| Cell 16 | `plot` | 核心图解 | 四条脚接触信号：决定哪些脚部点应当在世界空间中保持固定。 | `plot/executed_plot_image` | [结果 PNG](assets/03_contact_signal_timeline_result.png) |
+| Cell 19 | `viewer` | 核心图解 | 接触目标点：脚跟和脚掌锚点会在检测到的接触区间内保持固定。 | `canvas/live_canvas` | [结果 PNG](assets/02_contact_targets_result.png) |
+| Cell 25 | `viewer` | 核心图解 | 踝关节与 root 调试轴：在受约束关节处显示朝向和 root 补偿向量。 | `canvas/live_canvas` | [结果 PNG](assets/05_ankle_root_axes_result.png) |
+| Cell 28 | `plot` | 核心图解 | IK 膝盖阻尼曲线：说明修正误差如何沿腿部链条平滑分配。 | `plot/executed_plot_image` | [结果 PNG](assets/04_constraint_buffer_debug_result.png) |
+| Cell 29 | `viewer` | 核心图解 | 原始动画与 IK 修正对比：脚部漂移被压回到支撑脚区域附近。 | `canvas/live_canvas` | [结果 PNG](assets/01_raw_vs_solved_overview_result.png) |
+| Cell 34 | `timeline_viewer` | 核心动画 | Final Processing smoothstep 混合：修正权重在接触边界平滑淡入淡出。 | `canvas/live_canvas` | [结果 PNG](assets/06_final_processing_compare_result.png) / [GIF](assets/06_final_processing_compare_preview.gif) / [MP4](assets/06_final_processing_compare_preview.mp4) / [WebM](assets/06_final_processing_compare_preview.webm) |
 
 ## 代码 Cell 与可视化结果
 
-本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 
 | Cell / 片段 | 结果说明 | 证据 |
 | --- | --- | --- |
-| Cell 12 | The comparison clarifies the responsibility split between root translation and local joint offsets. | [结果 PNG](assets/07_keep_translation_compare_result.png) / [代码卡](assets/07_keep_translation_compare.png) |
+| Cell 12 | 这个对比明确了 root 平移和局部关节 offset 的职责边界。 | [结果 PNG](assets/07_keep_translation_compare_result.png) / [代码卡](assets/07_keep_translation_compare.png) |
 | Cell 16 | These signals decide which foot points should stay fixed in world space. | [结果 PNG](assets/03_contact_signal_timeline_result.png) / [代码卡](assets/03_contact_signal_timeline.png) |
 | Cell 19 | Stable targets are the anchors that let IK remove foot sliding. | [结果 PNG](assets/02_contact_targets_result.png) / [代码卡](assets/02_contact_targets.png) |
-| Cell 25 | The axes help check whether cleanup preserves foot orientation and body orientation. | [结果 PNG](assets/05_ankle_root_axes_result.png) / [代码卡](assets/05_ankle_root_axes.png) |
-| Cell 28 | The curve explains how correction error is smoothly distributed through the leg chain. | [结果 PNG](assets/04_constraint_buffer_debug_result.png) / [代码卡](assets/04_constraint_buffer_debug.png) |
-| Cell 29 | The reader can inspect whether the foot is more stable without damaging the body motion. | [结果 PNG](assets/01_raw_vs_solved_overview_result.png) / [代码卡](assets/01_raw_vs_solved_overview.png) |
+| Cell 25 | 这些调试轴用于检查清理后脚部朝向和身体朝向是否仍然合理。 | [结果 PNG](assets/05_ankle_root_axes_result.png) / [代码卡](assets/05_ankle_root_axes.png) |
+| Cell 28 | 曲线说明修正误差如何沿腿部链条平滑分配。 | [结果 PNG](assets/04_constraint_buffer_debug_result.png) / [代码卡](assets/04_constraint_buffer_debug.png) |
+| Cell 29 | 可以检查脚是否更稳定，同时身体动作有没有被破坏。 | [结果 PNG](assets/01_raw_vs_solved_overview_result.png) / [代码卡](assets/01_raw_vs_solved_overview.png) |
 | Cell 34 | Final processing smooths entering and leaving contact spans instead of recomputing the whole IK solve. | [结果 PNG](assets/06_final_processing_compare_result.png) / [GIF](assets/06_final_processing_compare_preview.gif) / [MP4](assets/06_final_processing_compare_preview.mp4) / [WebM](assets/06_final_processing_compare_preview.webm) / [代码卡](assets/06_final_processing_compare.png) |
+
+## 运行方式
+
+推荐用项目脚本准备环境并运行对应案例：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 footskate_cleanup_for_motion_capture_editing
+```
+
+手动阅读时，打开 `labs/AnimationPapers/Footskate Cleanup for Motion Capture Editing.ipynb`，按本文的 cell 顺序对照图像、GIF 和视频检查脚部约束如何逐步生效。
