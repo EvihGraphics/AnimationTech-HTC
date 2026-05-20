@@ -8,13 +8,22 @@
 | source path | `labs/AnimationPapers/Halo 4 Facial Animation.ipynb` |
 | env prefix | `.envs/halo_4_facial_animation` |
 | kernel | `animationtech-halo_4_facial_animation` |
-| validation status | `passed`（`manual_smoke`；自动执行通过，仍需 JupyterLab 手动冒烟） |
+| validation status | 自动执行已通过；交互部分仍建议在 JupyterLab 中人工检查 |
 
 ## 问题背景
 
 Halo 4 facial animations 这个 notebook 演示如何用主成分分析压缩面部顶点动画。原始数据是逐帧的完整头部顶点位置流：每帧都要把大量位置数据送到 GPU，内存和带宽都很昂贵。Notebook 先实现最直接的动态顶点流渲染，再用 PCA 把 220 帧面部动画压缩成 7 个主成分权重，最后写 shader 在 GPU 端用 mean head 和 7 个 component head 重建最终顶点位置。
 
 案例配置中记录的生成产物是 `labs/AnimationPapers/animated_face.dat`，公开资源包含 `halo_animated_face` 和 `ipyanimlab_package_assets`。
+
+## 阅读前置知识
+
+读这篇前最好先熟悉四件事：
+
+- **网格与顶点流**：知道三角形索引、顶点位置、法线、VBO/VAO 如何一起构成可渲染 mesh。
+- **GPU shader 基础**：理解 vertex shader 可以用 buffer 数据和 uniform 权重在顶点阶段重建位置。
+- **PCA 压缩直觉**：把大量高维顶点形变分解成平均形状、少量主成分和逐帧系数。
+- **Jupyter 交互 viewer**：能区分一次性表格输出、时间轴播放和 slider 控件观察到的结果。
 
 ## 总模块图
 
@@ -29,6 +38,22 @@ flowchart TD
     G --> H[inverse_transform 对比重建效果]
     H --> I[最终 shader 用 mean + components + weights 重建]
 ```
+
+## 代码执行路径
+
+Notebook 的执行顺序可以按“原始流播放 -> 压缩分析 -> GPU 重建”来读。
+
+```mermaid
+flowchart LR
+    A[Cell 5 读取 animated_face.dat] --> B[Cell 11 原始逐帧顶点流播放]
+    B --> C[Cell 13 估算原始内存占用]
+    C --> D[Cell 17 PCA 拟合并查看主成分形状]
+    D --> E[Cell 19 slider 观察单个主成分形变]
+    E --> F[Cell 23 CPU inverse_transform 对比重建]
+    F --> G[Cell 26 shader 用 mean/components/weights 实时重建]
+```
+
+这条路径先故意展示“最贵但最直接”的做法，再一步步把每帧完整顶点数据替换成 7 个权重。最后的 shader 版本才是运行时友好的形式：静态 buffer 保存平均脸和主成分，每帧只更新少量系数。
 
 ## 模块拆解
 
@@ -89,7 +114,7 @@ flowchart LR
 
 - 代码做什么：Load pickled triangle indices, normals, and per-frame vertex positions.
 - 运行后看到什么：`table`
-- 结果说明什么：The output confirms the face animation is stored as mesh topology plus a frame-indexed vertex stream.
+- 结果说明什么：输出确认面部动画由 mesh 拓扑和按帧索引的顶点流组成。
 - 可视化主体：Face mesh data loading
 - 捕获方式：`table/output`
 
@@ -109,7 +134,7 @@ flowchart LR
 
 - 代码做什么：Upload frame vertices to WebGL buffers and draw the animated face mesh.
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：This shows the raw per-frame geometry playback before any compression.
+- 结果说明什么：展示压缩前逐帧几何数据的播放效果。
 - 可视化主体：Raw vertex-stream face playback
 - 捕获方式：`canvas`
 
@@ -135,7 +160,7 @@ flowchart LR
 
 - 代码做什么：Print the raw vertex animation memory footprint.
 - 运行后看到什么：`log`
-- 结果说明什么：The memory log motivates PCA compression by showing why full vertex streams are expensive.
+- 结果说明什么：内存日志说明完整顶点流为什么昂贵，也引出 PCA 压缩的必要性。
 - 可视化主体：Raw animation memory size
 - 捕获方式：`log`
 
@@ -156,7 +181,7 @@ flowchart LR
 
 - 代码做什么：Fit PCA to flattened frame data and print the component shape.
 - 运行后看到什么：`table`
-- 结果说明什么：The component count shows how a large vertex stream becomes a compact coefficient space.
+- 结果说明什么：主成分数量展示了大规模顶点流如何变成紧凑的系数空间。
 - 可视化主体：Seven PCA component layout
 - 捕获方式：`table/output`
 
@@ -175,7 +200,7 @@ flowchart LR
 
 - 代码做什么：Move pose and multiplier controls to inspect an individual PCA component.
 - 运行后看到什么：`widget_controls`
-- 结果说明什么：The widget makes a basis component visible as a facial deformation direction.
+- 结果说明什么：控件把某个基向量显示成可见的面部形变方向。
 - 可视化主体：PCA component deformation viewer
 - 捕获方式：`widget_controls`
 
@@ -199,7 +224,7 @@ flowchart LR
 
 - 代码做什么：Inverse-transform PCA coefficients and draw original/reconstructed animation.
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：The viewer checks whether the compressed representation preserves the visible expression motion.
+- 结果说明什么：viewer 用来检查压缩表示是否保留了可见的表情运动。
 - 可视化主体：CPU PCA reconstruction playback
 - 捕获方式：`canvas`
 
@@ -228,11 +253,9 @@ flowchart LR
 
 - 代码做什么：Run the shader path that reconstructs vertex positions on the GPU.
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：The final viewer shows the runtime-friendly form of the PCA facial animation pipeline.
+- 结果说明什么：最终 viewer 展示适合运行时使用的 PCA 面部动画流程。
 - 可视化主体：GPU shader PCA reconstruction
 - 捕获方式：`canvas`
-
-这段动画要看头部几何的表情形变，而不是相机移动。每一帧只更新 7 个 PCA 权重，GPU shader 用平均脸和 7 个 component 在顶点阶段重建完整面部网格。
 
 ![GPU shader PCA reconstruction](assets/07_gpu_shader_reconstruction_result.png)
 
@@ -270,7 +293,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 halo_4_
 
 ## 重点可视化 / 动画
 
-本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
+本节只保留最能说明算法结果的图像和动画。代码学习卡移到文末证据表，供需要复现或追溯 cell 上下文时查看。
 
 
 ![Raw vertex-stream face playback](assets/02_raw_vertex_stream_viewer_preview.gif)
@@ -298,24 +321,24 @@ https://github.com/user-attachments/assets/617bb853-265d-4eed-b095-38b474535255
   <source src="assets/07_gpu_shader_reconstruction_preview.webm" type="video/webm">
 </video>
 
-| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| Cell | 输出类型 | 阅读位置 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |
-| Cell 11 | `timeline_viewer` | `key_animation` | Raw vertex-stream face playback: This shows the raw per-frame geometry playback before any compression. | `canvas` | [结果 PNG](assets/02_raw_vertex_stream_viewer_result.png) / [GIF](assets/02_raw_vertex_stream_viewer_preview.gif) / [MP4](assets/02_raw_vertex_stream_viewer_preview.mp4) / [WebM](assets/02_raw_vertex_stream_viewer_preview.webm) |
-| Cell 19 | `widget_controls` | `key_visual` | PCA component deformation viewer: The widget makes a basis component visible as a facial deformation direction. | `widget_controls` | [结果 PNG](assets/05_pca_component_viewer_result.png) / [GIF](assets/05_pca_component_viewer_preview.gif) / [MP4](assets/05_pca_component_viewer_preview.mp4) / [WebM](assets/05_pca_component_viewer_preview.webm) |
-| Cell 23 | `timeline_viewer` | `key_animation` | CPU PCA reconstruction playback: The viewer checks whether the compressed representation preserves the visible expression motion. | `canvas` | [结果 PNG](assets/06_cpu_reconstruction_compare_result.png) / [GIF](assets/06_cpu_reconstruction_compare_preview.gif) / [MP4](assets/06_cpu_reconstruction_compare_preview.mp4) / [WebM](assets/06_cpu_reconstruction_compare_preview.webm) |
-| Cell 26 | `timeline_viewer` | `key_animation` | GPU shader PCA reconstruction: The final viewer shows the runtime-friendly form of the PCA facial animation pipeline. | `canvas` | [结果 PNG](assets/07_gpu_shader_reconstruction_result.png) / [GIF](assets/07_gpu_shader_reconstruction_preview.gif) / [MP4](assets/07_gpu_shader_reconstruction_preview.mp4) / [WebM](assets/07_gpu_shader_reconstruction_preview.webm) |
+| Cell 11 | `timeline_viewer` | 核心动画 | 原始顶点流面部播放：展示压缩前逐帧几何数据的播放效果。 | `canvas` | [结果 PNG](assets/02_raw_vertex_stream_viewer_result.png) / [GIF](assets/02_raw_vertex_stream_viewer_preview.gif) / [MP4](assets/02_raw_vertex_stream_viewer_preview.mp4) / [WebM](assets/02_raw_vertex_stream_viewer_preview.webm) |
+| Cell 19 | `widget_controls` | 核心图解 | PCA 主成分形变查看器：用控件把某个基向量显示成可见的面部形变方向。 | `widget_controls` | [结果 PNG](assets/05_pca_component_viewer_result.png) / [GIF](assets/05_pca_component_viewer_preview.gif) / [MP4](assets/05_pca_component_viewer_preview.mp4) / [WebM](assets/05_pca_component_viewer_preview.webm) |
+| Cell 23 | `timeline_viewer` | 核心动画 | CPU PCA 重建播放：检查压缩表示是否保留了可见的表情运动。 | `canvas` | [结果 PNG](assets/06_cpu_reconstruction_compare_result.png) / [GIF](assets/06_cpu_reconstruction_compare_preview.gif) / [MP4](assets/06_cpu_reconstruction_compare_preview.mp4) / [WebM](assets/06_cpu_reconstruction_compare_preview.webm) |
+| Cell 26 | `timeline_viewer` | 核心动画 | GPU shader PCA 重建：最终 viewer 展示适合运行时使用的 PCA 面部动画流程。 | `canvas` | [结果 PNG](assets/07_gpu_shader_reconstruction_result.png) / [GIF](assets/07_gpu_shader_reconstruction_preview.gif) / [MP4](assets/07_gpu_shader_reconstruction_preview.mp4) / [WebM](assets/07_gpu_shader_reconstruction_preview.webm) |
 
 
 ## 代码 Cell 与可视化结果
 
-本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 
 | Cell / 片段 | 结果说明 | 证据 |
 | --- | --- | --- |
-| Cell 5 | The output confirms the face animation is stored as mesh topology plus a frame-indexed vertex stream. | [结果 PNG](assets/01_data_load_shapes_result.png) / [代码卡](assets/01_data_load_shapes.png) |
-| Cell 11 | This shows the raw per-frame geometry playback before any compression. | [结果 PNG](assets/02_raw_vertex_stream_viewer_result.png) / [GIF](assets/02_raw_vertex_stream_viewer_preview.gif) / [MP4](assets/02_raw_vertex_stream_viewer_preview.mp4) / [WebM](assets/02_raw_vertex_stream_viewer_preview.webm) / [代码卡](assets/02_raw_vertex_stream_viewer.png) |
-| Cell 13 | The memory log motivates PCA compression by showing why full vertex streams are expensive. | [结果 PNG](assets/03_memory_size_log_result.png) / [代码卡](assets/03_memory_size_log.png) |
-| Cell 17 | The component count shows how a large vertex stream becomes a compact coefficient space. | [结果 PNG](assets/04_pca_components_shape_result.png) / [代码卡](assets/04_pca_components_shape.png) |
-| Cell 19 | The widget makes a basis component visible as a facial deformation direction. | [结果 PNG](assets/05_pca_component_viewer_result.png) / [GIF](assets/05_pca_component_viewer_preview.gif) / [MP4](assets/05_pca_component_viewer_preview.mp4) / [WebM](assets/05_pca_component_viewer_preview.webm) / [代码卡](assets/05_pca_component_viewer.png) |
-| Cell 23 | The viewer checks whether the compressed representation preserves the visible expression motion. | [结果 PNG](assets/06_cpu_reconstruction_compare_result.png) / [GIF](assets/06_cpu_reconstruction_compare_preview.gif) / [MP4](assets/06_cpu_reconstruction_compare_preview.mp4) / [WebM](assets/06_cpu_reconstruction_compare_preview.webm) / [代码卡](assets/06_cpu_reconstruction_compare.png) |
-| Cell 26 | The final viewer shows the runtime-friendly form of the PCA facial animation pipeline. | [结果 PNG](assets/07_gpu_shader_reconstruction_result.png) / [GIF](assets/07_gpu_shader_reconstruction_preview.gif) / [MP4](assets/07_gpu_shader_reconstruction_preview.mp4) / [WebM](assets/07_gpu_shader_reconstruction_preview.webm) / [代码卡](assets/07_gpu_shader_reconstruction.png) |
+| Cell 5 | 输出确认面部动画由 mesh 拓扑和按帧索引的顶点流组成。 | [结果 PNG](assets/01_data_load_shapes_result.png) / [代码卡](assets/01_data_load_shapes.png) |
+| Cell 11 | 展示压缩前逐帧几何数据的播放效果。 | [结果 PNG](assets/02_raw_vertex_stream_viewer_result.png) / [GIF](assets/02_raw_vertex_stream_viewer_preview.gif) / [MP4](assets/02_raw_vertex_stream_viewer_preview.mp4) / [WebM](assets/02_raw_vertex_stream_viewer_preview.webm) / [代码卡](assets/02_raw_vertex_stream_viewer.png) |
+| Cell 13 | 内存日志说明完整顶点流为什么昂贵，也引出 PCA 压缩的必要性。 | [结果 PNG](assets/03_memory_size_log_result.png) / [代码卡](assets/03_memory_size_log.png) |
+| Cell 17 | 主成分数量展示了大规模顶点流如何变成紧凑的系数空间。 | [结果 PNG](assets/04_pca_components_shape_result.png) / [代码卡](assets/04_pca_components_shape.png) |
+| Cell 19 | 控件把某个基向量显示成可见的面部形变方向。 | [结果 PNG](assets/05_pca_component_viewer_result.png) / [GIF](assets/05_pca_component_viewer_preview.gif) / [MP4](assets/05_pca_component_viewer_preview.mp4) / [WebM](assets/05_pca_component_viewer_preview.webm) / [代码卡](assets/05_pca_component_viewer.png) |
+| Cell 23 | viewer 用来检查压缩表示是否保留了可见的表情运动。 | [结果 PNG](assets/06_cpu_reconstruction_compare_result.png) / [GIF](assets/06_cpu_reconstruction_compare_preview.gif) / [MP4](assets/06_cpu_reconstruction_compare_preview.mp4) / [WebM](assets/06_cpu_reconstruction_compare_preview.webm) / [代码卡](assets/06_cpu_reconstruction_compare.png) |
+| Cell 26 | 最终 viewer 展示适合运行时使用的 PCA 面部动画流程。 | [结果 PNG](assets/07_gpu_shader_reconstruction_result.png) / [GIF](assets/07_gpu_shader_reconstruction_preview.gif) / [MP4](assets/07_gpu_shader_reconstruction_preview.mp4) / [WebM](assets/07_gpu_shader_reconstruction_preview.webm) / [代码卡](assets/07_gpu_shader_reconstruction.png) |

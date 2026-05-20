@@ -9,7 +9,7 @@
 | transcript sources | [`docs/transcripts/ukobLRLKZDM_Reinforcement Learning 04 _ Motion Fields For Interactive Character Animation_.txt`](<../../../../docs/transcripts/ukobLRLKZDM_Reinforcement Learning 04 _ Motion Fields For Interactive Character Animation_.txt>) |
 | env prefix | `.envs/motion_fields` |
 | kernel | `animationtech-motion_fields_for_interactive_character_animation` |
-| validation status | `passed` (`manual_smoke`) |
+| validation status | 自动执行已通过；交互部分仍建议在 JupyterLab 中人工检查 |
 
 ## 问题背景
 
@@ -54,7 +54,7 @@ flowchart LR
     C35 --> C36[Runtime render<br/>choose action and lock feet]
 ```
 
-这条路径有两层含义。前半段把原始动画变成可查询的 motion field，后半段把查询结果变成控制策略。manifest 中的 cell 编号对应已经生成的博客结果媒体；实验 notebook 的原始单元里，部分实现代码和说明 markdown 相邻出现，因此正文会同时标出关键函数名。
+这条路径有两层含义。前半段把原始动画变成可查询的 motion field，后半段把查询结果变成控制策略。已生成证据中的 Cell 编号对应已经生成的博客结果媒体；实验 notebook 的原始单元里，部分实现代码和说明 markdown 相邻出现，因此正文会同时标出关键函数名。
 
 ## 模块拆解
 
@@ -254,13 +254,13 @@ flowchart LR
 
 ## 重点可视化 / 动画
 
-本节只使用 manifest 声明的结果媒体和 walkthrough，学习卡只放在后续证据表，不作为正文主视觉。
+本节只放已经稳定生成的结果媒体和 walkthrough。学习卡移到后续证据表，不抢正文主视觉。
 
-| 媒体 | manifest 角色 | 阅读重点 |
+| 媒体 | 证据类型 | 阅读重点 |
 | --- | --- | --- |
-| [UMAP motion-field embedding](assets/03_umap_motion_field_result.png) | `key_visual` | 高维 motion field 在低维投影中的邻域连续性 |
-| [Value-learning score curve](assets/07_value_learning_curve_result.png) | `key_visual` | Bellman residual 随 epoch 下降并进入稳定区间 |
-| [Motion Fields walkthrough](assets/00-walkthrough.webm) | `supporting_evidence` | 按 cell 顺序回放学习卡与结果证据 |
+| [UMAP motion-field embedding](assets/03_umap_motion_field_result.png) | 核心图解 | 高维 motion field 在低维投影中的邻域连续性 |
+| [Value-learning score curve](assets/07_value_learning_curve_result.png) | 核心图解 | Bellman residual 随 epoch 下降并进入稳定区间 |
+| [Motion Fields walkthrough](assets/00-walkthrough.webm) | 补充证据 | 按 cell 顺序回放学习卡与结果证据 |
 
 ## 代码 Cell 与可视化结果
 

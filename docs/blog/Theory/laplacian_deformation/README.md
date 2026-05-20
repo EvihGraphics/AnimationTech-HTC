@@ -9,7 +9,7 @@
 | transcript sources | [`docs/transcripts/0hyEbxAQVNY_Laplacian Mesh and Animation Deformation (re-upload).txt`](../../../../docs/transcripts/0hyEbxAQVNY_Laplacian Mesh and Animation Deformation (re-upload).txt) |
 | env prefix | `.envs/laplacian_deformation` |
 | kernel | `animationtech-laplacian_deformation` |
-| validation status | `passed` (`manual_smoke`) |
+| validation status | `passed`（人工冒烟检查） |
 
 ## 问题背景
 
@@ -225,8 +225,6 @@ flowchart LR
 - 可视化主体：Curved locomotion result
 - 捕获方式：`canvas`
 
-这段动画要看红色/黄色时空骨架如何跟随角色一起弯曲。角色不是在播放原始直线 clip，而是先把跨帧骨架图按弯曲路径重求解，再把变形后的图还原成可播放的 `quats/pos`。
-
 ![Curved locomotion result](assets/08_curved_locomotion_result_result.png)
 
 ![Curved locomotion result preview](assets/08_curved_locomotion_result_preview.gif)
@@ -250,7 +248,7 @@ https://github.com/user-attachments/assets/4acb38c5-3cae-449f-b243-aa2bbac81614
 
 ## 重点可视化 / 动画
 
-本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
+本节只放真正解释算法结果的图像和动画。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
 
 
 ![Rotation-invariant deformation controls](assets/06_rotation_invariance_controls_preview.gif)
@@ -277,14 +275,14 @@ https://github.com/user-attachments/assets/4acb38c5-3cae-449f-b243-aa2bbac81614
 
 | Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |
-| Cell 5 | `viewer` | `key_visual` | Generated strip mesh baseline: This baseline shows the graph vertices and edges before Laplacian reconstruction. | `canvas` | [结果 PNG](assets/01_strip_mesh_baseline_result.png) |
-| Cell 7 | `viewer` | `key_visual` | Unanchored Laplacian reconstruction: The result shows why Laplacian coordinates alone do not fix global placement. | `canvas` | [结果 PNG](assets/02_unanchored_reconstruction_result.png) |
-| Cell 9 | `viewer` | `key_visual` | Two-anchor reconstruction: Anchors turn relative differential coordinates into a positioned shape. | `canvas` | [结果 PNG](assets/03_two_anchor_solve_result.png) |
-| Cell 10 | `viewer` | `key_visual` | Three-anchor deformation: The viewer shows local deformation propagating through the graph. | `canvas` | [结果 PNG](assets/04_three_anchor_deformation_result.png) |
-| Cell 19 | `viewer` | `key_visual` | Vectorized 3D Laplacian solve: The same linear machinery scales from 2D graph points to 3D animation vertices. | `canvas` | [结果 PNG](assets/05_vectorized_3d_solve_result.png) |
-| Cell 29 | `widget_controls` | `key_visual` | Rotation-invariant deformation controls: The controls reveal which constraints preserve shape while allowing deformation. | `widget_controls` | [结果 PNG](assets/06_rotation_invariance_controls_result.png) / [GIF](assets/06_rotation_invariance_controls_preview.gif) / [MP4](assets/06_rotation_invariance_controls_preview.mp4) / [WebM](assets/06_rotation_invariance_controls_preview.webm) |
-| Cell 40 | `timeline_viewer` | `key_animation` | Animation graph reconstruction: The timeline viewer shows Laplacian deformation applied to animated pose data. | `canvas` | [结果 PNG](assets/07_animation_graph_deformation_result.png) / [GIF](assets/07_animation_graph_deformation_preview.gif) / [MP4](assets/07_animation_graph_deformation_preview.mp4) / [WebM](assets/07_animation_graph_deformation_preview.webm) |
-| Cell 46 | `timeline_viewer` | `key_animation` | Curved locomotion result: The final viewer checks whether graph deformation can redirect locomotion smoothly. | `canvas` | [结果 PNG](assets/08_curved_locomotion_result_result.png) / [GIF](assets/08_curved_locomotion_result_preview.gif) / [MP4](assets/08_curved_locomotion_result_preview.mp4) / [WebM](assets/08_curved_locomotion_result_preview.webm) |
+| Cell 5 | `viewer` | 核心图解 | Generated strip mesh baseline: This baseline shows the graph vertices and edges before Laplacian reconstruction. | `canvas` | [结果 PNG](assets/01_strip_mesh_baseline_result.png) |
+| Cell 7 | `viewer` | 核心图解 | Unanchored Laplacian reconstruction: The result shows why Laplacian coordinates alone do not fix global placement. | `canvas` | [结果 PNG](assets/02_unanchored_reconstruction_result.png) |
+| Cell 9 | `viewer` | 核心图解 | Two-anchor reconstruction: Anchors turn relative differential coordinates into a positioned shape. | `canvas` | [结果 PNG](assets/03_two_anchor_solve_result.png) |
+| Cell 10 | `viewer` | 核心图解 | Three-anchor deformation: The viewer shows local deformation propagating through the graph. | `canvas` | [结果 PNG](assets/04_three_anchor_deformation_result.png) |
+| Cell 19 | `viewer` | 核心图解 | Vectorized 3D Laplacian solve: The same linear machinery scales from 2D graph points to 3D animation vertices. | `canvas` | [结果 PNG](assets/05_vectorized_3d_solve_result.png) |
+| Cell 29 | `widget_controls` | 核心图解 | Rotation-invariant deformation controls: The controls reveal which constraints preserve shape while allowing deformation. | `widget_controls` | [结果 PNG](assets/06_rotation_invariance_controls_result.png) / [GIF](assets/06_rotation_invariance_controls_preview.gif) / [MP4](assets/06_rotation_invariance_controls_preview.mp4) / [WebM](assets/06_rotation_invariance_controls_preview.webm) |
+| Cell 40 | `timeline_viewer` | 核心动画 | Animation graph reconstruction: The timeline viewer shows Laplacian deformation applied to animated pose data. | `canvas` | [结果 PNG](assets/07_animation_graph_deformation_result.png) / [GIF](assets/07_animation_graph_deformation_preview.gif) / [MP4](assets/07_animation_graph_deformation_preview.mp4) / [WebM](assets/07_animation_graph_deformation_preview.webm) |
+| Cell 46 | `timeline_viewer` | 核心动画 | Curved locomotion result: The final viewer checks whether graph deformation can redirect locomotion smoothly. | `canvas` | [结果 PNG](assets/08_curved_locomotion_result_result.png) / [GIF](assets/08_curved_locomotion_result_preview.gif) / [MP4](assets/08_curved_locomotion_result_preview.mp4) / [WebM](assets/08_curved_locomotion_result_preview.webm) |
 
 
 ## 代码 Cell 与可视化结果

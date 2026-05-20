@@ -164,7 +164,7 @@ flowchart TD
 
 ## 关键 cell / 函数深讲
 
-本篇是 `.py` 支撑模块，没有 notebook cell；下面按 manifest 中的源码片段、命令日志和 artifact summary 对应到 function-level 讲解。
+本篇是 `.py` 支撑模块，没有 notebook cell；下面按源码片段、命令日志和产物摘要对应到函数层面讲解。
 
 ### maya-fallback - Maya API fallback and synthetic writer
 
@@ -251,7 +251,7 @@ flowchart TD
 
 ### dataflow - Exporter data flow
 
-manifest 的 dataflow 证据把脚本从“一个工具文件”放回完整案例：Maya selected mesh 或 synthetic fallback 进入 exporter，产出 `.dat`，再被 Halo 4 Facial Animation notebook 的 viewer 和 PCA pipeline 消费。
+数据流证据把脚本从“一个工具文件”放回完整案例：Maya selected mesh 或 synthetic fallback 进入 exporter，产出 `.dat`，再被 Halo 4 Facial Animation notebook 的 viewer 和 PCA pipeline 消费。
 
 ```mermaid
 flowchart LR
@@ -293,7 +293,7 @@ flowchart LR
 
 ## 重点可视化 / 动画
 
-manifest 没有把本模块声明为 `key_visual` 或 `key_animation`。正文只引用源码摘录、artifact summary、dataflow 和 walkthrough 证据；学习卡只放在后续证据表，不作为主视觉，也不新增滚动截图或假动画。
+这个模块本身是导出工具，不强行包装成算法动画。正文只引用源码摘录、产物摘要、数据流和 walkthrough；学习卡放在后续证据表里。
 
 | 片段 | 重点媒体 | visual_subject | media_role | 捕获方式 | 结果说明 |
 | --- | --- | --- | --- | --- | --- |
@@ -303,7 +303,7 @@ manifest 没有把本模块声明为 `key_visual` 或 `key_animation`。正文�
 | export-log | [结果 PNG](assets/04_export_command_log_result.png) | Exporter validation log | `code_evidence` | `code_evidence` | 记录 artifact 输出路径 |
 | artifact-summary | [结果 PNG](assets/05_animated_face_artifact_summary_result.png) | animated_face.dat artifact summary | `code_evidence` | `artifact_summary` | 验证 topology、normals、frames |
 | dataflow | [结果 PNG](assets/06_exporter_dataflow_result.png) | Exporter data flow | `code_evidence` | `artifact_summary` | 连接 exporter 与 Halo notebook |
-| walkthrough | [WebM](assets/00-walkthrough.webm) | module walkthrough | `supporting_evidence` | `step_sequence` | 辅助回放源码证据顺序 |
+| walkthrough | [WebM](assets/00-walkthrough.webm) | module walkthrough | 补充证据 | `step_sequence` | 辅助回放源码证据顺序 |
 
 ## 源码模块与执行证据
 
@@ -330,4 +330,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 halo_4_
 python "labs/AnimationPapers/Halo 4 exporter from maya.py" --force-synthetic --output "labs/AnimationPapers/animated_face.dat"
 ```
 
-在 Maya Python 环境中，选中目标 mesh 后省略 `--force-synthetic`，脚本会尝试读取当前选中对象并导出真实逐帧顶点动画。本 README 只引用 manifest 已声明的源码、日志和 artifact summary 证据。
+在 Maya Python 环境中，选中目标 mesh 后省略 `--force-synthetic`，脚本会尝试读取当前选中对象并导出真实逐帧顶点动画。本 README 只引用已有源码摘录、日志和产物摘要证据。

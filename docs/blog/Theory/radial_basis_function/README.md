@@ -304,7 +304,7 @@ Gaussian kernel 图说明：`epsilon` 不是简单的“越大越好”。kernel
 
 ## 重点可视化 / 动画
 
-正文重点媒体只引用 `key_visual` 的真实算法输出。学习卡仅作为后面的复现证据，不作为主视觉；`00-walkthrough.webm` 是学习卡串联视频，也不替代本文核心结果图。
+正文重点媒体只引用真实算法输出。学习卡仅作为后面的复现证据，不作为主视觉；`00-walkthrough.webm` 是学习卡串联视频，也不替代本文核心结果图。
 
 | Cell | 重点媒体 | 可视化主体 | 捕获方式 | 结果说明什么 |
 | --- | --- | --- | --- | --- |
@@ -318,13 +318,13 @@ Gaussian kernel 图说明：`epsilon` 不是简单的“越大越好”。kernel
 
 | Cell | 输出类型 | 媒体角色 | 捕获方式 | 发布必需 | 结果媒体 | 代码学习卡 |
 | --- | --- | --- | --- | --- | --- | --- |
-| 6 | `plot` | `key_visual` | `plot` | `true` | [PNG](assets/01_sample_function_points_result.png) | [PNG](assets/01_sample_function_points.png) |
-| 7 | `plot` | `key_visual` | `plot` | `true` | [PNG](assets/02_gaussian_kernel_influence_result.png) | [PNG](assets/02_gaussian_kernel_influence.png) |
+| 6 | `plot` | 核心图解 | `plot` | `true` | [PNG](assets/01_sample_function_points_result.png) | [PNG](assets/01_sample_function_points.png) |
+| 7 | `plot` | 核心图解 | `plot` | `true` | [PNG](assets/02_gaussian_kernel_influence_result.png) | [PNG](assets/02_gaussian_kernel_influence.png) |
 | 9 | `matrix` | `supporting_evidence` | `table` | `false` | [PNG](assets/03_distance_kernel_matrix_result.png) | [PNG](assets/03_distance_kernel_matrix.png) |
 | 10 | `table` | `supporting_evidence` | `table` | `false` | [PNG](assets/04_rbf_weights_result.png) | [PNG](assets/04_rbf_weights.png) |
-| 16 | `plot` | `key_visual` | `plot` | `true` | [PNG](assets/05_interpolated_query_result_result.png) | [PNG](assets/05_interpolated_query_result.png) |
+| 16 | `plot` | 核心图解 | `plot` | `true` | [PNG](assets/05_interpolated_query_result_result.png) | [PNG](assets/05_interpolated_query_result.png) |
 | 21 | `matrix` | `supporting_evidence` | `table` | `false` | [PNG](assets/06_polynomial_basis_matrix_result.png) | [PNG](assets/06_polynomial_basis_matrix.png) |
-| 27 | `plot` | `key_visual` | `plot` | `true` | [PNG](assets/07_augmented_rbf_fit_result.png) | [PNG](assets/07_augmented_rbf_fit.png) |
+| 27 | `plot` | 核心图解 | `plot` | `true` | [PNG](assets/07_augmented_rbf_fit_result.png) | [PNG](assets/07_augmented_rbf_fit.png) |
 
 ## 运行方式
 
@@ -335,4 +335,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 radial_
 .\.envs\radial_basis_function\python.exe -m jupyter lab --notebook-dir .
 ```
 
-打开 `labs/Theory/radial_basis_function.ipynb`，选择 kernel `animationtech-radial_basis_function`，按 cell 顺序运行。本文根据 notebook、manifest 与对应 transcript 整理；正文媒体均来自现有 `assets` 中的真实 notebook 输出。
+打开 `labs/Theory/radial_basis_function.ipynb`，选择 kernel `animationtech-radial_basis_function`，按 cell 顺序运行。本文根据 notebook、素材清单与对应 transcript 整理；正文媒体均来自现有 `assets` 中的真实 notebook 输出。

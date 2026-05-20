@@ -8,7 +8,7 @@
 | source path | [`labs/AnimationPapers/Motion Graph.ipynb`](<../../../../labs/AnimationPapers/Motion Graph.ipynb>) |
 | env prefix | `.envs/motion_graph` |
 | kernel | `animationtech-motion_graph` |
-| validation status | `passed`（`manual_smoke`，最后记录：`2026-04-29T19:59:27.0611060Z`；仍需 JupyterLab 手动 smoke test） |
+| validation status | 自动执行已通过（最后记录：`2026-04-29T19:59:27.0611060Z`）；交互部分仍建议在 JupyterLab 中人工检查 |
 
 ## 问题背景
 
@@ -107,7 +107,7 @@ Notebook 的前半段是离线建图：`Keep only a few ranges`、`Build point c
 
 `Search` 用 `Path` 维护候选路径的边序列、累计帧数和误差，并用栈式搜索扩展低成本路径。`Follow Path` 构造 Bezier 轨迹，把图路径生成的 root 轨迹与目标曲线比较，选出更接近目标的路径。可视化时，角色动画、目标曲线和误差线一起出现，能帮助判断问题是“图边不够”“边质量差”还是“搜索目标太难”。
 
-## 关键 cell / 函数深讲
+## 算法读法
 
 - `Keep only a few ranges`：控制输入数据规模和有效帧范围。`padding_frame_count` 决定窗口匹配和 blend 是否有足够上下文。
 - `Build point cloud`：把骨骼姿态转成点云。它决定距离度量看到的是哪些身体部位，脚点和 hips 点通常最影响行走转移质量。
@@ -139,22 +139,6 @@ Notebook 的前半段是离线建图：`Keep only a few ranges`、`Build point c
 
 如果距离度量过严，`local_minima` 会很少，图会断裂或缺少可选边；如果距离度量过松，图边很多但转移会脚滑、跳姿态。若 Tarjan 裁剪后节点大幅减少，说明候选边不能形成可循环结构。可视化的意义就在这里：它不只是播放动画，还把距离矩阵、候选边、图路径和轨迹误差串起来，让你能定位是哪一层破坏了生成质量。
 
-## 代码 Cell 与可视化结果
-
-本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和 PNG 学习卡片。PNG 由指定 cell 的代码摘要、输出区、viewer/canvas 或图表/日志合成，不使用整页滚动截图替代。
-
-
-| Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
-| --- | --- | --- | --- | --- |
-| 2 | `log` | Initialize Warp, NumPy, ipyanimlab, and graph dependencies. | The log confirms that distance matrices and local minima can be computed in the available environment. | [PNG](assets/cropped_ranges_padding.png) |
-| 6 | `viewer` | Render the source walking animation used to build the graph. | The graph input is a playable sequence of walking frames. | [PNG](assets/motion_graph_overview.png) |
-| 12 | `viewer` | Convert the skeleton pose to world-space point samples. | Point-cloud distance is closer to visible pose similarity than comparing only root or quaternions. | [PNG](assets/point_cloud_pose.png) |
-| 15 | `viewer` | Show source and target windows after horizontal translation and rotation alignment. | Similar gait windows can transition even when their world positions differ. | [PNG](assets/alignment_pair.png) |
-| 21 | `plot` | Plot the distance heatmap and mark local_minima candidates. | Low-error regions in the matrix become potential transition edges. | [PNG](assets/distance_matrix_minima.png) |
-| 28 | `log` | Print the strongly connected component pruning process. | Pruning keeps the runtime graph from entering dead ends that cannot continue generating motion. | [PNG](assets/scc_pruning.png) |
-| 33 | `viewer` | Play along graph edges while printing the current node and frame. | This validates Node and Edge abstractions as a playable animation sequence. | [PNG](assets/graph_nodes_edges.png) |
-| 45 | `timeline_viewer` | Display the graph-search result and the Bezier target path together. | The final viewer checks whether graph search can serve a path-following goal. | [PNG](assets/follow_path_visualization.png) |
-
 ## 关键 cell / 函数深讲
 
 ### Cell 2 - Runtime environment log
@@ -169,7 +153,7 @@ flowchart LR
 
 - 代码做什么：Initialize Warp, NumPy, ipyanimlab, and graph dependencies.
 - 运行后看到什么：`log`
-- 结果说明什么：The log confirms that distance matrices and local minima can be computed in the available environment.
+- 结果说明什么：日志确认当前环境可以计算距离矩阵和局部极小值。
 - 可视化主体：Runtime environment log
 - 捕获方式：`log`
 
@@ -188,7 +172,7 @@ flowchart LR
 
 - 代码做什么：Render the source walking animation used to build the graph.
 - 运行后看到什么：`viewer`
-- 结果说明什么：The graph input is a playable sequence of walking frames.
+- 结果说明什么：图结构的输入是一段可播放的行走帧序列。
 - 可视化主体：Raw walk clip playback
 - 捕获方式：`canvas`
 
@@ -284,7 +268,7 @@ flowchart LR
 
 - 代码做什么：Play along graph edges while printing the current node and frame.
 - 运行后看到什么：`viewer`
-- 结果说明什么：This validates Node and Edge abstractions as a playable animation sequence.
+- 结果说明什么：验证 Node 和 Edge 抽象能组成可播放动画序列。
 - 可视化主体：Graph traversal playback debug
 - 捕获方式：`canvas`
 
@@ -303,11 +287,9 @@ flowchart LR
 
 - 代码做什么：Display the graph-search result and the Bezier target path together.
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：The final viewer checks whether graph search can serve a path-following goal.
+- 结果说明什么：最终 viewer 检查图搜索能否服务于路径跟随目标。
 - 可视化主体：Follow-path result viewer
 - 捕获方式：`canvas`
-
-这段动画要看两件事：白色角色是否沿着地面上的贝塞尔目标线前进，以及红色误差线是否随着播放持续把当前 root 拉回目标路径。它展示的是图搜索结果真正被拼成一段可播放轨迹，而不是只给出一张距离矩阵。
 
 ![Follow-path result viewer](assets/follow_path_visualization_result.png)
 
@@ -334,7 +316,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 motion_
 
 ## 重点可视化 / 动画
 
-本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
+本节只保留最能说明算法结果的图像和动画。代码学习卡移到文末证据表，供需要复现或追溯 cell 上下文时查看。
 
 
 ![Follow-path result viewer](assets/follow_path_visualization_preview.gif)
@@ -347,27 +329,27 @@ https://github.com/user-attachments/assets/72d4ec2d-0922-495a-b456-45c66535e27e
   <source src="assets/follow_path_visualization_preview.webm" type="video/webm">
 </video>
 
-| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| Cell | 输出类型 | 阅读位置 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |
-| Cell 6 | `viewer` | `key_visual` | Raw walk clip playback: The graph input is a playable sequence of walking frames. | `canvas` | [结果 PNG](assets/motion_graph_overview_result.png) |
-| Cell 12 | `viewer` | `key_visual` | Point-cloud pose representation: Point-cloud distance is closer to visible pose similarity than comparing only root or quaternions. | `canvas` | [结果 PNG](assets/point_cloud_pose_result.png) |
-| Cell 15 | `viewer` | `key_visual` | Window alignment between two clips: Similar gait windows can transition even when their world positions differ. | `canvas` | [结果 PNG](assets/alignment_pair_result.png) |
-| Cell 21 | `plot` | `key_visual` | Distance matrix and local minima: Low-error regions in the matrix become potential transition edges. | `plot` | [结果 PNG](assets/distance_matrix_minima_result.png) |
-| Cell 33 | `viewer` | `key_visual` | Graph traversal playback debug: This validates Node and Edge abstractions as a playable animation sequence. | `canvas` | [结果 PNG](assets/graph_nodes_edges_result.png) |
-| Cell 45 | `timeline_viewer` | `key_animation` | Follow-path result viewer: The final viewer checks whether graph search can serve a path-following goal. | `canvas` | [结果 PNG](assets/follow_path_visualization_result.png) / [GIF](assets/follow_path_visualization_preview.gif) / [MP4](assets/follow_path_visualization_preview.mp4) / [WebM](assets/follow_path_visualization_preview.webm) |
+| Cell 6 | `viewer` | 核心图解 | 原始行走片段播放：图结构的输入是一段可播放的行走帧序列。 | `canvas` | [结果 PNG](assets/motion_graph_overview_result.png) |
+| Cell 12 | `viewer` | 核心图解 | 点云姿态表示：点云距离比只比较 root 或四元数更接近视觉上的姿态相似度。 | `canvas` | [结果 PNG](assets/point_cloud_pose_result.png) |
+| Cell 15 | `viewer` | 核心图解 | 两个片段的窗口对齐：相似步态窗口即使世界位置不同，也可以被对齐后转移。 | `canvas` | [结果 PNG](assets/alignment_pair_result.png) |
+| Cell 21 | `plot` | 核心图解 | 距离矩阵与局部极小值：矩阵中的低误差区域会成为候选转移边。 | `plot` | [结果 PNG](assets/distance_matrix_minima_result.png) |
+| Cell 33 | `viewer` | 核心图解 | 图遍历播放调试：验证 Node 和 Edge 抽象能组成可播放动画序列。 | `canvas` | [结果 PNG](assets/graph_nodes_edges_result.png) |
+| Cell 45 | `timeline_viewer` | 核心动画 | 路径跟随结果：最终 viewer 检查图搜索能否服务于路径跟随目标。 | `canvas` | [结果 PNG](assets/follow_path_visualization_result.png) / [GIF](assets/follow_path_visualization_preview.gif) / [MP4](assets/follow_path_visualization_preview.mp4) / [WebM](assets/follow_path_visualization_preview.webm) |
 
 
 ## 代码 Cell 与可视化结果
 
-本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 
 | Cell / 片段 | 结果说明 | 证据 |
 | --- | --- | --- |
-| Cell 2 | The log confirms that distance matrices and local minima can be computed in the available environment. | [结果 PNG](assets/cropped_ranges_padding_result.png) / [代码卡](assets/cropped_ranges_padding.png) |
-| Cell 6 | The graph input is a playable sequence of walking frames. | [结果 PNG](assets/motion_graph_overview_result.png) / [代码卡](assets/motion_graph_overview.png) |
+| Cell 2 | 日志确认当前环境可以计算距离矩阵和局部极小值。 | [结果 PNG](assets/cropped_ranges_padding_result.png) / [代码卡](assets/cropped_ranges_padding.png) |
+| Cell 6 | 图结构的输入是一段可播放的行走帧序列。 | [结果 PNG](assets/motion_graph_overview_result.png) / [代码卡](assets/motion_graph_overview.png) |
 | Cell 12 | Point-cloud distance is closer to visible pose similarity than comparing only root or quaternions. | [结果 PNG](assets/point_cloud_pose_result.png) / [代码卡](assets/point_cloud_pose.png) |
 | Cell 15 | Similar gait windows can transition even when their world positions differ. | [结果 PNG](assets/alignment_pair_result.png) / [代码卡](assets/alignment_pair.png) |
 | Cell 21 | Low-error regions in the matrix become potential transition edges. | [结果 PNG](assets/distance_matrix_minima_result.png) / [代码卡](assets/distance_matrix_minima.png) |
 | Cell 28 | Pruning keeps the runtime graph from entering dead ends that cannot continue generating motion. | [结果 PNG](assets/scc_pruning_result.png) / [代码卡](assets/scc_pruning.png) |
-| Cell 33 | This validates Node and Edge abstractions as a playable animation sequence. | [结果 PNG](assets/graph_nodes_edges_result.png) / [代码卡](assets/graph_nodes_edges.png) |
-| Cell 45 | The final viewer checks whether graph search can serve a path-following goal. | [结果 PNG](assets/follow_path_visualization_result.png) / [GIF](assets/follow_path_visualization_preview.gif) / [MP4](assets/follow_path_visualization_preview.mp4) / [WebM](assets/follow_path_visualization_preview.webm) / [代码卡](assets/follow_path_visualization.png) |
+| Cell 33 | 验证 Node 和 Edge 抽象能组成可播放动画序列。 | [结果 PNG](assets/graph_nodes_edges_result.png) / [代码卡](assets/graph_nodes_edges.png) |
+| Cell 45 | 最终 viewer 检查图搜索能否服务于路径跟随目标。 | [结果 PNG](assets/follow_path_visualization_result.png) / [GIF](assets/follow_path_visualization_preview.gif) / [MP4](assets/follow_path_visualization_preview.mp4) / [WebM](assets/follow_path_visualization_preview.webm) / [代码卡](assets/follow_path_visualization.png) |

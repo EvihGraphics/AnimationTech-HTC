@@ -9,7 +9,7 @@
 | transcript sources | [`docs/transcripts/COzRpFPZ4rk_Motion Warping.txt`](../../../../docs/transcripts/COzRpFPZ4rk_Motion Warping.txt) |
 | env prefix | `.envs/motion_warping` |
 | kernel | `animationtech-motion_warping` |
-| validation status | `passed` (`manual_smoke`) |
+| validation status | 自动执行已通过；交互部分仍建议在 JupyterLab 中人工检查 |
 
 ## 问题背景
 
@@ -63,8 +63,6 @@ pose warp 先取关键姿态差异，转换成局部 offset，再用曲线控制
 
 ## 关键 cell / 函数深讲
 
-## 关键 cell / 函数深讲
-
 ### Cell 5 - Source animation playback
 
 播放并观察未经修改的原始动作。这是建立后续 Warp 对比基准的第一步。
@@ -75,9 +73,9 @@ flowchart LR
     B --> C[观察关键事件动作帧]
 ```
 
-- 代码做什么：Source animation playback: This baseline lets later warped outputs be compared against the original motion.
+- 代码做什么：源动画播放：给后续 warping 结果提供原始动作基准。
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：This baseline lets later warped outputs be compared against the original motion.
+- 结果说明什么：给后续 warping 结果提供原始动作基准。
 - 可视化主体：Source animation playback
 - 捕获方式：`canvas`
 
@@ -100,9 +98,9 @@ flowchart LR
     B --> C[分析动作发生突变的时间点]
 ```
 
-- 代码做什么：Raw quaternion channel plot: The graph shows that animation warping often starts as curve manipulation.
+- 代码做什么：原始四元数通道曲线：说明 animation warping 往往从曲线编辑开始。
 - 运行后看到什么：`plot`
-- 结果说明什么：The graph shows that animation warping often starts as curve manipulation.
+- 结果说明什么：曲线说明 animation warping 往往从曲线编辑开始。
 - 可视化主体：Raw quaternion channel plot
 - 捕获方式：`plot`
 
@@ -118,9 +116,9 @@ flowchart LR
     B --> C[计算样条插值所需的切线]
 ```
 
-- 代码做什么：Time-warp keypoints and tangents: The plot shows how sparse timing edits become a continuous time-warp curve.
+- 代码做什么：Time-warp 关键点与切线：展示稀疏时间编辑如何变成连续时间扭曲曲线。
 - 运行后看到什么：`plot`
-- 结果说明什么：The plot shows how sparse timing edits become a continuous time-warp curve.
+- 结果说明什么：图中展示稀疏时间编辑如何变成连续 time-warp 曲线。
 - 可视化主体：Time-warp keypoints and tangents
 - 捕获方式：`plot`
 
@@ -137,9 +135,9 @@ flowchart LR
     C --> D[获得密集映射查找表]
 ```
 
-- 代码做什么：Resampled time-warp curve: The output shows the actual per-frame time lookup used for animation sampling.
+- 代码做什么：重采样后的 time-warp 曲线：展示动画采样实际使用的逐帧时间查找表。
 - 运行后看到什么：`plot`
-- 结果说明什么：The output shows the actual per-frame time lookup used for animation sampling.
+- 结果说明什么：输出展示动画采样实际使用的逐帧时间查找表。
 - 可视化主体：Resampled time-warp curve
 - 捕获方式：`plot`
 
@@ -156,9 +154,9 @@ flowchart LR
     C --> D[生成仅改变了节奏的动画]
 ```
 
-- 代码做什么：Time-warped animation comparison: The viewer reveals the timing change without changing the underlying pose content.
+- 代码做什么：Time-warp 动画对比：展示只改变时序、不改变底层姿态内容的效果。
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：The viewer reveals the timing change without changing the underlying pose content.
+- 结果说明什么：viewer 展示只改变时序、不改变底层姿态内容的效果。
 - 可视化主体：Time-warped animation comparison
 - 捕获方式：`canvas`
 
@@ -182,9 +180,9 @@ flowchart LR
     C --> D[记录修改量而非绝对坐标]
 ```
 
-- 代码做什么：Pose-warp key poses: The key-pose viewer shows what spatial correction will be blended into the clip.
+- 代码做什么：Pose-warp 关键姿态：展示将被混入片段的空间修正量。
 - 运行后看到什么：`viewer`
-- 结果说明什么：The key-pose viewer shows what spatial correction will be blended into the clip.
+- 结果说明什么：关键姿态 viewer 展示将被混入片段的空间修正量。
 - 可视化主体：Pose-warp key poses
 - 捕获方式：`canvas`
 
@@ -201,9 +199,9 @@ flowchart LR
     C --> D[用于缩放 Offset 偏差量]
 ```
 
-- 代码做什么：Offset warp curve: The curve explains how local pose edits are distributed smoothly.
+- 代码做什么：Offset warp 曲线：说明局部姿态编辑如何被平滑分配。
 - 运行后看到什么：`plot`
-- 结果说明什么：The curve explains how local pose edits are distributed smoothly.
+- 结果说明什么：曲线说明局部姿态编辑如何被平滑分配。
 - 可视化主体：Offset warp curve
 - 捕获方式：`plot`
 
@@ -220,9 +218,9 @@ flowchart LR
     C --> D[输出最终双重 Warp 动画]
 ```
 
-- 代码做什么：Final time and pose warped animation: This final viewer checks whether timing and pose edits combine into a coherent motion.
+- 代码做什么：最终时间与姿态 warping 动画：检查时序编辑和姿态编辑能否合成连贯动作。
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：This final viewer checks whether timing and pose edits combine into a coherent motion.
+- 结果说明什么：最终 viewer 检查时序编辑和姿态编辑能否合成连贯动作。
 - 可视化主体：Final time and pose warped animation
 - 捕获方式：`canvas`
 
@@ -249,7 +247,7 @@ Time warp 图验证事件是否发生在新时间；pose warp viewer 验证关�
 
 ## 重点可视化 / 动画
 
-本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
+本节只保留最能说明算法结果的图像和动画。代码学习卡移到文末证据表，供需要复现或追溯 cell 上下文时查看。
 
 
 ![Source animation playback](assets/01_source_animation_playback_preview.gif)
@@ -277,32 +275,32 @@ https://github.com/user-attachments/assets/2a3e910d-fd40-4620-b0e0-28ac59b0f917
   <source src="assets/08_combined_warped_animation_preview.webm" type="video/webm">
 </video>
 
-| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| Cell | 输出类型 | 阅读位置 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |
-| Cell 5 | `timeline_viewer` | `key_animation` | Source animation playback: This baseline lets later warped outputs be compared against the original motion. | `canvas` | [结果 PNG](assets/01_source_animation_playback_result.png) / [GIF](assets/01_source_animation_playback_preview.gif) / [MP4](assets/01_source_animation_playback_preview.mp4) / [WebM](assets/01_source_animation_playback_preview.webm) |
-| Cell 6 | `plot` | `key_visual` | Raw quaternion channel plot: The graph shows that animation warping often starts as curve manipulation. | `plot` | [结果 PNG](assets/02_raw_quaternion_channel_result.png) |
-| Cell 12 | `plot` | `key_visual` | Time-warp keypoints and tangents: The plot shows how sparse timing edits become a continuous time-warp curve. | `plot` | [结果 PNG](assets/03_timewarp_keypoints_result.png) |
-| Cell 15 | `plot` | `key_visual` | Resampled time-warp curve: The output shows the actual per-frame time lookup used for animation sampling. | `plot` | [结果 PNG](assets/04_resampled_timewarp_curve_result.png) |
-| Cell 20 | `timeline_viewer` | `key_animation` | Time-warped animation comparison: The viewer reveals the timing change without changing the underlying pose content. | `canvas` | [结果 PNG](assets/05_timewarped_animation_compare_result.png) / [GIF](assets/05_timewarped_animation_compare_preview.gif) / [MP4](assets/05_timewarped_animation_compare_preview.mp4) / [WebM](assets/05_timewarped_animation_compare_preview.webm) |
-| Cell 23 | `viewer` | `key_visual` | Pose-warp key poses: The key-pose viewer shows what spatial correction will be blended into the clip. | `canvas` | [结果 PNG](assets/06_pose_warp_key_poses_result.png) |
-| Cell 27 | `plot` | `key_visual` | Offset warp curve: The curve explains how local pose edits are distributed smoothly. | `plot` | [结果 PNG](assets/07_offset_warp_curve_result.png) |
-| Cell 31 | `timeline_viewer` | `key_animation` | Final time and pose warped animation: This final viewer checks whether timing and pose edits combine into a coherent motion. | `canvas` | [结果 PNG](assets/08_combined_warped_animation_result.png) / [GIF](assets/08_combined_warped_animation_preview.gif) / [MP4](assets/08_combined_warped_animation_preview.mp4) / [WebM](assets/08_combined_warped_animation_preview.webm) |
+| Cell 5 | `timeline_viewer` | 核心动画 | 源动画播放：给后续 warping 结果提供原始动作基准。 | `canvas` | [结果 PNG](assets/01_source_animation_playback_result.png) / [GIF](assets/01_source_animation_playback_preview.gif) / [MP4](assets/01_source_animation_playback_preview.mp4) / [WebM](assets/01_source_animation_playback_preview.webm) |
+| Cell 6 | `plot` | 核心图解 | 原始四元数通道曲线：说明 animation warping 往往从曲线编辑开始。 | `plot` | [结果 PNG](assets/02_raw_quaternion_channel_result.png) |
+| Cell 12 | `plot` | 核心图解 | Time-warp 关键点与切线：展示稀疏时间编辑如何变成连续时间扭曲曲线。 | `plot` | [结果 PNG](assets/03_timewarp_keypoints_result.png) |
+| Cell 15 | `plot` | 核心图解 | 重采样后的 time-warp 曲线：展示动画采样实际使用的逐帧时间查找表。 | `plot` | [结果 PNG](assets/04_resampled_timewarp_curve_result.png) |
+| Cell 20 | `timeline_viewer` | 核心动画 | Time-warp 动画对比：展示只改变时序、不改变底层姿态内容的效果。 | `canvas` | [结果 PNG](assets/05_timewarped_animation_compare_result.png) / [GIF](assets/05_timewarped_animation_compare_preview.gif) / [MP4](assets/05_timewarped_animation_compare_preview.mp4) / [WebM](assets/05_timewarped_animation_compare_preview.webm) |
+| Cell 23 | `viewer` | 核心图解 | Pose-warp 关键姿态：展示将被混入片段的空间修正量。 | `canvas` | [结果 PNG](assets/06_pose_warp_key_poses_result.png) |
+| Cell 27 | `plot` | 核心图解 | Offset warp 曲线：说明局部姿态编辑如何被平滑分配。 | `plot` | [结果 PNG](assets/07_offset_warp_curve_result.png) |
+| Cell 31 | `timeline_viewer` | 核心动画 | 最终时间与姿态 warping 动画：检查时序编辑和姿态编辑能否合成连贯动作。 | `canvas` | [结果 PNG](assets/08_combined_warped_animation_result.png) / [GIF](assets/08_combined_warped_animation_preview.gif) / [MP4](assets/08_combined_warped_animation_preview.mp4) / [WebM](assets/08_combined_warped_animation_preview.webm) |
 
 
 ## 代码 Cell 与可视化结果
 
-本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 
 | Cell / 片段 | 结果说明 | 证据 |
 | --- | --- | --- |
-| Cell 5 | This baseline lets later warped outputs be compared against the original motion. | [结果 PNG](assets/01_source_animation_playback_result.png) / [GIF](assets/01_source_animation_playback_preview.gif) / [MP4](assets/01_source_animation_playback_preview.mp4) / [WebM](assets/01_source_animation_playback_preview.webm) / [代码卡](assets/01_source_animation_playback.png) |
-| Cell 6 | The graph shows that animation warping often starts as curve manipulation. | [结果 PNG](assets/02_raw_quaternion_channel_result.png) / [代码卡](assets/02_raw_quaternion_channel.png) |
-| Cell 12 | The plot shows how sparse timing edits become a continuous time-warp curve. | [结果 PNG](assets/03_timewarp_keypoints_result.png) / [代码卡](assets/03_timewarp_keypoints.png) |
-| Cell 15 | The output shows the actual per-frame time lookup used for animation sampling. | [结果 PNG](assets/04_resampled_timewarp_curve_result.png) / [代码卡](assets/04_resampled_timewarp_curve.png) |
-| Cell 20 | The viewer reveals the timing change without changing the underlying pose content. | [结果 PNG](assets/05_timewarped_animation_compare_result.png) / [GIF](assets/05_timewarped_animation_compare_preview.gif) / [MP4](assets/05_timewarped_animation_compare_preview.mp4) / [WebM](assets/05_timewarped_animation_compare_preview.webm) / [代码卡](assets/05_timewarped_animation_compare.png) |
-| Cell 23 | The key-pose viewer shows what spatial correction will be blended into the clip. | [结果 PNG](assets/06_pose_warp_key_poses_result.png) / [代码卡](assets/06_pose_warp_key_poses.png) |
-| Cell 27 | The curve explains how local pose edits are distributed smoothly. | [结果 PNG](assets/07_offset_warp_curve_result.png) / [代码卡](assets/07_offset_warp_curve.png) |
-| Cell 31 | This final viewer checks whether timing and pose edits combine into a coherent motion. | [结果 PNG](assets/08_combined_warped_animation_result.png) / [GIF](assets/08_combined_warped_animation_preview.gif) / [MP4](assets/08_combined_warped_animation_preview.mp4) / [WebM](assets/08_combined_warped_animation_preview.webm) / [代码卡](assets/08_combined_warped_animation.png) |
+| Cell 5 | 给后续 warping 结果提供原始动作基准。 | [结果 PNG](assets/01_source_animation_playback_result.png) / [GIF](assets/01_source_animation_playback_preview.gif) / [MP4](assets/01_source_animation_playback_preview.mp4) / [WebM](assets/01_source_animation_playback_preview.webm) / [代码卡](assets/01_source_animation_playback.png) |
+| Cell 6 | 曲线说明 animation warping 往往从曲线编辑开始。 | [结果 PNG](assets/02_raw_quaternion_channel_result.png) / [代码卡](assets/02_raw_quaternion_channel.png) |
+| Cell 12 | 图中展示稀疏时间编辑如何变成连续 time-warp 曲线。 | [结果 PNG](assets/03_timewarp_keypoints_result.png) / [代码卡](assets/03_timewarp_keypoints.png) |
+| Cell 15 | 输出展示动画采样实际使用的逐帧时间查找表。 | [结果 PNG](assets/04_resampled_timewarp_curve_result.png) / [代码卡](assets/04_resampled_timewarp_curve.png) |
+| Cell 20 | viewer 展示只改变时序、不改变底层姿态内容的效果。 | [结果 PNG](assets/05_timewarped_animation_compare_result.png) / [GIF](assets/05_timewarped_animation_compare_preview.gif) / [MP4](assets/05_timewarped_animation_compare_preview.mp4) / [WebM](assets/05_timewarped_animation_compare_preview.webm) / [代码卡](assets/05_timewarped_animation_compare.png) |
+| Cell 23 | 关键姿态 viewer 展示将被混入片段的空间修正量。 | [结果 PNG](assets/06_pose_warp_key_poses_result.png) / [代码卡](assets/06_pose_warp_key_poses.png) |
+| Cell 27 | 曲线说明局部姿态编辑如何被平滑分配。 | [结果 PNG](assets/07_offset_warp_curve_result.png) / [代码卡](assets/07_offset_warp_curve.png) |
+| Cell 31 | 最终 viewer 检查时序编辑和姿态编辑能否合成连贯动作。 | [结果 PNG](assets/08_combined_warped_animation_result.png) / [GIF](assets/08_combined_warped_animation_preview.gif) / [MP4](assets/08_combined_warped_animation_preview.mp4) / [WebM](assets/08_combined_warped_animation_preview.webm) / [代码卡](assets/08_combined_warped_animation.png) |
 
 
 ## 运行方式

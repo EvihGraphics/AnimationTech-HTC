@@ -8,7 +8,7 @@
 | source path | `labs/AnimationPapers/Animation Format.ipynb` |
 | env prefix | `.envs/animation_format` |
 | kernel | `animationtech-animation_format` |
-| validation status | `passed`（`manual_smoke`；自动执行通过，仍需 JupyterLab 手动冒烟） |
+| validation status | 自动执行已通过；交互部分仍建议在 JupyterLab 中人工检查 |
 
 ## 问题背景
 
@@ -176,7 +176,7 @@ animation.quats[:, 0], animation.pos[:, 0] = root_q, root_p
 
 这一步把角色整体在地面上的移动与朝向交给 `Root`，让 `Hips` 更专注于身体姿态。后续如果想原地播放，只需要固定 `Root` 的位置或旋转；如果想把动作接入游戏角色控制，也可以把 `Root` 看作导航层与动画层之间的接口。
 
-## 关键 cell / 函数深讲
+## 基础函数读法
 
 ### `lab.import_bvh`
 
@@ -224,21 +224,6 @@ Root 投影 cell 是本篇最关键的工程 cell。它展示了如何把“角�
 
 理解这里之后，后面的 motion warping、footskate cleanup、verbs/adverbs 等案例都可以看作对同一套数据结构的进一步变换：有的改轨迹，有的改约束，有的改局部姿态，但底层仍是骨架层级和逐帧 `pos/quats`。
 
-## 代码 Cell 与可视化结果
-
-本节按 notebook 的关键 code cell 组织学习素材：每个条目都对应代码目的、实际输出类型、结果意义和 PNG 学习卡片。PNG 由指定 cell 的代码摘要、输出区、viewer/canvas 或图表/日志合成，不使用整页滚动截图替代。
-
-
-| Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
-| --- | --- | --- | --- | --- |
-| 11 | `viewer` | Run render(frame), convert BVH channels to character bone matrices, then draw the character, ground, skeleton lines, and local axes. | This confirms that the animation data can drive the live viewer; later format, mapping, and root-motion discussions use this visual baseline. | [PNG](assets/01_character_bind_pose.png) |
-| 12 | `viewer` | Run render_skeleton(frame) and draw only BVH skeleton lines and joint axes. | Separating the mesh from the skeleton lets the reader inspect the joint hierarchy directly. | [PNG](assets/02_raw_bvh_skeleton.png) |
-| 9 | `log` | Print the position and quaternion tensor shapes after importing BVH data. | The log shows that an animation is represented as frame x bone x channel arrays. | [PNG](assets/03_tensor_shape_output.png) |
-| 19 | `viewer` | Render the raw BVH skeleton beside the AnimMapper result on the target character. | This shows that mapping adapts hierarchy and pose to the character while preserving the time structure. | [PNG](assets/04_raw_vs_mapped_compare.png) |
-| 21 | `log` | Print the raw and mapped skeleton parent trees. | The textual tree turns the viewer difference into an inspectable parent-child hierarchy. | [PNG](assets/05_skeleton_tree_output.png) |
-| 24 | `timeline_viewer` | Use static_position/static_rotation controls to inspect root motion and local pelvis motion. | The result explains how global displacement and local body pose are stored separately. | [PNG](assets/06_root_projection_motion.png) |
-| 24 | `timeline_viewer` | Enable a Root toggle and observe which motion remains in the local skeleton. | This makes the role of Root translation and rotation visible in the animated result. | [PNG](assets/07_static_root_toggles.png) |
-
 ## 关键 cell / 函数深讲
 
 ### Cell 11 - Character bind pose and skeleton viewer
@@ -254,7 +239,7 @@ flowchart LR
 
 - 代码做什么：Run render(frame), convert BVH channels to character bone matrices, then draw the character, ground, skeleton lines, and local axes.
 - 运行后看到什么：`viewer`
-- 结果说明什么：This confirms that the animation data can drive the live viewer; later format, mapping, and root-motion discussions use this visual baseline.
+- 结果说明什么：确认动画数据能驱动实时 viewer，后续格式、映射和 Root motion 讨论都以它为基准。
 - 可视化主体：Character bind pose and skeleton viewer
 - 捕获方式：`canvas`
 
@@ -273,7 +258,7 @@ flowchart LR
 
 - 代码做什么：Run render_skeleton(frame) and draw only BVH skeleton lines and joint axes.
 - 运行后看到什么：`viewer`
-- 结果说明什么：Separating the mesh from the skeleton lets the reader inspect the joint hierarchy directly.
+- 结果说明什么：去掉 mesh 后，可以直接检查关节层级。
 - 可视化主体：Raw BVH skeleton-only view
 - 捕获方式：`canvas`
 
@@ -293,7 +278,7 @@ flowchart LR
 
 - 代码做什么：Print the position and quaternion tensor shapes after importing BVH data.
 - 运行后看到什么：`log`
-- 结果说明什么：The log shows that an animation is represented as frame x bone x channel arrays.
+- 结果说明什么：日志说明动画会被表示成 frame x bone x channel 的数组。
 - 可视化主体：pos/quats tensor shape output
 - 捕获方式：`log`
 
@@ -313,7 +298,7 @@ flowchart LR
 
 - 代码做什么：Render the raw BVH skeleton beside the AnimMapper result on the target character.
 - 运行后看到什么：`viewer`
-- 结果说明什么：This shows that mapping adapts hierarchy and pose to the character while preserving the time structure.
+- 结果说明什么：展示映射如何在保留时间结构的同时，把层级和姿态适配到角色资产。
 - 可视化主体：Raw skeleton versus mapped skeleton
 - 捕获方式：`canvas`
 
@@ -332,7 +317,7 @@ flowchart LR
 
 - 代码做什么：Print the raw and mapped skeleton parent trees.
 - 运行后看到什么：`log`
-- 结果说明什么：The textual tree turns the viewer difference into an inspectable parent-child hierarchy.
+- 结果说明什么：文本树把 viewer 中的差异落到可检查的父子层级上。
 - 可视化主体：Skeleton parent tree output
 - 捕获方式：`log`
 
@@ -353,7 +338,7 @@ flowchart LR
 
 - 代码做什么：Use static_position/static_rotation controls to inspect root motion and local pelvis motion.
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：The result explains how global displacement and local body pose are stored separately.
+- 结果说明什么：说明全局位移和局部身体姿态如何分开存储。
 - 可视化主体：Root projection and Root/Hips split
 - 捕获方式：`canvas`
 
@@ -380,7 +365,7 @@ flowchart LR
 
 - 代码做什么：Enable a Root toggle and observe which motion remains in the local skeleton.
 - 运行后看到什么：`timeline_viewer`
-- 结果说明什么：This makes the role of Root translation and rotation visible in the animated result.
+- 结果说明什么：让 Root 平移和旋转在动画中的作用变得可见。
 - 可视化主体：Static Root toggle comparison
 - 捕获方式：`canvas`
 
@@ -406,7 +391,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 animati
 
 ## 重点可视化 / 动画
 
-本节只放 `key_visual` 与 `key_animation` 的算法结果媒体。代码学习卡不作为正文主视觉；它们只在后续证据表中用于复现 cell 或源码上下文。
+本节只保留最能说明算法结果的图像和动画。代码学习卡移到文末证据表，供需要复现或追溯 cell 上下文时查看。
 
 
 ![Root projection and Root/Hips split](assets/06_root_projection_motion_preview.gif)
@@ -427,25 +412,25 @@ https://github.com/user-attachments/assets/f1a58680-65d5-444c-bae3-d5b51c46e0f0
   <source src="assets/07_static_root_toggles_preview.webm" type="video/webm">
 </video>
 
-| Cell | 输出类型 | 媒体角色 | 可视化主体 | 捕获方式 | 结果媒体 |
+| Cell | 输出类型 | 阅读位置 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |
-| Cell 11 | `viewer` | `key_visual` | Character bind pose and skeleton viewer: This confirms that the animation data can drive the live viewer; later format, mapping, and root-motion discussions use this visual baseline. | `canvas` | [结果 PNG](assets/01_character_bind_pose_result.png) |
-| Cell 12 | `viewer` | `key_visual` | Raw BVH skeleton-only view: Separating the mesh from the skeleton lets the reader inspect the joint hierarchy directly. | `canvas` | [结果 PNG](assets/02_raw_bvh_skeleton_result.png) |
-| Cell 19 | `viewer` | `key_visual` | Raw skeleton versus mapped skeleton: This shows that mapping adapts hierarchy and pose to the character while preserving the time structure. | `canvas` | [结果 PNG](assets/04_raw_vs_mapped_compare_result.png) |
-| Cell 24 | `timeline_viewer` | `key_animation` | Root projection and Root/Hips split: The result explains how global displacement and local body pose are stored separately. | `canvas` | [结果 PNG](assets/06_root_projection_motion_result.png) / [GIF](assets/06_root_projection_motion_preview.gif) / [MP4](assets/06_root_projection_motion_preview.mp4) / [WebM](assets/06_root_projection_motion_preview.webm) |
-| Cell 24 | `timeline_viewer` | `key_animation` | Static Root toggle comparison: This makes the role of Root translation and rotation visible in the animated result. | `canvas` | [结果 PNG](assets/07_static_root_toggles_result.png) / [GIF](assets/07_static_root_toggles_preview.gif) / [MP4](assets/07_static_root_toggles_preview.mp4) / [WebM](assets/07_static_root_toggles_preview.webm) |
+| Cell 11 | `viewer` | 核心图解 | 角色绑定姿势与骨架预览：确认动画数据能驱动实时 viewer，后续格式、映射和 Root motion 讨论都以它为基准。 | `canvas` | [结果 PNG](assets/01_character_bind_pose_result.png) |
+| Cell 12 | `viewer` | 核心图解 | 仅显示原始 BVH 骨架：去掉 mesh 后，可以直接检查关节层级。 | `canvas` | [结果 PNG](assets/02_raw_bvh_skeleton_result.png) |
+| Cell 19 | `viewer` | 核心图解 | 原始骨架与映射后骨架对比：展示映射如何在保留时间结构的同时，把层级和姿态适配到角色资产。 | `canvas` | [结果 PNG](assets/04_raw_vs_mapped_compare_result.png) |
+| Cell 24 | `timeline_viewer` | 核心动画 | Root 投影与 Root/Hips 拆分：说明全局位移和局部身体姿态如何分开存储。 | `canvas` | [结果 PNG](assets/06_root_projection_motion_result.png) / [GIF](assets/06_root_projection_motion_preview.gif) / [MP4](assets/06_root_projection_motion_preview.mp4) / [WebM](assets/06_root_projection_motion_preview.webm) |
+| Cell 24 | `timeline_viewer` | 核心动画 | Static Root 开关对比：直接显示 Root 平移和旋转在动画中的作用。 | `canvas` | [结果 PNG](assets/07_static_root_toggles_result.png) / [GIF](assets/07_static_root_toggles_preview.gif) / [MP4](assets/07_static_root_toggles_preview.mp4) / [WebM](assets/07_static_root_toggles_preview.webm) |
 
 
 ## 代码 Cell 与可视化结果
 
-本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
+下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 
 | Cell / 片段 | 结果说明 | 证据 |
 | --- | --- | --- |
-| Cell 11 | This confirms that the animation data can drive the live viewer; later format, mapping, and root-motion discussions use this visual baseline. | [结果 PNG](assets/01_character_bind_pose_result.png) / [代码卡](assets/01_character_bind_pose.png) |
-| Cell 12 | Separating the mesh from the skeleton lets the reader inspect the joint hierarchy directly. | [结果 PNG](assets/02_raw_bvh_skeleton_result.png) / [代码卡](assets/02_raw_bvh_skeleton.png) |
-| Cell 9 | The log shows that an animation is represented as frame x bone x channel arrays. | [结果 PNG](assets/03_tensor_shape_output_result.png) / [代码卡](assets/03_tensor_shape_output.png) |
-| Cell 19 | This shows that mapping adapts hierarchy and pose to the character while preserving the time structure. | [结果 PNG](assets/04_raw_vs_mapped_compare_result.png) / [代码卡](assets/04_raw_vs_mapped_compare.png) |
-| Cell 21 | The textual tree turns the viewer difference into an inspectable parent-child hierarchy. | [结果 PNG](assets/05_skeleton_tree_output_result.png) / [代码卡](assets/05_skeleton_tree_output.png) |
-| Cell 24 | The result explains how global displacement and local body pose are stored separately. | [结果 PNG](assets/06_root_projection_motion_result.png) / [GIF](assets/06_root_projection_motion_preview.gif) / [MP4](assets/06_root_projection_motion_preview.mp4) / [WebM](assets/06_root_projection_motion_preview.webm) / [代码卡](assets/06_root_projection_motion.png) |
-| Cell 24 | This makes the role of Root translation and rotation visible in the animated result. | [结果 PNG](assets/07_static_root_toggles_result.png) / [GIF](assets/07_static_root_toggles_preview.gif) / [MP4](assets/07_static_root_toggles_preview.mp4) / [WebM](assets/07_static_root_toggles_preview.webm) / [代码卡](assets/07_static_root_toggles.png) |
+| Cell 11 | 确认动画数据能驱动实时 viewer，后续格式、映射和 Root motion 讨论都以它为基准。 | [结果 PNG](assets/01_character_bind_pose_result.png) / [代码卡](assets/01_character_bind_pose.png) |
+| Cell 12 | 去掉 mesh 后，可以直接检查关节层级。 | [结果 PNG](assets/02_raw_bvh_skeleton_result.png) / [代码卡](assets/02_raw_bvh_skeleton.png) |
+| Cell 9 | 日志说明动画会被表示成 frame x bone x channel 的数组。 | [结果 PNG](assets/03_tensor_shape_output_result.png) / [代码卡](assets/03_tensor_shape_output.png) |
+| Cell 19 | 展示映射如何在保留时间结构的同时，把层级和姿态适配到角色资产。 | [结果 PNG](assets/04_raw_vs_mapped_compare_result.png) / [代码卡](assets/04_raw_vs_mapped_compare.png) |
+| Cell 21 | 文本树把 viewer 中的差异落到可检查的父子层级上。 | [结果 PNG](assets/05_skeleton_tree_output_result.png) / [代码卡](assets/05_skeleton_tree_output.png) |
+| Cell 24 | 说明全局位移和局部身体姿态如何分开存储。 | [结果 PNG](assets/06_root_projection_motion_result.png) / [GIF](assets/06_root_projection_motion_preview.gif) / [MP4](assets/06_root_projection_motion_preview.mp4) / [WebM](assets/06_root_projection_motion_preview.webm) / [代码卡](assets/06_root_projection_motion.png) |
+| Cell 24 | 让 Root 平移和旋转在动画中的作用变得可见。 | [结果 PNG](assets/07_static_root_toggles_result.png) / [GIF](assets/07_static_root_toggles_preview.gif) / [MP4](assets/07_static_root_toggles_preview.mp4) / [WebM](assets/07_static_root_toggles_preview.webm) / [代码卡](assets/07_static_root_toggles.png) |

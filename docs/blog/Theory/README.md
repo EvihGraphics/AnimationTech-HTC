@@ -8,7 +8,7 @@ Theory 分组对应后续动画案例所依赖的数学和几何基础。建议�
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 <slug>
 ```
 
-发布状态：5 个受管 notebook 全部有 README、assets 清单、v5 媒体和运行入口；其中 `curve_and_spline` 与 `laplacian_deformation` 已深写完成，其余 3 个案例是媒体完整的发布基底。
+发布状态：5 个 notebook 全部有 README、assets 清单、结果媒体和运行入口；每篇都已经补齐前置知识、代码执行路径、关键 cell / 函数深讲、结果读法和素材索引。
 
 ## 分组模块图
 
@@ -44,6 +44,9 @@ flowchart TD
 | --- | --- |
 | [`curve_and_spline`](curve_and_spline/README.md) | 参数、控制点、插值和连续性如何决定曲线形状与运动速度。 |
 | [`laplacian_deformation`](laplacian_deformation/README.md) | Laplacian 坐标、锚点约束和旋转不变性如何把局部形变传播到整体网格。 |
+| [`motiongraph_pointcloud_derivation`](motiongraph_pointcloud_derivation/README.md) | 从加权点云误差推到 Motion Graph 转移对齐的闭式解。 |
+| [`radial_basis_function`](radial_basis_function/README.md) | 从 Gaussian kernel、权重求解和多项式增强理解 RBF 插值。 |
+| [`radial_basis_function_verbs_and_adverbs`](radial_basis_function_verbs_and_adverbs/README.md) | 把线性项和 RBF 残差迁移到动作语义控制空间。 |
 
 ## 全量案例列表
 
@@ -51,9 +54,9 @@ flowchart TD
 | --- | --- | --- |
 | [`curve_and_spline`](curve_and_spline/README.md) | `notebook` | 深写完成 + 媒体完整 |
 | [`laplacian_deformation`](laplacian_deformation/README.md) | `notebook` | 深写完成 + 媒体完整 |
-| [`motiongraph_pointcloud_derivation`](motiongraph_pointcloud_derivation/README.md) | `notebook` | 媒体完整 + 发布基底 |
-| [`radial_basis_function`](radial_basis_function/README.md) | `notebook` | 媒体完整 + 术语说明增强 |
-| [`radial_basis_function_verbs_and_adverbs`](radial_basis_function_verbs_and_adverbs/README.md) | `notebook` | 媒体完整 + 发布基底 |
+| [`motiongraph_pointcloud_derivation`](motiongraph_pointcloud_derivation/README.md) | `notebook` | 深写完成 + 媒体完整 |
+| [`radial_basis_function`](radial_basis_function/README.md) | `notebook` | 深写完成 + 媒体完整 |
+| [`radial_basis_function_verbs_and_adverbs`](radial_basis_function_verbs_and_adverbs/README.md) | `notebook` | 深写完成 + 媒体完整 |
 
 ## 媒体与阅读建议
 

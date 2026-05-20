@@ -143,11 +143,11 @@ flowchart LR
 
 ## 关键 cell / 函数深讲
 
-本篇是 `.py` 支撑模块，没有 notebook cell；下面按 manifest 中的源码片段和验证步骤对应到 function-level 讲解。
+本篇是 `.py` 支撑模块，没有 notebook cell；下面按源码片段和验证步骤对应到函数层面讲解。
 
 ### imports - Module dependencies
 
-manifest 的 `imports` 片段证明这个模块的依赖面很小。`os` 只用于读取线程数环境变量，`numpy` 用于返回空表和 ndarray 形状，`ExtraTreesRegressor` 是唯一训练器。
+`imports` 片段证明这个模块的依赖面很小。`os` 只用于读取线程数环境变量，`numpy` 用于返回空表和 ndarray 形状，`ExtraTreesRegressor` 是唯一训练器。
 
 ```mermaid
 flowchart LR
@@ -244,7 +244,7 @@ flowchart LR
 
 ## 重点可视化 / 动画
 
-manifest 没有把本模块声明为 `key_visual` 或 `key_animation`。正文只引用真实源码摘录、命令日志和 walkthrough 证据；学习卡只放在后续证据表，不作为主视觉。
+这个模块本身是执行辅助代码，不强行包装成算法动画。正文只引用真实源码摘录、命令日志和 walkthrough；学习卡放在后续证据表里。
 
 | 片段 | 重点媒体 | visual_subject | media_role | 捕获方式 | 结果说明 |
 | --- | --- | --- | --- | --- | --- |
@@ -253,7 +253,7 @@ manifest 没有把本模块声明为 `key_visual` 或 `key_animation`。正文�
 | empty-guard | [结果 PNG](assets/03_empty_training_guard_result.png) | Empty training-set guard | `code_evidence` | `code_evidence` | 空样本仍返回稳定二维表 |
 | extra-trees | [结果 PNG](assets/04_extra_trees_regressor_result.png) | ExtraTrees value fitting | `code_evidence` | `code_evidence` | 训练、预测、reshape 的核心路径 |
 | import-check | [结果 PNG](assets/05_import_validation_log_result.png) | Import validation log | `code_evidence` | `code_evidence` | 验证模块可导入 |
-| walkthrough | [WebM](assets/00-walkthrough.webm) | module walkthrough | `supporting_evidence` | `step_sequence` | 辅助回放源码证据顺序 |
+| walkthrough | [WebM](assets/00-walkthrough.webm) | module walkthrough | 补充证据 | `step_sequence` | 辅助回放源码证据顺序 |
 
 ## 源码模块与执行证据
 
@@ -279,4 +279,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 real_ti
 $env:ANIMATIONTECH_TREE_N_JOBS = "1"
 ```
 
-这篇 README 只整理 manifest 中已声明的源码证据和 transcript 中的工程上下文，不新增媒体或修改训练代码。
+这篇 README 只整理已有源码证据和 transcript 中的工程上下文，不新增媒体或修改训练代码。

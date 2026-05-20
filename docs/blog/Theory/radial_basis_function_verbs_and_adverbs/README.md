@@ -355,7 +355,7 @@ Cell 11、14、20、21 说明径向残差项的角色：RBF 不再“统治”�
 
 ## 重点可视化 / 动画
 
-正文重点媒体只引用 `key_visual` 的真实算法输出。学习卡和 `00-walkthrough.webm` 只作为复现或学习证据，不作为主视觉。
+正文重点媒体只引用真实算法输出。学习卡和 `00-walkthrough.webm` 只作为复现或学习证据，不作为主视觉。
 
 | Cell | 重点媒体 | 可视化主体 | 捕获方式 | 结果说明什么 |
 | --- | --- | --- | --- | --- |
@@ -369,14 +369,14 @@ Cell 11、14、20、21 说明径向残差项的角色：RBF 不再“统治”�
 
 | Cell | 输出类型 | 媒体角色 | 捕获方式 | 发布必需 | 结果媒体 | 代码学习卡 |
 | --- | --- | --- | --- | --- | --- | --- |
-| 3 | `plot` | `key_visual` | `plot` | `true` | [PNG](assets/01_sample_adverb_space_result.png) | [PNG](assets/01_sample_adverb_space.png) |
+| 3 | `plot` | 核心图解 | `plot` | `true` | [PNG](assets/01_sample_adverb_space_result.png) | [PNG](assets/01_sample_adverb_space.png) |
 | 4 | `matrix` | `supporting_evidence` | `table` | `false` | [PNG](assets/02_4d_adverb_encoding_result.png) | [PNG](assets/02_4d_adverb_encoding.png) |
 | 7 | `table` | `supporting_evidence` | `table` | `false` | [PNG](assets/03_linear_coefficients_result.png) | [PNG](assets/03_linear_coefficients.png) |
-| 9 | `plot` | `key_visual` | `plot` | `true` | [PNG](assets/04_linear_color_field_result.png) | [PNG](assets/04_linear_color_field.png) |
+| 9 | `plot` | 核心图解 | `plot` | `true` | [PNG](assets/04_linear_color_field_result.png) | [PNG](assets/04_linear_color_field.png) |
 | 11 | `table` | `supporting_evidence` | `table` | `false` | [PNG](assets/05_linear_residuals_result.png) | [PNG](assets/05_linear_residuals.png) |
-| 14 | `plot` | `key_visual` | `plot` | `true` | [PNG](assets/06_cubic_bspline_basis_result.png) | [PNG](assets/06_cubic_bspline_basis.png) |
+| 14 | `plot` | 核心图解 | `plot` | `true` | [PNG](assets/06_cubic_bspline_basis_result.png) | [PNG](assets/06_cubic_bspline_basis.png) |
 | 20 | `matrix` | `supporting_evidence` | `table` | `false` | [PNG](assets/07_radial_system_solve_result.png) | [PNG](assets/07_radial_system_solve.png) |
-| 21 | `plot` | `key_visual` | `plot` | `true` | [PNG](assets/08_final_rbf_field_result.png) | [PNG](assets/08_final_rbf_field.png) |
+| 21 | `plot` | 核心图解 | `plot` | `true` | [PNG](assets/08_final_rbf_field_result.png) | [PNG](assets/08_final_rbf_field.png) |
 
 ## 运行方式
 
@@ -387,4 +387,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 radial_
 .\.envs\rbf_verbs_adv\python.exe -m jupyter lab --notebook-dir .
 ```
 
-打开 `labs/Theory/radial_basis_function_verbs_and_adverbs.ipynb`，选择 kernel `animationtech-radial_basis_function_verbs_and_adverbs`，按 cell 顺序运行。本文根据 notebook、manifest 与对应 transcript 整理；正文媒体均来自现有 `assets` 中的真实 notebook 输出。
+打开 `labs/Theory/radial_basis_function_verbs_and_adverbs.ipynb`，选择 kernel `animationtech-radial_basis_function_verbs_and_adverbs`，按 cell 顺序运行。本文根据 notebook、素材清单与对应 transcript 整理；正文媒体均来自现有 `assets` 中的真实 notebook 输出。
