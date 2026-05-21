@@ -19,3 +19,8 @@
 | `06_transition_table_precompute.png` | Cell 32 | `learning_card` | `supporting_evidence` | Transition table precompute：Moving the expensive search offline is what makes runtime interaction feasible. |
 | `07_value_learning_curve_result.png` | Cell 35 | `result_png` | `key_visual` | Value-learning score curve：The curve gives a quick read on whether the learned policy is stabilizing. |
 | `07_value_learning_curve.png` | Cell 35 | `learning_card` | `key_visual` | Value-learning score curve：The curve gives a quick read on whether the learned policy is stabilizing. |
+| `08_motion_field_neighbor_rollout_result.png` | Cell 23 | `result_png` | `key_animation` | Source notebook motion-field viewer：current pose and k-NN candidate strip from the original render function. |
+| `08_motion_field_neighbor_rollout_preview.gif` | Cell 23 | `gif_preview` | `key_animation` | Animated preview captured from the source notebook viewer. |
+| `08_motion_field_neighbor_rollout_preview.mp4` | Cell 23 | `video_mp4` | `key_animation` | H.264 local preview; GitHub attachment waits for human media approval. |
+| `08_motion_field_neighbor_rollout_preview.webm` | Cell 23 | `video_webm` | `key_animation` | VP9 local evidence copy. |
+| `08_motion_field_neighbor_rollout.png` | Cell 23 | `learning_card` | `key_animation` | Learning card kept for reproducibility; not used as the正文 key media. |

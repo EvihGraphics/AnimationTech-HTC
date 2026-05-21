@@ -17,3 +17,8 @@
 | `05_classifier_training_code.png` | Cell 18 | `learning_card` | `supporting_evidence` | Classifier construction：The card marks the transition from hand labels to a reusable prediction model. |
 | `06_saved_feature_vectors_result.png` | Cell 25 | `result_png` | `supporting_evidence` | Saved feature-vector artifact load：The artifact load is the stable validation path for the case after manual labeling has been done once. |
 | `06_saved_feature_vectors.png` | Cell 25 | `learning_card` | `supporting_evidence` | Saved feature-vector artifact load：The artifact load is the stable validation path for the case after manual labeling has been done once. |
+| `07_foot_contact_oracle_playback_result.png` | Cell 15 | `result_png` | `key_animation` | Source notebook foot-contact viewer：character, feature axes, and heel/toe contact markers from the original render/canvas cell. |
+| `07_foot_contact_oracle_playback_preview.gif` | Cell 15 | `gif_preview` | `key_animation` | Animated preview captured from the source notebook viewer/canvas. |
+| `07_foot_contact_oracle_playback_preview.mp4` | Cell 15 | `video_mp4` | `key_animation` | H.264 local preview; GitHub attachment waits for human media approval. |
+| `07_foot_contact_oracle_playback_preview.webm` | Cell 15 | `video_webm` | `key_animation` | VP9 local evidence copy. |
+| `07_foot_contact_oracle_playback.png` | Cell 15 | `learning_card` | `key_animation` | Learning card kept for reproducibility; not used as the正文 key media. |

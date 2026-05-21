@@ -2,13 +2,17 @@
 
 ## 元数据
 
-| 字段 | 值 |
+| 字段 | 内容 |
 | --- | --- |
 | slug | `motion_matching` |
 | source path | [`labs/AnimationPapers/Motion Matching.ipynb`](<../../../../labs/AnimationPapers/Motion Matching.ipynb>) |
-| env prefix | `.envs/motion_matching` |
+| transcript sources | [`docs/transcripts/3U_SyxqpGKA_Motion Matching.txt`](<../../../../docs/transcripts/3U_SyxqpGKA_Motion Matching.txt>) |
+| kind | `notebook` |
+| env | `.envs/motion_matching` |
 | kernel | `animationtech-motion_matching` |
-| validation status | 自动执行已通过（最后记录：`2026-04-29T19:59:40.3510337Z`）；交互部分仍建议在 JupyterLab 中人工检查 |
+| validation | `passed` (`manual_smoke`；自动执行通过，viewer 建议 JupyterLab 人工检查) |
+| publish tier | `深写完成 + 媒体完整` |
+| media quality | key_visual/key_animation 必须是算法输出本身，禁止滚动截图、整页 cell、代码卡裁剪和静态假动画 |
 
 ## 问题背景
 
@@ -330,7 +334,7 @@ https://github.com/user-attachments/assets/1793e880-6609-4d41-8944-b536f9ae6604
 | Cell 26 | `timeline_viewer` | 核心动画 | 停止与急转调试帧：停止和急转是检验匹配质量的压力测试。 | `canvas` | [结果 PNG](assets/fast_stop_turn_cases_result.png) / [GIF](assets/fast_stop_turn_cases_preview.gif) / [MP4](assets/fast_stop_turn_cases_preview.mp4) / [WebM](assets/fast_stop_turn_cases_preview.webm) |
 
 
-## 代码 Cell 与可视化结果
+## 代码 Cell 与可视化证据
 
 下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 

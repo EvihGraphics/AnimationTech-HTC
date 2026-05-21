@@ -2,13 +2,17 @@
 
 ## 元数据
 
-| 字段 | 值 |
+| 字段 | 内容 |
 | --- | --- |
 | slug | `motion_graph` |
 | source path | [`labs/AnimationPapers/Motion Graph.ipynb`](<../../../../labs/AnimationPapers/Motion Graph.ipynb>) |
-| env prefix | `.envs/motion_graph` |
+| transcript sources | [`docs/transcripts/3YbY0gG7AEQ_Motion Graphs.txt`](<../../../../docs/transcripts/3YbY0gG7AEQ_Motion Graphs.txt>) |
+| kind | `notebook` |
+| env | `.envs/motion_graph` |
 | kernel | `animationtech-motion_graph` |
-| validation status | 自动执行已通过（最后记录：`2026-04-29T19:59:27.0611060Z`）；交互部分仍建议在 JupyterLab 中人工检查 |
+| validation | `passed` (`manual_smoke`；自动执行通过，viewer 建议 JupyterLab 人工检查) |
+| publish tier | `深写完成 + 媒体完整` |
+| media quality | key_visual/key_animation 必须是算法输出本身，禁止滚动截图、整页 cell、代码卡裁剪和静态假动画 |
 
 ## 问题背景
 
@@ -339,7 +343,7 @@ https://github.com/user-attachments/assets/72d4ec2d-0922-495a-b456-45c66535e27e
 | Cell 45 | `timeline_viewer` | 核心动画 | 路径跟随结果：最终 viewer 检查图搜索能否服务于路径跟随目标。 | `canvas` | [结果 PNG](assets/follow_path_visualization_result.png) / [GIF](assets/follow_path_visualization_preview.gif) / [MP4](assets/follow_path_visualization_preview.mp4) / [WebM](assets/follow_path_visualization_preview.webm) |
 
 
-## 代码 Cell 与可视化结果
+## 代码 Cell 与可视化证据
 
 下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 

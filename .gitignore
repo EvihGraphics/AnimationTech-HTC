@@ -169,3 +169,4 @@ labs/AnimationPapers/realtime_planning_reach_position_group_value_functions*.dat
 *.dat
 .jupyter-runtime/
 docs/plans/
+.tmp_capture_frames/

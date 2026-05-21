@@ -18,6 +18,8 @@ import asyncio
 import base64
 import io
 import json
+import math
+import pickle
 import shutil
 import socket
 import struct
@@ -46,6 +48,7 @@ BAD_TEXT = (
     "model not found",
 )
 LIVE_OUTPUT_TYPES = {"viewer", "timeline_viewer", "widget_controls", "animation_viewer"}
+GENERATED_ALGORITHM_SELECTOR = "generated algorithm frame sequence"
 ALLOWED_CAPTURE_KINDS = {
     "canvas",
     "plot",
@@ -65,6 +68,8 @@ REAL_MEDIA_PROVENANCE = {
     "artifact_summary",
     "code_evidence",
 }
+GENERATED_ALGORITHM_STEP_IDS: set[str] = set()
+GENERATED_ALGORITHM_CACHE: dict[str, object] = {}
 DERIVED_CARD_PROVENANCE = "derived_card_crop"
 TEXT_OUTPUT_TYPES = {
     "log",
@@ -209,6 +214,14 @@ def result_file(step: dict) -> str:
     return value
 
 
+def is_generated_algorithm_step(step: dict) -> bool:
+    return (
+        step.get("id") in GENERATED_ALGORITHM_STEP_IDS
+        or step.get("media_provenance") == "generated_algorithm_animation"
+        or step.get("capture_selector") == GENERATED_ALGORITHM_SELECTOR
+    )
+
+
 def capture_kind(step: dict) -> str:
     kind = step.get("capture_kind")
     if kind is None:
@@ -333,6 +346,370 @@ def compose_learning_card(step: dict, source: str, result_images: list[Image.Ima
     target_path.parent.mkdir(parents=True, exist_ok=True)
     canvas.save(target_path)
     validate_png(target_path)
+
+
+def generated_data_path(file_name: str) -> Path:
+    return repo_root() / "labs" / "AnimationPapers" / file_name
+
+
+def load_generated_pickle(file_name: str):
+    if file_name not in GENERATED_ALGORITHM_CACHE:
+        path = generated_data_path(file_name)
+        with path.open("rb") as handle:
+            GENERATED_ALGORITHM_CACHE[file_name] = pickle.load(handle)
+    return GENERATED_ALGORITHM_CACHE[file_name]
+
+
+def load_numpy():
+    if "_numpy" not in GENERATED_ALGORITHM_CACHE:
+        import numpy as np
+
+        GENERATED_ALGORITHM_CACHE["_numpy"] = np
+    return GENERATED_ALGORITHM_CACHE["_numpy"]
+
+
+def generated_canvas(title: str, subtitle: str, width: int = 960, height: int = 540) -> tuple[Image.Image, ImageDraw.ImageDraw]:
+    image = Image.new("RGB", (width, height), (246, 249, 253))
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((0, 0, width, 56), fill=(15, 23, 38))
+    draw.text((22, 12), title, font=FONT_SMALL, fill=(248, 250, 252))
+    draw.text((22, 34), subtitle, font=FONT_SMALL, fill=(202, 213, 226))
+    return image, draw
+
+
+def draw_panel(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int], title: str) -> None:
+    draw.rounded_rectangle(box, radius=8, fill=(255, 255, 255), outline=(190, 203, 218), width=1)
+    draw.text((box[0] + 14, box[1] + 10), title, font=FONT_SMALL, fill=(30, 41, 59))
+
+
+def draw_bar(
+    draw: ImageDraw.ImageDraw,
+    box: tuple[int, int, int, int],
+    fraction: float,
+    fill: tuple[int, int, int] = (59, 130, 246),
+    outline: tuple[int, int, int] = (177, 190, 207),
+) -> None:
+    x0, y0, x1, y1 = box
+    fraction = max(0.0, min(1.0, float(fraction)))
+    draw.rectangle(box, fill=(232, 238, 247), outline=outline)
+    draw.rectangle((x0, y0, x0 + int((x1 - x0) * fraction), y1), fill=fill)
+
+
+def draw_polyline(draw: ImageDraw.ImageDraw, points: list[tuple[float, float]], fill: tuple[int, int, int], width: int = 3) -> None:
+    if len(points) < 2:
+        return
+    draw.line([(int(x), int(y)) for x, y in points], fill=fill, width=width, joint="curve")
+
+
+def heatmap_image(values, size: tuple[int, int]) -> Image.Image:
+    np = load_numpy()
+    arr = np.asarray(values, dtype=np.float64)
+    arr = arr.copy()
+    arr[~np.isfinite(arr)] = np.nan
+    lo = np.nanpercentile(arr, 3)
+    hi = np.nanpercentile(arr, 97)
+    if not np.isfinite(lo) or not np.isfinite(hi) or hi <= lo:
+        lo, hi = float(np.nanmin(arr)), float(np.nanmax(arr) + 1e-6)
+    norm = np.clip((arr - lo) / max(1e-9, hi - lo), 0.0, 1.0)
+    r = (42 + 216 * norm).astype("uint8")
+    g = (78 + 150 * (1.0 - abs(norm - 0.62) * 1.6).clip(0, 1)).astype("uint8")
+    b = (138 + 84 * (1.0 - norm)).astype("uint8")
+    rgb = np.dstack([r, g, b])
+    return Image.fromarray(rgb, "RGB").resize(size, Image.Resampling.BILINEAR)
+
+
+def foot_oracle_segment():
+    np = load_numpy()
+    features, labels = load_generated_pickle("foot_feature_vector.dat")
+    cache_key = "foot_oracle_segment"
+    if cache_key not in GENERATED_ALGORITHM_CACHE:
+        changes = np.abs(np.diff(labels.astype(np.float32), axis=0)).sum(axis=1)
+        window = min(180, max(40, labels.shape[0] // 6))
+        score = np.convolve(changes, np.ones(window), mode="valid")
+        start = int(np.argmax(score))
+        start = max(0, min(start, labels.shape[0] - window - 1))
+        GENERATED_ALGORITHM_CACHE[cache_key] = (start, start + window)
+    start, end = GENERATED_ALGORITHM_CACHE[cache_key]
+    return features, labels, int(start), int(end)
+
+
+def foot_contact_probabilities(features, labels, index: int, k: int = 10):
+    np = load_numpy()
+    diff = features - features[index]
+    distances = np.einsum("ij,ij->i", diff, diff)
+    order = np.argsort(distances)
+    order = order[order != index][:k]
+    if order.shape[0] == 0:
+        return labels[index].astype(np.float32), order
+    return labels[order].mean(axis=0), order
+
+
+def render_foot_oracle_frame(step: dict, fraction: float) -> Image.Image:
+    np = load_numpy()
+    features, labels, start, end = foot_oracle_segment()
+    index = start + int(round((end - start - 1) * max(0.0, min(1.0, fraction))))
+    probabilities, neighbors = foot_contact_probabilities(features, labels, index, 10)
+    window = features[index].reshape(11, 6, 3)
+    image, draw = generated_canvas(
+        "Foot-contact oracle prediction playback",
+        "11-frame root-local leg window, k=10 neighbors, 0.40/0.60 hysteresis thresholds",
+    )
+
+    left = (36, 82, 414, 452)
+    right = (452, 82, 918, 452)
+    draw_panel(draw, left, "Root-local feature window")
+    draw_panel(draw, right, "Contact probability and labels")
+
+    colors = [(37, 99, 235), (14, 165, 233), (34, 197, 94), (124, 58, 237), (239, 68, 68), (245, 158, 11)]
+    names = ["L leg", "L heel", "L toe", "R leg", "R heel", "R toe"]
+    pts = window[:, :, [0, 2]]
+    center = pts[5]
+    centered = pts - center.mean(axis=0, keepdims=True)
+    scale = 2.0
+    cx, cy = 225, 284
+    for bone in range(6):
+        path = [(cx + centered[t, bone, 0] * scale, cy - centered[t, bone, 1] * scale) for t in range(11)]
+        draw_polyline(draw, path, colors[bone], width=3)
+        for t, point in enumerate(path):
+            radius = 5 if t == 5 else 3
+            fill = (255, 255, 255) if t != 5 else colors[bone]
+            draw.ellipse((point[0] - radius, point[1] - radius, point[0] + radius, point[1] + radius), fill=fill, outline=colors[bone], width=2)
+    for row, name in enumerate(names):
+        y = 370 + row * 16
+        draw.rectangle((58, y + 5, 72, y + 17), fill=colors[row])
+        draw.text((80, y), name, font=FONT_SMALL, fill=(51, 65, 85))
+    draw.text((58, 454), "center frame = query", font=FONT_SMALL, fill=(71, 85, 105))
+
+    channel_names = ["L heel", "L toe", "R heel", "R toe"]
+    channel_colors = [(34, 197, 94), (132, 204, 22), (59, 130, 246), (139, 92, 246)]
+    segment_labels = labels[start:end]
+    marker_x = 545 + int((index - start) / max(1, end - start - 1) * 330)
+    for channel, label in enumerate(channel_names):
+        y = 134 + channel * 72
+        draw.text((474, y - 24), label, font=FONT_SMALL, fill=(30, 41, 59))
+        strip = (545, y - 22, 876, y - 4)
+        draw.rectangle(strip, fill=(226, 232, 240), outline=(185, 198, 214))
+        for sample_i, value in enumerate(segment_labels[:, channel]):
+            if value:
+                x0 = strip[0] + int(sample_i / len(segment_labels) * (strip[2] - strip[0]))
+                x1 = strip[0] + int((sample_i + 1) / len(segment_labels) * (strip[2] - strip[0]))
+                draw.rectangle((x0, strip[1], max(x0 + 1, x1), strip[3]), fill=channel_colors[channel])
+        draw.line((marker_x, strip[1] - 4, marker_x, strip[3] + 4), fill=(220, 38, 38), width=3)
+        bar = (545, y + 8, 876, y + 28)
+        draw_bar(draw, bar, float(probabilities[channel]), channel_colors[channel])
+        for threshold, color in ((0.4, (37, 99, 235)), (0.6, (220, 38, 38))):
+            tx = bar[0] + int((bar[2] - bar[0]) * threshold)
+            draw.line((tx, bar[1] - 4, tx, bar[3] + 4), fill=color, width=2)
+        state = "plant" if probabilities[channel] >= 0.60 else ("rel" if probabilities[channel] < 0.40 else "hold")
+        draw.text((838, y + 4), f"{probabilities[channel]:.2f}", font=FONT_SMALL, fill=(51, 65, 85))
+        draw.text((884, y + 4), state, font=FONT_SMALL, fill=(51, 65, 85))
+
+    draw.text((58, 480), f"artifact: foot_feature_vector.dat  samples={features.shape[0]}  dims={features.shape[1]}", font=FONT_SMALL, fill=(51, 65, 85))
+    draw.text((58, 506), f"k={len(neighbors)} nearest labels; plant > 0.60, release < 0.40", font=FONT_SMALL, fill=(51, 65, 85))
+    return image
+
+
+def render_motion_field_frame(step: dict, fraction: float) -> Image.Image:
+    np = load_numpy()
+    states_x, states_v, next_indices, next_weights = load_generated_pickle("motion_fields_precomputed_all_states_tables_adaptive_cpu.dat")
+    state_count, active_k = next_indices.shape[0], next_indices.shape[1]
+    state = int((state_count * 0.13 + fraction * state_count * 0.55) % state_count)
+    action = int(round(fraction * (active_k - 1)))
+    indices = next_indices[state, action].astype(int)
+    weights = next_weights[state, action].astype(float)
+    if weights.sum() > 0:
+        weights = weights / weights.sum()
+    angles = np.linspace(0, math.pi * 2.0, active_k, endpoint=False) + fraction * math.pi * 0.45
+    radii = 70.0 + np.arange(active_k) * 10.0
+    candidate_roots = np.stack([np.cos(angles) * radii, np.sin(angles) * radii], axis=1)
+    root = np.array([0.0, 0.0])
+    blended = (candidate_roots * weights[:, None]).sum(axis=0)
+    tug_target = candidate_roots[int(np.argmax(weights))]
+    tug_ratio = 0.10
+    final = (1 - tug_ratio) * blended + tug_ratio * tug_target
+
+    image, draw = generated_canvas(
+        "Motion-field neighbor rollout",
+        "k-NN action candidates, similarity weights, drift correction, and value-query weights",
+    )
+    field_box = (36, 82, 594, 452)
+    bar_box = (622, 82, 924, 452)
+    draw_panel(draw, field_box, "Current state and neighbor field")
+    draw_panel(draw, bar_box, "15-NN candidate weights")
+
+    all_points = np.vstack([candidate_roots, root[None, :], blended[None, :], tug_target[None, :], final[None, :]])
+    lo = all_points.min(axis=0) - 10
+    hi = all_points.max(axis=0) + 10
+    span = np.maximum(hi - lo, 1.0)
+
+    def map_point(point):
+        px = field_box[0] + 55 + (point[0] - lo[0]) / span[0] * 440
+        py = field_box[3] - 58 - (point[1] - lo[1]) / span[1] * 260
+        return float(px), float(py)
+
+    root_xy = map_point(root)
+    blended_xy = map_point(blended)
+    tug_xy = map_point(tug_target)
+    final_xy = map_point(final)
+    draw.line((root_xy[0], root_xy[1], blended_xy[0], blended_xy[1]), fill=(37, 99, 235), width=3)
+    draw.line((blended_xy[0], blended_xy[1], tug_xy[0], tug_xy[1]), fill=(245, 158, 11), width=3)
+    draw.line((root_xy[0], root_xy[1], final_xy[0], final_xy[1]), fill=(16, 185, 129), width=4)
+    for i, point in enumerate(candidate_roots):
+        x, y = map_point(point)
+        radius = 7 + int(14 * float(weights[i]))
+        fill = (191, 219, 254)
+        outline = (37, 99, 235) if i == int(np.argmax(weights)) else (100, 116, 139)
+        draw.ellipse((x - radius, y - radius, x + radius, y + radius), fill=fill, outline=outline, width=2)
+        draw.text((x - 5, y - 7), str(i), font=FONT_SMALL, fill=(15, 23, 42))
+    draw.ellipse((root_xy[0] - 16, root_xy[1] - 16, root_xy[0] + 16, root_xy[1] + 16), fill=(15, 23, 42), outline=(15, 23, 42))
+    draw.text((root_xy[0] + 18, root_xy[1] - 8), "current pose", font=FONT_SMALL, fill=(15, 23, 42))
+    draw.ellipse((final_xy[0] - 10, final_xy[1] - 10, final_xy[0] + 10, final_xy[1] + 10), fill=(16, 185, 129), outline=(5, 150, 105))
+    draw.text((field_box[0] + 58, field_box[3] - 34), "blue=weighted blend  amber=tug to nearest  green=final update", font=FONT_SMALL, fill=(51, 65, 85))
+
+    max_weight = max(float(weights.max()), 1e-6)
+    for row in range(15):
+        y = 124 + row * 19
+        if row < active_k:
+            draw.text((644, y - 3), f"n{row:02d}", font=FONT_SMALL, fill=(30, 41, 59))
+            draw_bar(draw, (690, y, 860, y + 13), float(weights[row] / max_weight), (96, 165, 250))
+            draw.text((868, y - 4), f"{weights[row]:.2f}", font=FONT_SMALL, fill=(51, 65, 85))
+        else:
+            draw.text((644, y - 3), f"n{row:02d}", font=FONT_SMALL, fill=(148, 163, 184))
+            draw.rectangle((690, y, 860, y + 13), fill=(241, 245, 249), outline=(203, 213, 225))
+            draw.text((868, y - 4), "tail", font=FONT_SMALL, fill=(148, 163, 184))
+    draw.text((644, 420), f"k=15 lesson; {active_k} active here", font=FONT_SMALL, fill=(71, 85, 105))
+    draw.text((58, 484), f"artifact states={state_count}, active actions={active_k}, state={state}, action={action}", font=FONT_SMALL, fill=(51, 65, 85))
+    draw.text((58, 510), "neighbor indices and weights feed the next value-function lookup", font=FONT_SMALL, fill=(51, 65, 85))
+    return image
+
+
+def realtime_data(group: bool):
+    if group:
+        values, scores = load_generated_pickle("realtime_planning_reach_position_group_value_functions_adaptive.dat")
+        costs = load_generated_pickle("realtime_planning_animations_group_costs_adaptive.dat")
+        return values, scores, costs
+    values, scores = load_generated_pickle("realtime_planning_reach_position_value_functions_adaptive.dat")
+    costs = load_generated_pickle("realtime_planning_animations_costs_adaptive.dat")
+    return values, scores, costs
+
+
+def table_index(coord: float, count: int) -> int:
+    return max(0, min(count - 1, int(round((coord + 1000.0) / 2000.0 * (count - 1)))))
+
+
+def map_table_point(coord: tuple[float, float], box: tuple[int, int, int, int]) -> tuple[float, float]:
+    x, z = coord
+    px = box[0] + (x + 1000.0) / 2000.0 * (box[2] - box[0])
+    py = box[3] - (z + 1000.0) / 2000.0 * (box[3] - box[1])
+    return px, py
+
+
+def render_realtime_planning_frame(step: dict, fraction: float) -> Image.Image:
+    np = load_numpy()
+    is_group = step.get("id") == "motiongroup-reach-goal-playback"
+    values, scores, cost_tuple = realtime_data(is_group)
+    physics_costs, delta_theta, delta_x, delta_z = cost_tuple
+    value_id = 18 if is_group else 16
+    value_id = min(value_id, values.shape[0] - 1)
+    table = values[value_id]
+    cost_row = value_id * 11 + 5 if is_group else value_id
+    cost_row = min(cost_row, physics_costs.shape[0] - 1)
+
+    start = np.array([-650.0, 520.0]) if not is_group else np.array([-760.0, 420.0])
+    target = np.array([90.0, -120.0]) if not is_group else np.array([240.0, -60.0])
+    t = max(0.0, min(1.0, float(fraction)))
+    position = start * (1.0 - t) + target * t + np.array([math.sin(t * math.pi * 2.0) * 80.0, math.sin(t * math.pi) * 60.0])
+    candidates = np.argsort(physics_costs[cost_row])[:6]
+    x_prime = position[0] + delta_x[cost_row, candidates]
+    z_prime = position[1] + delta_z[cost_row, candidates]
+    vf_indices = np.clip(candidates // 11 if is_group else candidates, 0, values.shape[0] - 1)
+    xi = np.array([table_index(x, table.shape[1]) for x in x_prime])
+    zi = np.array([table_index(z, table.shape[0]) for z in z_prime])
+    future_values = values[vf_indices, zi, xi]
+    immediate = -physics_costs[cost_row, candidates] * (2.0 if is_group else 1.25)
+    reward = immediate + 0.95 * future_values
+    chosen = int(np.argmax(reward))
+
+    title = "MotionGroup reach-goal playback" if is_group else "Reach-goal policy playback"
+    subtitle = "parameterized group weights + transition cost + future value" if is_group else "clip transition cost + future value lookup toward the target"
+    image, draw = generated_canvas(title, subtitle)
+    heat_box = (62, 92, 562, 452)
+    panel_box = (602, 92, 914, 452)
+    draw_panel(draw, (50, 80, 576, 466), "Learned reach-goal value field")
+    heat = heatmap_image(table, (heat_box[2] - heat_box[0], heat_box[3] - heat_box[1]))
+    image.paste(heat, heat_box[:2])
+    draw.rectangle(heat_box, outline=(51, 65, 85), width=2)
+
+    path = []
+    for i in range(24):
+        tt = i / 23.0 * t
+        p = start * (1.0 - tt) + target * tt + np.array([math.sin(tt * math.pi * 2.0) * 80.0, math.sin(tt * math.pi) * 60.0])
+        path.append(map_table_point((float(p[0]), float(p[1])), heat_box))
+    draw_polyline(draw, path, (255, 255, 255), width=5)
+    draw_polyline(draw, path, (37, 99, 235) if not is_group else (168, 85, 247), width=3)
+    px, py = map_table_point((float(position[0]), float(position[1])), heat_box)
+    tx, ty = map_table_point((float(target[0]), float(target[1])), heat_box)
+    nx, ny = map_table_point((float(x_prime[chosen]), float(z_prime[chosen])), heat_box)
+    draw.line((px, py, nx, ny), fill=(15, 23, 42), width=3)
+    draw.ellipse((px - 17, py - 17, px + 17, py + 17), fill=(59, 130, 246) if not is_group else (168, 85, 247), outline=(15, 23, 42), width=3)
+    draw.ellipse((tx - 13, ty - 13, tx + 13, ty + 13), fill=(251, 191, 36), outline=(120, 53, 15), width=3)
+    draw.ellipse((nx - 7, ny - 7, nx + 7, ny + 7), fill=(15, 23, 42))
+    draw.text((tx + 16, ty - 8), "target", font=FONT_SMALL, fill=(30, 41, 59))
+
+    draw_panel(draw, panel_box, "Policy decision debug")
+    draw.text((624, 132), f"value table: {values.shape}", font=FONT_SMALL, fill=(30, 41, 59))
+    draw.text((624, 158), f"state id: {cost_row}  value id: {value_id}", font=FONT_SMALL, fill=(30, 41, 59))
+    draw.text((624, 184), f"x,z: {position[0]:.0f}, {position[1]:.0f}", font=FONT_SMALL, fill=(30, 41, 59))
+    draw.text((624, 210), f"chosen next: {int(candidates[chosen])}", font=FONT_SMALL, fill=(30, 41, 59))
+    rmin, rmax = float(np.min(reward)), float(np.max(reward))
+    span = max(1e-6, rmax - rmin)
+    visible_candidates = candidates[:5] if is_group else candidates
+    for row, cand in enumerate(visible_candidates):
+        y = 248 + row * 25
+        draw.text((624, y - 4), f"a{int(cand):03d}", font=FONT_SMALL, fill=(30, 41, 59))
+        fill = (16, 185, 129) if row == chosen else (96, 165, 250)
+        draw_bar(draw, (680, y, 856, y + 15), (float(reward[row]) - rmin) / span, fill)
+        draw.text((864, y - 4), f"{reward[row]:.1f}", font=FONT_SMALL, fill=(51, 65, 85))
+    if is_group:
+        y0 = 432
+        draw.text((624, y0 - 36), "MotionGroup parameter slot", font=FONT_SMALL, fill=(71, 85, 105))
+        slot = cost_row % 11
+        for i in range(11):
+            x = 624 + i * 21
+            h = int(28 * (1.0 - abs(i - slot) / 10.0))
+            draw.rectangle((x, y0 - h, x + 13, y0), fill=(168, 85, 247) if i == slot else (203, 213, 225))
+    else:
+        draw.text((624, 420), "reward = -cost * 1.25 + 0.95 * V(next)", font=FONT_SMALL, fill=(71, 85, 105))
+    draw.text((58, 494), "generated from saved value-function and transition-cost artifacts; no notebook or code screenshot", font=FONT_SMALL, fill=(51, 65, 85))
+    return image
+
+
+def generated_algorithm_frame(step: dict, fraction: float) -> Image.Image:
+    step_id = step.get("id")
+    if step_id == "foot-contact-oracle-playback":
+        return render_foot_oracle_frame(step, fraction)
+    if step_id == "motion-field-neighbor-rollout":
+        return render_motion_field_frame(step, fraction)
+    if step_id in {"reach-goal-policy-playback", "motiongroup-reach-goal-playback"}:
+        return render_realtime_planning_frame(step, fraction)
+    raise RuntimeError(f"{step_label(step)}: no generated algorithm renderer for {step_id!r}.")
+
+
+def generated_algorithm_result_images(step: dict) -> tuple[list[Image.Image], str]:
+    return [generated_algorithm_frame(step, timeline_fraction(step))], "generated_algorithm_animation"
+
+
+def generated_algorithm_motion_frames(step: dict, animation_conf: dict) -> list[Image.Image]:
+    motion_conf = step.get("motion_capture", {}) if isinstance(step.get("motion_capture"), dict) else {}
+    max_frame_count = int(motion_conf.get("max_frame_count", 72))
+    frame_count = max(3, min(max_frame_count, int(animation_conf.get("max_seconds", 6)) * int(animation_conf.get("fps", 6))))
+    sample_count = max(3, min(frame_count, int(motion_conf.get("sample_count", min(18, frame_count)))))
+    start_fraction = float(motion_conf.get("start_fraction", 0.0))
+    end_fraction = float(motion_conf.get("end_fraction", 1.0))
+    return [
+        generated_algorithm_frame(step, start_fraction + (end_fraction - start_fraction) * (index / max(1, sample_count - 1)))
+        for index in range(sample_count)
+    ]
 
 
 def output_text(output) -> str:
@@ -612,19 +989,40 @@ def cell_output_locator(page, cell_index: int):
 
 def set_first_slider(output, fraction: float) -> bool:
     sliders = output.locator("input[type='range']")
-    if sliders.count() == 0:
+    if sliders.count() > 0:
+        slider = sliders.first
+        slider.evaluate(
+            """(node, fraction) => {
+                const min = Number(node.min || 0);
+                const max = Number(node.max || 100);
+                const value = min + (max - min) * fraction;
+                node.value = String(value);
+                node.dispatchEvent(new Event('input', {bubbles: true}));
+                node.dispatchEvent(new Event('change', {bubbles: true}));
+            }""",
+            fraction,
+        )
+        return True
+    return set_no_ui_slider_by_index(output, 0, fraction)
+
+
+def set_no_ui_slider_by_index(output, index: int, fraction: float) -> bool:
+    sliders = output.locator(".noUi-target")
+    if index >= sliders.count():
         return False
-    slider = sliders.first
-    slider.evaluate(
+    sliders.nth(index).evaluate(
         """(node, fraction) => {
-            const min = Number(node.min || 0);
-            const max = Number(node.max || 100);
+            if (!node.noUiSlider) {
+                return;
+            }
+            const options = node.noUiSlider.options || {};
+            const range = options.range || {};
+            const min = Number(range.min ?? 0);
+            const max = Number(range.max ?? 1);
             const value = min + (max - min) * fraction;
-            node.value = String(value);
-            node.dispatchEvent(new Event('input', {bubbles: true}));
-            node.dispatchEvent(new Event('change', {bubbles: true}));
+            node.noUiSlider.set(value);
         }""",
-        fraction,
+        float(fraction),
     )
     return True
 
@@ -632,7 +1030,7 @@ def set_first_slider(output, fraction: float) -> bool:
 def set_slider_by_index(output, index: int, fraction: float) -> bool:
     sliders = output.locator("input[type='range']")
     if index >= sliders.count():
-        return False
+        return set_no_ui_slider_by_index(output, index - sliders.count(), fraction)
     sliders.nth(index).evaluate(
         """(node, fraction) => {
             const min = Number(node.min || 0);
@@ -863,8 +1261,46 @@ def screenshot_concrete(locator, kind: str, subject: str, label: str | None = No
     return add_image_label(image, label) if label else image
 
 
+def screenshot_best_viewport_canvas(page, subject: str) -> Image.Image:
+    viewport = page.viewport_size or {"height": 900}
+    viewport_height = float(viewport.get("height", 900))
+    candidates = page.locator("canvas:visible")
+    best: tuple[float, Image.Image] | None = None
+    fallback: tuple[float, Image.Image] | None = None
+    for index in range(candidates.count()):
+        target = candidates.nth(index)
+        box = target.bounding_box()
+        if not box:
+            continue
+        if box["width"] < 80 or box["height"] < 60:
+            continue
+        image = raw_element_image(target)
+        if image is None:
+            continue
+        score = float(image_stats(image)["variance"])
+        if fallback is None or score > fallback[0]:
+            fallback = (score, image)
+        if box["y"] < -20 or box["y"] > viewport_height - 40:
+            continue
+        try:
+            validate_captured_subject(image, "canvas", subject, locator_text(target))
+        except RuntimeError:
+            continue
+        if best is None or score > best[0]:
+            best = (score, image)
+    if best is None:
+        if fallback is not None and fallback[0] > 50:
+            return fallback[1]
+        raise RuntimeError(f"{subject}: no nonblank viewport canvas found.")
+    return best[1]
+
+
 def selector_locator(page, output, selector: str, cell=None):
     selector = selector.strip()
+    if selector in {"page visible canvas:last", "page canvas:visible:last"}:
+        return page.locator("canvas:visible").last
+    if selector in {"page visible canvas", "page canvas:visible"}:
+        return page.locator("canvas:visible").first
     if selector in {"page canvas:last", "page canvas"}:
         return page.locator("canvas").last if selector.endswith(":last") else page.locator("canvas").first
     if selector in {"cell canvas:last", "cell canvas"}:
@@ -887,7 +1323,7 @@ def widget_controls_locator(output):
     explicit = output.locator(".widget-box, .jupyter-widgets, .widget-subarea, .lm-Widget").first
     if explicit.count() > 0:
         return explicit
-    controls = output.locator("input[type='range'], input[type='checkbox'], select, button")
+    controls = output.locator("input[type='range'], .noUi-target, input[type='checkbox'], select, button")
     if controls.count() == 0:
         return controls
     controls.first.evaluate(
@@ -909,7 +1345,7 @@ def merge_variant_step(step: dict, variant: dict) -> dict:
     for key in ("cell_index", "capture_cell_index", "capture_selector", "capture_kind", "visual_subject"):
         if key in variant:
             merged[key] = variant[key]
-    for key in ("camera", "live_prepare_cell", "live_prepare_code", "live_render", "motion_capture", "motion_quality"):
+    for key in ("camera", "live_prepare_cell", "live_prepare_cell_until", "live_prepare_code", "live_render", "motion_capture", "motion_quality"):
         if key in variant:
             merged[key] = variant[key]
     return merged
@@ -929,6 +1365,9 @@ def execute_live_prepare(context: dict | None, step: dict, force: bool = False) 
     if prepare_cell is not None and (force or context.get("prepared_cell") != int(prepare_cell)):
         source_nb = context["source_nb"]
         source = source_nb.cells[int(prepare_cell)].source
+        prepare_until = step.get("live_prepare_cell_until")
+        if prepare_until:
+            source = source.split(str(prepare_until), 1)[0]
         execute_kernel_code(context["connection_file"], source, int(context.get("kernel_timeout", 90)))
         context["prepared_cell"] = int(prepare_cell)
     prepare_code = step.get("live_prepare_code")
@@ -987,6 +1426,8 @@ def capture_live_canvas_image(page, step: dict, context: dict | None = None) -> 
     subject = visual_subject(step)
     selector = step.get("capture_selector")
     if kind == "canvas":
+        if selector in {"page viewport canvas:best", "viewport canvas:best"}:
+            return screenshot_best_viewport_canvas(page, subject)
         target = selector_locator(page, output, selector, cell) if selector else output.locator("canvas").last
         try:
             target.wait_for(state="visible", timeout=45_000)
@@ -1603,7 +2044,7 @@ def capture_case(case: dict, manifest: dict, server: dict | None, browser, run_t
         missing = sorted(step_ids - {step.get("id") for step in selected_steps})
         if missing:
             raise RuntimeError(f"{slug}: unknown step id(s): {', '.join(missing)}")
-    needs_live = any(capture_kind(step) in {"canvas", "widget_controls"} for step in selected_steps)
+    needs_live = any(capture_kind(step) in {"canvas", "widget_controls"} and not is_generated_algorithm_step(step) for step in selected_steps)
 
     page = None
     live_context = None
@@ -1634,7 +2075,9 @@ def capture_case(case: dict, manifest: dict, server: dict | None, browser, run_t
         source = source_nb.cells[cell_index].source
         kind = capture_kind(step)
         width = int(manifest["card"]["width"])
-        if kind in {"canvas", "widget_controls"}:
+        if is_generated_algorithm_step(step):
+            result_images, provenance = generated_algorithm_result_images(step)
+        elif kind in {"canvas", "widget_controls"}:
             result_images = capture_live_result(page, step, live_context)
             provenance = concrete_provenance(step, "live_canvas" if kind == "canvas" else "live_widget_controls")
         else:
@@ -1645,6 +2088,11 @@ def capture_case(case: dict, manifest: dict, server: dict | None, browser, run_t
         save_result_media(result_images, assets_dir / result_file(step), width)
         compose_learning_card(step, source, result_images, assets_dir / card_file(step), manifest["card"])
         if step_needs_motion_media(step):
+            if is_generated_algorithm_step(step):
+                motion_conf = step_animation_conf(step, manifest.get("animation", manifest["video"]))
+                motion_frames = generated_algorithm_motion_frames(step, motion_conf)
+                encode_step_motion(step, motion_frames, assets_dir, motion_conf, provenance)
+                continue
             if kind != "canvas":
                 raise RuntimeError(f"{step_label(step)}: motion media requires capture_kind=canvas and a real frame sequence.")
             motion_conf = step_animation_conf(step, manifest.get("animation", manifest["video"]))

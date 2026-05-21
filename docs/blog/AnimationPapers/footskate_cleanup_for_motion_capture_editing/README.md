@@ -1,14 +1,18 @@
 # Footskate Cleanup for Motion Capture Editing：动捕滑脚修复
 
-## 元信息
+## 元数据
 
-| 字段 | 值 |
+| 字段 | 内容 |
 | --- | --- |
 | slug | `footskate_cleanup_for_motion_capture_editing` |
-| source path | `labs/AnimationPapers/Footskate Cleanup for Motion Capture Editing.ipynb` |
-| env prefix | `.envs/footskate_cleanup` |
+| source path | [`labs/AnimationPapers/Footskate Cleanup for Motion Capture Editing.ipynb`](<../../../../labs/AnimationPapers/Footskate Cleanup for Motion Capture Editing.ipynb>) |
+| transcript sources | [`docs/transcripts/exASa8NAhc8_Footskate cleanup for motion capture editing.txt`](<../../../../docs/transcripts/exASa8NAhc8_Footskate cleanup for motion capture editing.txt>) |
+| kind | `notebook` |
+| env | `.envs/footskate_cleanup` |
 | kernel | `animationtech-footskate_cleanup_for_motion_capture_editing` |
-| validation status | 自动执行已通过；交互部分仍建议在 JupyterLab 中人工检查 |
+| validation | `passed` (`manual_smoke`；自动执行通过，viewer 建议 JupyterLab 人工检查) |
+| publish tier | `深写完成 + 媒体完整` |
+| media quality | key_visual/key_animation 必须是算法输出本身，禁止滚动截图、整页 cell、代码卡裁剪和静态假动画 |
 
 ## 问题背景
 
@@ -233,7 +237,7 @@ https://github.com/user-attachments/assets/2abd9291-3fe6-4c1d-a21c-51ed691da380
 | Cell 29 | `viewer` | 核心图解 | 原始动画与 IK 修正对比：脚部漂移被压回到支撑脚区域附近。 | `canvas/live_canvas` | [结果 PNG](assets/01_raw_vs_solved_overview_result.png) |
 | Cell 34 | `timeline_viewer` | 核心动画 | Final Processing smoothstep 混合：修正权重在接触边界平滑淡入淡出。 | `canvas/live_canvas` | [结果 PNG](assets/06_final_processing_compare_result.png) / [GIF](assets/06_final_processing_compare_preview.gif) / [MP4](assets/06_final_processing_compare_preview.mp4) / [WebM](assets/06_final_processing_compare_preview.webm) |
 
-## 代码 Cell 与可视化结果
+## 代码 Cell 与可视化证据
 
 下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 

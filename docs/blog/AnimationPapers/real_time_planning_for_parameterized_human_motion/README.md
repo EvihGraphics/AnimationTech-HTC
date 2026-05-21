@@ -5,10 +5,14 @@
 | 字段 | 内容 |
 | --- | --- |
 | slug | `real_time_planning_for_parameterized_human_motion` |
-| source path | [`labs/AnimationPapers/Real-Time Planning for Parameterized Human Motion.ipynb`](../../../../labs/AnimationPapers/Real-Time%20Planning%20for%20Parameterized%20Human%20Motion.ipynb) |
-| env prefix | `.envs/rt_param_human` |
+| source path | [`labs/AnimationPapers/Real-Time Planning for Parameterized Human Motion.ipynb`](<../../../../labs/AnimationPapers/Real-Time Planning for Parameterized Human Motion.ipynb>) |
+| transcript sources | [`docs/transcripts/tDilOjKfBaY_Reinforcement Learning 03 _ Realtime Planning For Parametrized Human Motion_.txt`](<../../../../docs/transcripts/tDilOjKfBaY_Reinforcement Learning 03 _ Realtime Planning For Parametrized Human Motion_.txt>) |
+| kind | `notebook` |
+| env | `.envs/rt_param_human` |
 | kernel | `animationtech-real_time_planning_for_parameterized_human_motion` |
-| validation status | 自动执行已通过；交互 viewer 仍建议在 JupyterLab 中人工检查 |
+| validation | `passed` (`manual_smoke`；自动执行通过，viewer 建议 JupyterLab 人工检查) |
+| publish tier | `深写完成 + 媒体完整` |
+| media quality | key_visual/key_animation 必须是算法输出本身，禁止滚动截图、整页 cell、代码卡裁剪和静态假动画 |
 
 ## 问题背景
 
@@ -212,6 +216,26 @@ group 版 `use_optimal_policy` 还会把 group id 映射回 value function 使�
 本节只保留最能说明算法结果的图像和动画。代码学习卡移到文末证据表，供需要复现或追溯 cell 上下文时查看。
 
 
+### Cell 47 - Source notebook reach-goal viewer
+
+这段动画对应语音稿中“把昂贵搜索提前训练成 value table，运行时只做局部查表决策”的核心思路。画面直接来自源案例 notebook 的 `Player(motion_clips)` 与原始 `render(frame)`：角色在地面上朝目标球滚动更新，切换窗口到来时源代码会查询策略并设置下一段 clip。阅读时关注角色朝目标点的连续推进，而不是后处理脚本重绘的 reward 条形图。
+
+![Reach-goal policy playback](assets/09_reach_goal_policy_playback_result.png)
+
+![Reach-goal policy playback preview](assets/09_reach_goal_policy_playback_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/09_reach_goal_policy_playback_result.png" src="assets/09_reach_goal_policy_playback_preview.mp4"></video>
+
+### Cell 74 - Source notebook MotionGroup reach-goal viewer
+
+这段动画使用源案例 notebook 的 `Player(motion_groups)` 与原始 `render(frame)`。它展示同样的目标追踪查询如何在 parameterized MotionGroup 动作空间里运行：角色和目标球都来自源 viewer，切换逻辑来自 notebook 中的 MotionGroup policy，而不是博客脚本生成的解释面板。
+
+![MotionGroup reach-goal playback](assets/10_motiongroup_reach_goal_playback_result.png)
+
+![MotionGroup reach-goal playback preview](assets/10_motiongroup_reach_goal_playback_preview.gif)
+
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/10_motiongroup_reach_goal_playback_result.png" src="assets/10_motiongroup_reach_goal_playback_preview.mp4"></video>
+
 | Cell | 输出类型 | 阅读位置 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |
 | Cell 30 | `plot` | 核心图解 | 朝向策略价值学习曲线：下降曲线说明策略在当前状态空间中趋于稳定。 | `plot` | [结果 PNG](assets/04_orientation_policy_controller_result.png) |
@@ -219,7 +243,7 @@ group 版 `use_optimal_policy` 还会把 group id 映射回 value function 使�
 | Cell 72 | `plot` | 核心图解 | MotionGroup 策略学习曲线：验证从 clip 扩展到 motion group 后仍能学到可用策略。 | `plot` | [结果 PNG](assets/08_group_reach_goal_result_result.png) |
 
 
-## 代码 Cell 与可视化结果
+## 代码 Cell 与可视化证据
 
 下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 
@@ -233,7 +257,8 @@ group 版 `use_optimal_policy` 还会把 group id 映射回 value function 使�
 | Cell 45 | 曲面展示从某个片段到达不同目标位置的未来代价。 | [结果 PNG](assets/06_value_surface_clip16_result.png) / [代码卡](assets/06_value_surface_clip16.png) |
 | Cell 61 | MotionGroup 把多个 clip 变成可参数化的动作空间。 | [结果 PNG](assets/07_motion_group_weight_blend_result.png) / [代码卡](assets/07_motion_group_weight_blend.png) |
 | Cell 72 | 曲线验证从 clip 扩展到 motion group 后仍能学到可用策略。 | [结果 PNG](assets/08_group_reach_goal_result_result.png) / [代码卡](assets/08_group_reach_goal_result.png) |
-
+| Cell 47 | Source notebook `Player(motion_clips)` viewer shows the runtime reach-goal policy tracking a target with original clip transitions. | [Result PNG](assets/09_reach_goal_policy_playback_result.png) / [GIF](assets/09_reach_goal_policy_playback_preview.gif) / [MP4](assets/09_reach_goal_policy_playback_preview.mp4) / [WebM](assets/09_reach_goal_policy_playback_preview.webm) / [代码卡](assets/09_reach_goal_policy_playback.png) |
+| Cell 74 | Source notebook `Player(motion_groups)` viewer shows the parameterized MotionGroup policy tracking a target with original group transitions. | [Result PNG](assets/10_motiongroup_reach_goal_playback_result.png) / [GIF](assets/10_motiongroup_reach_goal_playback_preview.gif) / [MP4](assets/10_motiongroup_reach_goal_playback_preview.mp4) / [WebM](assets/10_motiongroup_reach_goal_playback_preview.webm) / [代码卡](assets/10_motiongroup_reach_goal_playback.png) |
 ## 运行方式
 
 推荐用项目脚本准备环境并运行对应案例：

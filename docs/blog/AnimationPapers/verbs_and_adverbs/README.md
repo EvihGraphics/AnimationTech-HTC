@@ -5,11 +5,14 @@
 | 字段 | 内容 |
 | --- | --- |
 | slug | `verbs_and_adverbs` |
-| source path | [`labs/AnimationPapers/Verbs and Adverbs.ipynb`](../../../../labs/AnimationPapers/Verbs and Adverbs.ipynb) |
-| transcript sources | [`docs/transcripts/EBosvxpPONY_Verbs and Adverbs_ Multidimensional Motion Interpolation Using Radial Basis Func.txt`](../../../../docs/transcripts/EBosvxpPONY_Verbs and Adverbs_ Multidimensional Motion Interpolation Using Radial Basis Func.txt) |
-| env prefix | `.envs/verbs_and_adverbs` |
+| source path | [`labs/AnimationPapers/Verbs and Adverbs.ipynb`](<../../../../labs/AnimationPapers/Verbs and Adverbs.ipynb>) |
+| transcript sources | [`docs/transcripts/EBosvxpPONY_Verbs and Adverbs_ Multidimensional Motion Interpolation Using Radial Basis Func.txt`](<../../../../docs/transcripts/EBosvxpPONY_Verbs and Adverbs_ Multidimensional Motion Interpolation Using Radial Basis Func.txt>) |
+| kind | `notebook` |
+| env | `.envs/verbs_and_adverbs` |
 | kernel | `animationtech-verbs_and_adverbs` |
-| validation status | 自动执行已通过；交互部分仍建议在 JupyterLab 中人工检查 |
+| validation | `passed` (`manual_smoke`；自动执行通过，viewer 建议 JupyterLab 人工检查) |
+| publish tier | `深写完成 + 媒体完整` |
+| media quality | key_visual/key_animation 必须是算法输出本身，禁止滚动截图、整页 cell、代码卡裁剪和静态假动画 |
 
 ## 问题背景
 
@@ -311,7 +314,7 @@ https://github.com/user-attachments/assets/7c36901a-6782-465a-8c6b-281c0e36c487
 | Cell 33 | `timeline_viewer` | 核心动画 | 最终插值后的 adverb 控制：展示 verb/adverb 坐标如何生成新动画。 | `canvas` | [结果 PNG](assets/08_final_interpolated_adverb_controls_result.png) / [GIF](assets/08_final_interpolated_adverb_controls_preview.gif) / [MP4](assets/08_final_interpolated_adverb_controls_preview.mp4) / [WebM](assets/08_final_interpolated_adverb_controls_preview.webm) |
 
 
-## 代码 Cell 与可视化结果
+## 代码 Cell 与可视化证据
 
 下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 

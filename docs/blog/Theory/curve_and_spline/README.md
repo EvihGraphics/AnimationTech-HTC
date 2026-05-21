@@ -5,10 +5,14 @@
 | 字段 | 内容 |
 | --- | --- |
 | slug | `curve_and_spline` |
-| source path | [`labs/Theory/curve_and_spline.ipynb`](../../../../labs/Theory/curve_and_spline.ipynb) |
-| env prefix | `.envs/curve_and_spline` |
+| source path | [`labs/Theory/curve_and_spline.ipynb`](<../../../../labs/Theory/curve_and_spline.ipynb>) |
+| transcript sources | [`docs/transcripts/Ye8YY_ZvjrU_Curve and Spline Part1 _ Bezier Curve.txt`](<../../../../docs/transcripts/Ye8YY_ZvjrU_Curve and Spline Part1 _ Bezier Curve.txt>)<br>[`docs/transcripts/bjnJV4elorg_Curve and Spline Part2 _ Hermite Curve.txt`](<../../../../docs/transcripts/bjnJV4elorg_Curve and Spline Part2 _ Hermite Curve.txt>)<br>[`docs/transcripts/N9ojjE7RMpo_Curve and Spline Part3 _ Cardinal Spline.txt`](<../../../../docs/transcripts/N9ojjE7RMpo_Curve and Spline Part3 _ Cardinal Spline.txt>)<br>[`docs/transcripts/7KFtPx2LQrc_Curve and Spline Part4 _ Uniform Cubic B Spline.txt`](<../../../../docs/transcripts/7KFtPx2LQrc_Curve and Spline Part4 _ Uniform Cubic B Spline.txt>)<br>[`docs/transcripts/QiWnwcck0t4_Curve and Spline Part5 _ 1D curves.txt`](<../../../../docs/transcripts/QiWnwcck0t4_Curve and Spline Part5 _ 1D curves.txt>) |
+| kind | `notebook` |
+| env | `.envs/curve_and_spline` |
 | kernel | `animationtech-curve_and_spline` |
-| validation status | `passed` (`automated`) |
+| validation | `passed` (`automated`) |
+| publish tier | `深写完成 + 媒体完整` |
+| media quality | key_visual/key_animation 必须是算法输出本身，禁止滚动截图、整页 cell、代码卡裁剪和静态假动画 |
 
 ## 问题背景
 
@@ -498,7 +502,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 curve_a
 | Cell 92 | `plot` | 核心图解 | B-Spline least-squares fitting: The fitted curve does not need to pass through every sample, but it preserves a stable trend. | `plot` | [结果 PNG](assets/13-bspline-fitting_result.png) |
 
 
-## 代码 Cell 与可视化结果
+## 代码 Cell 与可视化证据
 
 本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
 

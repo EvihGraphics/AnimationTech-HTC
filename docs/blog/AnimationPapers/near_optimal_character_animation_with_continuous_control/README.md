@@ -5,11 +5,14 @@
 | 字段 | 内容 |
 | --- | --- |
 | slug | `near_optimal_character_animation_with_continuous_control` |
-| source path | [`labs/AnimationPapers/Near-optimal Character Animation with Continuous Control.ipynb`](../../../../labs/AnimationPapers/Near-optimal Character Animation with Continuous Control.ipynb) |
-| transcript sources | [`docs/transcripts/_S4vpMV0-UY_Reinforcement Learning 02 _ Near Optimal Character Animation with Continuous Con.txt`](../../../../docs/transcripts/_S4vpMV0-UY_Reinforcement Learning 02 _ Near Optimal Character Animation with Continuous Con.txt) |
-| env prefix | `.envs/near_opt_ctrl` |
+| source path | [`labs/AnimationPapers/Near-optimal Character Animation with Continuous Control.ipynb`](<../../../../labs/AnimationPapers/Near-optimal Character Animation with Continuous Control.ipynb>) |
+| transcript sources | [`docs/transcripts/_S4vpMV0-UY_Reinforcement Learning 02 _ Near Optimal Character Animation with Continuous Con.txt`](<../../../../docs/transcripts/_S4vpMV0-UY_Reinforcement Learning 02 _ Near Optimal Character Animation with Continuous Con.txt>) |
+| kind | `notebook` |
+| env | `.envs/near_opt_ctrl` |
 | kernel | `animationtech-near_optimal_character_animation_with_continuous_control` |
-| validation status | 自动执行已通过；交互部分仍建议在 JupyterLab 中人工检查 |
+| validation | `passed` (`manual_smoke`；自动执行通过，viewer 建议 JupyterLab 人工检查) |
+| publish tier | `深写完成 + 媒体完整` |
+| media quality | key_visual/key_animation 必须是算法输出本身，禁止滚动截图、整页 cell、代码卡裁剪和静态假动画 |
 
 ## 问题背景
 
@@ -244,7 +247,7 @@ https://github.com/user-attachments/assets/bfff5417-4489-4a83-819b-d4d05318fe99
 | Cell 38 | `timeline_viewer` | 核心动画 | 最优策略控制器：检查没有实体手柄时策略回调也能推进。 | `canvas` | [结果 PNG](assets/08_optimal_policy_player_result.png) / [GIF](assets/08_optimal_policy_player_preview.gif) / [MP4](assets/08_optimal_policy_player_preview.mp4) / [WebM](assets/08_optimal_policy_player_preview.webm) |
 
 
-## 代码 Cell 与可视化结果
+## 代码 Cell 与可视化证据
 
 下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 

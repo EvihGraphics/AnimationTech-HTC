@@ -459,6 +459,8 @@ def transform_source(slug: str, source: str, enable_precompute: bool, training_p
         if enable_precompute:
             updated = updated.replace("#_build_precomputed_tables()", "_build_precomputed_tables()")
         if "interact(" in updated and "viewer" in updated:
+            if "def render(frame, ratio=.1, select=0, on_spot=False, plot_map=False):" in updated:
+                return updated
             return "print('AnimationTech automated run: skipped interactive UI cell.')\n"
         return updated
 
@@ -523,6 +525,8 @@ def transform_source(slug: str, source: str, enable_precompute: bool, training_p
         for artifact_name in realtime_artifacts:
             updated = updated.replace(artifact_name, get_profile_artifact_name(artifact_name, training_profile))
         if "interact(" in updated and "viewer" in updated:
+            if "player = Player(motion_clips)" in updated or "player = Player(motion_groups)" in updated:
+                return updated
             return "print('AnimationTech automated run: skipped interactive UI cell.')\n"
         return updated
 
@@ -534,9 +538,15 @@ def transform_source(slug: str, source: str, enable_precompute: bool, training_p
         )
         updated = updated.replace("clip_length = 200\n", f"clip_length = {settings['clip_length']}\n")
         updated = updated.replace("n_neighbors = 10\n", f"n_neighbors = {settings['n_neighbors']}\n")
+        updated = updated.replace(
+            "repeat(current_feature_vector.shape[1]/3, axis=0)",
+            "repeat(int(current_feature_vector.shape[1] / 3), axis=0)",
+        )
         if "# get the first range, to see if it works" in updated or "# get the worst labeling" in updated:
             return "print('AnimationTech automated run: skipped expensive nearest-neighbor demo cell.')\n"
         if "interact(" in updated or "display(buttons)" in updated or "display(canvas)" in updated or "display(viewer)" in updated:
+            if "canvas = Canvas(width=1280, height=160)" in updated and "def render(frame):" in updated:
+                return updated
             return "print('AnimationTech automated run: skipped interactive UI cell.')\n"
         return updated
 
