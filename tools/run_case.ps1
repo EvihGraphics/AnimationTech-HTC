@@ -562,6 +562,27 @@ try {
             $exitCode = Invoke-LoggedProcess -filePath $pythonExe -arguments $moduleArgs -workingDirectory $sourceDir -logPath $logPath
         }
     }
+    elseif ([string]$case.kind -eq "python_script") {
+        $scriptArgs = @($entryPath)
+        $artifactList = @($case.generated_artifacts)
+        if ($artifactList.Count -gt 0) {
+            $artifactPath = Join-Path $repoRoot (Get-CasePathValue -item $artifactList[0])
+            New-Item -ItemType Directory -Force -Path (Split-Path -Parent $artifactPath) | Out-Null
+            $scriptArgs += @("--artifact", $artifactPath)
+        }
+        $visualDir = Join-Path $reportsRoot "visual-checks\$Slug"
+        New-Item -ItemType Directory -Force -Path $visualDir | Out-Null
+        $scriptArgs += @("--screenshot", (Join-Path $visualDir "final.png"))
+        $scriptArgs += @("--max-frames", "0")
+
+        if ($null -ne $case -and $case.PSObject.Properties.Name -contains "script_args" -and $case.script_args) {
+            foreach ($arg in @($case.script_args)) {
+                $scriptArgs += [string]$arg
+            }
+        }
+
+        $exitCode = Invoke-LoggedProcess -filePath $pythonExe -arguments $scriptArgs -workingDirectory $repoRoot -logPath $logPath
+    }
     else {
         throw "Unsupported case kind: $($case.kind)"
     }
@@ -587,7 +608,10 @@ if ([string]$case.kind -eq "notebook") {
     Copy-StudyNotebook -entryPath $entryPath -preparedPath $preparedPath
 }
 
-$note = if ($validationMode -match "manual_smoke") {
+$note = if ([string]$case.kind -eq "python_script") {
+    "Automated Evih/Raylib screenshot smoke passed."
+}
+elseif ($validationMode -match "manual_smoke") {
     "Automated execution passed. Manual JupyterLab smoke test is still required."
 }
 else {
