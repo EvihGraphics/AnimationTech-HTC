@@ -34,6 +34,7 @@ $env:JUPYTER_CONFIG_DIR = $localJupyterConfig
 $env:JUPYTER_DATA_DIR = $localJupyterRoot
 $env:JUPYTER_PATH = $localJupyterPath
 $env:IPYTHONDIR = Join-Path $localJupyterRoot "ipython"
+$env:PYTHONUTF8 = "1"
 New-Item -ItemType Directory -Force -Path $env:IPYTHONDIR | Out-Null
 
 function Get-LogicalProcessorCount {
@@ -242,7 +243,7 @@ function Update-CaseStatus([string]$status, [string]$note) {
     Set-Content -Path $statusFile -Value (($payload | ConvertTo-Json -Depth 8) + "`n") -Encoding UTF8
 }
 
-function Ensure-CondaEnv([string]$envPrefix, [string]$templatePath, [string]$kernelName, [string]$displayName, [bool]$RegisterKernel = $true) {
+function Ensure-CondaEnv([string]$envPrefix, [string]$templatePath, [string]$kernelName, [string]$displayName, [string]$PythonVersion = "3.10", [bool]$RegisterKernel = $true) {
     $pythonExe = Join-Path $envPrefix "python.exe"
     if (-not (Test-Path $pythonExe)) {
         $created = $false
@@ -251,7 +252,7 @@ function Ensure-CondaEnv([string]$envPrefix, [string]$templatePath, [string]$ker
                 Remove-Item -Path $envPrefix -Recurse -Force -ErrorAction SilentlyContinue
             }
 
-            & conda.exe create -y -p $envPrefix python=3.10 pip
+            & conda.exe create -y -p $envPrefix "python=$PythonVersion" pip
             if ($LASTEXITCODE -eq 0) {
                 $created = $true
                 break
@@ -453,6 +454,7 @@ if ($null -eq $case) {
 $entryPath = Join-Path $repoRoot $case.entry
 $sourceDir = Split-Path -Parent $entryPath
 $template = [string]$case.template
+$pythonVersion = if ($null -ne $case -and $case.PSObject.Properties.Name -contains "python_version" -and $case.python_version) { [string]$case.python_version } else { "3.10" }
 $validationMode = [string]$case.validation_mode
 $statusPolicyName = if ($null -ne $case.status_policy -and $case.status_policy.PSObject.Properties.Name -contains "policy") { [string]$case.status_policy.policy } else { "" }
 $logPath = Join-Path $logsDir "$Slug.log"
@@ -505,7 +507,7 @@ try {
         throw "Template requirements file missing: $templatePath"
     }
 
-    Ensure-CondaEnv -envPrefix $envPrefix -templatePath $templatePath -kernelName $case.kernel_name -displayName $displayName -RegisterKernel:([string]$case.kind -eq "notebook")
+    Ensure-CondaEnv -envPrefix $envPrefix -templatePath $templatePath -kernelName $case.kernel_name -displayName $displayName -PythonVersion $pythonVersion -RegisterKernel:([string]$case.kind -eq "notebook")
     if ($template -eq "papers-torch") {
         Ensure-TorchRuntime -pythonExe $pythonExe -resolvedTorchDevice $resolvedResources.torch_device
     }
