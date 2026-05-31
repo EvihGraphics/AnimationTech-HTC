@@ -386,6 +386,27 @@
                                         }
                   },
                   {
+                      "slug":  "motion_graph_evih",
+                      "entry":  "labs/AnimationPapers/Motion Graph EvihAnimation.ipynb",
+                      "kind":  "notebook",
+                      "template":  "papers-evih",
+                      "python_version":  "3.12",
+                      "env_prefix":  ".envs/motion_graph_evih",
+                      "kernel_name":  "animationtech-motion_graph_evih",
+                      "public_assets":  [
+                                            "lafan1"
+                                        ],
+                      "generated_artifacts":  [
+                                                  "labs/AnimationPapers/motion_graph_evih_generated.dat"
+                                              ],
+                      "validation_mode":  "manual_smoke",
+                      "status_policy":  {
+                                            "policy":  "manual_smoke",
+                                            "current_status":  "not_run",
+                                            "last_note":  "EvihAnimation Motion Graph case added; run tools/run_case.ps1 motion_graph_evih to validate."
+                                        }
+                  },
+                  {
                       "slug":  "motion_matching",
                       "entry":  "labs/AnimationPapers/Motion Matching.ipynb",
                       "kind":  "notebook",
