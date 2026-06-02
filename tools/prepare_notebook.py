@@ -8,6 +8,7 @@ MOTION_FIELDS_SLUG = "motion_fields_for_interactive_character_animation"
 REALTIME_PLANNING_SLUG = "real_time_planning_for_parameterized_human_motion"
 KNOWING_FOOT_DOWN_SLUG = "knowing_when_to_put_your_foot_down"
 NEAR_OPTIMAL_SLUG = "near_optimal_character_animation_with_continuous_control"
+MOTION_MATCHING_SLUG = "motion_matching"
 
 
 GAMEPAD_HELPER_SOURCE = """def animationtech_gamepad_axis(gamepad, index, default=0.0):
@@ -427,9 +428,39 @@ def transform_near_optimal_source(source: str) -> str:
     return source
 
 
+def transform_motion_matching_source(source: str) -> str:
+    if (
+        "def render(frame, max_speed=4." not in source
+        or "player.set_next_frame(best_frame+1, inertialize)" not in source
+        or "features_normalized[player.frame, :].copy()" not in source
+    ):
+        return source
+
+    updated = source.replace(
+        "def render(frame, max_speed=4., halflife=.5, halflife_rot=.4, code_vs_anim=0., fast_stop=False, inertialize=False):",
+        "def render(frame, max_speed=4., halflife=.5, halflife_rot=.4, code_vs_anim=0., fast_stop=False, inertialize=True, use_gamepad=False, move_x=1.0, move_z=0.0, turn_x=0.0, turn_z=0.0):",
+    )
+    updated = updated.replace(
+        "    posx = gamepad.axes[0].value \n    posz = -gamepad.axes[1].value \n",
+        "    if use_gamepad:\n        posx = animationtech_gamepad_axis(gamepad, 0)\n        posz = -animationtech_gamepad_axis(gamepad, 1)\n    else:\n        posx = move_x\n        posz = move_z\n",
+    )
+    updated = updated.replace(
+        "    posx = gamepad.axes[2].value \n    posz = -gamepad.axes[3].value \n",
+        "    if use_gamepad:\n        posx = animationtech_gamepad_axis(gamepad, 2)\n        posz = -animationtech_gamepad_axis(gamepad, 3)\n    else:\n        posx = turn_x\n        posz = turn_z\n",
+    )
+    updated = updated.replace(
+        "interact(\n    render, \n    frame=lab.Timeline(max=100),\n)",
+        "interact(\n    render,\n    frame=lab.Timeline(max=100),\n    max_speed=widgets.FloatSlider(value=4.0, min=0.0, max=8.0, step=0.1),\n    halflife=widgets.FloatSlider(value=0.5, min=0.05, max=1.5, step=0.05),\n    halflife_rot=widgets.FloatSlider(value=0.4, min=0.05, max=1.5, step=0.05),\n    code_vs_anim=widgets.FloatSlider(value=0.0, min=0.0, max=1.0, step=0.05),\n    fast_stop=widgets.Checkbox(value=False),\n    inertialize=widgets.Checkbox(value=True),\n    use_gamepad=widgets.Checkbox(value=False),\n    move_x=widgets.FloatSlider(value=1.0, min=-1.0, max=1.0, step=0.05),\n    move_z=widgets.FloatSlider(value=0.0, min=-1.0, max=1.0, step=0.05),\n    turn_x=widgets.FloatSlider(value=0.0, min=-1.0, max=1.0, step=0.05),\n    turn_z=widgets.FloatSlider(value=0.0, min=-1.0, max=1.0, step=0.05),\n)",
+    )
+    return updated
+
+
 def transform_source(slug: str, source: str, enable_precompute: bool, training_profile: str, torch_device: str) -> str:
     if slug == NEAR_OPTIMAL_SLUG:
         return transform_near_optimal_source(source)
+
+    if slug == MOTION_MATCHING_SLUG:
+        return transform_motion_matching_source(source)
 
     if slug == MOTION_FIELDS_SLUG:
         settings = get_motion_fields_settings(training_profile, torch_device)
