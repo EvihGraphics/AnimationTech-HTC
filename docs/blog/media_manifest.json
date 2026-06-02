@@ -2275,19 +2275,14 @@
           "card_file": "spring_damper_prediction.png",
           "result_file": "spring_damper_prediction_result.png",
           "media_role": "key_visual",
-          "controls": [
-            {
-              "kind": "slider",
-              "index": 0,
-              "role": "timeline",
-              "fraction": 0.45
-            }
-          ],
           "capture_kind": "canvas",
           "visual_subject": "Spring-damper future trajectory: This is the source of the future trajectory target used in the motion-matching query.",
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
-          "media_provenance": "live_canvas"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "live_prepare_code": "_blog_motion_matching_axes = [0.8, -1.0, 0.2, -0.6]\ndef animationtech_gamepad_axis(gamepad, index, default=0.0):\n    try:\n        return float(_blog_motion_matching_axes[index])\n    except Exception:\n        return default\nx = np.zeros(3, dtype=np.float32)\nv = np.zeros(3, dtype=np.float32)\na = np.zeros(3, dtype=np.float32)\nx_rot = np.array([1,0,0,0], dtype=np.float32)\nv_rot = np.zeros(3, dtype=np.float32)\ndesired_orientation = np.array([1,0,0,0], dtype=np.float32)",
+          "live_render": "_blog_t = float({fraction})\n_blog_motion_matching_axes[:] = [0.75 + 0.20 * np.sin(_blog_t * np.pi * 2.0), -1.0, 0.25 * np.sin(_blog_t * np.pi), -0.55]\nviewer.camera_pos = [-370, 280, 350]\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\n_blog_frame = int(round(100 * _blog_t))\nfor _blog_substep in range(4):\n    render(_blog_frame + _blog_substep, max_speed=4.0, halflife=.30, halflife_rot=.30)"
         },
         {
           "id": "source-animation",
@@ -2300,19 +2295,12 @@
           "card_file": "motion_matching_overview.png",
           "result_file": "motion_matching_overview_result.png",
           "media_role": "key_visual",
-          "controls": [
-            {
-              "kind": "slider",
-              "index": 0,
-              "role": "timeline",
-              "fraction": 0.35
-            }
-          ],
           "capture_kind": "canvas",
           "visual_subject": "Source locomotion clip playback: The database is built from real motion frames, not from generated poses.",
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
-          "media_provenance": "live_canvas"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true
         },
         {
           "id": "filtered-motion",
@@ -2325,19 +2313,12 @@
           "card_file": "trajectory_query_runtime.png",
           "result_file": "trajectory_query_runtime_result.png",
           "media_role": "key_visual",
-          "controls": [
-            {
-              "kind": "slider",
-              "index": 0,
-              "role": "timeline",
-              "fraction": 0.55
-            }
-          ],
           "capture_kind": "canvas",
           "visual_subject": "Filtered root displacement and orientation: Stable velocity and orientation estimates reduce noise in nearest-neighbor search.",
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
-          "media_provenance": "live_canvas"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true
         },
         {
           "id": "feature-vector",
@@ -2350,19 +2331,12 @@
           "card_file": "feature_vector_layout.png",
           "result_file": "feature_vector_layout_result.png",
           "media_role": "key_visual",
-          "controls": [
-            {
-              "kind": "slider",
-              "index": 0,
-              "role": "timeline",
-              "fraction": 0.5
-            }
-          ],
           "capture_kind": "canvas",
           "visual_subject": "33-dimensional feature layout: The abstract feature vector becomes visible as body parts and trajectory targets.",
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
-          "media_provenance": "live_canvas"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true
         },
         {
           "id": "normalization-code",
@@ -2407,9 +2381,10 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
           "motion_provenance": "live_control_scan",
-          "live_prepare_code": "_blog_motion_matching_axes = [0.0, -0.9, 0.25, -0.35]\ndef animationtech_gamepad_axis(gamepad, index, default=0.0):\n    try:\n        return float(_blog_motion_matching_axes[index])\n    except Exception:\n        return default\nx = np.zeros(3, dtype=np.float32)\nv = np.zeros(3, dtype=np.float32)\na = np.zeros(3, dtype=np.float32)\nplayer = Player(0)\nx_rot = np.array([1,0,0,0], dtype=np.float32)\nv_rot = np.zeros(3, dtype=np.float32)\ndesired_orientation = np.array([1,0,0,0], dtype=np.float32)",
-          "live_render": "_blog_t = float({fraction})\n_blog_motion_matching_axes[:] = [0.75 + 0.20 * np.sin(_blog_t * np.pi * 2.0), -1.0, 0.35 * np.sin(_blog_t * np.pi), -0.65]\nviewer.camera_pos = (player.p[0] + np.array([0, 115, 230], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = 180\n_blog_frame = int(round(100 * _blog_t))\nfor _blog_substep in range(4):\n    render(_blog_frame + _blog_substep, max_speed=5.5, halflife=.30, halflife_rot=.22, code_vs_anim=0.0, fast_stop=False, inertialize=True)",
+          "live_prepare_code": "x = np.zeros(3, dtype=np.float32)\nv = np.zeros(3, dtype=np.float32)\na = np.zeros(3, dtype=np.float32)\nplayer = Player(0)\nx_rot = np.array([1,0,0,0], dtype=np.float32)\nv_rot = np.zeros(3, dtype=np.float32)\ndesired_orientation = np.array([1,0,0,0], dtype=np.float32)",
+          "live_render": "_blog_t = float({fraction})\n_blog_move_x = 0.75 + 0.20 * np.sin(_blog_t * np.pi * 2.0)\n_blog_move_z = 1.0\n_blog_turn_x = 0.35 * np.sin(_blog_t * np.pi)\n_blog_turn_z = 0.65\n_blog_frame = int(round(100 * _blog_t))\n_blog_camera_offset = np.array([-370, 280, 350], dtype=np.float32)\nfor _blog_substep in range(4):\n    _blog_anchor = player.p[0].copy() if 'player' in globals() else x.copy()\n    viewer.camera_pos = (_blog_anchor + _blog_camera_offset).tolist()\n    viewer.camera_pitch = -18\n    viewer.camera_yaw = -45\n    render(_blog_frame + _blog_substep, max_speed=5.5, halflife=.30, halflife_rot=.22, code_vs_anim=0.0, fast_stop=False, inertialize=True, use_gamepad=False, move_x=_blog_move_x, move_z=_blog_move_z, turn_x=_blog_turn_x, turn_z=_blog_turn_z)",
           "motion_capture": {
             "fps": 6,
             "max_seconds": 6,
@@ -2431,7 +2406,7 @@
           "title": "Stop and turn debug frame",
           "code_purpose": "Inspect another runtime frame in the Player cell.",
           "result_meaning": "Stop and sharp-turn cases are useful stress tests for matching quality.",
-          "slider_fraction": 0.8,
+          "slider_fraction": 0.65,
           "card_file": "fast_stop_turn_cases.png",
           "result_file": "fast_stop_turn_cases_result.png",
           "media_role": "key_animation",
@@ -2440,7 +2415,7 @@
               "kind": "slider",
               "index": 0,
               "role": "timeline",
-              "fraction": 0.8
+              "fraction": 0.65
             }
           ],
           "preview_gif": "fast_stop_turn_cases_preview.gif",
@@ -2451,9 +2426,10 @@
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
           "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
           "motion_provenance": "live_control_scan",
-          "live_prepare_code": "_blog_motion_matching_axes = [0.0, -1.0, 0.0, 0.0]\ndef animationtech_gamepad_axis(gamepad, index, default=0.0):\n    try:\n        return float(_blog_motion_matching_axes[index])\n    except Exception:\n        return default\nx = np.zeros(3, dtype=np.float32)\nv = np.zeros(3, dtype=np.float32)\na = np.zeros(3, dtype=np.float32)\nplayer = Player(0)\nx_rot = np.array([1,0,0,0], dtype=np.float32)\nv_rot = np.zeros(3, dtype=np.float32)\ndesired_orientation = np.array([1,0,0,0], dtype=np.float32)",
-          "live_render": "_blog_t = float({fraction})\nif _blog_t < 0.45:\n    _blog_motion_matching_axes[:] = [0.15, -1.0, 0.0, 0.0]\nelif _blog_t < 0.72:\n    _blog_motion_matching_axes[:] = [1.0, -0.15, 1.0, -0.15]\nelse:\n    _blog_motion_matching_axes[:] = [0.0, 0.0, 1.0, 0.0]\nviewer.camera_pos = (player.p[0] + np.array([0, 115, 230], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = 180\n_blog_frame = int(round(100 * _blog_t))\nfor _blog_substep in range(4):\n    render(_blog_frame + _blog_substep, max_speed=5.8, halflife=.18, halflife_rot=.15, code_vs_anim=0.0, fast_stop=(_blog_t > 0.70), inertialize=True)",
+          "live_prepare_code": "x = np.zeros(3, dtype=np.float32)\nv = np.zeros(3, dtype=np.float32)\na = np.zeros(3, dtype=np.float32)\nplayer = Player(0)\nx_rot = np.array([1,0,0,0], dtype=np.float32)\nv_rot = np.zeros(3, dtype=np.float32)\ndesired_orientation = np.array([1,0,0,0], dtype=np.float32)",
+          "live_render": "_blog_t = float({fraction})\nif _blog_t < 0.45:\n    _blog_move_x, _blog_move_z, _blog_turn_x, _blog_turn_z = 0.15, 1.0, 0.0, 0.0\nelif _blog_t < 0.72:\n    _blog_move_x, _blog_move_z, _blog_turn_x, _blog_turn_z = 1.0, 0.15, 1.0, 0.15\nelse:\n    _blog_move_x, _blog_move_z, _blog_turn_x, _blog_turn_z = 0.0, 0.0, 1.0, 0.0\n_blog_frame = int(round(100 * _blog_t))\n_blog_camera_offset = np.array([-370, 280, 350], dtype=np.float32)\nfor _blog_substep in range(4):\n    _blog_anchor = player.p[0].copy() if 'player' in globals() else x.copy()\n    viewer.camera_pos = (_blog_anchor + _blog_camera_offset).tolist()\n    viewer.camera_pitch = -18\n    viewer.camera_yaw = -45\n    render(_blog_frame + _blog_substep, max_speed=5.8, halflife=.18, halflife_rot=.15, code_vs_anim=0.0, fast_stop=(_blog_t > 0.70), inertialize=True, use_gamepad=False, move_x=_blog_move_x, move_z=_blog_move_z, turn_x=_blog_turn_x, turn_z=_blog_turn_z)",
           "motion_capture": {
             "fps": 6,
             "max_seconds": 6,

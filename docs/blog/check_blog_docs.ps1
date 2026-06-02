@@ -21,6 +21,11 @@ import sys
 import zlib
 from pathlib import Path
 
+try:
+    from PIL import Image
+except Exception:
+    Image = None
+
 blog_root = Path(sys.argv[1]).resolve()
 repo_root = blog_root.parents[1]
 strict = len(sys.argv) > 2 and sys.argv[2].lower() == "true"
@@ -222,6 +227,19 @@ def png_has_embedded_pollution_text(path):
     text = "\n".join(chunks)
     return [marker for marker in pollution_text_markers if marker in text]
 
+def motion_matching_marker_counts(path):
+    if Image is None:
+        return None
+    with Image.open(path) as image:
+        red = 0
+        yellow = 0
+        for r, g, b in image.convert("RGB").getdata():
+            if r > 180 and g < 100 and b < 100:
+                red += 1
+            if r > 180 and g > 150 and b < 110:
+                yellow += 1
+    return red, yellow
+
 def check_result_png_visual_pollution(slug, step, media_path, width, height):
     label = step_label(slug, step)
     found_markers = png_has_embedded_pollution_text(media_path)
@@ -239,8 +257,18 @@ def check_result_png_visual_pollution(slug, step, media_path, width, height):
             add_error(f"Key result PNG looks like a tall scroll capture for {label}: {media_path} ({width}x{height})")
         if ratio > 10:
             add_error(f"Key result PNG has an extreme wide ratio for {label}: {media_path} ({width}x{height})")
+        if step.get("capture_kind") == "canvas" and height < 360:
+            add_error(f"Key canvas result is too short for {label}: {media_path} ({width}x{height})")
         if is_forbidden_key_provenance(provenance):
             add_error(f"Key result PNG uses forbidden provenance for {label}: {provenance}")
+        if slug == "motion_matching" and step.get("id") in {"runtime-player", "fast-stop-turn"}:
+            counts = motion_matching_marker_counts(media_path)
+            if counts is None:
+                add_error(f"Motion Matching marker check requires Pillow for {label}.")
+            else:
+                red, yellow = counts
+                if red < 8 or yellow < 8:
+                    add_error(f"Motion Matching runtime result lacks red/yellow trajectory markers for {label}: red={red}, yellow={yellow}")
 
 def section_between(text, heading, next_prefix="\n## "):
     start = text.find(heading)
