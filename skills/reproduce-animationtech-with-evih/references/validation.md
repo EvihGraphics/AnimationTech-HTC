@@ -22,6 +22,7 @@ Final matrix checks:
 ```powershell
 python skills\reproduce-animationtech-with-evih\scripts\check_evih_reproduction.py --repo-root . --expect-full-matrix --strict
 python skills\reproduce-animationtech-with-evih\scripts\check_evih_reproduction.py --repo-root . --require-artifacts --require-screenshots
+python skills\reproduce-animationtech-with-evih\scripts\check_evih_reproduction.py --repo-root . --expect-full-matrix --strict --require-artifacts --require-screenshots --validate-metrics --require-baseline-comparisons
 ```
 
 The checker is read-only. It should be safe when other agents are working.
@@ -46,6 +47,14 @@ Direct viewer smoke test:
   --max-frames 0
 ```
 
+Baseline comparison execution:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 <slug>_evih
+```
+
+This writes `.reports/animation-baselines/<slug>_evih/baseline.dat`, `.reports/animation-comparisons/<slug>_evih/comparison.json`, `.reports/animation-comparisons/<slug>_evih/evih.gif`, and `.reports/animation-comparisons/<slug>_evih/animationtech_source.gif`. Use `-SmokeOnly` only when intentionally checking the screenshot path without treating the result as complete.
+
 ## Completion Criteria
 
 For each Evih reproduction:
@@ -55,6 +64,8 @@ For each Evih reproduction:
 - Generated artifact exists and is nonempty after execution.
 - Screenshot exists, is a PNG, and is nonempty.
 - Case-specific metrics match the original contract or document intentional differences.
+- Baseline comparison report exists and has `pass == true`.
+- `evih.gif` and `animationtech_source.gif` exist in the comparison directory, are dynamic, and `comparison.json.visual_evidence.source_gif.algorithm_feature_match == true`.
 - Viewer exits unattended with `--screenshot --max-frames 0`.
 - Original non-Evih case still runs or remains untouched.
 
@@ -66,7 +77,7 @@ For full matrix completion:
 
 ## Visual Review Checklist
 
-Open the screenshot or inspect it with a pixel-aware tool when available:
+Open the screenshot or inspect it with a pixel-aware tool when checking smoke evidence:
 
 - The image is not blank or a single flat color.
 - Main subject is visible and framed.
@@ -74,6 +85,8 @@ Open the screenshot or inspect it with a pixel-aware tool when available:
 - Text does not hide the main subject.
 - For motion cases, skeleton, root path, target path, or contacts are visible.
 - For theory cases, sampled geometry or fields are visible.
+
+Do not use a single static screenshot as visual parity proof. Visual comparison for animation cases must use dynamic sequence evidence. For `_evih` managed runs, this means the generated `evih.gif` and `animationtech_source.gif` plus frame arrays, root trajectories, contacts/control time series, or other sampled time-series checks. The source GIF must show the case's final/core algorithm subject; if a blog GIF is static, misses the character/subject, or shows raw input/debug content, regenerate it from the baseline/source payload and record `replaced_reason`.
 
 ## Metrics Review
 
