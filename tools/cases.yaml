@@ -387,7 +387,7 @@
                   },
                   {
                       "slug":  "motion_graph_evih",
-                      "entry":  "labs/evih_reproductions/motion_graph/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -400,6 +400,8 @@
                                                   "labs/evih_reproductions/motion_graph/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "motion_graph",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -411,8 +413,8 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T15:14:57.4989895Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-02T06:51:08.9068471Z"
                                         }
                   },
                   {
@@ -594,7 +596,7 @@
                   },
                   {
                       "slug":  "curve_and_spline_evih",
-                      "entry":  "labs/evih_reproductions/curve_and_spline/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -607,6 +609,8 @@
                                                   "labs/evih_reproductions/curve_and_spline/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "curve_and_spline",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -618,13 +622,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-01T02:41:58.0480431Z"
                                         }
                   },
                   {
                       "slug":  "laplacian_deformation_evih",
-                      "entry":  "labs/evih_reproductions/laplacian_deformation/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -637,6 +641,8 @@
                                                   "labs/evih_reproductions/laplacian_deformation/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "laplacian_deformation",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -648,13 +654,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-02T06:39:46.4059147Z"
                                         }
                   },
                   {
                       "slug":  "motiongraph_pointcloud_derivation_evih",
-                      "entry":  "labs/evih_reproductions/motiongraph_pointcloud_derivation/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -667,6 +673,8 @@
                                                   "labs/evih_reproductions/motiongraph_pointcloud_derivation/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "motiongraph_pointcloud_derivation",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -678,13 +686,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-01T02:42:09.9418472Z"
                                         }
                   },
                   {
                       "slug":  "radial_basis_function_evih",
-                      "entry":  "labs/evih_reproductions/radial_basis_function/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -697,6 +705,8 @@
                                                   "labs/evih_reproductions/radial_basis_function/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "radial_basis_function",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -708,13 +718,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-01T07:55:09.0416126Z"
                                         }
                   },
                   {
                       "slug":  "radial_basis_function_verbs_and_adverbs_evih",
-                      "entry":  "labs/evih_reproductions/radial_basis_function_verbs_and_adverbs/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -727,6 +737,8 @@
                                                   "labs/evih_reproductions/radial_basis_function_verbs_and_adverbs/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "radial_basis_function_verbs_and_adverbs",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -738,13 +750,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-01T02:42:23.7520479Z"
                                         }
                   },
                   {
                       "slug":  "animation_evih",
-                      "entry":  "labs/evih_reproductions/animation/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -757,6 +769,8 @@
                                                   "labs/evih_reproductions/animation/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "animation",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -768,13 +782,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-02T06:35:52.5396913Z"
                                         }
                   },
                   {
                       "slug":  "character_usd_evih",
-                      "entry":  "labs/evih_reproductions/character_usd/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -787,6 +801,8 @@
                                                   "labs/evih_reproductions/character_usd/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "character_usd",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -798,13 +814,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-02T06:37:09.9763031Z"
                                         }
                   },
                   {
                       "slug":  "edit_material_evih",
-                      "entry":  "labs/evih_reproductions/edit_material/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -817,6 +833,8 @@
                                                   "labs/evih_reproductions/edit_material/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "edit_material",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -828,13 +846,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-01T02:42:41.5428256Z"
                                         }
                   },
                   {
                       "slug":  "multiple_characters_evih",
-                      "entry":  "labs/evih_reproductions/multiple_characters/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -847,6 +865,8 @@
                                                   "labs/evih_reproductions/multiple_characters/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "multiple_characters",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -858,13 +878,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-02T06:38:28.2546184Z"
                                         }
                   },
                   {
                       "slug":  "rigid_usd_evih",
-                      "entry":  "labs/evih_reproductions/rigid_usd/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -877,6 +897,8 @@
                                                   "labs/evih_reproductions/rigid_usd/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "rigid_usd",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -888,13 +910,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-01T02:42:53.3742739Z"
                                         }
                   },
                   {
                       "slug":  "simple_sphere_evih",
-                      "entry":  "labs/evih_reproductions/simple_sphere/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -907,6 +929,8 @@
                                                   "labs/evih_reproductions/simple_sphere/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "simple_sphere",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -918,13 +942,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T15:14:42.4700559Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-01T02:42:59.3029300Z"
                                         }
                   },
                   {
                       "slug":  "time_of_day_evih",
-                      "entry":  "labs/evih_reproductions/time_of_day/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -937,6 +961,8 @@
                                                   "labs/evih_reproductions/time_of_day/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "time_of_day",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -948,13 +974,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-01T02:43:05.2248133Z"
                                         }
                   },
                   {
                       "slug":  "animation_format_evih",
-                      "entry":  "labs/evih_reproductions/animation_format/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -967,6 +993,8 @@
                                                   "labs/evih_reproductions/animation_format/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "animation_format",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -978,13 +1006,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-02T06:34:35.5810259Z"
                                         }
                   },
                   {
                       "slug":  "footskate_cleanup_for_motion_capture_editing_evih",
-                      "entry":  "labs/evih_reproductions/footskate_cleanup_for_motion_capture_editing/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -997,6 +1025,8 @@
                                                   "labs/evih_reproductions/footskate_cleanup_for_motion_capture_editing/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "footskate_cleanup_for_motion_capture_editing",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -1008,13 +1038,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-02T06:41:04.9190364Z"
                                         }
                   },
                   {
                       "slug":  "halo_4_facial_animation_evih",
-                      "entry":  "labs/evih_reproductions/halo_4_facial_animation/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -1027,6 +1057,8 @@
                                                   "labs/evih_reproductions/halo_4_facial_animation/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "halo_4_facial_animation",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -1038,13 +1070,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-01T08:16:24.6174935Z"
                                         }
                   },
                   {
                       "slug":  "knowing_when_to_put_your_foot_down_evih",
-                      "entry":  "labs/evih_reproductions/knowing_when_to_put_your_foot_down/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -1057,6 +1089,8 @@
                                                   "labs/evih_reproductions/knowing_when_to_put_your_foot_down/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "knowing_when_to_put_your_foot_down",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -1068,13 +1102,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-02T06:42:23.5162584Z"
                                         }
                   },
                   {
                       "slug":  "motion_fields_for_interactive_character_animation_evih",
-                      "entry":  "labs/evih_reproductions/motion_fields_for_interactive_character_animation/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -1087,6 +1121,8 @@
                                                   "labs/evih_reproductions/motion_fields_for_interactive_character_animation/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "motion_fields_for_interactive_character_animation",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -1098,13 +1134,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-02T06:43:42.8031069Z"
                                         }
                   },
                   {
                       "slug":  "motion_matching_evih",
-                      "entry":  "labs/evih_reproductions/motion_matching/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -1117,6 +1153,8 @@
                                                   "labs/evih_reproductions/motion_matching/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "motion_matching",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -1128,13 +1166,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-02T06:30:16.9940537Z"
                                         }
                   },
                   {
                       "slug":  "motion_warping_evih",
-                      "entry":  "labs/evih_reproductions/motion_warping/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -1147,6 +1185,8 @@
                                                   "labs/evih_reproductions/motion_warping/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "motion_warping",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -1158,13 +1198,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-02T06:32:08.0633397Z"
                                         }
                   },
                   {
                       "slug":  "near_optimal_character_animation_with_continuous_control_evih",
-                      "entry":  "labs/evih_reproductions/near_optimal_character_animation_with_continuous_control/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -1177,6 +1217,8 @@
                                                   "labs/evih_reproductions/near_optimal_character_animation_with_continuous_control/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "near_optimal_character_animation_with_continuous_control",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -1188,13 +1230,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-02T06:45:02.1789893Z"
                                         }
                   },
                   {
                       "slug":  "precomputing_avatar_behavior_evih",
-                      "entry":  "labs/evih_reproductions/precomputing_avatar_behavior/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -1207,6 +1249,8 @@
                                                   "labs/evih_reproductions/precomputing_avatar_behavior/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "precomputing_avatar_behavior",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -1218,13 +1262,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-02T06:46:20.7324867Z"
                                         }
                   },
                   {
                       "slug":  "real_time_planning_for_parameterized_human_motion_evih",
-                      "entry":  "labs/evih_reproductions/real_time_planning_for_parameterized_human_motion/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -1237,6 +1281,8 @@
                                                   "labs/evih_reproductions/real_time_planning_for_parameterized_human_motion/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "real_time_planning_for_parameterized_human_motion",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -1248,13 +1294,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-02T06:47:38.9633051Z"
                                         }
                   },
                   {
                       "slug":  "verbs_and_adverbs_evih",
-                      "entry":  "labs/evih_reproductions/verbs_and_adverbs/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -1267,6 +1313,8 @@
                                                   "labs/evih_reproductions/verbs_and_adverbs/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "verbs_and_adverbs",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -1278,13 +1326,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-02T06:48:57.0795957Z"
                                         }
                   },
                   {
                       "slug":  "real_time_planning_multiprocess_func_evih",
-                      "entry":  "labs/evih_reproductions/real_time_planning_multiprocess_func/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -1297,6 +1345,8 @@
                                                   "labs/evih_reproductions/real_time_planning_multiprocess_func/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "real_time_planning_multiprocess_func",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -1308,13 +1358,13 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-01T02:44:19.2887078Z"
                                         }
                   },
                   {
                       "slug":  "halo_4_exporter_from_maya_evih",
-                      "entry":  "labs/evih_reproductions/halo_4_exporter_from_maya/viewer.py",
+                      "entry":  "labs/evih_reproductions/runner.py",
                       "kind":  "python_script",
                       "template":  "papers-evih",
                       "python_version":  "3.12",
@@ -1327,6 +1377,8 @@
                                                   "labs/evih_reproductions/halo_4_exporter_from_maya/generated.dat"
                                               ],
                       "script_args":  [
+                                          "--case",
+                                          "halo_4_exporter_from_maya",
                                           "--frame",
                                           "32",
                                           "--width",
@@ -1338,8 +1390,8 @@
                       "status_policy":  {
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
-                                            "last_note":  "Automated Evih/Raylib screenshot smoke passed.",
-                                            "last_run_utc":  "2026-05-31T14:36:30.3412605Z"
+                                            "last_note":  "Automated Evih/Raylib baseline comparison passed.",
+                                            "last_run_utc":  "2026-06-01T02:44:25.1629776Z"
                                         }
                   }
               ]

@@ -6,7 +6,8 @@ param(
     [ValidateSet("auto", "cpu", "gpu")]
     [string]$TorchDevice = "auto",
     [Nullable[int]]$MaxWorkers,
-    [Nullable[int]]$GpuIndex
+    [Nullable[int]]$GpuIndex,
+    [switch]$SmokeOnly
 )
 
 $ErrorActionPreference = "Continue"
@@ -24,11 +25,30 @@ $studyRoot = Join-Path $reportsRoot "study"
 $studyAnimationPapersDir = Join-Path $studyRoot "AnimationPapers"
 $locksDir = Join-Path $reportsRoot "locks"
 $statusDir = Join-Path $reportsRoot "status"
+$animationBaselinesDir = Join-Path $reportsRoot "animation-baselines"
+$animationComparisonsDir = Join-Path $reportsRoot "animation-comparisons"
+$sourceSkeletonEvihCases = @(
+    "motion_graph_evih",
+    "laplacian_deformation_evih",
+    "animation_evih",
+    "character_usd_evih",
+    "multiple_characters_evih",
+    "animation_format_evih",
+    "footskate_cleanup_for_motion_capture_editing_evih",
+    "knowing_when_to_put_your_foot_down_evih",
+    "motion_fields_for_interactive_character_animation_evih",
+    "motion_matching_evih",
+    "motion_warping_evih",
+    "near_optimal_character_animation_with_continuous_control_evih",
+    "precomputing_avatar_behavior_evih",
+    "real_time_planning_for_parameterized_human_motion_evih",
+    "verbs_and_adverbs_evih"
+)
 $localJupyterRoot = Join-Path $repoRoot ".jupyter"
 $localJupyterConfig = Join-Path $localJupyterRoot "config"
 $localJupyterPath = Join-Path $localJupyterRoot "share\jupyter"
 
-New-Item -ItemType Directory -Force -Path $reportsRoot, $logsDir, $executedDir, $preparedDir, $studyRoot, $locksDir, $statusDir, $localJupyterRoot, $localJupyterConfig, $localJupyterPath | Out-Null
+New-Item -ItemType Directory -Force -Path $reportsRoot, $logsDir, $executedDir, $preparedDir, $studyRoot, $locksDir, $statusDir, $animationBaselinesDir, $animationComparisonsDir, $localJupyterRoot, $localJupyterConfig, $localJupyterPath | Out-Null
 
 $env:JUPYTER_CONFIG_DIR = $localJupyterConfig
 $env:JUPYTER_DATA_DIR = $localJupyterRoot
@@ -454,6 +474,7 @@ if ($null -eq $case) {
 $entryPath = Join-Path $repoRoot $case.entry
 $sourceDir = Split-Path -Parent $entryPath
 $template = [string]$case.template
+$isEvihCase = ([string]$Slug).EndsWith("_evih") -and ($template -eq "papers-evih")
 $pythonVersion = if ($null -ne $case -and $case.PSObject.Properties.Name -contains "python_version" -and $case.python_version) { [string]$case.python_version } else { "3.10" }
 $validationMode = [string]$case.validation_mode
 $statusPolicyName = if ($null -ne $case.status_policy -and $case.status_policy.PSObject.Properties.Name -contains "policy") { [string]$case.status_policy.policy } else { "" }
@@ -575,6 +596,27 @@ try {
         $scriptArgs += @("--screenshot", (Join-Path $visualDir "final.png"))
         $scriptArgs += @("--max-frames", "0")
 
+        if ($isEvihCase -and -not $SmokeOnly) {
+            $baselineDir = Join-Path $animationBaselinesDir $Slug
+            $comparisonDir = Join-Path $animationComparisonsDir $Slug
+            New-Item -ItemType Directory -Force -Path $baselineDir, $comparisonDir | Out-Null
+            $scriptArgs += @("--baseline", (Join-Path $baselineDir "baseline.dat"))
+            $scriptArgs += @("--comparison-report", (Join-Path $comparisonDir "comparison.json"))
+            $scriptArgs += @("--evih-gif", (Join-Path $comparisonDir "evih.gif"))
+            $scriptArgs += @("--source-gif", (Join-Path $comparisonDir "animationtech_source.gif"))
+            if ($sourceSkeletonEvihCases -contains $Slug) {
+                $scriptArgs += @("--source-skeleton", (Join-Path $comparisonDir "animationtech_source.dat"))
+                $scriptArgs += @("--source-mesh", (Join-Path $comparisonDir "animationtech_source_mesh.dat"))
+                $scriptArgs += @("--evih-mesh", (Join-Path $comparisonDir "evih_mesh.dat"))
+                $scriptArgs += @("--source-mesh-gif", (Join-Path $comparisonDir "animationtech_source_mesh.gif"))
+                $scriptArgs += @("--evih-mesh-gif", (Join-Path $comparisonDir "evih_mesh.gif"))
+                $scriptArgs += "--require-source-skeleton-baseline"
+                $scriptArgs += "--require-character-mesh-comparison"
+            }
+            $scriptArgs += "--require-comparison"
+            $scriptArgs += "--require-gifs"
+        }
+
         if ($null -ne $case -and $case.PSObject.Properties.Name -contains "script_args" -and $case.script_args) {
             foreach ($arg in @($case.script_args)) {
                 $scriptArgs += [string]$arg
@@ -608,8 +650,16 @@ if ([string]$case.kind -eq "notebook") {
     Copy-StudyNotebook -entryPath $entryPath -preparedPath $preparedPath
 }
 
-$note = if ([string]$case.kind -eq "python_script") {
+$finalStatus = "passed"
+$note = if ([string]$case.kind -eq "python_script" -and $isEvihCase -and -not $SmokeOnly) {
+    "Automated Evih/Raylib baseline comparison passed."
+}
+elseif ([string]$case.kind -eq "python_script" -and $isEvihCase -and $SmokeOnly) {
+    $finalStatus = "smoke_passed"
     "Automated Evih/Raylib screenshot smoke passed."
+}
+elseif ([string]$case.kind -eq "python_script") {
+    "Automated script execution passed."
 }
 elseif ($validationMode -match "manual_smoke") {
     "Automated execution passed. Manual JupyterLab smoke test is still required."
@@ -618,5 +668,5 @@ else {
     "Automated execution passed."
 }
 
-Update-CaseStatus -status "passed" -note $note
-Write-Host "$Slug -> passed"
+Update-CaseStatus -status $finalStatus -note $note
+Write-Host "$Slug -> $finalStatus"

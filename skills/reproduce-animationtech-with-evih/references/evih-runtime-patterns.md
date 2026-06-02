@@ -1,22 +1,23 @@
 # Evih Runtime Patterns
 
-Use these patterns for new AnimationTech Evih/Raylib reproductions.
+Use `labs/AnimationPapers/evih_motion_graph` as the canonical shape. New reproductions should be case-local modules with a shared runner only for dispatch.
 
 ## Standard Layout
 
-Current repository shape uses a shared runner. For original slug `<slug>`:
+For original slug `<slug>`:
 
 ```text
 labs/evih_reproductions/
-  __init__.py
-  cases.py
-  runtime.py
-  runner.py
+  runner.py                 # lightweight dispatcher only
+  common.py                 # small cross-case helpers only
   <slug>/
+    __init__.py
+    core.py                 # deterministic computation and validation contract
+    viewer.py               # Raylib artifact viewer
     generated.dat
 ```
 
-Manifest entry, when integration is explicitly in scope:
+Manifest entry:
 
 ```text
 slug: <slug>_evih
@@ -33,35 +34,31 @@ script_args:
   - <slug>
 ```
 
-Do not replace the original case or move original notebooks. Add Evih reproductions beside them. If a case needs a dedicated viewer, keep the same CLI and document why the shared runner is not enough.
+Do not replace original notebooks. Do not finish with a generic family smoke renderer as the only implementation.
 
-## Runtime Split
+## Core Contract
 
-Put deterministic computation in the shared runtime or a case module:
+Every `core.py` exposes:
 
-- Load source data and public assets.
-- Convert EvihAnimation motions to a small local data model.
-- Compute case-specific metrics and generated playback data.
-- Save and load artifacts.
-- Expose a `run_pipeline(...)` function or equivalent small API.
+```python
+CONTRACT: dict[str, Any]
 
-Put visualization in `runtime.py`, `runner.py`, or a case-local viewer:
+def run_pipeline(repo_root: Path | None = None, strict_baseline: bool = True, **kwargs) -> dict[str, Any]: ...
+def save_generated(result: dict[str, Any], output_path: Path | None = None) -> Path: ...
+def load_generated(path: Path | None = None) -> dict[str, Any]: ...
+def validate_metrics(metrics: dict[str, Any]) -> None: ...
+def load_or_bake_baseline(repo_root: Path | None = None, baseline_path: Path | None = None, evih_payload: dict[str, Any] | None = None) -> dict[str, Any]: ...
+def compare_to_baseline(evih_payload: dict[str, Any], baseline: dict[str, Any]) -> dict[str, Any]: ...
+def validate_comparison(comparison: dict[str, Any]) -> None: ...
+```
 
-- Parse CLI arguments, including `--case` for the shared runner.
-- Generate the artifact if missing or if `--rebuild` is provided.
-- Load the artifact.
-- Draw with Raylib.
-- Save a screenshot when requested.
-- Exit after screenshot capture or after `--max-frames` frames.
+The artifact must include `metrics`. Once baseline comparison is enabled it must also include `input_signature`, `baseline_signature`, `evih_output`, and `comparison`. For motion cases it should include matrix or position arrays, parents, bone names, trajectory/debug overlays, and any contact/target data needed by the viewer. For theory cases it should include sampled values and debug geometry. For fallback cases it must include the fallback source and allowed differences.
 
-Keep notebooks optional. The Raylib script is the primary case entrypoint.
+## Viewer Contract
 
-## Common CLI
-
-Every entrypoint should accept:
+Every `viewer.py` accepts:
 
 ```text
---case <original_slug>   # required for shared runner
 --artifact <path>
 --screenshot <path>
 --frame <int>
@@ -70,76 +67,14 @@ Every entrypoint should accept:
 --height <int>
 ```
 
-Recommended behavior:
+The viewer loads an artifact, calls `validate_metrics()`, renders with Raylib, saves a screenshot when requested, and exits after screenshot capture or after `--max-frames` frames. Matplotlib fallback is acceptable only for screenshot validation.
 
-- `--max-frames 0` renders one selected frame, saves a screenshot if requested, and exits.
-- `--max-frames N` advances playback and exits after `N` frames.
-- `--artifact` may be required by the managed runner; otherwise default it to the case-local `generated.dat`.
-- `--screenshot` creates parent directories.
-- If Raylib writes the screenshot into the current working directory, move it to the requested path before exit.
+The shared runner accepts `--baseline`, `--comparison-report`, `--require-comparison`, `--evih-gif`, `--source-gif`, and `--require-gifs`. Managed `_evih` runs should use these flags so `passed` means artifact, screenshot, metrics, baseline comparison, and dynamic GIF evidence all passed.
 
-## EvihAnimation Data Model
+## Shared Code
 
-Prefer a small dataclass around EvihAnimation output:
+Shared helpers may provide serialization, Evih BVH loading, drawing primitives, and reduced-profile utilities. Shared code must not hide a case’s behavioral contract. Case-specific constants, expected counts, allowed differences, and schema notes live in the case-local `core.py`.
 
-```python
-@dataclass
-class MotionData:
-    bone_names: list[str]
-    parents: np.ndarray
-    global_matrices: np.ndarray
-    framerate: float
-    source: str
+## Motion Graph Adapter
 
-    @property
-    def positions(self) -> np.ndarray:
-        return self.global_matrices[..., :3, 3]
-```
-
-For BVH:
-
-```python
-from ai4animation.Import.BVHImporter import BVH
-
-motion = BVH(str(path)).LoadMotion()
-bone_names = list(motion.Hierarchy.BoneNames)
-parents = np.asarray(motion.Hierarchy.ParentIndices, dtype=np.int32)
-global_matrices = np.asarray(motion.Frames, dtype=np.float32)
-framerate = float(motion.Framerate)
-```
-
-If the source case uses ipyanimlab mapping for compatibility, keep that mapping in `core.py` and document why it remains part of the parity contract.
-
-## Raylib Drawing
-
-Use `pyray` from the `raylib` package:
-
-- Initialize with MSAA when available.
-- Set a fixed camera and target FPS.
-- Clear to a readable background.
-- Draw ground/reference grids for motion cases.
-- Draw bones with `draw_line_3d` and joints with small spheres.
-- Draw trajectories, targets, contacts, or debug overlays in distinct colors.
-- Draw short title/frame text; avoid long instructions in the app.
-- Always call `close_window()` before returning.
-
-When Raylib cannot run in the environment, a matplotlib fallback is acceptable for screenshot validation, but the primary path should remain Raylib.
-
-## Case Group Patterns
-
-- Curves and spline cases: precompute sampled points and draw polylines, control points, tangents, and numeric error overlays.
-- RBF cases: draw weighted points, interpolation fields, sampled curves, or heatmap grids.
-- Point-cloud and graph theory cases: draw points, edges, selected minima, and graph diagnostics.
-- Character and USD cases: use Evih/Raylib equivalent meshes or skeletons; keep visual theme and behavior rather than exact ipyanimlab API calls.
-- Motion warping and editing cases: show source versus result skeleton/root paths with aligned frame counts and clear target markers.
-- Motion matching/planning cases: preserve nearest-neighbor or value-function metrics, then draw selected motion, query vector/debug path, and policy output.
-- Halo/facial cases: render synthetic or exported facial vertices/curves/control points with nonempty expression changes.
-
-## Concurrency Rules
-
-Multiple agents may work in the repository. Before writing:
-
-- Check `git status --short`.
-- Use non-overlapping case directories.
-- Avoid shared manifest/template edits unless you are the integration owner.
-- Do not rewrite generated artifacts from another agent's case unless asked.
+`motion_graph_evih` may keep using `labs/AnimationPapers/evih_motion_graph` as the canonical implementation. The `labs/evih_reproductions/motion_graph` package should be a thin adapter that loads or builds the canonical artifact, standardizes it for the shared runner, and validates the Motion Graph baseline.

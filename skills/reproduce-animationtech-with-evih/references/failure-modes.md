@@ -85,6 +85,7 @@ Symptoms:
 - Screenshot is nonblank but misses the required concept.
 - Skeleton is visible but target path/contact/debug data is absent.
 - Theory case draws decoration but not the sampled result.
+- `animationtech_source.gif` is a blog asset but shows raw input, a debug/log cell, or a static/subjectless recording instead of the final algorithm result.
 
 Actions:
 
@@ -92,6 +93,7 @@ Actions:
 - Identify the smallest visual evidence that proves the case concept.
 - Add debug overlays before polishing colors or camera.
 - Make the screenshot deterministic by fixing frame, camera, and seed.
+- Select the last key animation/result cell for `animationtech_source.gif`; regenerate from the baseline/source payload when the blog GIF is static, missing the character/subject, or not algorithm-specific.
 
 ## Heavy Case Runtime
 
