@@ -149,6 +149,8 @@ flowchart LR
 
 ## 运行方式
 
+如果你想按浏览器/JupyterLab 步骤复现博客里的角色运动，先看 [用户操作指南](USER_GUIDE.md)。指南区分了手柄实时控制和博客确定性重放，并给出可直接粘贴到 notebook 的复现代码。
+
 推荐从托管学习副本进入，而不是直接编辑原始 notebook：
 
 ```powershell
