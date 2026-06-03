@@ -50,6 +50,7 @@ $summary = [pscustomobject]@{
     generated_utc = (Get-Date).ToUniversalTime().ToString("o")
     failed = ($results | Where-Object { $_.status -eq "failed" }).Count
     blocked_external = ($results | Where-Object { $_.status -eq "blocked_external" }).Count
+    smoke_passed = ($results | Where-Object { $_.status -eq "smoke_passed" }).Count
     passed = ($results | Where-Object { $_.status -eq "passed" }).Count
     results = $results
 }

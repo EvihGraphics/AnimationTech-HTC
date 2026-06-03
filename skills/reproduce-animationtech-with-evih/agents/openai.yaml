@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reproduce AnimationTech with Evih"
+  short_description: "Evih/Raylib AnimationTech reproduction guide"
+  default_prompt: "Use $reproduce-animationtech-with-evih to reproduce an AnimationTech case with EvihAnimation/Raylib and validate parity."

@@ -34,6 +34,24 @@ Re-run the full matrix:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\validate_all.ps1
 ```
 
+Run an Evih/Raylib reproduction with baseline comparison:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 <slug>_evih
+```
+
+Run only the Evih screenshot smoke path:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 <slug>_evih -SmokeOnly
+```
+
+Check the Evih baseline comparison matrix:
+
+```powershell
+python skills\reproduce-animationtech-with-evih\scripts\check_evih_reproduction.py --repo-root . --expect-full-matrix --strict --require-artifacts --require-screenshots --validate-metrics --require-baseline-comparisons --require-source-skeleton-baselines --require-character-mesh-comparisons
+```
+
 Read the latest summary:
 
 ```powershell
@@ -55,6 +73,15 @@ docs/cases/README.md
 - Logs are written to `.reports/logs/<slug>.log`.
 - Executed notebooks are written to `.reports/executed/<slug>/`.
 - Resolved package versions are written to `.reports/locks/<slug>.txt`.
+- Evih baseline caches are written to `.reports/animation-baselines/<slug>_evih/baseline.dat`.
+- Evih comparison reports are written to `.reports/animation-comparisons/<slug>_evih/comparison.json`.
+- Evih visual comparison GIFs are written next to the report as `.reports/animation-comparisons/<slug>_evih/evih.gif` and `.reports/animation-comparisons/<slug>_evih/animationtech_source.gif`.
+- For skeletal/BVH `_evih` cases, the strict source channel also writes `.reports/animation-comparisons/<slug>_evih/animationtech_source.dat`. That DAT stores the AnimationTech source skeleton trajectory (`global_positions`, `parents`, `bone_names`, `root_trajectory`, `fps`, `frame_count`, and source signature), and `animationtech_source.gif` is rendered from that DAT with the same skeleton/trajectory renderer used for `evih.gif`.
+- Skeletal/BVH `_evih` cases also write strict character mesh evidence: `animationtech_source_mesh.dat`, `evih_mesh.dat`, `animationtech_source_mesh.gif`, and `evih_mesh.gif`. These use the real `AnimLabSimpleMale.usd` skinned mesh buffers, deterministic CPU skinning for the numeric DAT channel, and an EvihAnimation-style Raylib renderer for the dynamic mesh GIF channel; blog GIFs, CPU/PIL polygon renders, and skeleton-only views cannot satisfy mesh strict comparison.
+
+For `_evih` cases, `passed` means the artifact, screenshot, metrics, baseline comparison, and required dynamic GIF evidence all passed. `smoke_passed` is reserved for `-SmokeOnly`, where the Raylib screenshot path passed but baseline comparison and GIF visual comparison were intentionally skipped.
+
+Static screenshots are only smoke evidence. Visual comparison for `_evih` work must inspect dynamic sequence evidence: every baseline comparison directory must contain `evih.gif` for the Evih result and `animationtech_source.gif` for the AnimationTech source result. For skeletal/BVH cases, blog GIFs are supplemental only; strict pass requires `source_channel == "animationtech_skeleton_trajectory"`, `mesh_channel == "animationtech_skinned_character_mesh"`, source/evih DATs, and same-renderer source/evih GIFs. The strict mesh GIF renderer must be `evihanimation_style_raylib`, which follows the EvihAnimation/AI4AnimationPy Raylib scene style with real skinned character mesh data, a perspective actor camera, ground grid, directional lighting, and trajectory overlay. For non-skeletal cases, the source GIF must show the case's final/core algorithm subject, normally the last key visualization cell in the blog/notebook assets. Blog GIFs are candidates only; if the selected asset is static, missing the subject, or represents raw input/debug content instead of the algorithm result, the runner regenerates `animationtech_source.gif` from the baseline/source payload and records `replaced_reason` in `comparison.json`.
 
 ## Special Handling
 

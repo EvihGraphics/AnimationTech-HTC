@@ -1,0 +1,17 @@
+numpy
+scipy
+matplotlib
+ipympl
+ipywidgets
+jupyterlab
+nbconvert
+nbclient
+ipykernel
+torch
+torchvision
+torchaudio
+raylib
+ipyanimlab==1.2.1
+ipywebgl
+usd-core
+git+https://github.com/EvihGraphics/EvihAnimation.git@c8c96e6ed0416c2a517a8207d0985417acff3edf#egg=ai4animation
