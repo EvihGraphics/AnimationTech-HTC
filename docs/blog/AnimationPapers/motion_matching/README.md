@@ -105,6 +105,8 @@ sequenceDiagram
 
 ![Runtime Player search loop preview](assets/inertialization_transition_preview.gif)
 
+https://github.com/user-attachments/assets/1793e880-6609-4d41-8944-b536f9ae6604
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/inertialization_transition_result.png">
   <source src="assets/inertialization_transition_preview.mp4" type="video/mp4">
   <source src="assets/inertialization_transition_preview.webm" type="video/webm">
@@ -113,6 +115,8 @@ sequenceDiagram
 ![Stop and turn debug frame](assets/fast_stop_turn_cases_result.png)
 
 ![Stop and turn debug frame preview](assets/fast_stop_turn_cases_preview.gif)
+
+https://github.com/user-attachments/assets/aacf204b-f999-4988-9a4e-ab3d33f6a699
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/fast_stop_turn_cases_result.png">
   <source src="assets/fast_stop_turn_cases_preview.mp4" type="video/mp4">

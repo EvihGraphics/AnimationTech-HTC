@@ -1,41 +1,41 @@
-# 全量修复 AnimationTech 博客媒体一致性并在 docs 归档 Skill
+# 并行修复博客媒体一致性并归档项目 Skill
 
 ## Summary
-对除 `motion_matching` 外的 18 个受管博客案例做“源视频/字幕/运行结果/博客媒体”一致性审计与修复。视频和字幕只作为对照依据，博客主图和动画必须来自 notebook/script 的真实算法输出。完成后把流程归档为当前仓库 docs 下的标准 skill 文档包。
+在执行阶段使用 subagents 并行审计和修复除 `motion_matching` 外的 18 个受管案例。每个 subagent 负责一组案例的媒体一致性排查、重采建议和案例目录修复；主 agent 负责共享文件合并、全量质量闸门、最终 skill 归档到 `D:\Users\hi\Documents\SCU\WorldModel\AnimationTech-HTC-learning\docs\skills\animationtech-blog-media-auditor`。
+
+## Parallel Work Split
+- Worker A：viewer/key animation 高风险案例  
+  `animation_format`、`footskate_cleanup_for_motion_capture_editing`、`motion_graph`、`motion_warping`
+- Worker B：角色控制/规划类案例  
+  `near_optimal_character_animation_with_continuous_control`、`precomputing_avatar_behavior`、`verbs_and_adverbs`
+- Worker C：重计算或非实时案例  
+  `real_time_planning_for_parameterized_human_motion`、`motion_fields_for_interactive_character_animation`、`knowing_when_to_put_your_foot_down`
+- Worker D：剩余 notebook 与 python_module 案例  
+  `halo_4_facial_animation`、`real_time_planning_multiprocess_func`、`halo_4_exporter_from_maya`、Theory 分组 5 个案例
+- Main agent：不重复处理案例；只做共享文件整合、冲突消解、全量检查、skill 归档。
 
 ## Key Changes
-- 对照 `docs/blog/media_manifest.json`、`docs/transcripts/*.txt`、本地视频/SRT 目录和各博客 README/assets，逐案例识别空 viewer、widget error、整页截图、代码卡裁剪、静态假动画、与演讲展示不一致的媒体。
-- 优先修复 `key_visual`、`key_animation`、`live_canvas`、viewer/timeline 输出；必要时调整 `live_render`、确定性输入、相机、timeline 参数、canvas crop、motion capture 范围。
-- 重新采集受影响案例资产：
+- 每个 worker 对照对应视频/SRT、`docs/transcripts`、manifest、README 和 assets，找出与演讲展示不一致或无意义的媒体。
+- Worker 可修改自己负责的案例目录：README、assets、assets/README、必要的 USER_GUIDE；不得直接改其他案例。
+- `docs/blog/media_manifest.json`、`check_blog_docs.ps1`、`tools/prepare_notebook.py` 由 main agent 统一修改；worker 只在最终报告里列出所需 manifest/check/notebook 转换变更。
+- 对需重采案例运行：
   ```powershell
   python .\docs\blog\capture_blog_media.py --slug <slug> --run-timeout 900
   ```
-- 精简对应 README：保留有说明力的算法输出图/动画，移除坏图、重复证据、旧链接和无意义截图；代码卡集中到附录证据表。
-- 加强 `check_blog_docs.ps1`：为发现的问题补充案例专项质量闸门，避免空画面、widget error 或缺少关键视觉主体的结果再次通过。
-- 归档标准 skill 到：
-  `D:\Users\hi\Documents\SCU\WorldModel\AnimationTech-HTC-learning\docs\skills\animationtech-blog-media-auditor`
-  包含 `SKILL.md`、必要 reference 和可复用审计脚本。
-
-## Public APIs / Interfaces / Types
-- 不改变现有 `media_manifest.json` schema，只更新字段值或补充已有采集字段。
-- 不改原始 notebook 的 public API；prepared/study 转换只做最小兼容修复。
-- docs 内 skill 作为项目归档与复用说明，不影响仓库运行时接口。
+- 不使用视频帧冒充博客结果；视频和字幕只作为参考证据。
 
 ## Test Plan
-- 对每个修改过的案例重采媒体并人工 smoke 关键 PNG/GIF/MP4。
-- 运行全量检查：
+- 每个 worker 对负责案例做人工 smoke：关键 PNG/GIF/MP4 必须有实际算法主体，不是空 viewer、widget error、代码卡、Jupyter chrome 或假动画。
+- Main agent 合并后运行：
   ```powershell
   powershell -NoProfile -ExecutionPolicy Bypass -File .\docs\blog\check_blog_docs.ps1
-  ```
-- 运行严格发布检查和报告：
-  ```powershell
   powershell -NoProfile -ExecutionPolicy Bypass -File .\docs\blog\check_blog_docs.ps1 -Strict
   powershell -NoProfile -ExecutionPolicy Bypass -File .\docs\blog\report_blog_docs.ps1
   ```
-- 校验归档 skill 基本结构：存在 `SKILL.md`，frontmatter 包含 `name` 和 `description`，references/scripts 路径可读。
+- Skill 归档后校验 `SKILL.md` frontmatter、references/scripts 可读，并记录 Motion Matching 作为标准样板。
 
 ## Assumptions
-- `motion_matching` 已完成，只作为参考样板，不重复重建。
-- Skill 归档在当前仓库 `docs\skills\animationtech-blog-media-auditor`，不写入用户级 `C:\Users\hi\.codex\skills`。
-- 视频帧不直接充当博客资产。
-- 不主动覆盖用户已有无关脏改；若某个案例修复必须触碰同名脏文件，先隔离确认。
+- 当前仍处于 Plan Mode，因此这里只规划 subagent fan-out；执行阶段再实际 spawn workers。
+- `motion_matching` 不重做，只作为修复模板和 skill 参考案例。
+- 共享文件由 main agent 串行修改，避免 subagent 并发写同一文件导致冲突。
+- 不覆盖用户已有无关脏改；若某案例必须触碰已有脏文件，先由 main agent隔离确认。
