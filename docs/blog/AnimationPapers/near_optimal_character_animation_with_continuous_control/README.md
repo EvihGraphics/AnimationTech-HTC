@@ -83,15 +83,6 @@ flowchart LR
 - 可视化主体：Source clip playback
 - 捕获方式：`canvas`
 
-![Source clip playback](assets/02_source_clip_playback_result.png)
-
-![Source clip playback preview](assets/02_source_clip_playback_preview.gif)
-
-
-https://github.com/user-attachments/assets/bfff5417-4489-4a83-819b-d4d05318fe99
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_source_clip_playback_result.png" src="assets/02_source_clip_playback_preview.mp4"></video>
-
 ### Cell 16 - Clip contact constraints
 
 提取每个片段的脚部接触窗口和位置，用以约束后续拼接动作的物理合理性。
@@ -108,15 +99,6 @@ flowchart LR
 - 结果说明什么：viewer 展示规划前如何表达物理合理性。
 - 可视化主体：Clip contact constraints
 - 捕获方式：`canvas`
-
-![Clip contact constraints](assets/04_contact_constraint_viewer_result.png)
-
-![Clip contact constraints preview](assets/04_contact_constraint_viewer_preview.gif)
-
-
-https://github.com/user-attachments/assets/6f827c0f-ea4c-4ed3-b7d2-36571202bd12
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_contact_constraint_viewer_result.png" src="assets/04_contact_constraint_viewer_preview.mp4"></video>
 
 ### Cell 19 - Random transition player
 
@@ -135,15 +117,6 @@ flowchart LR
 - 可视化主体：Random transition player
 - 捕获方式：`canvas`
 
-![Random transition player](assets/05_random_transition_player_result.png)
-
-![Random transition player preview](assets/05_random_transition_player_preview.gif)
-
-
-https://github.com/user-attachments/assets/85a27653-0c55-408c-b5be-5e945b46adc9
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/05_random_transition_player_result.png" src="assets/05_random_transition_player_preview.mp4"></video>
-
 ### Cell 36 - Learned value surface
 
 使用多项式基函数拟合未来收益（Value Function），并将空间状态对应的代价分布可视化。
@@ -161,8 +134,6 @@ flowchart LR
 - 可视化主体：Learned value surface
 - 捕获方式：`plot`
 
-![Learned value surface](assets/07_learned_value_surface_result.png)
-
 ### Cell 38 - Optimal-policy controller
 
 在运行时评估贪婪选择和价值表（Value Policy），让角色自主做出更长远的最优动作规划。
@@ -179,15 +150,6 @@ flowchart LR
 - 结果说明什么：viewer 检查没有实体手柄时策略回调也能推进。
 - 可视化主体：Optimal-policy controller
 - 捕获方式：`canvas`
-
-![Optimal-policy controller](assets/08_optimal_policy_player_result.png)
-
-![Optimal-policy controller preview](assets/08_optimal_policy_player_preview.gif)
-
-
-https://github.com/user-attachments/assets/4a71849b-72a9-47d3-b778-40811c83b5b9
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_optimal_policy_player_result.png" src="assets/08_optimal_policy_player_preview.mp4"></video>
 
 ## 关键数据结构
 
@@ -219,6 +181,8 @@ https://github.com/user-attachments/assets/bfff5417-4489-4a83-819b-d4d05318fe99
 
 **Cell 16 - Clip contact constraints**
 
+https://github.com/user-attachments/assets/6f827c0f-ea4c-4ed3-b7d2-36571202bd12
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_contact_constraint_viewer_result.png">
   <source src="assets/04_contact_constraint_viewer_preview.mp4" type="video/mp4">
   <source src="assets/04_contact_constraint_viewer_preview.webm" type="video/webm">
@@ -226,12 +190,20 @@ https://github.com/user-attachments/assets/bfff5417-4489-4a83-819b-d4d05318fe99
 
 **Cell 19 - Random transition player**
 
+https://github.com/user-attachments/assets/85a27653-0c55-408c-b5be-5e945b46adc9
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/05_random_transition_player_result.png">
   <source src="assets/05_random_transition_player_preview.mp4" type="video/mp4">
   <source src="assets/05_random_transition_player_preview.webm" type="video/webm">
 </video>
 
+**Cell 36 - Learned value surface**
+
+![Learned value surface](assets/07_learned_value_surface_result.png)
+
 **Cell 38 - Optimal-policy controller**
+
+https://github.com/user-attachments/assets/4a71849b-72a9-47d3-b778-40811c83b5b9
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_optimal_policy_player_result.png">
   <source src="assets/08_optimal_policy_player_preview.mp4" type="video/mp4">

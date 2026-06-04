@@ -259,7 +259,13 @@ flowchart LR
 
 本节只放源 notebook 真实输出。学习卡、skip log、controller log 和 walkthrough 只保留在后续证据表。
 
-### Cell 23 - Source notebook motion-field viewer
+媒体审计说明：`00-walkthrough.webm` 是补充 walkthrough，只回放 cell 学习卡与结果证据；正文核心媒体仍以 UMAP 和 value-learning 两张 executed plot 为准。
+
+| 媒体 | 证据类型 | 阅读重点 |
+| --- | --- | --- |
+| [UMAP motion-field embedding](assets/03_umap_motion_field_result.png) | 核心图解 | 高维 motion field 在低维投影中的邻域连续性 |
+| [Value-learning score curve](assets/07_value_learning_curve_result.png) | 核心图解 | Bellman residual 随 epoch 下降并进入稳定区间 |
+| [Motion Fields walkthrough](assets/00-walkthrough.webm) | 补充证据 | 按 cell 顺序回放学习卡与结果证据 |
 
 这段动画直接来自源案例 notebook 的 `render(frame, ratio=.1, select=..., on_spot=...)`。viewer 中间是当前 pose，旁边一排角色是 k-NN 候选动作，灰度强弱来自源代码里的邻居权重；每次调用 render 都会把当前状态推进到下一步。阅读时看当前角色如何不断从候选动作条中吸收局部运动，而不是看博客脚本重绘的矢量示意图。
 

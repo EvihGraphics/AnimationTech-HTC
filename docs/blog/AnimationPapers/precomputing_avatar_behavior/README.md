@@ -82,15 +82,6 @@ flowchart LR
 - 可视化主体：Source motion graph playback
 - 捕获方式：`canvas`
 
-![Source motion graph playback](assets/02_source_motion_graph_playback_result.png)
-
-![Source motion graph playback preview](assets/02_source_motion_graph_playback_preview.gif)
-
-
-https://github.com/user-attachments/assets/85426882-4855-4eec-b894-42f8d0445259
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_source_motion_graph_playback_result.png" src="assets/02_source_motion_graph_playback_preview.mp4"></video>
-
 ### Cell 16 - Random graph action playback
 
 使用提取出的 State 和 Action 拓扑图，通过随机选择下一步动作，验证图的连通性和片段间播放的连续性。
@@ -109,15 +100,6 @@ flowchart LR
 - 可视化主体：Random graph action playback
 - 捕获方式：`canvas`
 
-![Random graph action playback](assets/04_random_action_playback_result.png)
-
-![Random graph action playback preview](assets/04_random_action_playback_preview.gif)
-
-
-https://github.com/user-attachments/assets/cb9b9a98-336d-4890-8450-360a1391e6ae
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_random_action_playback_result.png" src="assets/04_random_action_playback_preview.mp4"></video>
-
 ### Cell 22 - Immediate reward policy viewer
 
 不考虑长远未来，仅根据当前离目标采样点的距离立即给出最大奖励，生成短视（Myopic）的最优动作策略。
@@ -134,15 +116,6 @@ flowchart LR
 - 结果说明什么：viewer 展示局部目标奖励如何选择图动作。
 - 可视化主体：Immediate reward policy viewer
 - 捕获方式：`canvas`
-
-![Immediate reward policy viewer](assets/07_reward_policy_viewer_result.png)
-
-![Immediate reward policy viewer preview](assets/07_reward_policy_viewer_preview.gif)
-
-
-https://github.com/user-attachments/assets/9e34bd3e-5368-4303-a4d6-7df9792c3603
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_reward_policy_viewer_result.png" src="assets/07_reward_policy_viewer_preview.mp4"></video>
 
 ### Cell 27 - MDP value-policy viewer
 
@@ -161,15 +134,6 @@ flowchart LR
 - 结果说明什么：最终 viewer 检查学到的价值函数能否驱动动作选择。
 - 可视化主体：MDP value-policy viewer
 - 捕获方式：`canvas`
-
-![MDP value-policy viewer](assets/08_mdp_value_policy_viewer_result.png)
-
-![MDP value-policy viewer preview](assets/08_mdp_value_policy_viewer_preview.gif)
-
-
-https://github.com/user-attachments/assets/475172d6-5ade-4363-a68c-79936b2630a3
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_mdp_value_policy_viewer_result.png" src="assets/08_mdp_value_policy_viewer_preview.mp4"></video>
 
 ## 关键数据结构
 
@@ -201,6 +165,8 @@ https://github.com/user-attachments/assets/85426882-4855-4eec-b894-42f8d0445259
 
 **Cell 16 - Random graph action playback**
 
+https://github.com/user-attachments/assets/cb9b9a98-336d-4890-8450-360a1391e6ae
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_random_action_playback_result.png">
   <source src="assets/04_random_action_playback_preview.mp4" type="video/mp4">
   <source src="assets/04_random_action_playback_preview.webm" type="video/webm">
@@ -208,12 +174,16 @@ https://github.com/user-attachments/assets/85426882-4855-4eec-b894-42f8d0445259
 
 **Cell 22 - Immediate reward policy viewer**
 
+https://github.com/user-attachments/assets/9e34bd3e-5368-4303-a4d6-7df9792c3603
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_reward_policy_viewer_result.png">
   <source src="assets/07_reward_policy_viewer_preview.mp4" type="video/mp4">
   <source src="assets/07_reward_policy_viewer_preview.webm" type="video/webm">
 </video>
 
 **Cell 27 - MDP value-policy viewer**
+
+https://github.com/user-attachments/assets/475172d6-5ade-4363-a68c-79936b2630a3
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_mdp_value_policy_viewer_result.png">
   <source src="assets/08_mdp_value_policy_viewer_preview.mp4" type="video/mp4">

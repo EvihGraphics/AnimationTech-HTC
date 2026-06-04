@@ -238,7 +238,14 @@ prepared notebook 默认读取 artifact，而不是自动保存，原因是保�
 
 正文重点只放源 notebook 真实输出：foot-contact oracle 的角色 viewer、root-local feature axes、脚跟/脚尖 contact 标记和原始标注时间条。代码、日志和 walkthrough 都放到后面的证据索引。
 
-### Cell 15 - Source notebook foot-contact viewer
+媒体审计说明：本节现有 PNG/WebM 都是复现证据，不是动态 foot-contact 预览；不要把 walkthrough 当作 key animation。真正的 footfall classifier preview 需要从项目 reproduction/artifact 生成后再提升为主视觉。
+
+| 媒体 | 证据类型 | 阅读重点 |
+| --- | --- | --- |
+| [Animation windows and frame count](assets/01_clip_window_count_result.png) | 补充证据 | 数据池规模与可切片数量 |
+| [Classifier construction](assets/05_classifier_training_code_result.png) | 补充证据 | 从人工标签到 k-NN oracle 的转换 |
+| [Saved feature-vector artifact load](assets/06_saved_feature_vectors_result.png) | 补充证据 | 已标注训练集的稳定复现入口 |
+| [Knowing When To Put Your Foot Down walkthrough](assets/00-walkthrough.webm) | 补充证据 | 按 cell 顺序回放学习卡与结果证据 |
 
 这段动画对应语音稿里“用少量人工标注训练一个脚接触 oracle”的核心步骤。画面来自源案例 notebook 的 `render(frame)` 与同一个 cell 中的 `Canvas` 标注条：viewer 里能看到角色、局部 feature axes 和脚部 contact marker；下方时间条显示四路 heel/toe label 随帧推进。阅读时看脚底标记是否在接触帧稳定出现，而不是看后处理脚本重绘的解释图。
 

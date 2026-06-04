@@ -202,19 +202,19 @@ B-Spline 图要看平滑性和局部支撑。曲线通常不穿过所有控制�
 
 | Cell | 输出类型 | 代码做什么 | 结果说明什么 | 素材 |
 | --- | --- | --- | --- | --- |
-| 13 | `plot` | Plot Bezier curves of different orders with their control points. | The curve is constrained by the control polygon rather than being an isolated function plot. | [PNG](assets/01-bezier-de-casteljau.png) |
-| 64 | `plot` | Plot recursively constructed B-Spline basis functions. | Local support explains why one B-Spline control point affects only a local curve span. | [PNG](assets/02-bernstein-basis.png) |
-| 22 | `plot` | Connect multiple cubic Bezier spans and draw their control points. | Long paths are built from local spans, and shared endpoints control continuity. | [PNG](assets/03-bezier-control-polygon.png) |
-| 15 | `log` | Expand the De Casteljau form using SymPy. | The symbolic output proves that recursive interpolation and Bernstein polynomials describe the same cubic Bezier. | [PNG](assets/04-rational-bezier-weight.png) |
-| 24 | `plot` | Compare low-order and cubic polynomial interpolation behavior. | Cubic curves can control both position and derivative, which is why they are common in animation curves. | [PNG](assets/05-cubic-bezier-spline.png) |
-| 40 | `plot` | Plot a 2D Hermite curve with endpoint tangent controls. | Velocity and tangent information are as important as position values in animation curves. | [PNG](assets/06-hermite-tangents.png) |
-| 56 | `plot` | Plot a Cardinal spline with control points. | Cardinal splines estimate tangents from neighboring points and pass through key points. | [PNG](assets/07-cardinal-tension.png) |
-| 62 | `plot` | Plot interpolation points, midpoints, and helper structures for continuity. | The output separates positional continuity, velocity continuity, and higher-order smoothness. | [PNG](assets/08-cardinal-continuity.png) |
-| 72 | `plot` | Plot a uniform cubic B-Spline and its control points. | B-Splines are smooth approximations and usually do not pass through every control point. | [PNG](assets/09-bspline-local-support.png) |
-| 77 | `plot` | Generate a 1D Hermite curve from key time, key value, and tangent. | This transfers geometric curve ideas to animation-editor keyframe curves. | [PNG](assets/10-keyframe-hermite.png) |
-| 83 | `plot` | Compare Cardinal sampling under non-uniform key times. | Treating parameter t as real time can place samples incorrectly. | [PNG](assets/11-nonuniform-cardinal-time.png) |
-| 88 | `plot` | Show a non-uniform Bezier time curve and recovered internal parameter. | Animation systems often need to solve internal curve parameters from frame time. | [PNG](assets/12-bezier-time-root.png) |
-| 92 | `plot` | Fit a complex sampled function with a uniform cubic B-Spline. | The fitted curve does not need to pass through every sample, but it preserves a stable trend. | [PNG](assets/13-bspline-fitting.png) |
+| 13 | `plot` | Plot Bezier curves of different orders with their control points. | The curve is constrained by the control polygon rather than being an isolated function plot. | [PNG](assets/01-bezier-de-casteljau_result.png) |
+| 64 | `plot` | Plot recursively constructed B-Spline basis functions. | Local support explains why one B-Spline control point affects only a local curve span. | [PNG](assets/02-bernstein-basis_result.png) |
+| 22 | `plot` | Connect multiple cubic Bezier spans and draw their control points. | Long paths are built from local spans, and shared endpoints control continuity. | [PNG](assets/03-bezier-control-polygon_result.png) |
+| 15 | `log` | Expand the De Casteljau form using SymPy. | The symbolic output proves that recursive interpolation and Bernstein polynomials describe the same cubic Bezier. | [PNG](assets/04-rational-bezier-weight_result.png) |
+| 24 | `plot` | Compare low-order and cubic polynomial interpolation behavior. | Cubic curves can control both position and derivative, which is why they are common in animation curves. | [PNG](assets/05-cubic-bezier-spline_result.png) |
+| 40 | `plot` | Plot a 2D Hermite curve with endpoint tangent controls. | Velocity and tangent information are as important as position values in animation curves. | [PNG](assets/06-hermite-tangents_result.png) |
+| 56 | `plot` | Plot a Cardinal spline with control points. | Cardinal splines estimate tangents from neighboring points and pass through key points. | [PNG](assets/07-cardinal-tension_result.png) |
+| 62 | `plot` | Plot interpolation points, midpoints, and helper structures for continuity. | The output separates positional continuity, velocity continuity, and higher-order smoothness. | [PNG](assets/08-cardinal-continuity_result.png) |
+| 72 | `plot` | Plot a uniform cubic B-Spline and its control points. | B-Splines are smooth approximations and usually do not pass through every control point. | [PNG](assets/09-bspline-local-support_result.png) |
+| 77 | `plot` | Generate a 1D Hermite curve from key time, key value, and tangent. | This transfers geometric curve ideas to animation-editor keyframe curves. | [PNG](assets/10-keyframe-hermite_result.png) |
+| 83 | `plot` | Compare Cardinal sampling under non-uniform key times. | Treating parameter t as real time can place samples incorrectly. | [PNG](assets/11-nonuniform-cardinal-time_result.png) |
+| 88 | `plot` | Show a non-uniform Bezier time curve and recovered internal parameter. | Animation systems often need to solve internal curve parameters from frame time. | [PNG](assets/12-bezier-time-root_result.png) |
+| 92 | `plot` | Fit a complex sampled function with a uniform cubic B-Spline. | The fitted curve does not need to pass through every sample, but it preserves a stable trend. | [PNG](assets/13-bspline-fitting_result.png) |
 
 ## 关键 cell / 函数深讲
 

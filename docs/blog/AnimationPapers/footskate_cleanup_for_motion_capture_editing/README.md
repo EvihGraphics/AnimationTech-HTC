@@ -220,12 +220,6 @@ notebook 先用普通版本生成 `solved_animation`，后面又用 `L4 = 1000` 
 
 本节只保留最能说明算法结果的图像和动画。代码学习卡移到文末证据表，供需要复现或追溯 cell 上下文时查看。
 
-![Final Processing boundary smoothing preview](assets/06_final_processing_compare_preview.gif)
-
-
-https://github.com/user-attachments/assets/2abd9291-3fe6-4c1d-a21c-51ed691da380
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_final_processing_compare_result.png" src="assets/06_final_processing_compare_preview.mp4"></video>
 
 | Cell | 输出类型 | 阅读位置 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |

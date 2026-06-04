@@ -146,9 +146,6 @@ flowchart LR
 
 ![Raw vertex-stream face playback preview](assets/02_raw_vertex_stream_viewer_preview.gif)
 
-
-https://github.com/user-attachments/assets/617bb853-265d-4eed-b095-38b474535255
-
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_raw_vertex_stream_viewer_result.png" src="assets/02_raw_vertex_stream_viewer_preview.mp4"></video>
 
 ### Cell 13 - Raw animation memory size
@@ -236,9 +233,6 @@ flowchart LR
 
 ![CPU PCA reconstruction playback preview](assets/06_cpu_reconstruction_compare_preview.gif)
 
-
-https://github.com/user-attachments/assets/b979b113-c290-4b17-b2e1-4cf25ffd4994
-
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_cpu_reconstruction_compare_result.png" src="assets/06_cpu_reconstruction_compare_preview.mp4"></video>
 
 ### Cell 26 - GPU shader PCA reconstruction
@@ -264,9 +258,6 @@ flowchart LR
 ![GPU shader PCA reconstruction](assets/07_gpu_shader_reconstruction_result.png)
 
 ![GPU shader PCA reconstruction preview](assets/07_gpu_shader_reconstruction_preview.gif)
-
-
-https://github.com/user-attachments/assets/48111d08-e64c-4f9d-8d94-5263667b5d6e
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_gpu_shader_reconstruction_result.png" src="assets/07_gpu_shader_reconstruction_preview.mp4"></video>
 
@@ -299,38 +290,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 halo_4_
 
 本节只保留最能说明算法结果的图像和动画。代码学习卡移到文末证据表，供需要复现或追溯 cell 上下文时查看。
 
-
-![Raw vertex-stream face playback](assets/02_raw_vertex_stream_viewer_preview.gif)
-
-
-https://github.com/user-attachments/assets/617bb853-265d-4eed-b095-38b474535255
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_raw_vertex_stream_viewer_result.png">
-  <source src="assets/02_raw_vertex_stream_viewer_preview.mp4" type="video/mp4">
-  <source src="assets/02_raw_vertex_stream_viewer_preview.webm" type="video/webm">
-</video>
-
-
-**Cell 23 - CPU PCA reconstruction playback**
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_cpu_reconstruction_compare_result.png">
-  <source src="assets/06_cpu_reconstruction_compare_preview.mp4" type="video/mp4">
-  <source src="assets/06_cpu_reconstruction_compare_preview.webm" type="video/webm">
-</video>
-
-**Cell 26 - GPU shader PCA reconstruction**
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_gpu_shader_reconstruction_result.png">
-  <source src="assets/07_gpu_shader_reconstruction_preview.mp4" type="video/mp4">
-  <source src="assets/07_gpu_shader_reconstruction_preview.webm" type="video/webm">
-</video>
-
 | Cell | 输出类型 | 阅读位置 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |
-| Cell 11 | `timeline_viewer` | 核心动画 | 原始顶点流面部播放：展示压缩前逐帧几何数据的播放效果。 | `canvas` | [结果 PNG](assets/02_raw_vertex_stream_viewer_result.png) / [GIF](assets/02_raw_vertex_stream_viewer_preview.gif) / [MP4](assets/02_raw_vertex_stream_viewer_preview.mp4) / [WebM](assets/02_raw_vertex_stream_viewer_preview.webm) |
+| Cell 11 | `timeline_viewer` | 核心动画 | 原始顶点流面部播放：展示压缩前逐帧几何数据的播放效果。 | `canvas` | [结果 PNG](assets/02_raw_vertex_stream_viewer_result.png) / [GIF](assets/02_raw_vertex_stream_viewer_preview.gif) / [MP4](assets/02_raw_vertex_stream_viewer_preview.mp4) / [WebM](assets/02_raw_vertex_stream_viewer_preview.webm) / [GitHub video](https://github.com/user-attachments/assets/617bb853-265d-4eed-b095-38b474535255) |
 | Cell 19 | `widget_controls` | 核心图解 | PCA 主成分形变查看器：用控件把某个基向量显示成可见的面部形变方向。 | `widget_controls` | [结果 PNG](assets/05_pca_component_viewer_result.png) / [GIF](assets/05_pca_component_viewer_preview.gif) / [MP4](assets/05_pca_component_viewer_preview.mp4) / [WebM](assets/05_pca_component_viewer_preview.webm) |
-| Cell 23 | `timeline_viewer` | 核心动画 | CPU PCA 重建播放：检查压缩表示是否保留了可见的表情运动。 | `canvas` | [结果 PNG](assets/06_cpu_reconstruction_compare_result.png) / [GIF](assets/06_cpu_reconstruction_compare_preview.gif) / [MP4](assets/06_cpu_reconstruction_compare_preview.mp4) / [WebM](assets/06_cpu_reconstruction_compare_preview.webm) |
-| Cell 26 | `timeline_viewer` | 核心动画 | GPU shader PCA 重建：最终 viewer 展示适合运行时使用的 PCA 面部动画流程。 | `canvas` | [结果 PNG](assets/07_gpu_shader_reconstruction_result.png) / [GIF](assets/07_gpu_shader_reconstruction_preview.gif) / [MP4](assets/07_gpu_shader_reconstruction_preview.mp4) / [WebM](assets/07_gpu_shader_reconstruction_preview.webm) |
+| Cell 23 | `timeline_viewer` | 核心动画 | CPU PCA 重建播放：检查压缩表示是否保留了可见的表情运动。 | `canvas` | [结果 PNG](assets/06_cpu_reconstruction_compare_result.png) / [GIF](assets/06_cpu_reconstruction_compare_preview.gif) / [MP4](assets/06_cpu_reconstruction_compare_preview.mp4) / [WebM](assets/06_cpu_reconstruction_compare_preview.webm) / [GitHub video](https://github.com/user-attachments/assets/b979b113-c290-4b17-b2e1-4cf25ffd4994) |
+| Cell 26 | `timeline_viewer` | 核心动画 | GPU shader PCA 重建：最终 viewer 展示适合运行时使用的 PCA 面部动画流程。 | `canvas` | [结果 PNG](assets/07_gpu_shader_reconstruction_result.png) / [GIF](assets/07_gpu_shader_reconstruction_preview.gif) / [MP4](assets/07_gpu_shader_reconstruction_preview.mp4) / [WebM](assets/07_gpu_shader_reconstruction_preview.webm) / [GitHub video](https://github.com/user-attachments/assets/48111d08-e64c-4f9d-8d94-5263667b5d6e) |
 
 
 ## 代码 Cell 与可视化证据

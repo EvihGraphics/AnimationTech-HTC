@@ -351,8 +351,6 @@ flowchart LR
 ![Root projection and Root/Hips split preview](assets/06_root_projection_motion_preview.gif)
 
 
-https://github.com/user-attachments/assets/f1a58680-65d5-444c-bae3-d5b51c46e0f0
-
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_root_projection_motion_result.png" src="assets/06_root_projection_motion_preview.mp4"></video>
 
 ### Cell 24 - Static Root toggle comparison
@@ -378,8 +376,6 @@ flowchart LR
 ![Static Root toggle comparison preview](assets/07_static_root_toggles_preview.gif)
 
 
-https://github.com/user-attachments/assets/93d326a8-60dd-439d-bc97-452968275553
-
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_static_root_toggles_result.png" src="assets/07_static_root_toggles_preview.mp4"></video>
 
 ## 运行方式
@@ -397,24 +393,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 animati
 
 本节只保留最能说明算法结果的图像和动画。代码学习卡移到文末证据表，供需要复现或追溯 cell 上下文时查看。
 
-
-![Root projection and Root/Hips split](assets/06_root_projection_motion_preview.gif)
-
-
-https://github.com/user-attachments/assets/f1a58680-65d5-444c-bae3-d5b51c46e0f0
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_root_projection_motion_result.png">
-  <source src="assets/06_root_projection_motion_preview.mp4" type="video/mp4">
-  <source src="assets/06_root_projection_motion_preview.webm" type="video/webm">
-</video>
-
-
-**Cell 24 - Static Root toggle comparison**
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/07_static_root_toggles_result.png">
-  <source src="assets/07_static_root_toggles_preview.mp4" type="video/mp4">
-  <source src="assets/07_static_root_toggles_preview.webm" type="video/webm">
-</video>
 
 | Cell | 输出类型 | 阅读位置 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |
