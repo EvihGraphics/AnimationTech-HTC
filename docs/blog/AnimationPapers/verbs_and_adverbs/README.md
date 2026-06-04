@@ -79,15 +79,6 @@ flowchart LR
 - 可视化主体：Raw sample clip overview
 - 捕获方式：`canvas`
 
-![Raw sample clip overview](assets/01_raw_sample_clips_result.png)
-
-![Raw sample clip overview preview](assets/01_raw_sample_clips_preview.gif)
-
-
-https://github.com/user-attachments/assets/7c36901a-6782-465a-8c6b-281c0e36c487
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/01_raw_sample_clips_result.png" src="assets/01_raw_sample_clips_preview.mp4"></video>
-
 ### Cell 10 - Canonical timing and contact inspection
 
 为了避免直接混合导致错步，将所有片段对齐到一个统一的特征时间轴（Phase），并在此检验接触状态的一致性。
@@ -104,15 +95,6 @@ flowchart LR
 - 结果说明什么：Canonical timing aligns examples before interpolation.
 - 可视化主体：Canonical timing and contact inspection
 - 捕获方式：`canvas`
-
-![Canonical timing and contact inspection](assets/02_canonical_timing_contacts_result.png)
-
-![Canonical timing and contact inspection preview](assets/02_canonical_timing_contacts_preview.gif)
-
-
-https://github.com/user-attachments/assets/e89b1fd9-6321-4029-b220-d00f449605c8
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_canonical_timing_contacts_result.png" src="assets/02_canonical_timing_contacts_preview.mp4"></video>
 
 ### Cell 14 - Looping animation comparison
 
@@ -131,15 +113,6 @@ flowchart LR
 - 可视化主体：Looping animation comparison
 - 捕获方式：`canvas`
 
-![Looping animation comparison](assets/03_looping_animation_compare_result.png)
-
-![Looping animation comparison preview](assets/03_looping_animation_compare_preview.gif)
-
-
-https://github.com/user-attachments/assets/47626e48-6d1c-4cdb-af74-13ca3bdbf819
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/03_looping_animation_compare_result.png" src="assets/03_looping_animation_compare_preview.mp4"></video>
-
 ### Cell 18 - Resampled canonical clips
 
 将规整并修复循环后的剪辑重采样到一致的帧数（如 401 帧），确保数据在数组维度上的对齐。
@@ -156,15 +129,6 @@ flowchart LR
 - 结果说明什么：viewer 检查样例是否共享同一时间域。
 - 可视化主体：Resampled canonical clips
 - 捕获方式：`canvas`
-
-![Resampled canonical clips](assets/04_resampled_canonical_clips_result.png)
-
-![Resampled canonical clips preview](assets/04_resampled_canonical_clips_preview.gif)
-
-
-https://github.com/user-attachments/assets/10c0e665-0a87-4a2a-b9e4-10a10fc1034f
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_resampled_canonical_clips_result.png" src="assets/04_resampled_canonical_clips_preview.mp4"></video>
 
 ### Cell 22 - B-spline curve fit
 
@@ -183,8 +147,6 @@ flowchart LR
 - 可视化主体：B-spline curve fit
 - 捕获方式：`plot`
 
-![B-spline curve fit](assets/05_bspline_fit_plot_result.png)
-
 ### Cell 23 - B-spline reconstruction viewer
 
 使用降维后的 B 样条控制点重新构建动画并播放，肉眼验证拟合压缩过程没有损失明显的视觉质量。
@@ -202,15 +164,6 @@ flowchart LR
 - 可视化主体：B-spline reconstruction viewer
 - 捕获方式：`canvas`
 
-![B-spline reconstruction viewer](assets/06_bspline_reconstruction_viewer_result.png)
-
-![B-spline reconstruction viewer preview](assets/06_bspline_reconstruction_viewer_preview.gif)
-
-
-https://github.com/user-attachments/assets/5f02c79f-1ecd-45e2-bd8a-5ec193f24aff
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_bspline_reconstruction_viewer_result.png" src="assets/06_bspline_reconstruction_viewer_preview.mp4"></video>
-
 ### Cell 33 - Final interpolated adverb controls
 
 集成径向基函数（RBF），通过交互式的 `angle`（方向）和 `mood`（心情/速度）滑杆，在潜空间实时插值出全新的动作。
@@ -227,15 +180,6 @@ flowchart LR
 - 结果说明什么：最终 viewer 展示 verb/adverb 坐标如何生成新动画。
 - 可视化主体：Final interpolated adverb controls
 - 捕获方式：`canvas`
-
-![Final interpolated adverb controls](assets/08_final_interpolated_adverb_controls_result.png)
-
-![Final interpolated adverb controls preview](assets/08_final_interpolated_adverb_controls_preview.gif)
-
-
-https://github.com/user-attachments/assets/647b8b0c-9885-4c53-984a-6a5ffefb886d
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_final_interpolated_adverb_controls_result.png" src="assets/08_final_interpolated_adverb_controls_preview.mp4"></video>
 
 ## 关键数据结构
 
@@ -267,12 +211,16 @@ https://github.com/user-attachments/assets/7c36901a-6782-465a-8c6b-281c0e36c487
 
 **Cell 10 - Canonical timing and contact inspection**
 
+https://github.com/user-attachments/assets/e89b1fd9-6321-4029-b220-d00f449605c8
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/02_canonical_timing_contacts_result.png">
   <source src="assets/02_canonical_timing_contacts_preview.mp4" type="video/mp4">
   <source src="assets/02_canonical_timing_contacts_preview.webm" type="video/webm">
 </video>
 
 **Cell 14 - Looping animation comparison**
+
+https://github.com/user-attachments/assets/47626e48-6d1c-4cdb-af74-13ca3bdbf819
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/03_looping_animation_compare_result.png">
   <source src="assets/03_looping_animation_compare_preview.mp4" type="video/mp4">
@@ -281,12 +229,20 @@ https://github.com/user-attachments/assets/7c36901a-6782-465a-8c6b-281c0e36c487
 
 **Cell 18 - Resampled canonical clips**
 
+https://github.com/user-attachments/assets/10c0e665-0a87-4a2a-b9e4-10a10fc1034f
+
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/04_resampled_canonical_clips_result.png">
   <source src="assets/04_resampled_canonical_clips_preview.mp4" type="video/mp4">
   <source src="assets/04_resampled_canonical_clips_preview.webm" type="video/webm">
 </video>
 
+**Cell 22 - B-spline curve fit**
+
+![B-spline curve fit](assets/05_bspline_fit_plot_result.png)
+
 **Cell 23 - B-spline reconstruction viewer**
+
+https://github.com/user-attachments/assets/5f02c79f-1ecd-45e2-bd8a-5ec193f24aff
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_bspline_reconstruction_viewer_result.png">
   <source src="assets/06_bspline_reconstruction_viewer_preview.mp4" type="video/mp4">
@@ -294,6 +250,8 @@ https://github.com/user-attachments/assets/7c36901a-6782-465a-8c6b-281c0e36c487
 </video>
 
 **Cell 33 - Final interpolated adverb controls**
+
+https://github.com/user-attachments/assets/647b8b0c-9885-4c53-984a-6a5ffefb886d
 
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/08_final_interpolated_adverb_controls_result.png">
   <source src="assets/08_final_interpolated_adverb_controls_preview.mp4" type="video/mp4">

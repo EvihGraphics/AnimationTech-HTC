@@ -2,6 +2,8 @@
 
 本目录存放 `knowing_when_to_put_your_foot_down` 的博客媒体。v5 媒体把正文结果图/动画和代码学习卡分开维护。
 
+媒体审计说明：当前媒体是复现证据集合；`00-walkthrough.webm` 是补充卡片序列，不作为关键动态媒体。若要发布真正的 key visual，应从项目输出生成 footfall classifier/contact preview 后再加入正文。
+
 | 文件 | 来源 | 类型 | 角色 | 说明 |
 | --- | --- | --- | --- | --- |
 | `00-walkthrough.webm` | case walkthrough | `walkthrough_webm` | `supporting_evidence` | 总览短视频 |

@@ -2,6 +2,8 @@
 
 本目录存放 `real_time_planning_for_parameterized_human_motion` 的博客媒体。v5 媒体把正文结果图/动画和代码学习卡分开维护。
 
+媒体审计说明：`00-walkthrough.webm` 是补充卡片序列，不作为关键动态媒体；`learning_card` 行只记录源码上下文，正文关键媒体应使用对应的 `*_result.png` executed 输出。
+
 | 文件 | 来源 | 类型 | 角色 | 说明 |
 | --- | --- | --- | --- | --- |
 | `00-walkthrough.webm` | case walkthrough | `walkthrough_webm` | `supporting_evidence` | 总览短视频 |

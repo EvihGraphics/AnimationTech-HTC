@@ -235,6 +235,8 @@ prepared notebook 默认读取 artifact，而不是自动保存，原因是保�
 
 这个案例没有单一的主动画结果，因此正文只挑选最有阅读价值的结果图和 walkthrough；学习卡放在后续证据表里。
 
+媒体审计说明：本节现有 PNG/WebM 都是复现证据，不是动态 foot-contact 预览；不要把 walkthrough 当作 key animation。真正的 footfall classifier preview 需要从项目 reproduction/artifact 生成后再提升为主视觉。
+
 | 媒体 | 证据类型 | 阅读重点 |
 | --- | --- | --- |
 | [Animation windows and frame count](assets/01_clip_window_count_result.png) | 补充证据 | 数据池规模与可切片数量 |

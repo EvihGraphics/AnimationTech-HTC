@@ -256,6 +256,8 @@ flowchart LR
 
 本节只放已经稳定生成的结果媒体和 walkthrough。学习卡移到后续证据表，不抢正文主视觉。
 
+媒体审计说明：`00-walkthrough.webm` 是补充 walkthrough，只回放 cell 学习卡与结果证据；正文核心媒体仍以 UMAP 和 value-learning 两张 executed plot 为准。
+
 | 媒体 | 证据类型 | 阅读重点 |
 | --- | --- | --- |
 | [UMAP motion-field embedding](assets/03_umap_motion_field_result.png) | 核心图解 | 高维 motion field 在低维投影中的邻域连续性 |

@@ -1527,7 +1527,22 @@
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
-          "github_video_url": "https://github.com/user-attachments/assets/617bb853-265d-4eed-b095-38b474535255"
+          "github_video_url": "https://github.com/user-attachments/assets/617bb853-265d-4eed-b095-38b474535255",
+          "crop_canvas_render_area": true,
+          "live_prepare_code": "def animationtech_blog_raw_face_render(frame):\n    viewer.bind_buffer(buffer=vbo)\n    viewer.buffer_data(src_data=frames[int(frame), ...].astype(np.float32).flatten(), usage='DYNAMIC_DRAW')\n    viewer.begin_shadow()\n    viewer.end_shadow()\n    viewer.begin_display()\n    viewer.draw_ground()\n    viewer.use_program(prog)\n    viewer.bind_vertex_array(vao)\n    viewer.uniform('u_color', material.albedo)\n    viewer.uniform('u_material', material.material_uniform)\n    viewer.draw_elements('TRIANGLES', indices.shape[0] * 3, 'UNSIGNED_SHORT', 0)\n    viewer.end_display()\n    viewer.execute_commands()",
+          "live_render": "_blog_frame = int(round((frames.shape[0] - 1) * {fraction}))\nviewer.camera_pos = [-220, 170, 210]\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nanimationtech_blog_raw_face_render(_blog_frame)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 6,
+            "sample_count": 36,
+            "max_frame_count": 48,
+            "start_fraction": 0.05,
+            "end_fraction": 0.95
+          },
+          "motion_quality": {
+            "min_max_delta": 1.8,
+            "min_changed_fraction": 0.04
+          }
         },
         {
           "id": "memory-size",
@@ -1564,7 +1579,7 @@
         {
           "id": "pca-component-viewer",
           "cell_index": 19,
-          "output_type": "widget_controls",
+          "output_type": "viewer",
           "title": "PCA component deformation viewer",
           "code_purpose": "Move pose and multiplier controls to inspect an individual PCA component.",
           "result_meaning": "The widget makes a basis component visible as a facial deformation direction.",
@@ -1592,11 +1607,26 @@
           "preview_gif": "05_pca_component_viewer_preview.gif",
           "video_mp4": "05_pca_component_viewer_preview.mp4",
           "video_webm": "05_pca_component_viewer_preview.webm",
-          "capture_kind": "widget_controls",
+          "capture_kind": "canvas",
           "visual_subject": "PCA component deformation viewer: The widget makes a basis component visible as a facial deformation direction.",
-          "capture_selector": "output widget controls",
+          "capture_selector": "output canvas:last",
           "publish_media_required": true,
-          "media_provenance": "live_widget_controls"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "live_prepare_code": "def animationtech_blog_pca_component_render(pose, mult=65.0):\n    pose = int(np.clip(pose, 0, pca.components_.shape[0] - 1))\n    v = pca.components_[pose, :] * float(mult) + pca.mean_\n    viewer.begin_shadow()\n    viewer.end_shadow()\n    viewer.begin_display()\n    viewer.draw_ground()\n    viewer.use_program(prog)\n    viewer.bind_buffer(buffer=vbo)\n    viewer.buffer_data(src_data=v.astype(np.float32).flatten(), usage='DYNAMIC_DRAW')\n    viewer.bind_vertex_array(vao)\n    viewer.uniform('u_color', material.albedo)\n    viewer.uniform('u_material', material.material_uniform)\n    viewer.draw_elements('TRIANGLES', indices.shape[0] * 3, 'UNSIGNED_SHORT', 0)\n    viewer.end_display()\n    viewer.execute_commands()",
+          "live_render": "_blog_pose = int(round((pca.components_.shape[0] - 1) * {fraction}))\nviewer.camera_pos = [-220, 170, 210]\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nanimationtech_blog_pca_component_render(_blog_pose, mult=65.0)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 6,
+            "sample_count": 7,
+            "max_frame_count": 12,
+            "start_fraction": 0.0,
+            "end_fraction": 1.0
+          },
+          "motion_quality": {
+            "min_max_delta": 1.2,
+            "min_changed_fraction": 0.01
+          }
         },
         {
           "id": "cpu-reconstruction",
@@ -1626,7 +1656,22 @@
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
-          "github_video_url": "https://github.com/user-attachments/assets/b979b113-c290-4b17-b2e1-4cf25ffd4994"
+          "github_video_url": "https://github.com/user-attachments/assets/b979b113-c290-4b17-b2e1-4cf25ffd4994",
+          "crop_canvas_render_area": true,
+          "live_prepare_code": "def animationtech_blog_cpu_reconstruction_render(frame):\n    frame = int(frame)\n    anim = anim_pca[frame] * 5.0\n    reconstructed = pca.inverse_transform(anim).reshape(-1, 3)\n    reconstructed[:, 0] += 30\n    viewer.begin_shadow()\n    viewer.end_shadow()\n    viewer.begin_display()\n    viewer.draw_ground()\n    viewer.use_program(prog)\n    viewer.bind_buffer(buffer=vbo)\n    viewer.buffer_data(src_data=frames[frame, ...].astype(np.float32).flatten(), usage='DYNAMIC_DRAW')\n    viewer.bind_vertex_array(vao)\n    viewer.uniform('u_color', material.albedo)\n    viewer.uniform('u_material', material.material_uniform)\n    viewer.draw_elements('TRIANGLES', indices.shape[0] * 3, 'UNSIGNED_SHORT', 0)\n    viewer.bind_buffer(buffer=vbo)\n    viewer.buffer_data(src_data=reconstructed.astype(np.float32).flatten(), usage='DYNAMIC_DRAW')\n    viewer.bind_vertex_array(vao)\n    viewer.uniform('u_color', material.albedo)\n    viewer.uniform('u_material', material.material_uniform)\n    viewer.draw_elements('TRIANGLES', indices.shape[0] * 3, 'UNSIGNED_SHORT', 0)\n    viewer.end_display()\n    viewer.execute_commands()",
+          "live_render": "_blog_frame = int(round((anim_pca.shape[0] - 1) * {fraction}))\nviewer.camera_pos = [-170, 150, 230]\nviewer.camera_pitch = -16\nviewer.camera_yaw = -38\nanimationtech_blog_cpu_reconstruction_render(_blog_frame)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 6,
+            "sample_count": 36,
+            "max_frame_count": 48,
+            "start_fraction": 0.05,
+            "end_fraction": 0.95
+          },
+          "motion_quality": {
+            "min_max_delta": 1.8,
+            "min_changed_fraction": 0.04
+          }
         },
         {
           "id": "gpu-reconstruction",

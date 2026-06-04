@@ -296,8 +296,6 @@ flowchart LR
 ![Follow-path result viewer preview](assets/follow_path_visualization_preview.gif)
 
 
-https://github.com/user-attachments/assets/72d4ec2d-0922-495a-b456-45c66535e27e
-
 <video controls muted loop playsinline preload="metadata" width="100%" poster="assets/follow_path_visualization_result.png" src="assets/follow_path_visualization_preview.mp4"></video>
 
 ## 运行方式
@@ -318,16 +316,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 motion_
 
 本节只保留最能说明算法结果的图像和动画。代码学习卡移到文末证据表，供需要复现或追溯 cell 上下文时查看。
 
-
-![Follow-path result viewer](assets/follow_path_visualization_preview.gif)
-
-
-https://github.com/user-attachments/assets/72d4ec2d-0922-495a-b456-45c66535e27e
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/follow_path_visualization_result.png">
-  <source src="assets/follow_path_visualization_preview.mp4" type="video/mp4">
-  <source src="assets/follow_path_visualization_preview.webm" type="video/webm">
-</video>
 
 | Cell | 输出类型 | 阅读位置 | 可视化主体 | 捕获方式 | 结果媒体 |
 | --- | --- | --- | --- | --- | --- |
