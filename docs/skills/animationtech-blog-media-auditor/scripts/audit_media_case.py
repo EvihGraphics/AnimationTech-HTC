@@ -9,6 +9,7 @@ case assets.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import struct
@@ -93,6 +94,17 @@ def embedded_pollution(path: Path) -> list[str]:
     return [marker for marker in POLLUTION_MARKERS if marker in text]
 
 
+def file_digest(path: Path) -> str | None:
+    try:
+        digest = hashlib.sha256()
+        with path.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return digest.hexdigest()
+    except OSError:
+        return None
+
+
 def summarize_case(repo: Path, case: dict, video_root: Path) -> list[str]:
     lines: list[str] = []
     slug = case.get("slug", "<missing>")
@@ -122,6 +134,7 @@ def summarize_case(repo: Path, case: dict, video_root: Path) -> list[str]:
         lines.append(f"- evidence: {stem} mp4={mp4} srt={srt}")
 
     warnings: list[str] = []
+    key_result_digests: dict[str, list[str]] = {}
     for step in case.get("steps", []):
         label = f"{step.get('id', '<missing-id>')} cell={step.get('cell_index', '-')}"
         role = step.get("media_role", "")
@@ -165,6 +178,14 @@ def summarize_case(repo: Path, case: dict, video_root: Path) -> list[str]:
                 markers = embedded_pollution(path)
                 if markers:
                     warnings.append(f"{label}: PNG text markers {name}: {', '.join(markers)}")
+            if key == "result_file" and role in {"key_visual", "key_animation"}:
+                digest = file_digest(path)
+                if digest:
+                    key_result_digests.setdefault(digest, []).append(f"{step.get('id', '<missing-id>')}={name}")
+
+    for duplicates in key_result_digests.values():
+        if len(duplicates) > 1:
+            warnings.append(f"duplicate key result bytes: {', '.join(duplicates)}")
 
     if warnings:
         lines.append("- warnings:")

@@ -180,10 +180,6 @@ flowchart LR
 
 ![Rotation-invariant deformation controls](assets/06_rotation_invariance_controls_result.png)
 
-![Rotation-invariant deformation controls preview](assets/06_rotation_invariance_controls_preview.gif)
-
-<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_rotation_invariance_controls_result.png" src="assets/06_rotation_invariance_controls_preview.mp4"></video>
-
 ### Cell 40 - Animation graph reconstruction
 
 对实际的角色运动序列提取图结构，验证 Laplacian 框架如何影响带时间轴的跨帧动画。
@@ -254,7 +250,7 @@ flowchart LR
 | Cell 9 | `viewer` | 核心图解 | Two-anchor reconstruction: Anchors turn relative differential coordinates into a positioned shape. | `canvas` | [结果 PNG](assets/03_two_anchor_solve_result.png) |
 | Cell 10 | `viewer` | 核心图解 | Three-anchor deformation: The viewer shows local deformation propagating through the graph. | `canvas` | [结果 PNG](assets/04_three_anchor_deformation_result.png) |
 | Cell 19 | `viewer` | 核心图解 | Vectorized 3D Laplacian solve: The same linear machinery scales from 2D graph points to 3D animation vertices. | `canvas` | [结果 PNG](assets/05_vectorized_3d_solve_result.png) |
-| Cell 29 | `widget_controls` | 核心图解 | Rotation-invariant deformation controls: The controls reveal which constraints preserve shape while allowing deformation. | `widget_controls` | [结果 PNG](assets/06_rotation_invariance_controls_result.png) / [GIF](assets/06_rotation_invariance_controls_preview.gif) / [MP4](assets/06_rotation_invariance_controls_preview.mp4) / [WebM](assets/06_rotation_invariance_controls_preview.webm) |
+| Cell 29 | `widget_controls` | 核心图解 | Rotation-invariant deformation controls: The controls reveal which constraints preserve shape while allowing deformation. | `canvas` | [结果 PNG](assets/06_rotation_invariance_controls_result.png) |
 | Cell 40 | `timeline_viewer` | 核心动画 | Animation graph reconstruction: The timeline viewer shows Laplacian deformation applied to animated pose data. | `canvas` | [结果 PNG](assets/07_animation_graph_deformation_result.png) / [GIF](assets/07_animation_graph_deformation_preview.gif) / [MP4](assets/07_animation_graph_deformation_preview.mp4) / [WebM](assets/07_animation_graph_deformation_preview.webm) / [GitHub video](https://github.com/user-attachments/assets/41fa9cc6-4f7c-40eb-b540-8c1ecf02cc3b) |
 | Cell 46 | `timeline_viewer` | 核心动画 | Curved locomotion result: The final viewer checks whether graph deformation can redirect locomotion smoothly. | `canvas` | [结果 PNG](assets/08_curved_locomotion_result_result.png) / [GIF](assets/08_curved_locomotion_result_preview.gif) / [MP4](assets/08_curved_locomotion_result_preview.mp4) / [WebM](assets/08_curved_locomotion_result_preview.webm) / [GitHub video](https://github.com/user-attachments/assets/4acb38c5-3cae-449f-b243-aa2bbac81614) |
 
@@ -270,7 +266,7 @@ flowchart LR
 | Cell 9 | Anchors turn relative differential coordinates into a positioned shape. | [结果 PNG](assets/03_two_anchor_solve_result.png) / [代码卡](assets/03_two_anchor_solve.png) |
 | Cell 10 | The viewer shows local deformation propagating through the graph. | [结果 PNG](assets/04_three_anchor_deformation_result.png) / [代码卡](assets/04_three_anchor_deformation.png) |
 | Cell 19 | The same linear machinery scales from 2D graph points to 3D animation vertices. | [结果 PNG](assets/05_vectorized_3d_solve_result.png) / [代码卡](assets/05_vectorized_3d_solve.png) |
-| Cell 29 | The controls reveal which constraints preserve shape while allowing deformation. | [结果 PNG](assets/06_rotation_invariance_controls_result.png) / [GIF](assets/06_rotation_invariance_controls_preview.gif) / [MP4](assets/06_rotation_invariance_controls_preview.mp4) / [WebM](assets/06_rotation_invariance_controls_preview.webm) / [代码卡](assets/06_rotation_invariance_controls.png) |
+| Cell 29 | The controls reveal which constraints preserve shape while allowing deformation. | [结果 PNG](assets/06_rotation_invariance_controls_result.png) / [代码卡](assets/06_rotation_invariance_controls.png) |
 | Cell 40 | The timeline viewer shows Laplacian deformation applied to animated pose data. | [结果 PNG](assets/07_animation_graph_deformation_result.png) / [GIF](assets/07_animation_graph_deformation_preview.gif) / [MP4](assets/07_animation_graph_deformation_preview.mp4) / [WebM](assets/07_animation_graph_deformation_preview.webm) / [代码卡](assets/07_animation_graph_deformation.png) |
 | Cell 46 | The final viewer checks whether graph deformation can redirect locomotion smoothly. | [结果 PNG](assets/08_curved_locomotion_result_result.png) / [GIF](assets/08_curved_locomotion_result_preview.gif) / [MP4](assets/08_curved_locomotion_result_preview.mp4) / [WebM](assets/08_curved_locomotion_result_preview.webm) / [代码卡](assets/08_curved_locomotion_result.png) |
 

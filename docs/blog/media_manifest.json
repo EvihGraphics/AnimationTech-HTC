@@ -284,8 +284,12 @@
           "capture_kind": "canvas",
           "visual_subject": "Generated strip mesh baseline: This baseline shows the graph vertices and edges before Laplacian reconstruction.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 46,
           "publish_media_required": true,
-          "media_provenance": "live_canvas"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 5,
+          "live_render": "viewer.execute_commands()"
         },
         {
           "id": "unanchored-reconstruction",
@@ -300,8 +304,12 @@
           "capture_kind": "canvas",
           "visual_subject": "Unanchored Laplacian reconstruction: The result shows why Laplacian coordinates alone do not fix global placement.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 46,
           "publish_media_required": true,
-          "media_provenance": "live_canvas"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 7,
+          "live_render": "viewer.execute_commands()"
         },
         {
           "id": "two-anchor-solve",
@@ -316,8 +324,12 @@
           "capture_kind": "canvas",
           "visual_subject": "Two-anchor reconstruction: Anchors turn relative differential coordinates into a positioned shape.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 46,
           "publish_media_required": true,
-          "media_provenance": "live_canvas"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 9,
+          "live_render": "viewer.execute_commands()"
         },
         {
           "id": "three-anchor-deform",
@@ -332,8 +344,12 @@
           "capture_kind": "canvas",
           "visual_subject": "Three-anchor deformation: The viewer shows local deformation propagating through the graph.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 46,
           "publish_media_required": true,
-          "media_provenance": "live_canvas"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 10,
+          "live_render": "viewer.execute_commands()"
         },
         {
           "id": "vectorized-3d",
@@ -348,8 +364,12 @@
           "capture_kind": "canvas",
           "visual_subject": "Vectorized 3D Laplacian solve: The same linear machinery scales from 2D graph points to 3D animation vertices.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 46,
           "publish_media_required": true,
-          "media_provenance": "live_canvas"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 19,
+          "live_render": "viewer.execute_commands()"
         },
         {
           "id": "rotation-invariance",
@@ -379,7 +399,7 @@
             {
               "kind": "slider",
               "index": 1,
-              "role": "parameter",
+              "role": "iteration",
               "fraction": 0.5
             },
             {
@@ -393,14 +413,15 @@
               "checked": true
             }
           ],
-          "preview_gif": "06_rotation_invariance_controls_preview.gif",
-          "video_mp4": "06_rotation_invariance_controls_preview.mp4",
-          "video_webm": "06_rotation_invariance_controls_preview.webm",
-          "capture_kind": "widget_controls",
+          "capture_kind": "canvas",
           "visual_subject": "Rotation-invariant deformation controls: The controls reveal which constraints preserve shape while allowing deformation.",
-          "capture_selector": "output widget controls",
+          "capture_selector": "output canvas:last",
+          "capture_cell_index": 46,
           "publish_media_required": true,
-          "media_provenance": "live_widget_controls"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 29,
+          "live_render": "render(use_edge=True, use_rotation_invariance=True, hard_constraints=False, iteration=20)"
         },
         {
           "id": "animation-graph",
@@ -427,10 +448,22 @@
           "capture_kind": "canvas",
           "visual_subject": "Animation graph reconstruction: The timeline viewer shows Laplacian deformation applied to animated pose data.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 46,
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
-          "github_video_url": "https://github.com/user-attachments/assets/41fa9cc6-4f7c-40eb-b540-8c1ecf02cc3b"
+          "github_video_url": "https://github.com/user-attachments/assets/41fa9cc6-4f7c-40eb-b540-8c1ecf02cc3b",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 40,
+          "live_render": "_blog_frame = int(round((fcount - 1) * {fraction}))\nviewer.camera_pos = (pos[_blog_frame, 0] + np.array([-250, 190, 240], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nrender(_blog_frame)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 4,
+            "sample_count": 12,
+            "max_frame_count": 18,
+            "start_fraction": 0.05,
+            "end_fraction": 0.95
+          }
         },
         {
           "id": "curved-locomotion",
@@ -935,7 +968,10 @@
           "visual_subject": "Character bind pose and skeleton viewer: This confirms that the animation data can drive the live viewer; later format, mapping, and root-motion discussions use this visual baseline.",
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
-          "media_provenance": "live_canvas"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 11,
+          "live_render": "render(int(round((animation.quats.shape[0] - 1) * {fraction})))"
         },
         {
           "id": "raw-bvh-skeleton",
@@ -960,7 +996,10 @@
           "visual_subject": "Raw BVH skeleton-only view: Separating the mesh from the skeleton lets the reader inspect the joint hierarchy directly.",
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
-          "media_provenance": "live_canvas"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 12,
+          "live_render": "render_skeleton(int(round((animation.quats.shape[0] - 1) * {fraction})))"
         },
         {
           "id": "tensor-shapes",
@@ -1001,7 +1040,10 @@
           "visual_subject": "Raw skeleton versus mapped skeleton: This shows that mapping adapts hierarchy and pose to the character while preserving the time structure.",
           "capture_selector": "output canvas:last",
           "publish_media_required": true,
-          "media_provenance": "live_canvas"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 19,
+          "live_render": "render_compare(int(round((animation_raw.quats.shape[0] - 1) * {fraction})), offset=60, show_skeleton=True)"
         },
         {
           "id": "skeleton-tree",
@@ -1047,7 +1089,18 @@
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
-          "github_video_url": "https://github.com/user-attachments/assets/f1a58680-65d5-444c-bae3-d5b51c46e0f0"
+          "github_video_url": "https://github.com/user-attachments/assets/f1a58680-65d5-444c-bae3-d5b51c46e0f0",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 24,
+          "live_render": "render(int(round((animation.quats.shape[0] - 1) * {fraction})), static_position=False, static_rotation=False)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 4,
+            "sample_count": 12,
+            "max_frame_count": 18,
+            "start_fraction": 0.05,
+            "end_fraction": 0.95
+          }
         },
         {
           "id": "static-root-toggles",
@@ -1085,7 +1138,18 @@
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
-          "github_video_url": "https://github.com/user-attachments/assets/93d326a8-60dd-439d-bc97-452968275553"
+          "github_video_url": "https://github.com/user-attachments/assets/93d326a8-60dd-439d-bc97-452968275553",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 24,
+          "live_render": "render(int(round((animation.quats.shape[0] - 1) * {fraction})), static_position=True, static_rotation=True)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 4,
+            "sample_count": 12,
+            "max_frame_count": 18,
+            "start_fraction": 0.05,
+            "end_fraction": 0.95
+          }
         }
       ],
       "video_step": {
@@ -1624,8 +1688,8 @@
             "end_fraction": 1.0
           },
           "motion_quality": {
-            "min_max_delta": 1.2,
-            "min_changed_fraction": 0.01
+            "min_max_delta": 0.3,
+            "min_changed_fraction": 0.008
           }
         },
         {
@@ -1661,10 +1725,10 @@
           "live_prepare_code": "def animationtech_blog_cpu_reconstruction_render(frame):\n    frame = int(frame)\n    anim = anim_pca[frame] * 5.0\n    reconstructed = pca.inverse_transform(anim).reshape(-1, 3)\n    reconstructed[:, 0] += 30\n    viewer.begin_shadow()\n    viewer.end_shadow()\n    viewer.begin_display()\n    viewer.draw_ground()\n    viewer.use_program(prog)\n    viewer.bind_buffer(buffer=vbo)\n    viewer.buffer_data(src_data=frames[frame, ...].astype(np.float32).flatten(), usage='DYNAMIC_DRAW')\n    viewer.bind_vertex_array(vao)\n    viewer.uniform('u_color', material.albedo)\n    viewer.uniform('u_material', material.material_uniform)\n    viewer.draw_elements('TRIANGLES', indices.shape[0] * 3, 'UNSIGNED_SHORT', 0)\n    viewer.bind_buffer(buffer=vbo)\n    viewer.buffer_data(src_data=reconstructed.astype(np.float32).flatten(), usage='DYNAMIC_DRAW')\n    viewer.bind_vertex_array(vao)\n    viewer.uniform('u_color', material.albedo)\n    viewer.uniform('u_material', material.material_uniform)\n    viewer.draw_elements('TRIANGLES', indices.shape[0] * 3, 'UNSIGNED_SHORT', 0)\n    viewer.end_display()\n    viewer.execute_commands()",
           "live_render": "_blog_frame = int(round((anim_pca.shape[0] - 1) * {fraction}))\nviewer.camera_pos = [-170, 150, 230]\nviewer.camera_pitch = -16\nviewer.camera_yaw = -38\nanimationtech_blog_cpu_reconstruction_render(_blog_frame)",
           "motion_capture": {
-            "fps": 6,
-            "max_seconds": 6,
-            "sample_count": 36,
-            "max_frame_count": 48,
+            "fps": 4,
+            "max_seconds": 4,
+            "sample_count": 7,
+            "max_frame_count": 12,
             "start_fraction": 0.05,
             "end_fraction": 0.95
           },
@@ -2131,8 +2195,12 @@
           "capture_kind": "canvas",
           "visual_subject": "Raw walk clip playback: The graph input is a playable sequence of walking frames.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 45,
           "publish_media_required": true,
-          "media_provenance": "live_canvas"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 6,
+          "live_render": "_blog_frame = int(round((frame_count - 1) * {fraction}))\nviewer.camera_pos = (animation.pos[_blog_frame, 0] + np.array([-250, 190, 240], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nrender(_blog_frame)"
         },
         {
           "id": "point-cloud",
@@ -2156,8 +2224,12 @@
           "capture_kind": "canvas",
           "visual_subject": "Point-cloud pose representation: Point-cloud distance is closer to visible pose similarity than comparing only root or quaternions.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 45,
           "publish_media_required": true,
-          "media_provenance": "live_canvas"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 12,
+          "live_render": "_blog_frame = int(round((frame_count - 1) * {fraction}))\nviewer.camera_pos = (animation.pos[_blog_frame, 0] + np.array([-250, 190, 240], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nrender(_blog_frame, window=6)"
         },
         {
           "id": "alignment",
@@ -2181,8 +2253,12 @@
           "capture_kind": "canvas",
           "visual_subject": "Window alignment between two clips: Similar gait windows can transition even when their world positions differ.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 45,
           "publish_media_required": true,
-          "media_provenance": "live_canvas"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 15,
+          "live_render": "_blog_frame_a = int(round((frame_count - 1) * 0.25))\n_blog_frame_b = int(round((frame_count - 1) * 0.65))\nviewer.camera_pos = (animation.pos[_blog_frame_a, 0] + np.array([-250, 190, 240], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nrender(_blog_frame_a, _blog_frame_b, 0.5)"
         },
         {
           "id": "distance-matrix",
@@ -2238,8 +2314,12 @@
           "capture_kind": "canvas",
           "visual_subject": "Graph traversal playback debug: This validates Node and Edge abstractions as a playable animation sequence.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 45,
           "publish_media_required": true,
-          "media_provenance": "live_canvas"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 33,
+          "live_render": "_blog_frame = int(round((walk_frame - 1) * {fraction}))\nviewer.camera_pos = (walk_p[_blog_frame, 0] + np.array([-250, 190, 240], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nrender(_blog_frame)"
         },
         {
           "id": "follow-path",
@@ -2266,15 +2346,18 @@
           "capture_kind": "canvas",
           "visual_subject": "Follow-path result viewer: The final viewer checks whether graph search can serve a path-following goal.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 45,
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
-          "live_render": "_blog_frame = int(round((total_frame_count - 1) * {fraction}))\nviewer.camera_pos = (traj_p[_blog_frame, 0] + np.array([0, 105, 210], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = 180\nrender(_blog_frame)",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 45,
+          "live_render": "_blog_frame = int(round((total_frame_count - 1) * {fraction}))\nviewer.camera_pos = (traj_p[_blog_frame, 0] + np.array([-250, 190, 240], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nrender(_blog_frame)",
           "motion_capture": {
             "fps": 6,
-            "max_seconds": 6,
-            "sample_count": 36,
-            "max_frame_count": 48,
+            "max_seconds": 4,
+            "sample_count": 12,
+            "max_frame_count": 18,
             "start_fraction": 0.05,
             "end_fraction": 0.95
           },
@@ -2540,10 +2623,22 @@
           "capture_kind": "canvas",
           "visual_subject": "Source animation playback: This baseline lets later warped outputs be compared against the original motion.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 31,
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
-          "github_video_url": "https://github.com/user-attachments/assets/2a3e910d-fd40-4620-b0e0-28ac59b0f917"
+          "github_video_url": "https://github.com/user-attachments/assets/2a3e910d-fd40-4620-b0e0-28ac59b0f917",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 5,
+          "live_render": "render(int(round((frame_count - 1) * {fraction})))",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 4,
+            "sample_count": 12,
+            "max_frame_count": 18,
+            "start_fraction": 0.05,
+            "end_fraction": 0.95
+          }
         },
         {
           "id": "raw-channel-plot",
@@ -2618,10 +2713,22 @@
           "capture_kind": "canvas",
           "visual_subject": "Time-warped animation comparison: The viewer reveals the timing change without changing the underlying pose content.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 31,
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
-          "github_video_url": "https://github.com/user-attachments/assets/cab0161e-4390-49df-87ab-de3b9aa1515a"
+          "github_video_url": "https://github.com/user-attachments/assets/cab0161e-4390-49df-87ab-de3b9aa1515a",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 20,
+          "live_render": "render(int(round(430 * {fraction})))",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 4,
+            "sample_count": 12,
+            "max_frame_count": 18,
+            "start_fraction": 0.05,
+            "end_fraction": 0.95
+          }
         },
         {
           "id": "pose-warp-keys",
@@ -2645,8 +2752,12 @@
           "capture_kind": "canvas",
           "visual_subject": "Pose-warp key poses: The key-pose viewer shows what spatial correction will be blended into the clip.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 31,
           "publish_media_required": true,
-          "media_provenance": "live_canvas"
+          "media_provenance": "live_canvas",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 23,
+          "live_render": "render(int(round((frame_count - 1) * {fraction})))"
         },
         {
           "id": "offset-curve",
@@ -2689,10 +2800,23 @@
           "capture_kind": "canvas",
           "visual_subject": "Final time and pose warped animation: This final viewer checks whether timing and pose edits combine into a coherent motion.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 31,
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
-          "github_video_url": "https://github.com/user-attachments/assets/d871efca-08a5-4cee-9139-2380a4cc6d2b"
+          "github_video_url": "https://github.com/user-attachments/assets/d871efca-08a5-4cee-9139-2380a4cc6d2b",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 31,
+          "live_prepare_code": "def animationtech_blog_render_combined_warp(frame):\n    p = animation.pos[frame, ...].copy()\n    q = animation.quats[frame, ...]\n    p[0, 0] -= 150\n    a = lab.utils.quat_to_mat(q, p)\n    pwt = new_p[frame, ...].copy()\n    qwt = new_q[frame, ...]\n    b = lab.utils.quat_to_mat(qwt, pwt)\n    pw = full_warp_p[frame, ...].copy()\n    qw = full_warp_q[frame, ...]\n    pw[0, 0] += 150\n    c = lab.utils.quat_to_mat(qw, pw)\n    viewer.set_shadow_poi(pwt[0])\n    viewer.begin_shadow()\n    viewer.draw(character, a)\n    viewer.draw(character_b, b)\n    viewer.draw(character_c, c)\n    viewer.end_shadow()\n    viewer.begin_display()\n    viewer.draw_ground()\n    viewer.draw(character, a)\n    viewer.draw(character_b, b)\n    viewer.draw(character_c, c)\n    viewer.end_display()\n    viewer.execute_commands()",
+          "live_render": "_blog_frame = int(round(430 * {fraction}))\nviewer.camera_pos = (new_p[_blog_frame, 0] + np.array([-300, 210, 300], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nanimationtech_blog_render_combined_warp(_blog_frame)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 4,
+            "sample_count": 12,
+            "max_frame_count": 18,
+            "start_fraction": 0.05,
+            "end_fraction": 0.95
+          }
         }
       ],
       "video_step": {
@@ -2760,10 +2884,22 @@
           "capture_kind": "canvas",
           "visual_subject": "Source clip playback: The viewer establishes the motion vocabulary available to the planner.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 38,
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
-          "github_video_url": "https://github.com/user-attachments/assets/bfff5417-4489-4a83-819b-d4d05318fe99"
+          "github_video_url": "https://github.com/user-attachments/assets/bfff5417-4489-4a83-819b-d4d05318fe99",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 9,
+          "live_render": "_blog_frame = int(round((all_clips[0][0].shape[0] - 1) * {fraction}))\nviewer.camera_pos = (all_clips[0][1][_blog_frame, 0] + np.array([-250, 190, 240], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nrender(_blog_frame)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 4,
+            "sample_count": 12,
+            "max_frame_count": 18,
+            "start_fraction": 0.05,
+            "end_fraction": 0.95
+          }
         },
         {
           "id": "clip-count",
@@ -2845,10 +2981,22 @@
           "capture_kind": "canvas",
           "visual_subject": "Random transition player: This validates that clips can be stitched into continuous playback.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 38,
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
-          "github_video_url": "https://github.com/user-attachments/assets/85a27653-0c55-408c-b5be-5e945b46adc9"
+          "github_video_url": "https://github.com/user-attachments/assets/85a27653-0c55-408c-b5be-5e945b46adc9",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 19,
+          "live_render": "import random as _blog_random\n_blog_random.seed(7)\nplayer = Player()\nplayer.set_next_clip(0)\nfor _blog_i in range(1 + int(round(24 * {fraction}))):\n    render(_blog_i)\nviewer.camera_pos = (player.positions[0] + np.array([-250, 190, 240], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nrender(25)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 4,
+            "sample_count": 8,
+            "max_frame_count": 12,
+            "start_fraction": 0.0,
+            "end_fraction": 1.0
+          }
         },
         {
           "id": "transition-cost",
@@ -3533,10 +3681,22 @@
           "capture_kind": "canvas",
           "visual_subject": "Raw sample clip overview: The viewer establishes the motion examples that will be normalized and blended.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 33,
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
-          "github_video_url": "https://github.com/user-attachments/assets/7c36901a-6782-465a-8c6b-281c0e36c487"
+          "github_video_url": "https://github.com/user-attachments/assets/7c36901a-6782-465a-8c6b-281c0e36c487",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 7,
+          "live_render": "_blog_frame = int(round(60 * {fraction}))\nviewer.camera_pos = [-250, 190, 240]\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nrender(_blog_frame)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 4,
+            "sample_count": 8,
+            "max_frame_count": 12,
+            "start_fraction": 0.0,
+            "end_fraction": 1.0
+          }
         },
         {
           "id": "canonical-timing",
@@ -3572,10 +3732,22 @@
           "capture_kind": "canvas",
           "visual_subject": "Canonical timing and contact inspection: Canonical timing aligns examples before interpolation.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 33,
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
-          "github_video_url": "https://github.com/user-attachments/assets/e89b1fd9-6321-4029-b220-d00f449605c8"
+          "github_video_url": "https://github.com/user-attachments/assets/e89b1fd9-6321-4029-b220-d00f449605c8",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 10,
+          "live_render": "_blog_frame = int(round((animations[1].pos.shape[0] - 1) * {fraction}))\nviewer.camera_pos = (animations[1].pos[_blog_frame, 0] + np.array([-250, 190, 240], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nrender(_blog_frame, index=1, onspot=False)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 4,
+            "sample_count": 8,
+            "max_frame_count": 12,
+            "start_fraction": 0.0,
+            "end_fraction": 1.0
+          }
         },
         {
           "id": "looping-clips",
@@ -3611,10 +3783,22 @@
           "capture_kind": "canvas",
           "visual_subject": "Looping animation comparison: Looping makes repeated motion comparable across clips.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 33,
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
-          "github_video_url": "https://github.com/user-attachments/assets/47626e48-6d1c-4cdb-af74-13ca3bdbf819"
+          "github_video_url": "https://github.com/user-attachments/assets/47626e48-6d1c-4cdb-af74-13ca3bdbf819",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 14,
+          "live_render": "_blog_frame = int(round((animations[2].pos.shape[0] - 1) * {fraction}))\nviewer.camera_pos = (animations[2].pos[_blog_frame, 0] + np.array([-250, 190, 240], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nrender(_blog_frame, index=2, onspot=False)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 4,
+            "sample_count": 8,
+            "max_frame_count": 12,
+            "start_fraction": 0.0,
+            "end_fraction": 1.0
+          }
         },
         {
           "id": "resampled-clips",
@@ -3650,10 +3834,22 @@
           "capture_kind": "canvas",
           "visual_subject": "Resampled canonical clips: The viewer checks that examples share a common timing domain.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 33,
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
-          "github_video_url": "https://github.com/user-attachments/assets/10c0e665-0a87-4a2a-b9e4-10a10fc1034f"
+          "github_video_url": "https://github.com/user-attachments/assets/10c0e665-0a87-4a2a-b9e4-10a10fc1034f",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 18,
+          "live_render": "_blog_frame = int(round(400 * {fraction}))\nviewer.camera_pos = (resampled_animations[3].pos[_blog_frame, 0] + np.array([-250, 190, 240], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nrender(_blog_frame, index=3, onspot=False)",
+          "motion_capture": {
+            "fps": 6,
+            "max_seconds": 4,
+            "sample_count": 8,
+            "max_frame_count": 12,
+            "start_fraction": 0.0,
+            "end_fraction": 1.0
+          }
         },
         {
           "id": "bspline-fit",
@@ -3705,10 +3901,22 @@
           "capture_kind": "canvas",
           "visual_subject": "B-spline reconstruction viewer: The viewer validates the curve representation as playable motion.",
           "capture_selector": "output canvas:last",
+          "capture_cell_index": 33,
           "publish_media_required": true,
           "media_provenance": "live_canvas",
           "motion_provenance": "live_control_scan",
-          "github_video_url": "https://github.com/user-attachments/assets/5f02c79f-1ecd-45e2-bd8a-5ec193f24aff"
+          "github_video_url": "https://github.com/user-attachments/assets/5f02c79f-1ecd-45e2-bd8a-5ec193f24aff",
+          "crop_canvas_render_area": true,
+          "live_prepare_cell": 23,
+          "live_render": "_blog_frame = int(round(400 * {fraction}))\nviewer.camera_pos = (resampled_animations[4].pos[min(_blog_frame, resampled_animations[4].pos.shape[0] - 1), 0] + np.array([-250, 190, 240], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nrender(_blog_frame, index=4, onspot=False)",
+          "motion_capture": {
+            "fps": 4,
+            "max_seconds": 4,
+            "sample_count": 6,
+            "max_frame_count": 8,
+            "start_fraction": 0.0,
+            "end_fraction": 1.0
+          }
         },
         {
           "id": "adverb-table",

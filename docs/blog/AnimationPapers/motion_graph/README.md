@@ -330,6 +330,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 motion_
 | Cell 33 | `viewer` | 核心图解 | 图遍历播放调试：验证 Node 和 Edge 抽象能组成可播放动画序列。 | `canvas` | [结果 PNG](assets/graph_nodes_edges_result.png) |
 | Cell 45 | `timeline_viewer` | 核心动画 | 路径跟随结果：最终 viewer 检查图搜索能否服务于路径跟随目标。 | `canvas` | [结果 PNG](assets/follow_path_visualization_result.png) / [GIF](assets/follow_path_visualization_preview.gif) / [MP4](assets/follow_path_visualization_preview.mp4) / [WebM](assets/follow_path_visualization_preview.webm) |
 
+发布视频镜像：https://github.com/user-attachments/assets/72d4ec2d-0922-495a-b456-45c66535e27e
+
 
 ## 代码 Cell 与可视化证据
 

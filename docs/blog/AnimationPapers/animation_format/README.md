@@ -402,6 +402,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 animati
 | Cell 24 | `timeline_viewer` | 核心动画 | Root 投影与 Root/Hips 拆分：说明全局位移和局部身体姿态如何分开存储。 | `canvas` | [结果 PNG](assets/06_root_projection_motion_result.png) / [GIF](assets/06_root_projection_motion_preview.gif) / [MP4](assets/06_root_projection_motion_preview.mp4) / [WebM](assets/06_root_projection_motion_preview.webm) |
 | Cell 24 | `timeline_viewer` | 核心动画 | Static Root 开关对比：直接显示 Root 平移和旋转在动画中的作用。 | `canvas` | [结果 PNG](assets/07_static_root_toggles_result.png) / [GIF](assets/07_static_root_toggles_preview.gif) / [MP4](assets/07_static_root_toggles_preview.mp4) / [WebM](assets/07_static_root_toggles_preview.webm) |
 
+发布视频镜像：
+
+- https://github.com/user-attachments/assets/f1a58680-65d5-444c-bae3-d5b51c46e0f0
+- https://github.com/user-attachments/assets/93d326a8-60dd-439d-bc97-452968275553
+
 
 ## 代码 Cell 与可视化证据
 
