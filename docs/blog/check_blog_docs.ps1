@@ -13,6 +13,7 @@ if (-not $pythonCommand) {
 
 $pythonScript = @'
 import json
+import hashlib
 import re
 import shutil
 import struct
@@ -472,6 +473,7 @@ if media_manifest is not None:
         if len(steps) < 5:
             add_error(f"Media case {slug} needs at least 5 learning steps.")
         media_entries = []
+        key_animation_hashes = {}
         for step in steps:
             for key in ("result_file", "card_file", "preview_gif", "video_mp4", "video_webm"):
                 if step.get(key):
@@ -496,6 +498,15 @@ if media_manifest is not None:
                 continue
             if media_path.stat().st_size <= 0:
                 add_error(f"Media file is empty for {slug}: {media_path}")
+            if (
+                strict
+                and media_entry.get("key") in {"preview_gif", "video_mp4", "video_webm"}
+                and media_entry.get("step", {}).get("media_role") == "key_animation"
+            ):
+                digest = hashlib.sha256(media_path.read_bytes()).hexdigest()
+                key_animation_hashes.setdefault((media_entry.get("key"), digest), []).append(
+                    f"{media_entry.get('step', {}).get('id')}={media_file}"
+                )
             if media_file not in optional_readme_media_files and media_ref not in readme_text:
                 add_error(f"README for {slug} does not reference {media_ref}.")
             if media_file not in asset_text:
@@ -642,6 +653,10 @@ if media_manifest is not None:
                 add_error(f"Media step for {slug} has unsupported output_type: {step.get('output_type')}")
         if strict and key_media_section and legacy_video_link_pattern.search(key_media_section):
             add_error(f"Key media section for {slug} still uses link-only video open/download text.")
+        if strict:
+            for (media_kind, _), duplicates in key_animation_hashes.items():
+                if len(duplicates) > 1:
+                    add_error(f"Key animations for {slug} have duplicate {media_kind} bytes: {', '.join(duplicates)}")
 
 if errors:
     print("docs/blog check failed:")

@@ -9,6 +9,7 @@ REALTIME_PLANNING_SLUG = "real_time_planning_for_parameterized_human_motion"
 KNOWING_FOOT_DOWN_SLUG = "knowing_when_to_put_your_foot_down"
 NEAR_OPTIMAL_SLUG = "near_optimal_character_animation_with_continuous_control"
 MOTION_MATCHING_SLUG = "motion_matching"
+VERBS_AND_ADVERBS_SLUG = "verbs_and_adverbs"
 
 
 GAMEPAD_HELPER_SOURCE = """def animationtech_gamepad_axis(gamepad, index, default=0.0):
@@ -33,6 +34,51 @@ def animationtech_gamepad_button(gamepad, index, default=0.0):
 
 GAMEPAD_AXIS_PATTERN = re.compile(r"gamepad\.axes\s*\[\s*(\d+)\s*\]\.value")
 GAMEPAD_BUTTON_PATTERN = re.compile(r"gamepad\.buttons\s*\[\s*(\d+)\s*\]\.value")
+
+
+VERBS_AND_ADVERBS_INTERPOLATE_SOURCE = """# Show how a value selects one segment and four B-spline control points.
+from IPython.display import display
+
+fig2, ax2 = plt.subplots(1, 1)
+
+def test_value(value):
+    BS = np.array([[-1,3,-3,1],[3,-6,0,4],[-3,3,3,1], [1,0,0,0]], dtype=np.double).T/6.0
+    t = np.linspace(0, 1, 101)
+    T = np.column_stack([t**3, t**2, t, np.ones_like(t)])
+
+    index = min(int(value * 20), 19)
+    ratio = (value * 20) - index
+    pts = bspline_animations.quats[5, :, 1, 1][index:index+4]
+
+    y = np.dot(T, np.dot(BS, pts))
+
+    # x points along keyframes
+    x_actual = np.arange(401, dtype=np.int32)
+    ax2.cla()
+
+    ax2.plot((index+t)*400/20, y, label='Cubic B Spline')
+    ax2.plot(x_actual, resampled_animations[5].quats[:, 1, 1], label='Original', linestyle='dashed')
+    ax2.scatter(x_points[index:index+4], pts, label='Control Points', color='red')
+    ax2.scatter((index+ratio)*400/20, y[int(ratio*100)], label='value', color='blue')
+
+    ax2.set_title('Selecting a Cubic B-Spline Segment')
+    ax2.set_xlabel('Keyframe')
+    ax2.set_ylabel('Value')
+    ax2.legend(loc='best')
+    fig2.canvas.draw_idle()
+
+value_slider = widgets.FloatSlider(
+    description='value', min=0, max=1, step=0.001, value=0,
+    layout=widgets.Layout(width='800px'), continuous_update=True,
+)
+
+def update_test_value(change):
+    test_value(change['new'])
+
+value_slider.observe(update_test_value, names='value')
+test_value(value_slider.value)
+display(widgets.VBox([value_slider, fig2.canvas]))
+"""
 
 
 def get_motion_fields_settings(training_profile: str, torch_device: str) -> dict:
@@ -455,12 +501,21 @@ def transform_motion_matching_source(source: str) -> str:
     return updated
 
 
+def transform_verbs_and_adverbs_source(source: str) -> str:
+    if "def test_value(value):" not in source or "# showing picking the right points" not in source:
+        return source
+    return VERBS_AND_ADVERBS_INTERPOLATE_SOURCE
+
+
 def transform_source(slug: str, source: str, enable_precompute: bool, training_profile: str, torch_device: str) -> str:
     if slug == NEAR_OPTIMAL_SLUG:
         return transform_near_optimal_source(source)
 
     if slug == MOTION_MATCHING_SLUG:
         return transform_motion_matching_source(source)
+
+    if slug == VERBS_AND_ADVERBS_SLUG:
+        return transform_verbs_and_adverbs_source(source)
 
     if slug == MOTION_FIELDS_SLUG:
         settings = get_motion_fields_settings(training_profile, torch_device)

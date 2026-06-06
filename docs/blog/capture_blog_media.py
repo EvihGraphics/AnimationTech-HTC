@@ -14,6 +14,7 @@ schema migrations do not require a full live recapture.
 from __future__ import annotations
 
 import argparse
+import atexit
 import asyncio
 import base64
 import io
@@ -35,6 +36,21 @@ import nbformat
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 from playwright.sync_api import sync_playwright
+
+
+_KERNEL_CLIENTS: dict[Path, BlockingKernelClient] = {}
+
+
+def close_kernel_clients() -> None:
+    for client in _KERNEL_CLIENTS.values():
+        try:
+            client.stop_channels()
+        except Exception:
+            pass
+    _KERNEL_CLIENTS.clear()
+
+
+atexit.register(close_kernel_clients)
 
 
 BAD_TEXT = (
@@ -543,31 +559,33 @@ def kernel_connection_file(server: dict, notebook_path: str) -> Path:
 
 
 def execute_kernel_code(connection_file: Path, code: str, timeout_seconds: int = 60) -> None:
-    client = BlockingKernelClient()
-    client.load_connection_file(str(connection_file))
-    client.start_channels()
-    try:
-        message_id = client.execute(code, store_history=False)
-        deadline = time.time() + timeout_seconds
-        errors: list[str] = []
-        while time.time() < deadline:
-            try:
-                message = client.get_iopub_msg(timeout=1)
-            except Exception:
-                continue
-            if message.get("parent_header", {}).get("msg_id") != message_id:
-                continue
-            msg_type = message.get("msg_type")
-            content = message.get("content", {})
-            if msg_type == "error":
-                errors.append("\n".join(content.get("traceback") or [content.get("ename", "error")]))
-            if msg_type == "status" and content.get("execution_state") == "idle":
-                if errors:
-                    raise RuntimeError("Kernel render command failed:\n" + "\n".join(errors))
-                return
-        raise TimeoutError("Kernel render command timed out.")
-    finally:
-        client.stop_channels()
+    connection_file = connection_file.resolve()
+    client = _KERNEL_CLIENTS.get(connection_file)
+    if client is None:
+        client = BlockingKernelClient()
+        client.load_connection_file(str(connection_file))
+        client.start_channels()
+        _KERNEL_CLIENTS[connection_file] = client
+
+    message_id = client.execute(code, store_history=False)
+    deadline = time.time() + timeout_seconds
+    errors: list[str] = []
+    while time.time() < deadline:
+        try:
+            message = client.get_iopub_msg(timeout=1)
+        except Exception:
+            continue
+        if message.get("parent_header", {}).get("msg_id") != message_id:
+            continue
+        msg_type = message.get("msg_type")
+        content = message.get("content", {})
+        if msg_type == "error":
+            errors.append("\n".join(content.get("traceback") or [content.get("ename", "error")]))
+        if msg_type == "status" and content.get("execution_state") == "idle":
+            if errors:
+                raise RuntimeError("Kernel render command failed:\n" + "\n".join(errors))
+            return
+    raise TimeoutError("Kernel render command timed out.")
 
 
 def run_all_cells(page, server: dict, case: dict, timeout_seconds: int) -> None:

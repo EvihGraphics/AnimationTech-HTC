@@ -16,9 +16,6 @@
 | `05_vectorized_3d_solve_result.png` | Cell 19 | `result_png` | `key_visual` | Vectorized 3D Laplacian solve：The same linear machinery scales from 2D graph points to 3D animation vertices. |
 | `05_vectorized_3d_solve.png` | Cell 19 | `learning_card` | `key_visual` | Vectorized 3D Laplacian solve：The same linear machinery scales from 2D graph points to 3D animation vertices. |
 | `06_rotation_invariance_controls_result.png` | Cell 29 | `result_png` | `key_visual` | Rotation-invariant deformation controls：The controls reveal which constraints preserve shape while allowing deformation. |
-| `06_rotation_invariance_controls_preview.gif` | Cell 29 | `preview_gif` | `key_visual` | Rotation-invariant deformation controls：The controls reveal which constraints preserve shape while allowing deformation. |
-| `06_rotation_invariance_controls_preview.mp4` | Cell 29 | `video_mp4` | `key_visual` | Rotation-invariant deformation controls：The controls reveal which constraints preserve shape while allowing deformation. |
-| `06_rotation_invariance_controls_preview.webm` | Cell 29 | `video_webm` | `key_visual` | Rotation-invariant deformation controls：The controls reveal which constraints preserve shape while allowing deformation. |
 | `06_rotation_invariance_controls.png` | Cell 29 | `learning_card` | `key_visual` | Rotation-invariant deformation controls：The controls reveal which constraints preserve shape while allowing deformation. |
 | `07_animation_graph_deformation_result.png` | Cell 40 | `result_png` | `key_animation` | Animation graph reconstruction：The timeline viewer shows Laplacian deformation applied to animated pose data. |
 | `07_animation_graph_deformation_preview.gif` | Cell 40 | `preview_gif` | `key_animation` | Animation graph reconstruction：The timeline viewer shows Laplacian deformation applied to animated pose data. |

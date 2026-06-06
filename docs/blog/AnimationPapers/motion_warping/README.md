@@ -255,6 +255,12 @@ Time warp 图验证事件是否发生在新时间；pose warp viewer 验证关�
 | Cell 27 | `plot` | 核心图解 | Offset warp 曲线：说明局部姿态编辑如何被平滑分配。 | `plot` | [结果 PNG](assets/07_offset_warp_curve_result.png) |
 | Cell 31 | `timeline_viewer` | 核心动画 | 最终时间与姿态 warping 动画：检查时序编辑和姿态编辑能否合成连贯动作。 | `canvas` | [结果 PNG](assets/08_combined_warped_animation_result.png) / [GIF](assets/08_combined_warped_animation_preview.gif) / [MP4](assets/08_combined_warped_animation_preview.mp4) / [WebM](assets/08_combined_warped_animation_preview.webm) |
 
+发布视频镜像：
+
+- https://github.com/user-attachments/assets/2a3e910d-fd40-4620-b0e0-28ac59b0f917
+- https://github.com/user-attachments/assets/cab0161e-4390-49df-87ab-de3b9aa1515a
+- https://github.com/user-attachments/assets/d871efca-08a5-4cee-9139-2380a4cc6d2b
+
 
 ## 代码 Cell 与可视化结果
 

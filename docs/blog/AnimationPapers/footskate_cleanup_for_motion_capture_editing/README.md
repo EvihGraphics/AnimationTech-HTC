@@ -227,6 +227,13 @@ notebook 先用普通版本生成 `solved_animation`，后面又用 `L4 = 1000` 
 | Cell 29 | `viewer` | 核心图解 | 原始动画与 IK 修正对比：脚部漂移被压回到支撑脚区域附近。 | `canvas/live_canvas` | [结果 PNG](assets/01_raw_vs_solved_overview_result.png) |
 | Cell 34 | `timeline_viewer` | 核心动画 | Final Processing smoothstep 混合：修正权重在接触边界平滑淡入淡出。 | `canvas/live_canvas` | [结果 PNG](assets/06_final_processing_compare_result.png) / [GIF](assets/06_final_processing_compare_preview.gif) / [MP4](assets/06_final_processing_compare_preview.mp4) / [WebM](assets/06_final_processing_compare_preview.webm) |
 
+<video controls muted loop playsinline preload="metadata" width="100%" poster="assets/06_final_processing_compare_result.png">
+  <source src="assets/06_final_processing_compare_preview.mp4" type="video/mp4">
+  <source src="assets/06_final_processing_compare_preview.webm" type="video/webm">
+</video>
+
+发布视频镜像：https://github.com/user-attachments/assets/2abd9291-3fe6-4c1d-a21c-51ed691da380
+
 ## 代码 Cell 与可视化结果
 
 下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
