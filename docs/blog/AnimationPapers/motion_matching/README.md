@@ -2,7 +2,7 @@
 
 ## 元数据
 
-| 字段 | 值 |
+| 字段 | 内容 |
 | --- | --- |
 | slug | `motion_matching` |
 | source path | [`labs/AnimationPapers/Motion Matching.ipynb`](<../../../../labs/AnimationPapers/Motion Matching.ipynb>) |
@@ -126,6 +126,7 @@ https://github.com/user-attachments/assets/aacf204b-f999-4988-9a4e-ab3d33f6a699
 ## 关键 cell / 函数深讲
 
 ### Cell 9 - Spring-damper future trajectory
+<<<<<<< HEAD
 
 这个 cell 展示输入预测本身：红色当前 marker 和黄色未来 marker 是后续 motion matching query 的轨迹目标来源。
 
@@ -167,9 +168,55 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpaper
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpapers_lab.ps1 -NoOpen
 python .\docs\blog\capture_blog_media.py --slug motion_matching --run-timeout 900
 ```
+=======
+>>>>>>> eb3557a6ca35a2bf32c39dc7f8a1e38c395992cb
 
-## 代码 Cell 与可视化结果
+这个 cell 展示输入预测本身：红色当前 marker 和黄色未来 marker 是后续 motion matching query 的轨迹目标来源。
 
+<<<<<<< HEAD
+=======
+```mermaid
+flowchart LR
+    A[Input direction] --> B[Velocity spring]
+    A --> C[Facing spring]
+    B --> D[Future root positions]
+    C --> E[Future facing directions]
+    D --> F[Query trajectory slice]
+    E --> F
+```
+
+### Cell 21 - 33-dimensional feature layout
+
+这个 cell 把抽象特征重新画回 viewer：脚、hips 和未来轨迹都能在同一画面里检查。它适合用来判断“最近邻搜索在比较什么”，也适合发现某个特征块权重过高或过低。
+
+### Cell 23 - Feature normalization code
+
+这个 cell 是距离度量的核心。不同物理量先标准化，再按语义权重缩放，最终进入欧氏距离。调 `feature_weights` 时，应优先观察停止、急转、慢走这类最容易暴露匹配质量的输入。
+
+### Cell 26 - Runtime Player search loop
+
+`render` 在每帧构造 query，搜索 `features_normalized`，然后调用 `Player.set_next_frame(best_frame + 1)`。重新采集后的 runtime 结果图不再是空地面：角色、红色当前位置和黄色未来轨迹都在画面内。
+
+## 运行方式
+
+如果你想按浏览器/JupyterLab 步骤复现博客里的角色运动，先看 [用户操作指南](USER_GUIDE.md)。指南区分了手柄实时控制和博客确定性重放，并给出可直接粘贴到 notebook 的复现代码。
+
+推荐从托管学习副本进入，而不是直接编辑原始 notebook：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpapers_lab.ps1
+```
+
+博客媒体重新采集使用：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\start_animationpapers_lab.ps1 -NoOpen
+python .\docs\blog\capture_blog_media.py --slug motion_matching --run-timeout 900
+```
+
+## 代码 Cell 与可视化证据
+
+>>>>>>> eb3557a6ca35a2bf32c39dc7f8a1e38c395992cb
 | Cell | 作用 | 媒体 |
 | --- | --- | --- |
 | 9 | Spring-damper 未来轨迹预测。 | [结果 PNG](assets/spring_damper_prediction_result.png) / [代码卡](assets/spring_damper_prediction.png) |

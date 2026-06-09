@@ -193,7 +193,7 @@ function Get-LiveJupyterServers {
             $token = [string]$info.token
             $url = ([string]$info.url).TrimEnd("/")
             $statusUrl = "{0}/api/status?token={1}" -f $url, [uri]::EscapeDataString($token)
-            Invoke-RestMethod -Uri $statusUrl -TimeoutSec 5 | Out-Null
+            Invoke-RestMethod -Uri $statusUrl -Headers @{ "Authorization" = "token $token" } -TimeoutSec 5 | Out-Null
             $servers += [pscustomobject]@{
                 pid = [int]$info.pid
                 port = [int]$info.port
@@ -274,10 +274,10 @@ function Test-ServerReady($server, $notebookCases) {
     $token = [string]$server.token
     $contentPath = [uri]::EscapeDataString("$studyUrlPath/Near-optimal Character Animation with Continuous Control.ipynb")
     $contentUrl = "{0}/api/contents/{1}?token={2}" -f $baseUrl, $contentPath, [uri]::EscapeDataString($token)
-    Invoke-RestMethod -Uri $contentUrl -TimeoutSec 15 | Out-Null
+    Invoke-RestMethod -Uri $contentUrl -Headers @{ "Authorization" = "token $token" } -TimeoutSec 15 | Out-Null
 
     $kernelUrl = "{0}/api/kernelspecs?token={1}" -f $baseUrl, [uri]::EscapeDataString($token)
-    $kernels = Invoke-RestMethod -Uri $kernelUrl -TimeoutSec 15
+    $kernels = Invoke-RestMethod -Uri $kernelUrl -Headers @{ "Authorization" = "token $token" } -TimeoutSec 15
     $missing = @()
     foreach ($case in $notebookCases) {
         if (-not ($kernels.kernelspecs.PSObject.Properties.Name -contains [string]$case.kernel_name)) {

@@ -1,17 +1,18 @@
 # RBF Verbs and Adverbs：动作语义空间中的线性项与径向残差
 
-## 元信息
+## 元数据
 
-| 字段 | 值 |
+| 字段 | 内容 |
 | --- | --- |
 | slug | `radial_basis_function_verbs_and_adverbs` |
-| source path | [`labs/Theory/radial_basis_function_verbs_and_adverbs.ipynb`](../../../../labs/Theory/radial_basis_function_verbs_and_adverbs.ipynb) |
-| transcript sources | [`docs/transcripts/rL0pEfXbQ6g_Radial Basis Function _ Multidimensional Motion Interpolation.txt`](../../../../docs/transcripts/rL0pEfXbQ6g_Radial%20Basis%20Function%20_%20Multidimensional%20Motion%20Interpolation.txt) |
+| source path | [`labs/Theory/radial_basis_function_verbs_and_adverbs.ipynb`](<../../../../labs/Theory/radial_basis_function_verbs_and_adverbs.ipynb>) |
+| transcript sources | [`docs/transcripts/rL0pEfXbQ6g_Radial Basis Function _ Multidimensional Motion Interpolation.txt`](<../../../../docs/transcripts/rL0pEfXbQ6g_Radial Basis Function _ Multidimensional Motion Interpolation.txt>) |
 | kind | `notebook` |
-| env prefix | `.envs/rbf_verbs_adv` |
+| env | `.envs/rbf_verbs_adv` |
 | kernel | `animationtech-radial_basis_function_verbs_and_adverbs` |
-| validation status | `passed` (`automated`) |
-| publish tier | `深写完成 + 媒体完整` |
+| validation | `passed` (`automated`) |
+| publish tier | `媒体完整 + 发布基底` |
+| media quality | key_visual/key_animation 必须是算法输出本身，禁止滚动截图、整页 cell、代码卡裁剪和静态假动画 |
 
 ## 问题背景
 
@@ -365,7 +366,7 @@ Cell 11、14、20、21 说明径向残差项的角色：RBF 不再“统治”�
 | 14 | [结果 PNG](assets/06_cubic_bspline_basis_result.png) | Cubic B-spline radial basis | `plot` | 展示 compact-support kernel 的局部影响形状。 |
 | 21 | [结果 PNG](assets/08_final_rbf_field_result.png) | Residual-corrected RBF field | `plot` | 展示线性趋势加 RBF 残差后的最终动作参数场。 |
 
-## 代码 Cell 与可视化结果
+## 代码 Cell 与可视化证据
 
 | Cell | 输出类型 | 媒体角色 | 捕获方式 | 发布必需 | 结果媒体 | 代码学习卡 |
 | --- | --- | --- | --- | --- | --- | --- |

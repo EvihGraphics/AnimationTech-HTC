@@ -2,15 +2,17 @@
 
 ## 元数据
 
-| 字段 | 值 |
+| 字段 | 内容 |
 | --- | --- |
 | slug | `real_time_planning_multiprocess_func` |
-| source path | [`labs/AnimationPapers/RealTimePlanning_MultiProcess_Func.py`](../../../../labs/AnimationPapers/RealTimePlanning_MultiProcess_Func.py) |
+| source path | [`labs/AnimationPapers/RealTimePlanning_MultiProcess_Func.py`](<../../../../labs/AnimationPapers/RealTimePlanning_MultiProcess_Func.py>) |
 | transcript sources | [`docs/transcripts/tDilOjKfBaY_Reinforcement Learning 03 _ Realtime Planning For Parametrized Human Motion_.txt`](<../../../../docs/transcripts/tDilOjKfBaY_Reinforcement Learning 03 _ Realtime Planning For Parametrized Human Motion_.txt>) |
 | kind | `python_module` |
-| env prefix | `.envs/rtp_mp` |
+| env | `.envs/rtp_mp` |
 | kernel | `animationtech-real_time_planning_multiprocess_func` |
-| validation status | `passed` (`automated` import-level validation) |
+| validation | `passed` (`automated`) |
+| publish tier | `媒体完整 + 发布基底` |
+| media quality | key_visual/key_animation 必须是算法输出本身，禁止滚动截图、整页 cell、代码卡裁剪和静态假动画 |
 
 ## 问题背景
 

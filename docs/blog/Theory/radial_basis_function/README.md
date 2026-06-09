@@ -1,17 +1,18 @@
 # 径向基函数插值：从稀疏样本到连续函数场
 
-## 元信息
+## 元数据
 
-| 字段 | 值 |
+| 字段 | 内容 |
 | --- | --- |
 | slug | `radial_basis_function` |
-| source path | [`labs/Theory/radial_basis_function.ipynb`](../../../../labs/Theory/radial_basis_function.ipynb) |
-| transcript sources | [`docs/transcripts/luX11STn1Uk_Radial Basis Function.txt`](../../../../docs/transcripts/luX11STn1Uk_Radial%20Basis%20Function.txt) |
+| source path | [`labs/Theory/radial_basis_function.ipynb`](<../../../../labs/Theory/radial_basis_function.ipynb>) |
+| transcript sources | [`docs/transcripts/luX11STn1Uk_Radial Basis Function.txt`](<../../../../docs/transcripts/luX11STn1Uk_Radial Basis Function.txt>) |
 | kind | `notebook` |
-| env prefix | `.envs/radial_basis_function` |
+| env | `.envs/radial_basis_function` |
 | kernel | `animationtech-radial_basis_function` |
-| validation status | `passed` (`automated`) |
-| publish tier | `深写完成 + 媒体完整` |
+| validation | `passed` (`automated`) |
+| publish tier | `媒体完整 + 发布基底` |
+| media quality | key_visual/key_animation 必须是算法输出本身，禁止滚动截图、整页 cell、代码卡裁剪和静态假动画 |
 
 ## 问题背景
 
@@ -314,7 +315,7 @@ Gaussian kernel 图说明：`epsilon` 不是简单的“越大越好”。kernel
 | 21 | [结果 PNG](assets/06_polynomial_basis_matrix_result.png) | Polynomial basis matrix | `table` | 展示多项式增强项如何把样本坐标变成全局趋势基。 |
 | 27 | [结果 PNG](assets/07_augmented_rbf_fit_result.png) | Augmented RBF fit | `plot` | 展示多项式增强如何改善稀疏样本下的全局趋势。 |
 
-## 代码 Cell 与可视化结果
+## 代码 Cell 与可视化证据
 
 | Cell | 输出类型 | 媒体角色 | 捕获方式 | 发布必需 | 结果媒体 | 代码学习卡 |
 | --- | --- | --- | --- | --- | --- | --- |

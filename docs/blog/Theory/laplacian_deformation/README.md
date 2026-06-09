@@ -5,11 +5,14 @@
 | 字段 | 内容 |
 | --- | --- |
 | slug | `laplacian_deformation` |
-| source path | [`labs/Theory/laplacian_deformation.ipynb`](../../../../labs/Theory/laplacian_deformation.ipynb) |
-| transcript sources | [`docs/transcripts/0hyEbxAQVNY_Laplacian Mesh and Animation Deformation (re-upload).txt`](../../../../docs/transcripts/0hyEbxAQVNY_Laplacian Mesh and Animation Deformation (re-upload).txt) |
-| env prefix | `.envs/laplacian_deformation` |
+| source path | [`labs/Theory/laplacian_deformation.ipynb`](<../../../../labs/Theory/laplacian_deformation.ipynb>) |
+| transcript sources | [`docs/transcripts/0hyEbxAQVNY_Laplacian Mesh and Animation Deformation (re-upload).txt`](<../../../../docs/transcripts/0hyEbxAQVNY_Laplacian Mesh and Animation Deformation (re-upload).txt>) |
+| kind | `notebook` |
+| env | `.envs/laplacian_deformation` |
 | kernel | `animationtech-laplacian_deformation` |
-| validation status | `passed`（人工冒烟检查） |
+| validation | `passed` (`manual_smoke`；自动执行通过，viewer 建议 JupyterLab 人工检查) |
+| publish tier | `深写完成 + 媒体完整` |
+| media quality | key_visual/key_animation 必须是算法输出本身，禁止滚动截图、整页 cell、代码卡裁剪和静态假动画 |
 
 ## 问题背景
 
@@ -252,7 +255,7 @@ flowchart LR
 | Cell 46 | `timeline_viewer` | 核心动画 | Curved locomotion result: The final viewer checks whether graph deformation can redirect locomotion smoothly. | `canvas` | [结果 PNG](assets/08_curved_locomotion_result_result.png) / [GIF](assets/08_curved_locomotion_result_preview.gif) / [MP4](assets/08_curved_locomotion_result_preview.mp4) / [WebM](assets/08_curved_locomotion_result_preview.webm) / [GitHub video](https://github.com/user-attachments/assets/4acb38c5-3cae-449f-b243-aa2bbac81614) |
 
 
-## 代码 Cell 与可视化结果
+## 代码 Cell 与可视化证据
 
 本节保留每个 cell 的可复现证据。结果 PNG 用于正文阅读，代码卡记录代码摘要与输出来源；有 timeline 或参数滑杆的 cell 同时提供 GIF、MP4 和 WebM。
 

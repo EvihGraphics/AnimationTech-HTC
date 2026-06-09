@@ -338,7 +338,7 @@
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
                                             "last_note":  "Automated execution passed. Manual JupyterLab smoke test is still required.",
-                                            "last_run_utc":  "2026-04-29T19:57:03.2494879Z"
+                                            "last_run_utc":  "2026-05-20T13:32:37.6701067Z"
                                         }
                   },
                   {
@@ -360,7 +360,7 @@
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
                                             "last_note":  "Automated execution passed. Manual JupyterLab smoke test is still required.",
-                                            "last_run_utc":  "2026-04-29T19:58:18.2493674Z"
+                                            "last_run_utc":  "2026-05-20T13:34:47.3025629Z"
                                         }
                   },
                   {
@@ -527,7 +527,7 @@
                                             "policy":  "manual_smoke",
                                             "current_status":  "passed",
                                             "last_note":  "Automated execution passed. Manual JupyterLab smoke test is still required.",
-                                            "last_run_utc":  "2026-04-29T20:14:01.5305015Z"
+                                            "last_run_utc":  "2026-05-20T14:05:47.8335348Z"
                                         }
                   },
                   {

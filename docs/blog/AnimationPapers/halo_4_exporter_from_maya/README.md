@@ -2,15 +2,17 @@
 
 ## 元数据
 
-| 字段 | 值 |
+| 字段 | 内容 |
 | --- | --- |
 | slug | `halo_4_exporter_from_maya` |
 | source path | [`labs/AnimationPapers/Halo 4 exporter from maya.py`](<../../../../labs/AnimationPapers/Halo 4 exporter from maya.py>) |
-| transcript sources | [`docs/transcripts/JNR7iFONGmg_Halo4 Facial Animations.txt`](../../../../docs/transcripts/JNR7iFONGmg_Halo4%20Facial%20Animations.txt) |
+| transcript sources | [`docs/transcripts/JNR7iFONGmg_Halo4 Facial Animations.txt`](<../../../../docs/transcripts/JNR7iFONGmg_Halo4 Facial Animations.txt>) |
 | kind | `python_module` |
-| env prefix | `.envs/halo_4_exporter_from_maya` |
+| env | `.envs/halo_4_exporter_from_maya` |
 | kernel | `animationtech-halo_4_exporter_from_maya` |
-| validation status | `passed` (`automated` script-level validation) |
+| validation | `passed` (`automated`) |
+| publish tier | `媒体完整 + 发布基底` |
+| media quality | key_visual/key_animation 必须是算法输出本身，禁止滚动截图、整页 cell、代码卡裁剪和静态假动画 |
 
 ## 问题背景
 

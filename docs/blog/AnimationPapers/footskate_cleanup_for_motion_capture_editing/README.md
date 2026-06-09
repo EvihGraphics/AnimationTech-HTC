@@ -1,14 +1,18 @@
 # Footskate Cleanup for Motion Capture Editing：动捕滑脚修复
 
-## 元信息
+## 元数据
 
-| 字段 | 值 |
+| 字段 | 内容 |
 | --- | --- |
 | slug | `footskate_cleanup_for_motion_capture_editing` |
-| source path | `labs/AnimationPapers/Footskate Cleanup for Motion Capture Editing.ipynb` |
-| env prefix | `.envs/footskate_cleanup` |
+| source path | [`labs/AnimationPapers/Footskate Cleanup for Motion Capture Editing.ipynb`](<../../../../labs/AnimationPapers/Footskate Cleanup for Motion Capture Editing.ipynb>) |
+| transcript sources | [`docs/transcripts/exASa8NAhc8_Footskate cleanup for motion capture editing.txt`](<../../../../docs/transcripts/exASa8NAhc8_Footskate cleanup for motion capture editing.txt>) |
+| kind | `notebook` |
+| env | `.envs/footskate_cleanup` |
 | kernel | `animationtech-footskate_cleanup_for_motion_capture_editing` |
-| validation status | 自动执行已通过；交互部分仍建议在 JupyterLab 中人工检查 |
+| validation | `passed` (`manual_smoke`；自动执行通过，viewer 建议 JupyterLab 人工检查) |
+| publish tier | `深写完成 + 媒体完整` |
+| media quality | key_visual/key_animation 必须是算法输出本身，禁止滚动截图、整页 cell、代码卡裁剪和静态假动画 |
 
 ## 问题背景
 

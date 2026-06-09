@@ -5,11 +5,14 @@
 | 字段 | 内容 |
 | --- | --- |
 | slug | `motion_warping` |
-| source path | [`labs/AnimationPapers/Motion Warping.ipynb`](../../../../labs/AnimationPapers/Motion Warping.ipynb) |
-| transcript sources | [`docs/transcripts/COzRpFPZ4rk_Motion Warping.txt`](../../../../docs/transcripts/COzRpFPZ4rk_Motion Warping.txt) |
-| env prefix | `.envs/motion_warping` |
+| source path | [`labs/AnimationPapers/Motion Warping.ipynb`](<../../../../labs/AnimationPapers/Motion Warping.ipynb>) |
+| transcript sources | [`docs/transcripts/COzRpFPZ4rk_Motion Warping.txt`](<../../../../docs/transcripts/COzRpFPZ4rk_Motion Warping.txt>) |
+| kind | `notebook` |
+| env | `.envs/motion_warping` |
 | kernel | `animationtech-motion_warping` |
-| validation status | 自动执行已通过；交互部分仍建议在 JupyterLab 中人工检查 |
+| validation | `passed` (`manual_smoke`；自动执行通过，viewer 建议 JupyterLab 人工检查) |
+| publish tier | `深写完成 + 媒体完整` |
+| media quality | key_visual/key_animation 必须是算法输出本身，禁止滚动截图、整页 cell、代码卡裁剪和静态假动画 |
 
 ## 问题背景
 
@@ -256,13 +259,21 @@ Time warp 图验证事件是否发生在新时间；pose warp viewer 验证关�
 | Cell 31 | `timeline_viewer` | 核心动画 | 最终时间与姿态 warping 动画：检查时序编辑和姿态编辑能否合成连贯动作。 | `canvas` | [结果 PNG](assets/08_combined_warped_animation_result.png) / [GIF](assets/08_combined_warped_animation_preview.gif) / [MP4](assets/08_combined_warped_animation_preview.mp4) / [WebM](assets/08_combined_warped_animation_preview.webm) |
 
 发布视频镜像：
+<<<<<<< HEAD
+
+- https://github.com/user-attachments/assets/2a3e910d-fd40-4620-b0e0-28ac59b0f917
+- https://github.com/user-attachments/assets/cab0161e-4390-49df-87ab-de3b9aa1515a
+- https://github.com/user-attachments/assets/d871efca-08a5-4cee-9139-2380a4cc6d2b
+
+=======
+>>>>>>> eb3557a6ca35a2bf32c39dc7f8a1e38c395992cb
 
 - https://github.com/user-attachments/assets/2a3e910d-fd40-4620-b0e0-28ac59b0f917
 - https://github.com/user-attachments/assets/cab0161e-4390-49df-87ab-de3b9aa1515a
 - https://github.com/user-attachments/assets/d871efca-08a5-4cee-9139-2380a4cc6d2b
 
 
-## 代码 Cell 与可视化结果
+## 代码 Cell 与可视化证据
 
 下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 

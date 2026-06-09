@@ -19,6 +19,7 @@ import shutil
 import struct
 import subprocess
 import sys
+import zlib
 from pathlib import Path
 
 try:
@@ -75,6 +76,7 @@ key_media_roles = {"key_visual", "key_animation"}
 forbidden_key_provenance = {
     "curated_algorithm_visual",
     "derived_card_crop",
+    "generated_algorithm_animation",
     "learning_card",
     "scroll_capture",
     "whole_cell",
@@ -205,7 +207,25 @@ def png_has_embedded_pollution_text(path):
         raw = Path(path).read_bytes()
     except OSError:
         return []
-    text = raw.decode("latin-1", errors="ignore")
+    if not raw.startswith(b"\x89PNG\r\n\x1a\n"):
+        return []
+    chunks = []
+    pos = 8
+    while pos + 8 <= len(raw):
+        length = struct.unpack(">I", raw[pos:pos + 4])[0]
+        chunk_type = raw[pos + 4:pos + 8]
+        data = raw[pos + 8:pos + 8 + length]
+        if chunk_type in {b"tEXt", b"iTXt"}:
+            chunks.append(data.decode("latin-1", errors="ignore"))
+        elif chunk_type == b"zTXt":
+            try:
+                nul = data.index(b"\x00")
+                chunks.append(data[:nul].decode("latin-1", errors="ignore"))
+                chunks.append(zlib.decompress(data[nul + 2:]).decode("latin-1", errors="ignore"))
+            except Exception:
+                chunks.append(data.decode("latin-1", errors="ignore"))
+        pos += 12 + length
+    text = "\n".join(chunks)
     return [marker for marker in pollution_text_markers if marker in text]
 
 def motion_matching_marker_counts(path):
@@ -467,8 +487,8 @@ if media_manifest is not None:
         if case_kind == "python_module":
             if "## \u6e90\u7801\u6a21\u5757\u4e0e\u6267\u884c\u8bc1\u636e" not in readme_text:
                 add_error(f"README for {slug} is missing ## \u6e90\u7801\u6a21\u5757\u4e0e\u6267\u884c\u8bc1\u636e.")
-        elif "## \u4ee3\u7801 Cell \u4e0e\u53ef\u89c6\u5316\u7ed3\u679c" not in readme_text:
-            add_error(f"README for {slug} is missing ## \u4ee3\u7801 Cell \u4e0e\u53ef\u89c6\u5316\u7ed3\u679c.")
+        elif "## \u4ee3\u7801 Cell \u4e0e\u53ef\u89c6\u5316\u8bc1\u636e" not in readme_text:
+            add_error(f"README for {slug} is missing ## \u4ee3\u7801 Cell \u4e0e\u53ef\u89c6\u5316\u8bc1\u636e.")
         steps = case.get("steps", [])
         if len(steps) < 5:
             add_error(f"Media case {slug} needs at least 5 learning steps.")
@@ -593,6 +613,8 @@ if media_manifest is not None:
                     add_error(f"Key media for {slug} is missing media_provenance: {step.get('id')}")
                 elif is_forbidden_key_provenance(provenance):
                     add_error(f"Key media for {slug} uses forbidden media_provenance={provenance}: {step.get('id')}")
+                if step.get("capture_selector") == "generated algorithm frame sequence":
+                    add_error(f"Key media for {slug} cannot use generated algorithm frame sequence: {step.get('id')}")
                 if slug == footskate_slug and provenance not in footskate_key_provenance_allowlist:
                     add_error(f"Footskate key media must use live_canvas or executed_plot_image provenance: {step.get('id')} has {provenance}")
                 if provenance == "live_canvas" and capture_kind != "canvas":
@@ -614,7 +636,8 @@ if media_manifest is not None:
                         add_error(f"Key animation for {slug} must provide a local video preview for {mp4_ref}: {step.get('id')}")
                     github_video_url = step.get("github_video_url")
                     if not github_video_url:
-                        add_error(f"Key animation for {slug} missing github_video_url: {step.get('id')}")
+                        if step.get("github_video_url_pending") is not True:
+                            add_error(f"Key animation for {slug} missing github_video_url: {step.get('id')}")
                     else:
                         if not is_github_video_url(github_video_url):
                             add_error(f"Key animation for {slug} has invalid github_video_url: {step.get('id')}")

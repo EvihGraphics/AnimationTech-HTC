@@ -1902,6 +1902,51 @@
           "capture_selector": "executed output text/html|text/plain table",
           "publish_media_required": false,
           "media_provenance": "executed_structured_output"
+        },
+        {
+          "id": "foot-contact-oracle-playback",
+          "cell_index": 15,
+          "capture_cell_index": 15,
+          "output_type": "timeline_viewer",
+          "title": "Foot-contact oracle prediction playback",
+          "code_purpose": "Use the source notebook contact-labeling viewer to render the character, local feature axes, and heel/toe contact markers over time.",
+          "result_meaning": "The animation is captured from the original notebook viewer/canvas, so the contact labels and foot markers are the source case's own runtime visualization rather than a redrawn blog diagram.",
+          "slider_fraction": 0.45,
+          "card_file": "07_foot_contact_oracle_playback.png",
+          "result_file": "07_foot_contact_oracle_playback_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.45
+            }
+          ],
+          "preview_gif": "07_foot_contact_oracle_playback_preview.gif",
+          "video_mp4": "07_foot_contact_oracle_playback_preview.mp4",
+          "video_webm": "07_foot_contact_oracle_playback_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Foot-contact oracle prediction playback: source notebook viewer showing the character, root-local feature axes, and live heel/toe contact markers.",
+          "capture_selector": "cell canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "source_notebook_live_viewer",
+          "github_video_url_pending": true,
+          "live_prepare_code": "import pickle\nwith open('foot_feature_vector.dat', 'rb') as _blog_f:\n    trained_feature_vector, trained_label = pickle.load(_blog_f)\nmirror_trained_feature_vector = trained_feature_vector.copy().reshape(-1, 3)\nmirror_trained_feature_vector[:, 0] *= -1\nclassifier_feature_vector = np.concatenate([trained_feature_vector, mirror_trained_feature_vector.reshape(-1, trained_feature_vector.shape[1])])\nclassifier_label = np.concatenate([trained_label, trained_label])\nclassifier = NearestNeighbors(n_neighbors=n_neighbors, algorithm='auto').fit(classifier_feature_vector)\nanimation_q, animation_p = animations[0].quats[window_size:clip_length+window_size,...], animations[0].pos[window_size:clip_length+window_size,...]\n_, animation_gp = lab.utils.quat_fk(animation_q, animation_p, animations[0].parents)\ncurrent_feature_vector = feature_vector[:clip_length]\ncurrent_label = predict(current_feature_vector)",
+          "live_render": "_blog_frame = int(round((animation_q.shape[0] - 1) * {fraction}))\ntry:\n    timeline.set_value(_blog_frame)\nexcept Exception:\n    pass\nviewer.camera_pos = (animation_p[_blog_frame, 0] + np.array([-220, 170, 210], dtype=np.float32)).tolist()\nviewer.camera_pitch = -18\nviewer.camera_yaw = -45\nrender(_blog_frame)\nupdate_canvas()",
+          "motion_capture": {
+            "fps": 5,
+            "max_seconds": 4,
+            "sample_count": 10,
+            "max_frame_count": 10,
+            "start_fraction": 0.0,
+            "end_fraction": 1.0
+          },
+          "motion_quality": {
+            "min_changed_fraction": 0.02,
+            "min_max_delta": 1.0
+          }
         }
       ],
       "video_step": {
@@ -2040,6 +2085,52 @@
           "capture_selector": "executed output image/png",
           "publish_media_required": true,
           "media_provenance": "executed_plot_output"
+        },
+        {
+          "id": "motion-field-neighbor-rollout",
+          "cell_index": 23,
+          "capture_cell_index": 23,
+          "output_type": "timeline_viewer",
+          "title": "Motion-field neighbor rollout",
+          "code_purpose": "Use the source notebook motion-field viewer to render the current pose and its k-NN neighbor candidates as the rollout advances.",
+          "result_meaning": "The animation is captured from the original notebook render function, showing the source case's live character and neighbor candidate strip rather than a redrawn diagnostic panel.",
+          "slider_fraction": 0.5,
+          "card_file": "08_motion_field_neighbor_rollout.png",
+          "result_file": "08_motion_field_neighbor_rollout_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.5
+            }
+          ],
+          "preview_gif": "08_motion_field_neighbor_rollout_preview.gif",
+          "video_mp4": "08_motion_field_neighbor_rollout_preview.mp4",
+          "video_webm": "08_motion_field_neighbor_rollout_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Motion-field neighbor rollout: source notebook viewer showing the current pose and k-NN neighbor candidates while the source render function advances the state.",
+          "capture_selector": "cell canvas:last",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "source_notebook_live_viewer",
+          "github_video_url_pending": true,
+          "live_prepare_cell": 23,
+          "live_prepare_cell_until": "interact(",
+          "live_render": "render(0, ratio=0.1, select=-1, on_spot=True, plot_map=False)",
+          "motion_capture": {
+            "fps": 5,
+            "max_seconds": 4,
+            "sample_count": 10,
+            "max_frame_count": 10,
+            "start_fraction": 0.0,
+            "end_fraction": 1.0
+          },
+          "motion_quality": {
+            "min_changed_fraction": 0.02,
+            "min_max_delta": 1.0
+          }
         }
       ],
       "video_step": {
@@ -3446,6 +3537,98 @@
           "capture_selector": "executed output image/png",
           "publish_media_required": true,
           "media_provenance": "executed_plot_output"
+        },
+        {
+          "id": "reach-goal-policy-playback",
+          "cell_index": 47,
+          "capture_cell_index": 47,
+          "output_type": "timeline_viewer",
+          "title": "Reach-goal policy playback",
+          "code_purpose": "Use the source notebook Player(motion_clips) viewer to roll the character toward the target with the learned reach-goal policy.",
+          "result_meaning": "The animation is captured from the original notebook viewer, so the character, target sphere, clip transitions, and policy decisions come from the source case runtime.",
+          "slider_fraction": 0.5,
+          "card_file": "09_reach_goal_policy_playback.png",
+          "result_file": "09_reach_goal_policy_playback_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.5
+            }
+          ],
+          "preview_gif": "09_reach_goal_policy_playback_preview.gif",
+          "video_mp4": "09_reach_goal_policy_playback_preview.mp4",
+          "video_webm": "09_reach_goal_policy_playback_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "Reach-goal policy playback: source notebook viewer showing Player(motion_clips), target tracking, and clip-policy transitions.",
+          "capture_selector": "page viewport canvas:best",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "source_notebook_live_viewer",
+          "github_video_url_pending": true,
+          "live_prepare_cell": 47,
+          "live_prepare_cell_until": "interact(",
+          "live_render": "_blog_steps = max(1, int(round(1 + 12 * {fraction})))\nplayer = Player(motion_clips)\nplayer.set_next_clip(119)\nplayer.target = np.array([-200, 0, 500], dtype=np.float32)\nplayer.wait_counter = 0\nfor _blog_tick in range(_blog_steps):\n    viewer.camera_pos = (player.positions[0] + np.array([0, 125, 245], dtype=np.float32)).tolist()\n    viewer.camera_pitch = -18\n    viewer.camera_yaw = 180\n    render(0)",
+          "motion_capture": {
+            "fps": 8,
+            "max_seconds": 6,
+            "sample_count": 40,
+            "max_frame_count": 48,
+            "start_fraction": 0.0,
+            "end_fraction": 1.0
+          },
+          "motion_quality": {
+            "min_changed_fraction": 0.02,
+            "min_max_delta": 1.0
+          }
+        },
+        {
+          "id": "motiongroup-reach-goal-playback",
+          "cell_index": 74,
+          "capture_cell_index": 74,
+          "output_type": "timeline_viewer",
+          "title": "MotionGroup reach-goal playback",
+          "code_purpose": "Use the source notebook Player(motion_groups) viewer to roll the parameterized MotionGroup policy toward the target.",
+          "result_meaning": "The animation is captured from the original notebook viewer, showing the source case's MotionGroup player, target sphere, and runtime transitions without a redrawn diagnostic overlay.",
+          "slider_fraction": 0.5,
+          "card_file": "10_motiongroup_reach_goal_playback.png",
+          "result_file": "10_motiongroup_reach_goal_playback_result.png",
+          "media_role": "key_animation",
+          "controls": [
+            {
+              "kind": "slider",
+              "index": 0,
+              "role": "timeline",
+              "fraction": 0.5
+            }
+          ],
+          "preview_gif": "10_motiongroup_reach_goal_playback_preview.gif",
+          "video_mp4": "10_motiongroup_reach_goal_playback_preview.mp4",
+          "video_webm": "10_motiongroup_reach_goal_playback_preview.webm",
+          "capture_kind": "canvas",
+          "visual_subject": "MotionGroup reach-goal playback: source notebook viewer showing Player(motion_groups), target tracking, and parameterized MotionGroup transitions.",
+          "capture_selector": "page viewport canvas:best",
+          "publish_media_required": true,
+          "media_provenance": "live_canvas",
+          "motion_provenance": "source_notebook_live_viewer",
+          "github_video_url_pending": true,
+          "live_prepare_cell": 74,
+          "live_prepare_cell_until": "interact(",
+          "live_render": "_blog_steps = max(1, int(round(1 + 12 * {fraction})))\nplayer = Player(motion_groups)\nplayer.set_next_clip(62 * 11)\nplayer.target = np.array([-200, 0, 500], dtype=np.float32)\nplayer.wait_counter = 0\nfor _blog_tick in range(_blog_steps):\n    viewer.camera_pos = (player.positions[0] + np.array([0, 125, 245], dtype=np.float32)).tolist()\n    viewer.camera_pitch = -18\n    viewer.camera_yaw = 180\n    render(0)",
+          "motion_capture": {
+            "fps": 8,
+            "max_seconds": 6,
+            "sample_count": 40,
+            "max_frame_count": 48,
+            "start_fraction": 0.0,
+            "end_fraction": 1.0
+          },
+          "motion_quality": {
+            "min_changed_fraction": 0.02,
+            "min_max_delta": 1.0
+          }
         }
       ],
       "video_step": {

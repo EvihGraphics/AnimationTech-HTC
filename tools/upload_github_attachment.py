@@ -233,6 +233,11 @@ def needs_login(page) -> bool:
         return True
     if has_visible_textarea(page):
         return False
+    try:
+        if "page not found" in page.title().lower():
+            return True
+    except Exception:
+        pass
     return page.locator("a[href*='/login']").count() > 0
 
 
@@ -442,13 +447,14 @@ def upload_with_playwright(
                 wait_for_login_if_needed(page, repo, headless, timeout_seconds)
                 open_markdown_editor(page, repo, branch, base_branch, editor_url)
 
+            editor_timeout_ms = max(30_000, timeout_seconds * 1000)
             textarea = page.locator("textarea:visible").first
-            textarea.wait_for(state="visible", timeout=30_000)
+            textarea.wait_for(state="visible", timeout=editor_timeout_ms)
             textarea.click()
 
             file_inputs = page.locator("input[type='file']")
             try:
-                file_inputs.first.wait_for(state="attached", timeout=15_000)
+                file_inputs.first.wait_for(state="attached", timeout=editor_timeout_ms)
             except PlaywrightTimeoutError as exc:
                 raise SystemExit(
                     "Could not find GitHub Markdown attachment file input. "
@@ -528,11 +534,12 @@ def upload_many_with_playwright(
                 wait_for_login_if_needed(page, repo, headless, timeout_seconds)
                 open_markdown_editor(page, repo, branch, base_branch, editor_url)
 
+            editor_timeout_ms = max(30_000, timeout_seconds * 1000)
             textarea = page.locator("textarea:visible").first
-            textarea.wait_for(state="visible", timeout=30_000)
+            textarea.wait_for(state="visible", timeout=editor_timeout_ms)
             file_inputs = page.locator("input[type='file']")
             try:
-                file_inputs.first.wait_for(state="attached", timeout=15_000)
+                file_inputs.first.wait_for(state="attached", timeout=editor_timeout_ms)
             except PlaywrightTimeoutError as exc:
                 raise SystemExit(
                     "Could not find GitHub Markdown attachment file input. "

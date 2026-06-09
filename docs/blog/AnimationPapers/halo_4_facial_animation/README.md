@@ -2,13 +2,17 @@
 
 ## 元数据
 
-| 字段 | 值 |
+| 字段 | 内容 |
 | --- | --- |
 | slug | `halo_4_facial_animation` |
-| source path | `labs/AnimationPapers/Halo 4 Facial Animation.ipynb` |
-| env prefix | `.envs/halo_4_facial_animation` |
+| source path | [`labs/AnimationPapers/Halo 4 Facial Animation.ipynb`](<../../../../labs/AnimationPapers/Halo 4 Facial Animation.ipynb>) |
+| transcript sources | [`docs/transcripts/JNR7iFONGmg_Halo4 Facial Animations.txt`](<../../../../docs/transcripts/JNR7iFONGmg_Halo4 Facial Animations.txt>) |
+| kind | `notebook` |
+| env | `.envs/halo_4_facial_animation` |
 | kernel | `animationtech-halo_4_facial_animation` |
-| validation status | 自动执行已通过；交互部分仍建议在 JupyterLab 中人工检查 |
+| validation | `passed` (`manual_smoke`；自动执行通过，viewer 建议 JupyterLab 人工检查) |
+| publish tier | `媒体完整 + 发布基底` |
+| media quality | key_visual/key_animation 必须是算法输出本身，禁止滚动截图、整页 cell、代码卡裁剪和静态假动画 |
 
 ## 问题背景
 
@@ -294,7 +298,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\run_case.ps1 halo_4_
 | Cell 26 | `timeline_viewer` | 核心动画 | GPU shader PCA 重建：最终 viewer 展示适合运行时使用的 PCA 面部动画流程。 | `canvas` | [结果 PNG](assets/07_gpu_shader_reconstruction_result.png) / [GIF](assets/07_gpu_shader_reconstruction_preview.gif) / [MP4](assets/07_gpu_shader_reconstruction_preview.mp4) / [WebM](assets/07_gpu_shader_reconstruction_preview.webm) / [GitHub video](https://github.com/user-attachments/assets/48111d08-e64c-4f9d-8d94-5263667b5d6e) |
 
 
-## 代码 Cell 与可视化结果
+## 代码 Cell 与可视化证据
 
 下面是附录式证据索引：结果 PNG 便于快速核对，代码卡用于追溯代码摘要与输出来源；带时间轴或参数滑杆的条目同时保留 GIF、MP4 和 WebM。
 

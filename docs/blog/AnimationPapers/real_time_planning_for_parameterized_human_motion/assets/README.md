@@ -23,3 +23,13 @@
 | `07_motion_group_weight_blend.png` | Cell 61 | `learning_card` | `supporting_evidence` | MotionGroup count output：Motion groups turn multiple clips into a parameterized action space. |
 | `08_group_reach_goal_result_result.png` | Cell 72 | `result_png` | `key_visual` | MotionGroup policy-learning curve：The plot verifies that a useful policy can still be learned after moving from clips to motion groups. |
 | `08_group_reach_goal_result.png` | Cell 72 | `learning_card` | `key_visual` | MotionGroup policy-learning curve：The plot verifies that a useful policy can still be learned after moving from clips to motion groups. |
+| `09_reach_goal_policy_playback_result.png` | Cell 47 | `result_png` | `key_animation` | Source notebook `Player(motion_clips)` viewer：character target tracking from the original render function. |
+| `09_reach_goal_policy_playback_preview.gif` | Cell 47 | `gif_preview` | `key_animation` | Animated preview captured from the source notebook clip-policy viewer. |
+| `09_reach_goal_policy_playback_preview.mp4` | Cell 47 | `video_mp4` | `key_animation` | H.264 local preview; GitHub attachment waits for human media approval. |
+| `09_reach_goal_policy_playback_preview.webm` | Cell 47 | `video_webm` | `key_animation` | VP9 local evidence copy. |
+| `09_reach_goal_policy_playback.png` | Cell 47 | `learning_card` | `key_animation` | Learning card kept for reproducibility; not used as the正文 key media. |
+| `10_motiongroup_reach_goal_playback_result.png` | Cell 74 | `result_png` | `key_animation` | Source notebook `Player(motion_groups)` viewer：parameterized MotionGroup target tracking from the original render function. |
+| `10_motiongroup_reach_goal_playback_preview.gif` | Cell 74 | `gif_preview` | `key_animation` | Animated preview captured from the source notebook MotionGroup viewer. |
+| `10_motiongroup_reach_goal_playback_preview.mp4` | Cell 74 | `video_mp4` | `key_animation` | H.264 local preview; GitHub attachment waits for human media approval. |
+| `10_motiongroup_reach_goal_playback_preview.webm` | Cell 74 | `video_webm` | `key_animation` | VP9 local evidence copy. |
+| `10_motiongroup_reach_goal_playback.png` | Cell 74 | `learning_card` | `key_animation` | Learning card kept for reproducibility; not used as the正文 key media. |

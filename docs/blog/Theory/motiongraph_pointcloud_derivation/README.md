@@ -2,15 +2,17 @@
 
 ## 元数据
 
-| 字段 | 值 |
+| 字段 | 内容 |
 | --- | --- |
 | slug | `motiongraph_pointcloud_derivation` |
-| source path | [`labs/Theory/motiongraph_pointcloud_derivation.ipynb`](../../../../labs/Theory/motiongraph_pointcloud_derivation.ipynb) |
+| source path | [`labs/Theory/motiongraph_pointcloud_derivation.ipynb`](<../../../../labs/Theory/motiongraph_pointcloud_derivation.ipynb>) |
 | transcript sources | [`docs/transcripts/h1ZpqBlHkk0_MotionGraphs _ Derivation of the closed form solution.txt`](<../../../../docs/transcripts/h1ZpqBlHkk0_MotionGraphs _ Derivation of the closed form solution.txt>) |
 | kind | `notebook` |
-| env prefix | `.envs/motiongraph_pointcloud_derivation` |
+| env | `.envs/motiongraph_pointcloud_derivation` |
 | kernel | `animationtech-motiongraph_pointcloud_derivation` |
-| validation status | `passed` (`automated`) |
+| validation | `passed` (`automated`) |
+| publish tier | `媒体完整 + 发布基底` |
+| media quality | key_visual/key_animation 必须是算法输出本身，禁止滚动截图、整页 cell、代码卡裁剪和静态假动画 |
 
 ## 问题背景
 
@@ -360,7 +362,7 @@ flowchart TD
 | 20 | [公式 PNG](assets/06_theta_solution_result.png) | Final theta solution | `formula` | 旋转解落到 atan 闭式公式 |
 | walkthrough | [WebM](assets/00-walkthrough.webm) | 学习卡顺序回放 | `step_sequence` | 辅助检查公式输出顺序 |
 
-## 代码 Cell 与可视化结果
+## 代码 Cell 与可视化证据
 
 结果 PNG 是正文阅读证据；代码学习卡只用于追溯 cell 摘要和输出来源。
 
